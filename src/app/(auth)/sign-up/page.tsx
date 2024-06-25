@@ -1,25 +1,24 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { useFormState } from "react-dom";
-import { useFormStatus } from "react-dom";
+import Link from 'next/link';
+import { useFormState } from 'react-dom';
+import { useFormStatus } from 'react-dom';
 
-import { signUpAction } from "@/lib/actions/users";
+import { signUpAction } from '@/lib/actions/users';
 
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import AuthFormError from "@/components/auth/AuthFormError";
-
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import AuthFormError from '@/components/auth/AuthFormError';
 
 export default function SignUpPage() {
   const [state, formAction] = useFormState(signUpAction, {
-    error: "",
+    error: '',
   });
 
   return (
-    <main className="max-w-lg mx-auto my-4 bg-popover p-10">
-      <h1 className="text-2xl font-bold text-center">Create an account</h1>
+    <main className="mx-auto my-4 max-w-lg bg-popover p-10">
+      <h1 className="text-center text-2xl font-bold">Create an account</h1>
       <AuthFormError state={state} />
       <form action={formAction}>
         <Label htmlFor="email" className="text-muted-foreground">
@@ -34,8 +33,8 @@ export default function SignUpPage() {
         <br />
         <SubmitButton />
       </form>
-      <div className="mt-4 text-muted-foreground text-center text-sm">
-        Already have an account?{" "}
+      <div className="mt-4 text-center text-sm text-muted-foreground">
+        Already have an account?{' '}
         <Link href="/sign-in" className="text-secondary-foreground underline">
           Sign in
         </Link>
@@ -48,7 +47,7 @@ const SubmitButton = () => {
   const { pending } = useFormStatus();
   return (
     <Button className="w-full" type="submit" disabled={pending}>
-      Sign{pending ? "ing" : ""} up
+      Sign{pending ? 'ing' : ''} up
     </Button>
   );
 };

@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { Button } from "../ui/button";
-import { useFormStatus } from "react-dom";
-import { signOutAction } from "@/lib/actions/users";
+import { Button } from '../ui/button';
+import { useFormStatus } from 'react-dom';
+import { signOutAction } from '@/lib/actions/users';
 
 export default function SignOutBtn() {
   return (
@@ -15,8 +15,8 @@ export default function SignOutBtn() {
 const Btn = () => {
   const { pending } = useFormStatus();
   return (
-    <Button type="submit" disabled={pending} variant={"destructive"}>
-      Sign{pending ? "ing" : ""} out
+    <Button type="submit" disabled={pending} variant={'destructive'}>
+      Sign{pending ? 'ing' : ''} out
     </Button>
   );
 };

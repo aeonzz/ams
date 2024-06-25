@@ -1,11 +1,6 @@
 {
   "hasSrc": true,
-  "packages": [
-    "lucia",
-    "prisma",
-    "resend",
-    "shadcn-ui"
-  ],
+  "packages": ["lucia", "prisma", "resend", "shadcn-ui"],
   "preferredPackageManager": "npm",
   "t3": false,
   "alias": "@",
