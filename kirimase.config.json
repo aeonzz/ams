@@ -1,0 +1,18 @@
+{
+  "hasSrc": true,
+  "packages": [
+    "lucia",
+    "prisma",
+    "resend",
+    "shadcn-ui"
+  ],
+  "preferredPackageManager": "npm",
+  "t3": false,
+  "alias": "@",
+  "analytics": true,
+  "rootPath": "src/",
+  "auth": "lucia",
+  "orm": "prisma",
+  "componentLib": "shadcn-ui",
+  "driver": "pg"
+}
