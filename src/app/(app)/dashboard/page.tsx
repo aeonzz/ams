@@ -1,4 +1,4 @@
-import SignOutBtn from '@/components/auth/SignOutBtn';
+import SignOutBtn from '@/components/SignOutBtn';
 import { getUserAuth } from '@/lib/auth/utils';
 
 export default async function Home() {

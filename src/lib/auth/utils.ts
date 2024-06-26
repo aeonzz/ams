@@ -35,7 +35,9 @@ export const checkAuth = async () => {
   if (!session) redirect('/sign-in');
 };
 
-export const genericError = { error: 'Error, please try again.' };
+export const genericError = {
+  error: 'An error occurred while making the request. Please try again later',
+};
 
 export const setAuthCookie = (cookie: Cookie) => {
   // cookies().set(cookie.name, cookie.value, cookie.attributes); // <- suggested approach from the docs, but does not work with `next build` locally

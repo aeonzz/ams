@@ -16,48 +16,45 @@ import {
 } from '../auth/utils';
 
 import { authedProcedure } from './procedures';
-import { updateUserSchema } from '../db/schema/auth';
+import { authenticationSchema, updateUserSchema } from '../db/schema/auth';
+import { createServerAction } from 'zsa';
 
 interface ActionResult {
   error: string;
 }
 
-export async function signInAction(
-  _: ActionResult,
-  formData: FormData
-): Promise<ActionResult> {
-  const { data, error } = validateAuthFormData(formData);
-  if (error !== null) return { error };
+export const signInAction = createServerAction()
+  .input(authenticationSchema)
+  .handler(async ({ input }) => {
+    try {
+      const existingUser = await db.user.findUnique({
+        where: { email: input.email.toLowerCase() },
+      });
+      if (!existingUser) {
+        return {
+          error: 'Incorrect username or password',
+        };
+      }
 
-  try {
-    const existingUser = await db.user.findUnique({
-      where: { email: data.email.toLowerCase() },
-    });
-    if (!existingUser) {
-      return {
-        error: 'Incorrect username or password',
-      };
+      const validPassword = await new Argon2id().verify(
+        existingUser.hashedPassword,
+        input.password
+      );
+      if (!validPassword) {
+        return {
+          error: 'Incorrect username or password',
+        };
+      }
+
+      const session = await lucia.createSession(existingUser.id, {});
+      const sessionCookie = lucia.createSessionCookie(session.id);
+      setAuthCookie(sessionCookie);
+
+      return { error: null };
+    } catch (error) {
+      return genericError;
     }
-
-    const validPassword = await new Argon2id().verify(
-      existingUser.hashedPassword,
-      data.password
-    );
-    if (!validPassword) {
-      return {
-        error: 'Incorrect username or password',
-      };
-    }
-
-    const session = await lucia.createSession(existingUser.id, {});
-    const sessionCookie = lucia.createSessionCookie(session.id);
-    setAuthCookie(sessionCookie);
-
-    return redirect('/dashboard');
-  } catch (e) {
-    return genericError;
-  }
-}
+  });
 
 export async function signUpAction(
   _: ActionResult,
