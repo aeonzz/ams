@@ -20,6 +20,7 @@ import { authenticationSchema } from '@/lib/db/schema/auth';
 import { toast } from 'sonner';
 import { PasswordInput } from './password-input';
 import SubmitButton from './SubmitButton';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function SignInForm() {
   const [isLoading, setIsLoading] = useState(false);
@@ -56,16 +57,18 @@ export default function SignInForm() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="m@example.com"
-                  type="email"
-                  disabled={isLoading}
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
+              <motion.div layout className="space-y-2">
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="m@example.com"
+                    type="email"
+                    disabled={isLoading}
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </motion.div>
             </FormItem>
           )}
         />
@@ -74,28 +77,43 @@ export default function SignInForm() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <div className="flex justify-between">
-                <FormLabel>Password</FormLabel>
-                <Link
-                  href="/forgot-password"
-                  className="ml-auto inline-block text-sm underline"
-                >
-                  Forgot your password?
-                </Link>
-              </div>
-              <FormControl>
-                <PasswordInput
-                  id="password"
-                  autoComplete="password"
-                  disabled={isLoading}
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
+              <motion.div layout className="space-y-2">
+                <div className="flex justify-between">
+                  <FormLabel>Password</FormLabel>
+                  <Link
+                    href="/forgot-password"
+                    className="ml-auto inline-block text-sm underline"
+                  >
+                    Forgot your password?
+                  </Link>
+                </div>
+                <FormControl>
+                  <PasswordInput
+                    id="password"
+                    autoComplete="password"
+                    disabled={isLoading}
+                    {...field}
+                  />
+                </FormControl>
+              </motion.div>
+              <AnimatePresence mode="popLayout">
+                {form.formState.errors.password && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.3, type: 'spring' }}
+                  >
+                    <FormMessage />
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </FormItem>
           )}
         />
-        <SubmitButton isLoading={isLoading} />
+        <motion.div layout>
+          <SubmitButton isLoading={isLoading} />
+        </motion.div>
       </form>
     </Form>
   );

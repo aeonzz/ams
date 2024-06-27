@@ -65,7 +65,7 @@ module.exports = {
           from: { height: 'var(--radix-accordion-content-height)' },
           to: { height: 0 },
         },
-        shine: {
+        'shine': {
           from: { backgroundPosition: '200% 0' },
           to: { backgroundPosition: '-200% 0' },
         },
@@ -73,7 +73,7 @@ module.exports = {
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
-        shine: 'shine 8s ease-in-out infinite',
+        'shine': 'shine 8s ease-in-out infinite',
       },
     },
   },
