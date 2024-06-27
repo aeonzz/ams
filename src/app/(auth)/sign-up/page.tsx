@@ -9,7 +9,6 @@ import { signUpAction } from '@/lib/actions/users';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import AuthFormError from '@/components/auth/AuthFormError';
 
 export default function SignUpPage() {
   const [state, formAction] = useFormState(signUpAction, {
@@ -19,7 +18,7 @@ export default function SignUpPage() {
   return (
     <main className="mx-auto my-4 max-w-lg bg-popover p-10">
       <h1 className="text-center text-2xl font-bold">Create an account</h1>
-      <AuthFormError state={state} />
+      {/* <AuthFormError state={state} /> */}
       <form action={formAction}>
         <Label htmlFor="email" className="text-muted-foreground">
           Email

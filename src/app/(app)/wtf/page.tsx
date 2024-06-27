@@ -20,7 +20,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { updateUserSchema } from '@/lib/db/schema/auth';
 
-export default function page() {
+export default function Page() {
   const { isPending, mutate } = useServerActionMutation(updateUser);
   const form = useForm<z.infer<typeof updateUserSchema>>({
     resolver: zodResolver(updateUserSchema),

@@ -8,18 +8,64 @@ export default function LoadingSpinner({
 }) {
   return (
     <svg
-      xmlns="http://www.w3.org/2000/svg"
       width="24"
       height="24"
       viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={cn('animate-spin', className)}
+      xmlns="http://www.w3.org/2000/svg"
+      className={cn('fill-white', className)}
     >
-      <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+      <g>
+        <rect x="11" y="1" width="2" height="5" opacity=".14" />
+        <rect
+          x="11"
+          y="1"
+          width="2"
+          height="5"
+          transform="rotate(30 12 12)"
+          opacity=".29"
+        />
+        <rect
+          x="11"
+          y="1"
+          width="2"
+          height="5"
+          transform="rotate(60 12 12)"
+          opacity=".43"
+        />
+        <rect
+          x="11"
+          y="1"
+          width="2"
+          height="5"
+          transform="rotate(90 12 12)"
+          opacity=".57"
+        />
+        <rect
+          x="11"
+          y="1"
+          width="2"
+          height="5"
+          transform="rotate(120 12 12)"
+          opacity=".71"
+        />
+        <rect
+          x="11"
+          y="1"
+          width="2"
+          height="5"
+          transform="rotate(150 12 12)"
+          opacity=".86"
+        />
+        <rect x="11" y="1" width="2" height="5" transform="rotate(180 12 12)" />
+        <animateTransform
+          attributeName="transform"
+          type="rotate"
+          calcMode="discrete"
+          dur="0.75s"
+          values="0 12 12;30 12 12;60 12 12;90 12 12;120 12 12;150 12 12;180 12 12;210 12 12;240 12 12;270 12 12;300 12 12;330 12 12;360 12 12"
+          repeatCount="indefinite"
+        />
+      </g>
     </svg>
   );
 }

@@ -64,11 +64,24 @@ export default function SignInForm() {
                     placeholder="m@example.com"
                     type="email"
                     disabled={isLoading}
+                    autoFocus
                     {...field}
                   />
                 </FormControl>
-                <FormMessage />
               </motion.div>
+              <AnimatePresence mode="popLayout">
+                {form.formState.errors.email && (
+                  <motion.div
+                    layout
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.3, type: 'spring' }}
+                  >
+                    <FormMessage />
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </FormItem>
           )}
         />
@@ -99,6 +112,7 @@ export default function SignInForm() {
               <AnimatePresence mode="popLayout">
                 {form.formState.errors.password && (
                   <motion.div
+                    layout
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
                     exit={{ opacity: 0, height: 0 }}

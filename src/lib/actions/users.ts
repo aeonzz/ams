@@ -32,7 +32,7 @@ export const signInAction = createServerAction()
       });
       if (!existingUser) {
         return {
-          error: 'Incorrect username or password',
+          error: 'Incorrect email or password',
         };
       }
 
@@ -42,7 +42,7 @@ export const signInAction = createServerAction()
       );
       if (!validPassword) {
         return {
-          error: 'Incorrect username or password',
+          error: 'Incorrect email or password',
         };
       }
 

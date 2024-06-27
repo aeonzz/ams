@@ -11,14 +11,14 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
 export default function UpdateNameCard({ name }: { name: string }) {
-  const [state, formAction] = useFormState(updateUser, {
-    error: '',
-  });
+  // const [state, formAction] = useFormState(updateUser, {
+  //   error: '',
+  // });
 
-  useEffect(() => {
-    if (state.success == true) toast.success('Updated User');
-    if (state.error) toast.error('Error', { description: state.error });
-  }, [state]);
+  // useEffect(() => {
+  //   if (state.success == true) toast.success('Updated User');
+  //   if (state.error) toast.error('Error', { description: state.error });
+  // }, [state]);
 
   return (
     <AccountCard
@@ -28,7 +28,7 @@ export default function UpdateNameCard({ name }: { name: string }) {
           'Please enter your full name, or a display name you are comfortable with.',
       }}
     >
-      <form action={formAction}>
+      <form>
         <AccountCardBody>
           <Input defaultValue={name ?? ''} name="name" />
         </AccountCardBody>
