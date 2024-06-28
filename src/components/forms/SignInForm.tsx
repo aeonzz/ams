@@ -18,7 +18,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { authenticationSchema } from '@/lib/db/schema/auth';
 import { toast } from 'sonner';
 import { PasswordInput } from '../ui/password-input';
-import SubmitButton from '../SubmitButton';
+import { SubmitButton } from '../SubmitButton';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function SignInForm() {
@@ -126,7 +126,13 @@ export default function SignInForm() {
           )}
         />
         <motion.div layout>
-          <SubmitButton isLoading={isLoading} />
+          <SubmitButton
+            disabled={isLoading}
+            className="w-full"
+            variant="ringHover"
+          >
+            Sign in
+          </SubmitButton>
         </motion.div>
       </form>
     </Form>

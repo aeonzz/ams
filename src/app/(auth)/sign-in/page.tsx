@@ -7,7 +7,7 @@ import { motion, LayoutGroup } from 'framer-motion';
 export default function SignInPage() {
   return (
     <LayoutGroup>
-      <div className="h-screen w-full">
+      <div className="w-full">
         <div className="flex items-center justify-center py-12">
           <div className="mx-auto grid w-full place-items-center gap-6">
             <motion.div layout className="grid gap-2 text-center">

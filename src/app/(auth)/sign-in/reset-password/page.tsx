@@ -1,15 +1,16 @@
 import { db } from '@/lib/db/index';
-import React from "react";
-import ForgotPassword from "./_components/ForgotPassword";
+import React from 'react';
 import ChangePasswordForm from '@/components/forms/ChangePasswordForm';
+import { checkAuth, getUserAuth } from '@/lib/auth/utils';
+import ForgotPassword from './_components/ForgotPassword';
 
 interface ResetPasswordPageProps {
   searchParams: { [key: string]: string | string[] | undefined };
 }
 
-const ResetPasswordPage: React.FC<ResetPasswordPageProps> = async ({
+export default async function ResetPasswordPage({
   searchParams,
-}) => {
+}: ResetPasswordPageProps) {
 
   if (searchParams.token) {
     const user = await db.user.findUnique({
@@ -53,10 +54,6 @@ const ResetPasswordPage: React.FC<ResetPasswordPageProps> = async ({
       </>
     );
   } else {
-    return (
-      <ForgotPassword />
-    );
+    return <ForgotPassword />;
   }
-};
-
-export default ResetPasswordPage;
+}
