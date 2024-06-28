@@ -29,7 +29,7 @@ export async function POST(request: Request) {
       },
     });
     const data = await resend.emails.send({
-      from: 'Kirimase <onboarding@resend.dev>',
+      from: 'Fuck <ams-swart.vercel.app>',
       to: [email],
       subject: 'Hello world!',
       react: ResetPassword({
