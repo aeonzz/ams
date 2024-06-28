@@ -19,7 +19,7 @@ import { authenticationSchema } from '@/lib/db/schema/auth';
 import { toast } from 'sonner';
 import { PasswordInput } from './password-input';
 import SubmitButton from './SubmitButton';
-import { m, LazyMotion, domAnimation, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function SignInForm() {
   const [isLoading, setIsLoading] = useState(false);
@@ -46,90 +46,89 @@ export default function SignInForm() {
     }
   }
   return (
-    <LazyMotion features={domAnimation}>
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="grid w-[350px] gap-4"
-        >
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <m.div layout className="space-y-2">
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="m@example.com"
-                      type="email"
-                      disabled={isLoading}
-                      autoFocus
-                      {...field}
-                    />
-                  </FormControl>
-                </m.div>
-                <AnimatePresence mode="popLayout">
-                  {form.formState.errors.email && (
-                    <m.div
-                      layout
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.3, type: 'spring' }}
-                    >
-                      <FormMessage />
-                    </m.div>
-                  )}
-                </AnimatePresence>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <m.div layout className="space-y-2">
-                  <div className="flex justify-between">
-                    <FormLabel>Password</FormLabel>
-                    <Link
-                      href="/forgot-password"
-                      className="ml-auto inline-block text-sm underline"
-                    >
-                      Forgot your password?
-                    </Link>
-                  </div>
-                  <FormControl>
-                    <PasswordInput
-                      id="password"
-                      autoComplete="password"
-                      disabled={isLoading}
-                      {...field}
-                    />
-                  </FormControl>
-                </m.div>
-                <AnimatePresence mode="popLayout">
-                  {form.formState.errors.password && (
-                    <m.div
-                      layout
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.3, type: 'spring' }}
-                    >
-                      <FormMessage />
-                    </m.div>
-                  )}
-                </AnimatePresence>
-              </FormItem>
-            )}
-          />
-          <m.div layout>
-            <SubmitButton isLoading={isLoading} />
-          </m.div>
-        </form>
-      </Form>
-    </LazyMotion>
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="grid w-[350px] gap-4"
+      >
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <motion.div layout className="space-y-2">
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="m@example.com"
+                    type="email"
+                    disabled={isLoading}
+                    autoFocus
+                    {...field}
+                  />
+                </FormControl>
+              </motion.div>
+              <AnimatePresence mode="popLayout">
+                {form.formState.errors.email && (
+                  <motion.div
+                    layout
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.3, type: 'spring' }}
+                  >
+                    <FormMessage />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <motion.div layout className="space-y-2">
+                <div className="flex justify-between">
+                  <FormLabel>Password</FormLabel>
+                  <Link
+                    href="/forgot-password"
+                    className="ml-auto inline-block text-sm text-blue-500 underline"
+                  >
+                    Forgot your password?
+                  </Link>
+                </div>
+                <FormControl>
+                  <PasswordInput
+                    id="password"
+                    autoComplete="off"
+                    placeholder="••••••••••••"
+                    disabled={isLoading}
+                    {...field}
+                  />
+                </FormControl>
+              </motion.div>
+              <AnimatePresence mode="popLayout">
+                {form.formState.errors.password && (
+                  <motion.div
+                    layout
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.3, type: 'spring' }}
+                  >
+                    <FormMessage />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </FormItem>
+          )}
+        />
+        <motion.div layout>
+          <SubmitButton isLoading={isLoading} />
+        </motion.div>
+      </form>
+    </Form>
   );
 }

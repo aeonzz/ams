@@ -52,6 +52,7 @@ export const signInAction = createServerAction()
 
       return { error: null };
     } catch (error) {
+      console.log(error);
       return genericError;
     }
   });

@@ -20,7 +20,7 @@ const buttonVariants = cva(
         expandIcon:
           "group relative text-primary-foreground bg-primary hover:bg-primary/90",
         ringHover:
-          "bg-secondary text-secondary-foreground transition-all duration-300 hover:bg-secondary/90 hover:ring-1 hover:ring-primary/90 hover:ring-offset-1",
+          "bg-secondary text-secondary-foreground transition-all duration-300 hover:bg-secondary/90 hover:ring-1 hover:ring-primary/90 hover:ring-offset-1 border border-secondary-foreground/5",
         shine:
           "text-primary-foreground animate-shine bg-gradient-to-r from-primary via-primary/75 to-primary bg-[length:400%_100%] ",
         gooeyRight:
