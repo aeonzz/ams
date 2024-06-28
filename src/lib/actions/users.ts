@@ -25,6 +25,7 @@ interface ActionResult {
 
 export const signInAction = createServerAction()
   .input(authenticationSchema)
+  .timeout(10000)
   .handler(async ({ input }) => {
     try {
       const existingUser = await db.user.findUnique({

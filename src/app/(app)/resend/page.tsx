@@ -17,7 +17,7 @@ export default function Home() {
     setErrors(null);
     try {
       const payload = emailSchema.parse({
-        name: nameInputRef.current?.value,
+        // name: nameInputRef.current?.value,
         email: emailInputRef.current?.value,
       });
       console.log(payload);
@@ -28,8 +28,10 @@ export default function Home() {
           'Content-Type': 'application/json',
         },
       });
-      const { id } = await req.json();
-      if (id) alert('Successfully sent!');
+      const response = await req.json();
+
+      console.log(response)
+      // if (id) alert('Successfully sent!');
     } catch (err) {
       if (err instanceof z.ZodError) {
         setErrors(err.flatten().fieldErrors as Errors);
@@ -92,7 +94,7 @@ export default function Home() {
             name="name"
             ref={nameInputRef}
             className={`w-full rounded-md border px-3 py-2 text-sm focus:outline-neutral-700 ${
-              !!errors?.name ? 'border-red-700' : 'border-neutral-200'
+              !!errors?.email ? 'border-red-700' : 'border-neutral-200'
             }`}
           />
         </div>

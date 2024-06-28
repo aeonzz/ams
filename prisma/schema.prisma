@@ -23,11 +23,13 @@ datasource db {
 }
 
 model User {
-  id             String    @id
-  email          String    @unique
-  hashedPassword String
-  name           String?
-  sessions       Session[]
+  id                       String    @id
+  email                    String    @unique
+  hashedPassword           String
+  resetPasswordToken       String?   @unique
+  resetPasswordTokenExpiry DateTime?
+  name                     String?
+  sessions                 Session[]
 }
 
 model Session {

@@ -17,8 +17,8 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { authenticationSchema } from '@/lib/db/schema/auth';
 import { toast } from 'sonner';
-import { PasswordInput } from './password-input';
-import SubmitButton from './SubmitButton';
+import { PasswordInput } from '../ui/password-input';
+import SubmitButton from '../SubmitButton';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function SignInForm() {
@@ -93,7 +93,7 @@ export default function SignInForm() {
                 <div className="flex justify-between">
                   <FormLabel>Password</FormLabel>
                   <Link
-                    href="/forgot-password"
+                    href="/sign-in/reset-password"
                     className="ml-auto inline-block text-sm text-blue-500 underline"
                   >
                     Forgot your password?
