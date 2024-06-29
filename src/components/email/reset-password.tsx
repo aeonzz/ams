@@ -21,7 +21,7 @@ export const ResetPassword: React.FC<Readonly<ResetPasswordProps>> = ({
 }) => (
   <Html>
     <Head />
-    <Preview>Dropbox reset your password</Preview>
+    <Preview>Reset Password</Preview>
     <Body style={main}>
       <Container style={container}>
         <Section>

@@ -15,6 +15,7 @@ module.exports = {
     extend: {
       colors: {
         border: 'hsl(var(--border))',
+        inputBorder: 'hsl(var(--input-border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
         background: 'hsl(var(--background))',
@@ -65,7 +66,15 @@ module.exports = {
           from: { height: 'var(--radix-accordion-content-height)' },
           to: { height: 0 },
         },
-        'shine': {
+        'collapsible-down': {
+          from: { height: '0' },
+          to: { height: 'var(--radix-collapsible-content-height)' },
+        },
+        'collapsible-up': {
+          from: { height: 'var(--radix-collapsible-content-height)' },
+          to: { height: '0' },
+        },
+        shine: {
           from: { backgroundPosition: '200% 0' },
           to: { backgroundPosition: '-200% 0' },
         },
@@ -73,7 +82,13 @@ module.exports = {
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
-        'shine': 'shine 8s ease-in-out infinite',
+        'collapsible-down': 'collapsible-down 0.6s cubic-bezier(0.19, 1, 0.22, 1)',
+        'collapsible-up': 'collapsible-up 0.6s cubic-bezier(0.19, 1, 0.22, 1)',
+        shine: 'shine 8s ease-in-out infinite',
+      },
+      transitionTimingFunction: {
+        "in-expo": "cubic-bezier(0.95, 0.05, 0.795, 0.035)",
+        "out-expo": "cubic-bezier(0.19, 1, 0.22, 1)",
       },
     },
   },

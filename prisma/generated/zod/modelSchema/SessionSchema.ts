@@ -8,6 +8,7 @@ export const SessionSchema = z.object({
   id: z.string(),
   userId: z.string(),
   expiresAt: z.coerce.date(),
+  createdAt: z.coerce.date(),
 })
 
 export type Session = z.infer<typeof SessionSchema>

@@ -15,6 +15,12 @@ export async function POST(request: Request) {
       },
     });
 
+    if (!user) {
+      return NextResponse.json({
+        error: `User not found with email: ${email}`,
+      });
+    }
+
     const resetPasswordToken = crypto.randomBytes(32).toString('base64url');
     const today = new Date();
     const expiryDate = new Date(today.setDate(today.getDate() + 1));
@@ -29,18 +35,21 @@ export async function POST(request: Request) {
       },
     });
     const data = await resend.emails.send({
-      from: 'Fuck <ams-swart.vercel.app>',
+      from: 'HAHA <onboarding@resend.dev>',
       to: [email],
-      subject: 'Hello world!',
+      subject: 'Hello!',
       react: ResetPassword({
         email: email,
         resetPasswordToken: resetPasswordToken,
       }),
       text: 'Email powered by Resend.',
     });
-    
+
     return NextResponse.json(data);
   } catch (error) {
-    return NextResponse.json({ error });
+    return NextResponse.json({
+      error:
+        'An error occurred while making the request. Please try again later',
+    });
   }
 }

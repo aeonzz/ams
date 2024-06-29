@@ -29,19 +29,12 @@ export default function SignInForm() {
 
   async function onSubmit(values: z.infer<typeof authenticationSchema>) {
     setIsLoading(true);
-    const response = await signInAction(values);
+    const [data, error] = await signInAction(values);
 
-    if (response && response[0]?.error) {
+    if (error) {
       setIsLoading(false);
       toast.error('Uh oh! Something went wrong.', {
-        description: response[0]?.error,
-      });
-    }
-
-    if (response && response[1]?.message) {
-      setIsLoading(false);
-      toast.error('Uh oh! Something went wrong.', {
-        description: response[1]?.message,
+        description: error.message,
       });
     }
   }

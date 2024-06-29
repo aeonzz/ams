@@ -1,7 +1,6 @@
 import { db } from '@/lib/db/index';
 import React from 'react';
 import ChangePasswordForm from '@/components/forms/ChangePasswordForm';
-import { checkAuth, getUserAuth } from '@/lib/auth/utils';
 import ForgotPassword from './_components/ForgotPassword';
 
 interface ResetPasswordPageProps {
@@ -11,49 +10,35 @@ interface ResetPasswordPageProps {
 export default async function ResetPasswordPage({
   searchParams,
 }: ResetPasswordPageProps) {
+  const token = searchParams.token as string;
 
-  if (searchParams.token) {
-    const user = await db.user.findUnique({
-      where: {
-        resetPasswordToken: searchParams.token as string,
-      },
-    });
-
-    if (!user)
-      return (
-        <h1 className="tracking-tightl scroll-m-20 text-center text-2xl font-semibold">
-          Invalid token
-        </h1>
-      );
-    const resetPasswordTokenExpiry = user.resetPasswordTokenExpiry;
-    if (!resetPasswordTokenExpiry)
-      return (
-        <h1 className="tracking-tightl scroll-m-20 text-center text-2xl font-semibold">
-          Invalid token
-        </h1>
-      );
-    const today = new Date();
-    const isTokenExpired = today > resetPasswordTokenExpiry;
-    if (isTokenExpired)
-      return (
-        <h1 className="tracking-tightl scroll-m-20 text-center text-2xl font-semibold">
-          Token expired
-        </h1>
-      );
-
-    return (
-      <>
-        <h1 className="scroll-m-20 text-xl font-semibold tracking-tight">
-          Reset Your Password
-        </h1>
-        <p className="text-center text-sm text-muted-foreground">
-          Please enter your new password and confirm it to complete the reset
-          process.
-        </p>
-        <ChangePasswordForm resetPasswordToken={searchParams.token as string} />
-      </>
-    );
-  } else {
+  if (!token) {
     return <ForgotPassword />;
   }
+
+  const user = await db.user.findUnique({
+    where: { resetPasswordToken: token },
+  });
+
+  if (!user || !user.resetPasswordTokenExpiry) {
+    return <ErrorMessage message="Invalid token" />;
+  }
+
+  const isTokenExpired = new Date() > user.resetPasswordTokenExpiry;
+
+  if (isTokenExpired) {
+    return <ErrorMessage message="Token expired" />;
+  }
+
+  return (
+    <div className="flex flex-col items-center justify-center space-y-2">
+      <ChangePasswordForm resetPasswordToken={token} />
+    </div>
+  );
 }
+
+const ErrorMessage = ({ message }: { message: string }) => (
+  <h1 className="scroll-m-20 text-center text-2xl font-semibold tracking-tight">
+    {message}
+  </h1>
+);

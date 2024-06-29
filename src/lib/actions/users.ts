@@ -16,7 +16,12 @@ import {
 } from '../auth/utils';
 
 import { authedProcedure } from './procedures';
-import { authenticationSchema, updateUserSchema } from '../db/schema/auth';
+import {
+  authenticationSchema,
+  changePasswordSchema,
+  resetPasswordSchema,
+  updateUserSchema,
+} from '../db/schema/auth';
 import { createServerAction } from 'zsa';
 
 interface ActionResult {
@@ -31,30 +36,26 @@ export const signInAction = createServerAction()
       const existingUser = await db.user.findUnique({
         where: { email: input.email.toLowerCase() },
       });
+
       if (!existingUser) {
-        return {
-          error: 'Incorrect email or password',
-        };
+        throw 'Incorrect email or password';
       }
 
       const validPassword = await new Argon2id().verify(
         existingUser.hashedPassword,
         input.password
       );
+
       if (!validPassword) {
-        return {
-          error: 'Incorrect email or password',
-        };
+        throw 'Incorrect email or password';
       }
 
       const session = await lucia.createSession(existingUser.id, {});
       const sessionCookie = lucia.createSessionCookie(session.id);
       setAuthCookie(sessionCookie);
-
-      return { error: null };
     } catch (error) {
       console.log(error);
-      return genericError;
+      throw 'An error occurred while making the request. Please try again later';
     }
   });
 
@@ -120,5 +121,42 @@ export const updateUser = authedProcedure
       return { success: true, error: '' };
     } catch (e) {
       return genericError;
+    }
+  });
+
+export const resetPassword = createServerAction()
+  .input(changePasswordSchema)
+  .handler(async ({ input }) => {
+    const user = await db.user.findUnique({
+      where: {
+        resetPasswordToken: input.resetPasswordToken,
+      },
+    });
+
+    if (!user) {
+      throw 'User not found';
+    }
+
+    const resetPasswordTokenExpiry = user.resetPasswordTokenExpiry;
+
+    if (!resetPasswordTokenExpiry) {
+      throw 'Token expired';
+    }
+
+    const hashedPassword = await new Argon2id().hash(input.password);
+    try {
+      await db.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          hashedPassword,
+          resetPasswordToken: null,
+          resetPasswordTokenExpiry: null,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      throw 'An error occurred while making the request. Please try again later';
     }
   });

@@ -1,15 +1,32 @@
-import SignOutBtn from '@/components/SignOutBtn';
-import { getUserAuth } from '@/lib/auth/utils';
+import Link from "next/link";
 
-export default async function Home() {
-  const { session } = await getUserAuth();
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator
+} from "@/components/ui/breadcrumb";
+import ContentLayout from "@/components/navigations/content-layout";
+
+export default function DashboardPage() {
   return (
-    <main className="">
-      <h1 className="my-2 text-2xl font-bold">Profile</h1>
-      <pre className="my-2 rounded-lg bg-secondary p-4">
-        {JSON.stringify(session, null, 2)}
-      </pre>
-      <SignOutBtn />
-    </main>
+    <ContentLayout title="Dashboard">
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link href="/">Home</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Dashboard</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+      {/* <PlaceholderContent /> */}
+    </ContentLayout>
   );
 }

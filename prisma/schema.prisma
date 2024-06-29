@@ -36,5 +36,6 @@ model Session {
   id        String   @id
   userId    String
   expiresAt DateTime
+  createdAt DateTime @default(now())
   user      User     @relation(references: [id], fields: [userId], onDelete: Cascade)
 }

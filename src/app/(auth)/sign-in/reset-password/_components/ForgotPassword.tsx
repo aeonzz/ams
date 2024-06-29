@@ -3,7 +3,7 @@
 import { SubmitButton } from '@/components/SubmitButton';
 import { emailSchema } from '@/lib/email/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
@@ -17,8 +17,8 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Mail, Send } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import axios from 'axios';
 
 export default function ForgotPassword() {
   const [isEmailSent, setIsEmailSent] = useState(false);
@@ -33,32 +33,33 @@ export default function ForgotPassword() {
   async function onSubmit(data: z.infer<typeof emailSchema>) {
     setIsLoading(true);
 
-    try {
-      const payload = {
-        email: data.email,
-      };
-      console.log(payload);
-      const req = await fetch('/api/email', {
-        method: 'POST',
-        body: JSON.stringify(payload),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      const res = await req.json();
-      if (res.data.id) setIsEmailSent(true);
-    } catch (err) {
-      console.log(err);
-      setIsLoading(false);
-      toast.error('Uh oh! Something went wrong.', {
-        description:
-          'An error occurred while making the request. Please try again later',
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  }
+    const payload = {
+      email: data.email,
+    };
 
+    axios
+      .post('/api/email', payload)
+      .then((res) => {
+        if (res.data.error) {
+          toast.error('Uh oh! Something went wrong.', {
+            description: res.data.error,
+          });
+        } else {
+          setIsEmailSent(true);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        setIsLoading(false);
+        toast.error('Uh oh! Something went wrong.', {
+          description:
+            'An error occurred while making the request. Please try again later',
+        });
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }
   return (
     <>
       {isEmailSent ? (
@@ -74,9 +75,9 @@ export default function ForgotPassword() {
         <>
           <motion.div
             layout
-            className="flex flex-col items-center justify-center"
+            className="flex flex-col items-center justify-center gap-2"
           >
-            <h1 className="scroll-m-20 text-xl font-semibold tracking-tight">
+            <h1 className="scroll-m-20 text-2xl font-semibold tracking-tight">
               Forgot Password?
             </h1>
             <p className="text-center text-sm text-muted-foreground">
@@ -89,14 +90,14 @@ export default function ForgotPassword() {
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
-              className="!mt-7 w-[450px]"
+              className="mt-4 w-[354px]"
             >
               <FormField
                 control={form.control}
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <motion.div layout className="flex items-center space-x-3">
+                    <motion.div layout className="space-y-2">
                       <FormControl>
                         <Input
                           placeholder="Enter your email"
@@ -106,13 +107,11 @@ export default function ForgotPassword() {
                       </FormControl>
                       <SubmitButton
                         disabled={isLoading}
-                        variant="expandIcon"
-                        Icon={Send}
-                        iconPlacement="right"
-                        className="w-32"
+                        variant="ringHover"
+                        className="w-full"
                         type="submit"
                       >
-                        Send
+                        Reset Password
                       </SubmitButton>
                     </motion.div>
                     <AnimatePresence mode="popLayout">

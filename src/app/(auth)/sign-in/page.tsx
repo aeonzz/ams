@@ -17,12 +17,12 @@ export default function SignInPage() {
               </p>
             </motion.div>
             <SignInForm />
-            <motion.div layout className="mt-4 text-center text-sm">
+            {/* <motion.div layout className="mt-4 text-center text-sm">
               Don&apos;t have an account?{' '}
-              <Link href="#" className="text-blue-500 underline">
+              <Link href="/sign-up" className="text-blue-500 underline">
                 Sign up
               </Link>
-            </motion.div>
+            </motion.div> */}
           </div>
         </div>
       </div>
