@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 import CreateRequest from '../screens/dashboard/create-request';
 import CommandSearchDialog from '../command-search-dialog';

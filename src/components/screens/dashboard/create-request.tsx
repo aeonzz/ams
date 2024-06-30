@@ -10,15 +10,18 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { useCreateRequest } from '@/hooks/use-create-request';
+import { useDialog } from '@/hooks/use-dialog';
 
 export default function CreateRequest() {
   const createRequest = useCreateRequest();
+  const dialog = useDialog();
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
-      if ((e.key === 'c' && !e.shiftKey) || (e.key === 'C' && !e.shiftKey)) {
+      if (e.key.toLowerCase() === 'c' && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
-        createRequest.setIsOpen();
+        createRequest.setIsOpen(true);
+        dialog.setIsOpen(false);
       }
     };
 

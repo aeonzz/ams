@@ -20,19 +20,20 @@ import {
   CommandSeparator,
   CommandShortcut,
 } from '@/components/ui/command';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { useDialog } from '@/hooks/use-dialog';
+import { useCreateRequest } from '@/hooks/use-create-request';
 
 export default function CommandSearchDialog() {
-  const [open, setOpen] = useState(false);
+  const createRequest = useCreateRequest();
+  const dialog = useDialog();
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
-      if (
-        (e.key === 'k' && (e.metaKey || e.ctrlKey)) ||
-        (e.key === 'K' && (e.metaKey || e.ctrlKey))
-      ) {
+      if (e.key.toLowerCase() === 'k' && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
-        setOpen((open) => !open);
+        dialog.setIsOpen(true);
+        createRequest.setIsOpen(false);
       }
     };
 
@@ -48,15 +49,23 @@ export default function CommandSearchDialog() {
           <span className="text-xs">Ctrl</span>J
         </kbd>
       </p> */}
-      <CommandDialog open={open} onOpenChange={setOpen}>
+      <CommandDialog open={dialog.isOpen} onOpenChange={dialog.setIsOpen}>
         <CommandInput placeholder="Type a command or search..." />
         <CommandList>
           <CommandEmpty>No results found.</CommandEmpty>
           <CommandGroup heading="Request">
-            <CommandItem>
+            <CommandItem
+              onSelect={() => {
+                createRequest.setIsOpen(true);
+                dialog.setIsOpen(false);
+              }}
+            >
               <Plus className="mr-2 h-4 w-4" />
               <span>Create request</span>
-              <CommandShortcut>C</CommandShortcut>
+              <div className="ml-auto space-x-1">
+                <CommandShortcut>Ctrl</CommandShortcut>
+                <CommandShortcut>C</CommandShortcut>
+              </div>
             </CommandItem>
             <CommandItem>
               <Smile className="mr-2 h-4 w-4" />
@@ -86,7 +95,7 @@ export default function CommandSearchDialog() {
             </CommandItem>
           </CommandGroup>
           <CommandGroup heading="Miscellaneous">
-            <CommandItem>
+            <CommandItem onClick={() => {}}>
               <PanelRight className="mr-2 h-4 w-4" />
               <span>Collapse navigation sidebar</span>
               <CommandShortcut>[</CommandShortcut>

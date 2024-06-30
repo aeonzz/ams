@@ -1,11 +1,11 @@
 import { create } from 'zustand';
 
-export interface useCreateRequestStore {
+export interface useDialogStore {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
 }
 
-export const useCreateRequest = create<useCreateRequestStore>((set) => ({
+export const useDialog = create<useDialogStore>((set) => ({
   isOpen: false,
   setIsOpen: (isOpen: boolean) => {
     set(() => ({ isOpen }));
