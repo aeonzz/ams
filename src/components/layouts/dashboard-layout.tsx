@@ -1,6 +1,5 @@
 'use client';
 
-import * as React from 'react';
 import { cn } from '@/lib/utils';
 import { useStore } from '@/hooks/use-store';
 import { useSidebarToggle } from '@/hooks/use-sidebar-toggle';
@@ -24,7 +23,7 @@ export default function DashboardLayout({
           sidebar?.isOpen === false ? 'lg:ml-[90px]' : 'lg:ml-72'
         )}
       >
-        <div className="min-h-[calc(100vh_-_16px)] w-full bg-secondary rounded-md border">
+        <div className="min-h-[calc(100vh_-_16px)] w-full rounded-md border bg-secondary">
           {children}
         </div>
       </main>

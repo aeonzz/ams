@@ -9,6 +9,7 @@ import {
   BreadcrumbSeparator
 } from "@/components/ui/breadcrumb";
 import ContentLayout from "@/components/navigations/content-layout";
+import DashboardScreen from "@/components/screens/dashboard";
 
 export default function DashboardPage() {
   return (
@@ -26,6 +27,7 @@ export default function DashboardPage() {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
+      <DashboardScreen />
       {/* <PlaceholderContent /> */}
     </ContentLayout>
   );

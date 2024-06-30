@@ -15,7 +15,7 @@ module.exports = {
     extend: {
       colors: {
         border: 'hsl(var(--border))',
-        inputBorder: 'hsl(var(--input-border))',
+        'input-border': 'hsl(var(--input-border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
         background: 'hsl(var(--background))',
@@ -39,6 +39,10 @@ module.exports = {
         accent: {
           DEFAULT: 'hsl(var(--accent))',
           foreground: 'hsl(var(--accent-foreground))',
+        },
+        'secondary-accent': {
+          DEFAULT: 'hsl(var(--secondary-accent))',
+          foreground: 'hsl(var(--secondary-accent-foreground))',
         },
         popover: {
           DEFAULT: 'hsl(var(--popover))',
@@ -82,13 +86,14 @@ module.exports = {
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
-        'collapsible-down': 'collapsible-down 0.6s cubic-bezier(0.19, 1, 0.22, 1)',
+        'collapsible-down':
+          'collapsible-down 0.6s cubic-bezier(0.19, 1, 0.22, 1)',
         'collapsible-up': 'collapsible-up 0.6s cubic-bezier(0.19, 1, 0.22, 1)',
         shine: 'shine 8s ease-in-out infinite',
       },
       transitionTimingFunction: {
-        "in-expo": "cubic-bezier(0.95, 0.05, 0.795, 0.035)",
-        "out-expo": "cubic-bezier(0.19, 1, 0.22, 1)",
+        'in-expo': 'cubic-bezier(0.95, 0.05, 0.795, 0.035)',
+        'out-expo': 'cubic-bezier(0.19, 1, 0.22, 1)',
       },
     },
   },

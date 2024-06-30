@@ -58,6 +58,9 @@
     --accent: 234 6% 8%;
     --accent-foreground: 0 0% 98%;
 
+    --secondary-accent: 234 13.5% 16%;
+    --secondary-accent-foreground: 0 0% 98%;
+
     --destructive: 0 62.8% 40%;
     --destructive-foreground: 0 0% 98%;
 
