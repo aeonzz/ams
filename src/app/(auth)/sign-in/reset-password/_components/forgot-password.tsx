@@ -1,6 +1,6 @@
 'use client';
 
-import { SubmitButton } from '@/components/SubmitButton';
+import { SubmitButton } from '@/components/ui/submit-button';
 import { emailSchema } from '@/lib/email/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';

@@ -5,8 +5,8 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { useSidebarToggle } from '@/hooks/use-sidebar-toggle';
 import { useStore } from '@/hooks/use-store';
-import Menu from './sidebar-components/menu';
-import SidebarToggle from './sidebar-components/sidebar-toggle';
+import SidebarToggle from './dashboard-sidebar-components/sidebar-toggle';
+import Menu from './dashboard-sidebar-components/menu';
 
 export default function DashboardSidebar() {
   const sidebar = useStore(useSidebarToggle, (state) => state);

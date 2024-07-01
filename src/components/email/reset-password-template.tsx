@@ -10,15 +10,14 @@ import {
 } from '@react-email/components';
 import * as React from 'react';
 
-interface ResetPasswordProps {
+interface ResetPasswordTemplateProps {
   email: string;
   resetPasswordToken: string;
 }
 
-export const ResetPassword: React.FC<Readonly<ResetPasswordProps>> = ({
-  email,
-  resetPasswordToken,
-}) => (
+export const ResetPasswordTemplate: React.FC<
+  Readonly<ResetPasswordTemplateProps>
+> = ({ email, resetPasswordToken }) => (
   <Html>
     <Head />
     <Preview>Reset Password</Preview>

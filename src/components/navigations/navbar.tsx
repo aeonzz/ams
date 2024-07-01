@@ -1,5 +1,5 @@
-import ModeToggle from '../mode-toggle';
-import SheetMenu from './sidebar-components/sheet-menu';
+import { ThemeToggle } from '../ui/theme-toggle';
+import SheetMenu from './dashboard-sidebar-components/sheet-menu';
 
 interface NavbarProps {
   title: string;
@@ -14,7 +14,7 @@ export default function Navbar({ title }: NavbarProps) {
           <h1 className="font-bold">{title}</h1>
         </div>
         <div className="flex flex-1 items-center justify-end space-x-2">
-          <ModeToggle />
+          <ThemeToggle />
         </div>
       </div>
     </header>

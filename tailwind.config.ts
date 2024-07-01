@@ -95,6 +95,10 @@ module.exports = {
         'in-expo': 'cubic-bezier(0.95, 0.05, 0.795, 0.035)',
         'out-expo': 'cubic-bezier(0.19, 1, 0.22, 1)',
       },
+      height: {
+        'cmdk-list': 'var(--cmdk-list-height)',
+        'min-cmdk-list': 'min(420px, var(--cmdk-list-height))',
+      },
     },
   },
   plugins: [require('tailwindcss-animate')],

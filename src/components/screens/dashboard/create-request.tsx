@@ -9,19 +9,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { useCreateRequest } from '@/hooks/use-create-request';
 import { useDialog } from '@/hooks/use-dialog';
 
 export default function CreateRequest() {
-  const createRequest = useCreateRequest();
   const dialog = useDialog();
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (e.key.toLowerCase() === 'c' && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
-        createRequest.setIsOpen(true);
-        dialog.setIsOpen(false);
+        dialog.setCreateRequest(true)
+        dialog.setCommandDialog(false)
       }
     };
 
@@ -30,7 +28,7 @@ export default function CreateRequest() {
   }, []);
 
   return (
-    <Dialog open={createRequest.isOpen} onOpenChange={createRequest.setIsOpen}>
+    <Dialog open={dialog.createRequest} onOpenChange={dialog.setCreateRequest}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Are you absolutely sure?</DialogTitle>

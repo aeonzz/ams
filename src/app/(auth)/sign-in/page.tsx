@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import SignInForm from '../../../components/forms/SignInForm';
+import SignInForm from '../../../components/forms/signin-form';
 import { motion, LayoutGroup } from 'framer-motion';
 
 export default function SignInPage() {

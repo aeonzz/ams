@@ -2,7 +2,7 @@
 
 import { useFormStatus } from 'react-dom';
 import { signOutAction } from '@/lib/actions/users';
-import { Button } from './ui/button';
+import { Button } from './button';
 
 export default function SignOutBtn() {
   return (

@@ -1,13 +1,19 @@
 import { create } from 'zustand';
 
-export interface useDialogStore {
-  isOpen: boolean;
-  setIsOpen: (isOpen: boolean) => void;
+export interface UseDialogStore {
+  createRequest: boolean;
+  setCreateRequest: (createRequest: boolean) => void;
+  commandDialog: boolean;
+  setCommandDialog: (commandDialog: boolean) => void;
 }
 
-export const useDialog = create<useDialogStore>((set) => ({
-  isOpen: false,
-  setIsOpen: (isOpen: boolean) => {
-    set(() => ({ isOpen }));
+export const useDialog = create<UseDialogStore>((set) => ({
+  createRequest: false,
+  setCreateRequest: (createRequest: boolean) => {
+    set(() => ({ createRequest }));
+  },
+  commandDialog: false,
+  setCommandDialog: (commandDialog: boolean) => {
+    set(() => ({ commandDialog }));
   },
 }));

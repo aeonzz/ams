@@ -1,6 +1,6 @@
 import React from 'react';
 import CreateRequest from '../screens/dashboard/create-request';
-import CommandSearchDialog from '../command-search-dialog';
+import CommandSearchDialog from '../dialogs/command-search-dialog';
 
 export default function CommandLayout({
   children,

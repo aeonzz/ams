@@ -14,7 +14,7 @@ import {
   TooltipProvider,
 } from '@/components/ui/tooltip';
 import CollapseMenuButton from './collapse-menu-button';
-import { getMenuList } from '@/lib/menu-list';
+import { getMenuList } from '@/config/menu-list';
 import { signOutAction } from '@/lib/actions/users';
 
 interface MenuProps {

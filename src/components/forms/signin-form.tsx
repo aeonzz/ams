@@ -18,7 +18,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { authenticationSchema } from '@/lib/db/schema/auth';
 import { toast } from 'sonner';
 import { PasswordInput } from '../ui/password-input';
-import { SubmitButton } from '../SubmitButton';
+import { SubmitButton } from '../ui/submit-button';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function SignInForm() {

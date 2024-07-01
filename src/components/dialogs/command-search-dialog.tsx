@@ -22,18 +22,18 @@ import {
 } from '@/components/ui/command';
 import { useEffect } from 'react';
 import { useDialog } from '@/hooks/use-dialog';
-import { useCreateRequest } from '@/hooks/use-create-request';
+import { useSidebarToggle } from '@/hooks/use-sidebar-toggle';
 
 export default function CommandSearchDialog() {
-  const createRequest = useCreateRequest();
   const dialog = useDialog();
+  const sidebar = useSidebarToggle();
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (e.key.toLowerCase() === 'k' && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
-        dialog.setIsOpen(true);
-        createRequest.setIsOpen(false);
+        dialog.setCommandDialog(true);
+        dialog.setCreateRequest(false);
       }
     };
 
@@ -49,15 +49,18 @@ export default function CommandSearchDialog() {
           <span className="text-xs">Ctrl</span>J
         </kbd>
       </p> */}
-      <CommandDialog open={dialog.isOpen} onOpenChange={dialog.setIsOpen}>
+      <CommandDialog
+        open={dialog.commandDialog}
+        onOpenChange={dialog.setCommandDialog}
+      >
         <CommandInput placeholder="Type a command or search..." />
         <CommandList>
           <CommandEmpty>No results found.</CommandEmpty>
           <CommandGroup heading="Request">
             <CommandItem
               onSelect={() => {
-                createRequest.setIsOpen(true);
-                dialog.setIsOpen(false);
+                dialog.setCreateRequest(true);
+                dialog.setCommandDialog(false);
               }}
             >
               <Plus className="mr-2 h-4 w-4" />
@@ -95,7 +98,7 @@ export default function CommandSearchDialog() {
             </CommandItem>
           </CommandGroup>
           <CommandGroup heading="Miscellaneous">
-            <CommandItem onClick={() => {}}>
+            <CommandItem onSelect={() => sidebar.setIsOpen()}>
               <PanelRight className="mr-2 h-4 w-4" />
               <span>Collapse navigation sidebar</span>
               <CommandShortcut>[</CommandShortcut>

@@ -1,7 +1,7 @@
 import { db } from '@/lib/db/index';
 import React from 'react';
-import ChangePasswordForm from '@/components/forms/ChangePasswordForm';
-import ForgotPassword from './_components/ForgotPassword';
+import ChangePasswordForm from '@/components/forms/change-password-form';
+import ForgotPassword from './_components/forgot-password';
 
 interface ResetPasswordPageProps {
   searchParams: { [key: string]: string | string[] | undefined };

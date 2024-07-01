@@ -19,7 +19,7 @@ import { toast } from 'sonner';
 import { resetPasswordSchema } from '@/lib/db/schema/auth';
 import { resetPassword } from '@/lib/actions/users';
 import { motion, AnimatePresence } from 'framer-motion';
-import { SubmitButton } from '../SubmitButton';
+import { SubmitButton } from '../ui/submit-button';
 
 interface ChangePasswordFormProps {
   resetPasswordToken: string;
