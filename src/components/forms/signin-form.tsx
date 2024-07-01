@@ -42,7 +42,7 @@ export default function SignInForm() {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="grid w-[350px] gap-4"
+        className="grid w-full gap-4 sm:w-[350px]"
       >
         <FormField
           control={form.control}

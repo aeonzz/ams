@@ -41,6 +41,7 @@ export default function ForgotPassword() {
       .post('/api/email', payload)
       .then((res) => {
         if (res.data.error) {
+          console.log(res.data.error)
           toast.error('Uh oh! Something went wrong.', {
             description: res.data.error,
           });
@@ -75,7 +76,7 @@ export default function ForgotPassword() {
         <>
           <motion.div
             layout
-            className="flex flex-col items-center justify-center gap-2"
+            className="flex flex-col items-center justify-center gap-2 text-center"
           >
             <h1 className="scroll-m-20 text-2xl font-semibold tracking-tight">
               Forgot Password?
@@ -90,7 +91,7 @@ export default function ForgotPassword() {
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
-              className="mt-4 w-[354px]"
+              className="mt-4 w-full sm:w-[350px]"
             >
               <FormField
                 control={form.control}

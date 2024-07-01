@@ -73,7 +73,7 @@ export default function ChangePasswordForm({
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="w-[330px] space-y-3"
+          className="w-full sm:w-[330px] space-y-3"
         >
           <FormField
             control={form.control}
