@@ -1,9 +1,9 @@
 'use client';
 
 import { cn } from '@/lib/utils';
-import { useStore } from '@/hooks/use-store';
-import { useSidebarToggle } from '@/hooks/use-sidebar-toggle';
 import DashboardSidebar from '../navigations/dashboard-sidebar';
+import { useStore } from '@/lib/hooks/use-store';
+import { useSidebarToggle } from '@/lib/hooks/use-sidebar-toggle';
 
 export default function DashboardLayout({
   children,
@@ -11,7 +11,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const sidebar = useStore(useSidebarToggle, (state) => state);
-
+  
   if (!sidebar) return null;
 
   return (

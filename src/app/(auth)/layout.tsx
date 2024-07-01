@@ -10,7 +10,7 @@ export default async function AuthLayout({
   if (session?.session) redirect('/dashboard');
 
   return (
-    <div className="flex h-screen flex-col items-center justify-center px-6">
+    <div className="flex min-h-screen flex-col items-center justify-center px-4">
       {children}
     </div>
   );

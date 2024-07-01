@@ -21,8 +21,8 @@ import {
   CommandShortcut,
 } from '@/components/ui/command';
 import { useEffect } from 'react';
-import { useDialog } from '@/hooks/use-dialog';
-import { useSidebarToggle } from '@/hooks/use-sidebar-toggle';
+import { useDialog } from '@/lib/hooks/use-dialog';
+import { useSidebarToggle } from '@/lib/hooks/use-sidebar-toggle';
 
 export default function CommandSearchDialog() {
   const dialog = useDialog();

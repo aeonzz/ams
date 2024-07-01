@@ -1,7 +1,7 @@
 'use client';
 
 import { updateUser } from '@/lib/actions/users';
-import { useServerActionMutation } from '@/lib/hooks/server-action-hooks';
+import { useServerActionMutation } from '@/hooks/server-action-hooks';
 import React from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';

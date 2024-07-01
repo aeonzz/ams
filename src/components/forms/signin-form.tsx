@@ -42,7 +42,7 @@ export default function SignInForm() {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="grid w-full gap-4 sm:w-[350px]"
+        className="grid w-full gap-4"
       >
         <FormField
           control={form.control}
@@ -68,7 +68,7 @@ export default function SignInForm() {
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
                     exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.3, type: 'spring' }}
+                    transition={{ duration: 0.3, type: 'spring',  }}
                   >
                     <FormMessage />
                   </motion.div>

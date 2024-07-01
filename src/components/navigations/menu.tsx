@@ -13,9 +13,9 @@ import {
   TooltipContent,
   TooltipProvider,
 } from '@/components/ui/tooltip';
-import CollapseMenuButton from './collapse-menu-button';
 import { getMenuList } from '@/config/menu-list';
 import { signOutAction } from '@/lib/actions/users';
+import CollapseMenuButton from './collapse-menu-button';
 
 interface MenuProps {
   isOpen: boolean | undefined;

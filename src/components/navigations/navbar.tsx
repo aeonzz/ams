@@ -1,5 +1,5 @@
 import { ThemeToggle } from '../ui/theme-toggle';
-import SheetMenu from './dashboard-sidebar-components/sheet-menu';
+import SheetMenu from './sheet-menu';
 
 interface NavbarProps {
   title: string;

@@ -9,7 +9,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { useDialog } from '@/hooks/use-dialog';
+import { useDialog } from '@/lib/hooks/use-dialog';
 
 export default function CreateRequest() {
   const dialog = useDialog();
