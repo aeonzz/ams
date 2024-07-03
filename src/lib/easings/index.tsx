@@ -1,3 +1,3 @@
 import { cubicBezier } from 'framer-motion';
 
-export const outExpo = cubicBezier(0.35, 0.17, 0.3, 0.86);
+export const outExpo = cubicBezier(0.19, 1, 0.22, 1);

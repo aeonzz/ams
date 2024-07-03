@@ -8,14 +8,14 @@ import {
   buttonVariants,
 } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { m, AnimatePresence, LazyMotion, domAnimation } from 'framer-motion';
 import { forwardRef } from 'react';
 import { Slot, Slottable } from '@radix-ui/react-slot';
+import { AnimatePresence, MotionProps, motion } from 'framer-motion';
+import { outExpo } from '@/lib/easings';
 
-const SubmitButton = forwardRef<
-  HTMLButtonElement,
-  ButtonProps & ButtonIconProps
->(
+type SubmiButtonProps = ButtonProps & ButtonIconProps & MotionProps;
+
+const SubmitButton = forwardRef<HTMLButtonElement, SubmiButtonProps>(
   (
     {
       className,
@@ -31,7 +31,7 @@ const SubmitButton = forwardRef<
   ) => {
     const Comp = asChild ? Slot : 'button';
     return (
-      <LazyMotion features={domAnimation}>
+      <motion.div layout transition={{ duration: 0.3, ease: outExpo }}>
         <Comp
           className={cn(
             'relative overflow-hidden',
@@ -48,7 +48,7 @@ const SubmitButton = forwardRef<
           )}
           <AnimatePresence mode="wait" initial={false}>
             {disabled ? (
-              <m.div
+              <motion.div
                 key="loading"
                 initial={{ y: -10 }}
                 animate={{ y: 0 }}
@@ -56,9 +56,9 @@ const SubmitButton = forwardRef<
                 transition={{ duration: 0.3, type: 'spring' }}
               >
                 <LoadingSpinner />
-              </m.div>
+              </motion.div>
             ) : (
-              <m.div
+              <motion.div
                 key="standby"
                 initial={{ y: -10 }}
                 animate={{ y: 0 }}
@@ -66,7 +66,7 @@ const SubmitButton = forwardRef<
                 transition={{ duration: 0.2, type: 'spring' }}
               >
                 <Slottable>{props.children}</Slottable>
-              </m.div>
+              </motion.div>
             )}
           </AnimatePresence>
           {Icon && iconPlacement === 'right' && (
@@ -75,7 +75,7 @@ const SubmitButton = forwardRef<
             </div>
           )}
         </Comp>
-      </LazyMotion>
+      </motion.div>
     );
   }
 );

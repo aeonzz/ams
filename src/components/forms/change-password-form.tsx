@@ -18,8 +18,8 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { resetPasswordSchema } from '@/lib/db/schema/auth';
 import { resetPassword } from '@/lib/actions/users';
-import { motion, AnimatePresence } from 'framer-motion';
 import { SubmitButton } from '../ui/submit-button';
+import { MotionLayout } from '../layouts/motion-layout';
 
 interface ChangePasswordFormProps {
   resetPasswordToken: string;
@@ -58,10 +58,7 @@ export default function ChangePasswordForm({
 
   return (
     <>
-      <motion.div
-        layout
-        className="flex flex-col items-center justify-center space-y-2"
-      >
+      <MotionLayout className="flex flex-col items-center justify-center space-y-2">
         <h1 className="scroll-m-20 text-xl font-semibold tracking-tight">
           Reset Your Password
         </h1>
@@ -69,18 +66,18 @@ export default function ChangePasswordForm({
           Please enter your new password and confirm it to complete the reset
           process.
         </p>
-      </motion.div>
+      </MotionLayout>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="w-full sm:w-[330px] space-y-3"
+          className="w-full space-y-3 sm:w-[330px]"
         >
           <FormField
             control={form.control}
             name="password"
             render={({ field }) => (
               <FormItem>
-                <motion.div layout className="space-y-2">
+                <MotionLayout>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
                     <Input
@@ -91,20 +88,8 @@ export default function ChangePasswordForm({
                       {...field}
                     />
                   </FormControl>
-                </motion.div>
-                <AnimatePresence mode="popLayout">
-                  {form.formState.errors.password && (
-                    <motion.div
-                      layout
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.3, type: 'spring' }}
-                    >
-                      <FormMessage />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                </MotionLayout>
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -113,7 +98,7 @@ export default function ChangePasswordForm({
             name="confirmPassword"
             render={({ field }) => (
               <FormItem>
-                <motion.div layout className="space-y-2">
+                <MotionLayout>
                   <FormLabel>Re-Enter your password</FormLabel>
                   <FormControl>
                     <Input
@@ -123,32 +108,18 @@ export default function ChangePasswordForm({
                       {...field}
                     />
                   </FormControl>
-                </motion.div>
-                <AnimatePresence mode="popLayout">
-                  {form.formState.errors.confirmPassword && (
-                    <motion.div
-                      layout
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.3, type: 'spring' }}
-                    >
-                      <FormMessage />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                </MotionLayout>
+                <FormMessage />
               </FormItem>
             )}
           />
-          <motion.div layout>
-            <SubmitButton
-              disabled={isLoading}
-              className="w-full"
-              variant="ringHover"
-            >
-              Confirm
-            </SubmitButton>
-          </motion.div>
+          <SubmitButton
+            disabled={isLoading}
+            className="w-full"
+            variant="ringHover"
+          >
+            Confirm
+          </SubmitButton>
         </form>
       </Form>
     </>

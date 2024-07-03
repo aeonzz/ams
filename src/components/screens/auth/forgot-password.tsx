@@ -3,7 +3,7 @@
 import { SubmitButton } from '@/components/ui/submit-button';
 import { emailSchema } from '@/lib/email/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
@@ -17,8 +17,8 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
+import { MotionLayout } from '@/components/layouts/motion-layout';
 
 export default function ForgotPassword() {
   const [isEmailSent, setIsEmailSent] = useState(false);
@@ -41,7 +41,7 @@ export default function ForgotPassword() {
       .post('/api/email', payload)
       .then((res) => {
         if (res.data.error) {
-          console.log(res.data.error)
+          console.log(res.data.error);
           toast.error('Uh oh! Something went wrong.', {
             description: res.data.error,
           });
@@ -74,10 +74,7 @@ export default function ForgotPassword() {
         </>
       ) : (
         <>
-          <motion.div
-            layout
-            className="flex flex-col items-center justify-center gap-2 text-center"
-          >
+          <MotionLayout className="flex flex-col items-center justify-center gap-2 text-center">
             <h1 className="scroll-m-20 text-2xl font-semibold tracking-tight">
               Forgot Password?
             </h1>
@@ -87,7 +84,7 @@ export default function ForgotPassword() {
               below.
               <br /> We&apos;ll send you a link to reset your password.
             </p>
-          </motion.div>
+          </MotionLayout>
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
@@ -98,7 +95,7 @@ export default function ForgotPassword() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <motion.div layout className="space-y-2">
+                    <MotionLayout>
                       <FormControl>
                         <Input
                           placeholder="Enter your email"
@@ -106,28 +103,16 @@ export default function ForgotPassword() {
                           {...field}
                         />
                       </FormControl>
-                      <SubmitButton
-                        disabled={isLoading}
-                        variant="ringHover"
-                        className="w-full"
-                        type="submit"
-                      >
-                        Reset Password
-                      </SubmitButton>
-                    </motion.div>
-                    <AnimatePresence mode="popLayout">
-                      {form.formState.errors.email && (
-                        <motion.div
-                          layout
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: 'auto' }}
-                          exit={{ opacity: 0, height: 0 }}
-                          transition={{ duration: 0.3, type: 'spring' }}
-                        >
-                          <FormMessage />
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
+                    </MotionLayout>
+                    <FormMessage />
+                    <SubmitButton
+                      disabled={isLoading}
+                      variant="ringHover"
+                      className="w-full"
+                      type="submit"
+                    >
+                      Reset Password
+                    </SubmitButton>
                   </FormItem>
                 )}
               />

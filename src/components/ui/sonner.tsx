@@ -2,10 +2,8 @@
 
 import { cn } from '@/lib/utils';
 import { useTheme } from 'next-themes';
-import { Inter } from 'next/font/google';
+import { GeistSans } from 'geist/font/sans';
 import { Toaster as Sonner } from 'sonner';
-
-const inter = Inter({ subsets: ['latin'] });
 
 type ToasterProps = React.ComponentProps<typeof Sonner>;
 
@@ -19,7 +17,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
       toastOptions={{
         classNames: {
           toast: cn(
-            inter.className,
+            GeistSans.className,
             'group toast group-[.toaster]:bg-background group-[.toaster]:text-foreground group-[.toaster]:border-border group-[.toaster]:shadow-lg'
           ),
           description: 'group-[.toast]:text-muted-foreground',

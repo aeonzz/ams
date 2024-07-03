@@ -19,7 +19,7 @@ import { authenticationSchema } from '@/lib/db/schema/auth';
 import { toast } from 'sonner';
 import { PasswordInput } from '../ui/password-input';
 import { SubmitButton } from '../ui/submit-button';
-import { motion, AnimatePresence } from 'framer-motion';
+import { MotionLayout } from '../layouts/motion-layout';
 
 export default function SignInForm() {
   const [isLoading, setIsLoading] = useState(false);
@@ -49,7 +49,7 @@ export default function SignInForm() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <motion.div layout className="space-y-2">
+              <MotionLayout>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
                   <Input
@@ -60,20 +60,8 @@ export default function SignInForm() {
                     {...field}
                   />
                 </FormControl>
-              </motion.div>
-              <AnimatePresence mode="popLayout">
-                {form.formState.errors.email && (
-                  <motion.div
-                    layout
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.3, type: 'spring',  }}
-                  >
-                    <FormMessage />
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              </MotionLayout>
+              <FormMessage />
             </FormItem>
           )}
         />
@@ -82,8 +70,8 @@ export default function SignInForm() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <motion.div layout className="space-y-2">
-                <div className="flex justify-between">
+              <MotionLayout>
+                <div className="flex items-center justify-between mb-1">
                   <FormLabel>Password</FormLabel>
                   <Link
                     href="/sign-in/reset-password"
@@ -101,32 +89,18 @@ export default function SignInForm() {
                     {...field}
                   />
                 </FormControl>
-              </motion.div>
-              <AnimatePresence mode="popLayout">
-                {form.formState.errors.password && (
-                  <motion.div
-                    layout
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.3, type: 'spring' }}
-                  >
-                    <FormMessage />
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              </MotionLayout>
+              <FormMessage />
             </FormItem>
           )}
         />
-        <motion.div layout>
-          <SubmitButton
-            disabled={isLoading}
-            className="w-full"
-            variant="ringHover"
-          >
-            Sign in
-          </SubmitButton>
-        </motion.div>
+        <SubmitButton
+          disabled={isLoading}
+          className="w-full"
+          variant="ringHover"
+        >
+          Sign in
+        </SubmitButton>
       </form>
     </Form>
   );

@@ -4,26 +4,35 @@ import { cn } from '@/lib/utils';
 import DashboardSidebar from '../navigations/dashboard-sidebar';
 import { useStore } from '@/lib/hooks/use-store';
 import { useSidebarToggle } from '@/lib/hooks/use-sidebar-toggle';
+import { User } from 'prisma/generated/zod';
+
+interface DashboardLayoutProps {
+  children: React.ReactNode;
+  currentUser: User;
+}
 
 export default function DashboardLayout({
   children,
-}: {
-  children: React.ReactNode;
-}) {
+  currentUser,
+}: DashboardLayoutProps) {
   const sidebar = useStore(useSidebarToggle, (state) => state);
-  
+
   if (!sidebar) return null;
 
   return (
     <>
-      <DashboardSidebar />
+      <DashboardSidebar
+        isOpen={sidebar.isOpen}
+        setIsOpen={sidebar.setIsOpen}
+        currentUser={currentUser}
+      />
       <main
         className={cn(
-          'h-auto bg-background p-2 pl-0 transition-[margin-left] duration-300 ease-in-out',
+          'h-auto bg-background p-2 pl-0 transition-[margin-left] duration-300 ease-out-expo',
           sidebar?.isOpen === false ? 'lg:ml-[90px]' : 'lg:ml-72'
         )}
       >
-        <div className="min-h-[calc(100vh_-_16px)] w-full rounded-md border bg-secondary">
+        <div className="min-h-[calc(100vh_-_16px)] w-full overflow-hidden rounded-md border bg-secondary">
           {children}
         </div>
       </main>

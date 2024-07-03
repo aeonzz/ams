@@ -1,15 +1,21 @@
-import Navbar from "./navbar";
+import { User } from 'prisma/generated/zod';
+import Navbar from './navbar';
 
 interface ContentLayoutProps {
   title: string;
   children: React.ReactNode;
+  currentUser: User;
 }
 
-export default function ContentLayout({ title, children }: ContentLayoutProps) {
+export default function ContentLayout({
+  title,
+  children,
+  currentUser,
+}: ContentLayoutProps) {
   return (
     <div>
-      <Navbar title={title} />
-      <div className="container pt-8 pb-8 px-4 sm:px-8">{children}</div>
+      <Navbar title={title} currentUser={currentUser} />
+      <div className="w-full px-4 pb-8 pt-8 sm:px-8">{children}</div>
     </div>
   );
 }

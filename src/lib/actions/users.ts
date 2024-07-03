@@ -15,7 +15,6 @@ import {
   getUserAuth,
 } from '../auth/utils';
 
-import { authedProcedure } from './procedures';
 import {
   authenticationSchema,
   changePasswordSchema,
@@ -23,6 +22,7 @@ import {
   updateUserSchema,
 } from '../db/schema/auth';
 import { createServerAction } from 'zsa';
+import { authedProcedure } from './procedures';
 
 interface ActionResult {
   error: string;
@@ -155,6 +155,25 @@ export const resetPassword = createServerAction()
           resetPasswordTokenExpiry: null,
         },
       });
+    } catch (error) {
+      console.log(error);
+      throw 'An error occurred while making the request. Please try again later';
+    }
+  });
+
+export const currentUser = authedProcedure
+  .createServerAction()
+  .handler(async ({ ctx }) => {
+    const { user } = ctx;
+
+    try {
+      const data = await db.user.findUnique({
+        where: {
+          id: user.id,
+        },
+      });
+
+      return data;
     } catch (error) {
       console.log(error);
       throw 'An error occurred while making the request. Please try again later';

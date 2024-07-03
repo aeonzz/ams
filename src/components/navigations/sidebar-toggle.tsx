@@ -8,7 +8,7 @@ import { useEffect } from 'react';
 
 interface SidebarToggleProps {
   isOpen: boolean | undefined;
-  setIsOpen?: () => void;
+  setIsOpen: () => void;
 }
 
 export default function SidebarToggle({
@@ -19,7 +19,7 @@ export default function SidebarToggle({
     const down = (e: KeyboardEvent) => {
       if (e.key === '[') {
         e.preventDefault();
-        setIsOpen?.();
+        setIsOpen();
       }
     };
 
@@ -28,16 +28,16 @@ export default function SidebarToggle({
   }, []);
 
   return (
-    <div className="invisible absolute -right-[16px] top-[14px] z-20 lg:visible">
+    <div className="invisible absolute -right-[16px] bottom-14 z-20 lg:visible">
       <Button
-        onClick={() => setIsOpen?.()}
+        onClick={() => setIsOpen()}
         className="h-8 w-8 rounded-md"
         variant="outline"
         size="icon"
       >
         <ChevronLeft
           className={cn(
-            'h-4 w-4 transition-transform duration-700 ease-in-out',
+            'h-4 w-4 transition-transform duration-700 ease-out-expo',
             isOpen === false ? 'rotate-180' : 'rotate-0'
           )}
         />

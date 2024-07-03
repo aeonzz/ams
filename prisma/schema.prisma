@@ -30,6 +30,7 @@ model User {
   resetPasswordTokenExpiry DateTime?
   name                     String?
   sessions                 Session[]
+  role                     Role      @default(USER)
 }
 
 model Session {
@@ -38,4 +39,10 @@ model Session {
   expiresAt DateTime
   createdAt DateTime @default(now())
   user      User     @relation(references: [id], fields: [userId], onDelete: Cascade)
+}
+
+enum Role {
+  USER
+  ADMIN
+  SYSTEMADMIN
 }
