@@ -1,25 +1,16 @@
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
 import ContentLayout from '@/components/navigations/content-layout';
-import DashboardScreen from '@/components/screens/dashboard';
-import { currentUser } from '@/lib/actions/users';
 import FetchDataError from '@/components/screens/fetch-data-error';
+import { currentUser } from '@/lib/actions/users';
+import React from 'react';
 
-export default async function DashboardPage() {
+export default async function Page() {
   const [data] = await currentUser();
 
   if (!data) {
     return <FetchDataError />;
   }
-  
   return (
-    <ContentLayout title="Dashboard" currentUser={data}>
+    <ContentLayout title="Account" currentUser={data}>
       {/* <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -33,7 +24,7 @@ export default async function DashboardPage() {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb> */}
-      <DashboardScreen />
+      asdasd
     </ContentLayout>
   );
 }

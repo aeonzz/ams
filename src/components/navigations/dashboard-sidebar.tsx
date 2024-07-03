@@ -1,12 +1,11 @@
-import Link from 'next/link';
-import { PanelsTopLeft } from 'lucide-react';
+'use client';
 
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
 import SidebarToggle from './sidebar-toggle';
-import Menu from './menu';
-import UserNav from './user-nav';
 import { User } from 'prisma/generated/zod';
+import { usePathname } from 'next/navigation';
+import MainMenu from './main-menu';
+import SettingsMenu from './settings-menu';
 
 interface DashboardSidebarProps {
   isOpen: boolean | undefined;
@@ -19,20 +18,23 @@ export default function DashboardSidebar({
   setIsOpen,
   currentUser,
 }: DashboardSidebarProps) {
+  const pathname = usePathname();
   return (
     <aside
       className={cn(
         'fixed left-0 top-0 z-20 h-screen -translate-x-full transition-[width] duration-300 ease-out-expo lg:translate-x-0',
-        isOpen === false ? 'w-[90px]' : 'w-72'
+        isOpen === false ? 'w-[76px]' : 'w-72'
       )}
     >
-      <SidebarToggle isOpen={isOpen} setIsOpen={setIsOpen} />
+      {!pathname.startsWith('/settings') && (
+        <SidebarToggle isOpen={isOpen} setIsOpen={setIsOpen} />
+      )}
       <div className="relative flex h-full flex-col overflow-y-auto px-3 py-3">
-        <UserNav
-          currentUser={currentUser}
-          isOpen={isOpen}
-        />
-        <Menu isOpen={isOpen} />
+        {pathname.startsWith('/dashboard') ? (
+          <MainMenu isOpen={isOpen} currentUser={currentUser} />
+        ) : (
+          <SettingsMenu />
+        )}
       </div>
     </aside>
   );

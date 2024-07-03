@@ -4,97 +4,78 @@ import {
   Settings,
   Bookmark,
   SquarePen,
-  LayoutGrid
-} from "lucide-react";
-
-type Submenu = {
-  href: string;
-  label: string;
-  active: boolean;
-};
-
-type Menu = {
-  href: string;
-  label: string;
-  active: boolean;
-  icon: any;
-  submenus: Submenu[];
-};
-
-type Group = {
-  groupLabel: string;
-  menus: Menu[];
-};
+  LayoutGrid,
+} from 'lucide-react';
 
 export function getMenuList(pathname: string): Group[] {
   return [
     {
-      groupLabel: "",
+      groupLabel: '',
       menus: [
         {
-          href: "/dashboard",
-          label: "Dashboard",
-          active: pathname.includes("/dashboard"),
+          href: '/dashboard',
+          label: 'Dashboard',
+          active: pathname.includes('/dashboard'),
           icon: LayoutGrid,
-          submenus: []
-        }
-      ]
+          submenus: [],
+        },
+      ],
     },
     {
-      groupLabel: "Contents",
+      groupLabel: 'Contents',
       menus: [
         {
-          href: "",
-          label: "Posts",
-          active: pathname.includes("/posts"),
+          href: '',
+          label: 'Posts',
+          active: pathname.includes('/posts'),
           icon: SquarePen,
           submenus: [
             {
-              href: "/posts",
-              label: "All Posts",
-              active: pathname === "/posts"
+              href: '/posts',
+              label: 'All Posts',
+              active: pathname === '/posts',
             },
             {
-              href: "/posts/new",
-              label: "New Post",
-              active: pathname === "/posts/new"
-            }
-          ]
+              href: '/posts/new',
+              label: 'New Post',
+              active: pathname === '/posts/new',
+            },
+          ],
         },
         {
-          href: "/categories",
-          label: "Categories",
-          active: pathname.includes("/categories"),
+          href: '/categories',
+          label: 'Categories',
+          active: pathname.includes('/categories'),
           icon: Bookmark,
-          submenus: []
+          submenus: [],
         },
         {
-          href: "/tags",
-          label: "Tags",
-          active: pathname.includes("/tags"),
+          href: '/tags',
+          label: 'Tags',
+          active: pathname.includes('/tags'),
           icon: Tag,
-          submenus: []
-        }
-      ]
+          submenus: [],
+        },
+      ],
     },
     {
-      groupLabel: "Settings",
+      groupLabel: 'Settings',
       menus: [
         {
-          href: "/users",
-          label: "Users",
-          active: pathname.includes("/users"),
+          href: '/users',
+          label: 'Users',
+          active: pathname.includes('/users'),
           icon: Users,
-          submenus: []
+          submenus: [],
         },
         {
-          href: "/account",
-          label: "Account",
-          active: pathname.includes("/account"),
+          href: '/account',
+          label: 'Account',
+          active: pathname.includes('/account'),
           icon: Settings,
-          submenus: []
-        }
-      ]
-    }
+          submenus: [],
+        },
+      ],
+    },
   ];
 }

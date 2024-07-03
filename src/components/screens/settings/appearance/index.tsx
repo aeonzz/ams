@@ -2,9 +2,11 @@
 
 import { Button } from '@/components/ui/button';
 import { useTheme } from 'next-themes';
+import React from 'react';
 
-export default function Page() {
+export default function AppearanceScreen() {
   const { setTheme } = useTheme();
+
   return (
     <div>
       <h1 className="text-2xl font-semibold">Settings</h1>

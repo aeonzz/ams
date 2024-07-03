@@ -1,15 +1,13 @@
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
-  SheetHeader,
   SheetContent,
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { MenuIcon, PanelsTopLeft } from 'lucide-react';
-import Link from 'next/link';
-import Menu from './menu';
 import UserNav from './user-nav';
 import { User } from 'prisma/generated/zod';
+import MainMenu from './main-menu';
 
 interface SheetMenuProps {
   currentUser: User;
@@ -28,7 +26,7 @@ export default function SheetMenu({ currentUser }: SheetMenuProps) {
         side="left"
       >
         <UserNav currentUser={currentUser} isOpen />
-        <Menu isOpen />
+        <MainMenu isOpen currentUser={currentUser} />
       </SheetContent>
     </Sheet>
   );

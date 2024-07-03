@@ -1,7 +1,6 @@
 'use client';
 
 import { updateUser } from '@/lib/actions/users';
-import { useServerActionMutation } from '@/hooks/server-action-hooks';
 import React from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -19,6 +18,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { updateUserSchema } from '@/lib/db/schema/auth';
+import { useServerActionMutation } from '@/lib/hooks/server-action-hooks';
 
 export default function Page() {
   const { isPending, mutate } = useServerActionMutation(updateUser);
