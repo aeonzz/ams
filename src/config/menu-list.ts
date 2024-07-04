@@ -1,3 +1,4 @@
+import { Group } from '@/lib/types/menu';
 import {
   Tag,
   Users,

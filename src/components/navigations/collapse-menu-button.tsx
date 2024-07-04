@@ -26,6 +26,7 @@ import {
   DropdownMenuContent,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
+import SubMenuButton from './sub-menu-button';
 
 type Submenu = {
   href: string;
@@ -96,28 +97,13 @@ export default function CollapseMenuButton({
       </CollapsibleTrigger>
       <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
         {submenus.map(({ href, label, active }, index) => (
-          <Button
-            key={index}
-            variant={active ? 'secondary' : 'ghost'}
-            className="mb-1 h-10 w-full justify-start"
-            asChild
-          >
-            <Link href={href}>
-              <span className="ml-2 mr-4">
-                <Dot size={18} />
-              </span>
-              <p
-                className={cn(
-                  'max-w-[170px] truncate',
-                  isOpen
-                    ? 'translate-x-0 opacity-100'
-                    : '-translate-x-96 opacity-0'
-                )}
-              >
-                {label}
-              </p>
-            </Link>
-          </Button>
+          <SubMenuButton
+            href={href}
+            label={label}
+            active={active}
+            index={index}
+            isOpen={isOpen}
+          />
         ))}
       </CollapsibleContent>
     </Collapsible>
@@ -154,7 +140,12 @@ export default function CollapseMenuButton({
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
-      <DropdownMenuContent side="right" sideOffset={25} align="start">
+      <DropdownMenuContent
+        side="right"
+        sideOffset={25}
+        align="start"
+        onCloseAutoFocus={(e) => e.preventDefault()}
+      >
         <DropdownMenuLabel className="max-w-[190px] truncate">
           {label}
         </DropdownMenuLabel>

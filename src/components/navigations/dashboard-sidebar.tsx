@@ -30,10 +30,10 @@ export default function DashboardSidebar({
         <SidebarToggle isOpen={isOpen} setIsOpen={setIsOpen} />
       )}
       <div className="relative flex h-full flex-col overflow-y-auto px-3 py-3">
-        {pathname.startsWith('/dashboard') ? (
-          <MainMenu isOpen={isOpen} currentUser={currentUser} />
-        ) : (
+        {pathname.startsWith('/settings') ? (
           <SettingsMenu />
+        ) : (
+          <MainMenu isOpen={isOpen} currentUser={currentUser} />
         )}
       </div>
     </aside>

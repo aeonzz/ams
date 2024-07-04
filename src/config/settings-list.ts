@@ -1,3 +1,5 @@
+import { Group } from "@/lib/types/menu";
+
 export function getSettingsList(pathname: string): Group[] {
   return [
     {

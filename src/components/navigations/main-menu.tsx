@@ -1,11 +1,9 @@
 'use client';
 
-import Link from 'next/link';
 import { Ellipsis, LogOut } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Tooltip,
@@ -13,11 +11,12 @@ import {
   TooltipContent,
   TooltipProvider,
 } from '@/components/ui/tooltip';
-import { getMenuList } from '@/config/menu-list';
-import React from 'react';
+import React, { useMemo } from 'react';
 import CollapseMenuButton from './collapse-menu-button';
 import UserNav from './user-nav';
 import { User } from 'prisma/generated/zod';
+import { getMenuList } from '@/config/menu-list';
+import MenuButton from './menu-button';
 
 interface MainMenuProps {
   isOpen: boolean | undefined;
@@ -59,37 +58,23 @@ export default function MainMenu({ isOpen, currentUser }: MainMenuProps) {
                   <p className="pb-2"></p>
                 )}
                 {menus.map(
-                  ({ href, label, icon: Icon, active, submenus }, index) =>
-                    submenus.length === 0 ? (
+                  ({ href, label, icon: Icon, active, submenus }, index) => {
+                    const memoizedSubmenus = useMemo(
+                      () => submenus,
+                      [submenus]
+                    );
+                    return submenus.length === 0 ? (
                       <div className="w-full" key={index}>
                         <TooltipProvider disableHoverableContent>
                           <Tooltip delayDuration={100}>
                             <TooltipTrigger asChild>
-                              <Button
-                                variant={active ? 'secondary' : 'ghost'}
-                                className="mb-1 h-10 w-full justify-start"
-                                asChild
-                              >
-                                <Link href={href} prefetch>
-                                  <span
-                                    className={cn(
-                                      isOpen === false ? '' : 'mr-4'
-                                    )}
-                                  >
-                                    <Icon className="size-5" />
-                                  </span>
-                                  <p
-                                    className={cn(
-                                      'max-w-[200px] truncate',
-                                      isOpen === false
-                                        ? '-translate-x-96 opacity-0'
-                                        : 'translate-x-0 opacity-100'
-                                    )}
-                                  >
-                                    {label}
-                                  </p>
-                                </Link>
-                              </Button>
+                              <MenuButton
+                                icon={Icon}
+                                label={label}
+                                active={active}
+                                isOpen={isOpen}
+                                href={href}
+                              />
                             </TooltipTrigger>
                             {isOpen === false && (
                               <TooltipContent side="right">
@@ -105,11 +90,12 @@ export default function MainMenu({ isOpen, currentUser }: MainMenuProps) {
                           icon={Icon}
                           label={label}
                           active={active}
-                          submenus={submenus}
+                          submenus={memoizedSubmenus}
                           isOpen={isOpen}
                         />
                       </div>
-                    )
+                    );
+                  }
                 )}
               </li>
             ))}

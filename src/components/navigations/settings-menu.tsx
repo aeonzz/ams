@@ -6,7 +6,7 @@ import { ChevronLeft } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { getSettingsList } from '@/config/settings-list';
 import { cn } from '@/lib/utils';
-import Link from 'next/link';
+import SettingsMenuButton from './settings-menu-button';
 
 export default function SettingsMenu() {
   const router = useRouter();
@@ -27,15 +27,11 @@ export default function SettingsMenu() {
               </p>
               {menus.map(({ href, label, active }, index) => (
                 <div className="w-full" key={index}>
-                  <Button
-                    variant={active ? 'secondary' : 'ghost'}
-                    className="mb-1 h-10 w-full justify-start"
-                    asChild
-                  >
-                    <Link href={href} prefetch>
-                      <p className={cn('max-w-[200px] truncate')}>{label}</p>
-                    </Link>
-                  </Button>
+                  <SettingsMenuButton
+                    active={active}
+                    label={label}
+                    href={href}
+                  />
                 </div>
               ))}
             </li>
