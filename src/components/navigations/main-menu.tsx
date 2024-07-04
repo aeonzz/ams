@@ -20,15 +20,14 @@ import MenuButton from './menu-button';
 
 interface MainMenuProps {
   isOpen: boolean | undefined;
-  currentUser: User;
 }
 
-export default function MainMenu({ isOpen, currentUser }: MainMenuProps) {
+export default function MainMenu({ isOpen }: MainMenuProps) {
   const pathname = usePathname();
   const menuList = getMenuList(pathname);
   return (
     <>
-      <UserNav currentUser={currentUser} isOpen={isOpen} />
+      <UserNav isOpen={isOpen} />
       <ScrollArea className="[&>div>div[style]]:!block">
         <nav className="h-full w-full">
           <ul className="flex flex-col items-start space-y-1">

@@ -10,13 +10,11 @@ import SettingsMenu from './settings-menu';
 interface DashboardSidebarProps {
   isOpen: boolean | undefined;
   setIsOpen: () => void;
-  currentUser: User;
 }
 
 export default function DashboardSidebar({
   isOpen,
   setIsOpen,
-  currentUser,
 }: DashboardSidebarProps) {
   const pathname = usePathname();
   return (
@@ -33,7 +31,7 @@ export default function DashboardSidebar({
         {pathname.startsWith('/settings') ? (
           <SettingsMenu />
         ) : (
-          <MainMenu isOpen={isOpen} currentUser={currentUser} />
+          <MainMenu isOpen={isOpen} />
         )}
       </div>
     </aside>

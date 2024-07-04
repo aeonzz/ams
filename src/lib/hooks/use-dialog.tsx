@@ -5,6 +5,8 @@ export interface UseDialogStore {
   setCreateRequest: (createRequest: boolean) => void;
   commandDialog: boolean;
   setCommandDialog: (commandDialog: boolean) => void;
+  profileUploadDialog: boolean;
+  setProfileUploadDialog: (commandDialog: boolean) => void;
 }
 
 export const useDialog = create<UseDialogStore>((set) => ({
@@ -15,5 +17,9 @@ export const useDialog = create<UseDialogStore>((set) => ({
   commandDialog: false,
   setCommandDialog: (commandDialog: boolean) => {
     set(() => ({ commandDialog }));
+  },
+  profileUploadDialog: false,
+  setProfileUploadDialog: (profileUploadDialog: boolean) => {
+    set(() => ({ profileUploadDialog }));
   },
 }));

@@ -8,12 +8,10 @@ import { User } from 'prisma/generated/zod';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
-  currentUser: User;
 }
 
 export default function DashboardLayout({
   children,
-  currentUser,
 }: DashboardLayoutProps) {
   const sidebar = useStore(useSidebarToggle, (state) => state);
 
@@ -24,7 +22,6 @@ export default function DashboardLayout({
       <DashboardSidebar
         isOpen={sidebar.isOpen}
         setIsOpen={sidebar.setIsOpen}
-        currentUser={currentUser}
       />
       <main
         className={cn(

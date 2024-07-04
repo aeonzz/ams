@@ -9,8 +9,10 @@ import {
 } from '@/components/ui/dialog';
 import { ImageUp } from 'lucide-react';
 import { Button } from '../ui/button';
+import { useDialog } from '@/lib/hooks/use-dialog';
 
 export default function UploadProfileDialog() {
+  // const dialog = useDialog();
   return (
     <Dialog>
       <DialogTrigger asChild>

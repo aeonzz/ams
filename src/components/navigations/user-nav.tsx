@@ -17,13 +17,14 @@ import { signOutAction } from '@/lib/actions/users';
 import { useDialog } from '@/lib/hooks/use-dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Link from 'next/link';
+import { useSession } from '@/lib/hooks/use-session';
 
 interface UserNavProps {
-  currentUser: User;
   isOpen: boolean | undefined;
 }
 
-export default function UserNav({ currentUser, isOpen }: UserNavProps) {
+export default function UserNav({ isOpen }: UserNavProps) {
+  const currentUser = useSession();
   const [isLoading, setIsLoading] = useState(false);
   const createRequest = useDialog();
   async function handleLogout(e: Event) {
