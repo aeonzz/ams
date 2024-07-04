@@ -18,8 +18,7 @@ export default function CreateRequest() {
     const down = (e: KeyboardEvent) => {
       if (e.key.toLowerCase() === 'c' && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
-        dialog.setCreateRequest(true)
-        dialog.setCommandDialog(false)
+        dialog.setActiveDialog('requestDialog');
       }
     };
 
@@ -28,7 +27,10 @@ export default function CreateRequest() {
   }, []);
 
   return (
-    <Dialog open={dialog.createRequest} onOpenChange={dialog.setCreateRequest}>
+    <Dialog 
+      open={dialog.activeDialog === 'requestDialog'} 
+      onOpenChange={(open) => dialog.setActiveDialog(open ? 'requestDialog' : '')}
+    >
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Are you absolutely sure?</DialogTitle>

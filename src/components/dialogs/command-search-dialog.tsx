@@ -21,8 +21,8 @@ import {
   CommandShortcut,
 } from '@/components/ui/command';
 import { useEffect } from 'react';
-import { useDialog } from '@/lib/hooks/use-dialog';
 import { useSidebarToggle } from '@/lib/hooks/use-sidebar-toggle';
+import { useDialog } from '@/lib/hooks/use-dialog';
 
 export default function CommandSearchDialog() {
   const dialog = useDialog();
@@ -32,26 +32,19 @@ export default function CommandSearchDialog() {
     const down = (e: KeyboardEvent) => {
       if (e.key.toLowerCase() === 'k' && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
-        dialog.setCommandDialog(true);
-        dialog.setCreateRequest(false);
+        dialog.setActiveDialog('commandDialog');
       }
     };
 
     document.addEventListener('keydown', down);
     return () => document.removeEventListener('keydown', down);
-  }, []); 
+  }, []);
 
   return (
     <>
-      {/* <p className="text-sm text-muted-foreground">
-        Press{" "}
-        <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
-          <span className="text-xs">Ctrl</span>J
-        </kbd>
-      </p> */}
       <CommandDialog
-        open={dialog.commandDialog}
-        onOpenChange={dialog.setCommandDialog}
+      open={dialog.activeDialog === 'commandDialog'} 
+      onOpenChange={(open) => dialog.setActiveDialog(open ? 'commandDialog' : '')}
       >
         <CommandInput placeholder="Type a command or search..." />
         <CommandList>
@@ -59,8 +52,7 @@ export default function CommandSearchDialog() {
           <CommandGroup heading="Request">
             <CommandItem
               onSelect={() => {
-                dialog.setCreateRequest(true);
-                dialog.setCommandDialog(false);
+                dialog.setActiveDialog('requestDialog');
               }}
             >
               <Plus className="mr-2 h-4 w-4" />

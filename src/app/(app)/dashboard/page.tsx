@@ -11,15 +11,9 @@ import DashboardScreen from '@/components/screens/dashboard';
 import { currentUser } from '@/lib/actions/users';
 import FetchDataError from '@/components/screens/fetch-data-error';
 
-export default async function DashboardPage() {
-  const [data] = await currentUser();
-
-  if (!data) {
-    return <FetchDataError />;
-  }
-  
+export default function DashboardPage() {
   return (
-    <ContentLayout title="Dashboard" currentUser={data}>
+    <ContentLayout title="Dashboard">
       {/* <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>

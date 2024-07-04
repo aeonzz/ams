@@ -10,14 +10,13 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '../ui/button';
-import { User } from 'prisma/generated/zod';
 import { cn } from '@/lib/utils';
 import { ChevronDown, SquarePen } from 'lucide-react';
 import { signOutAction } from '@/lib/actions/users';
-import { useDialog } from '@/lib/hooks/use-dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Link from 'next/link';
 import { useSession } from '@/lib/hooks/use-session';
+import { useDialog } from '@/lib/hooks/use-dialog';
 
 interface UserNavProps {
   isOpen: boolean | undefined;
@@ -26,7 +25,8 @@ interface UserNavProps {
 export default function UserNav({ isOpen }: UserNavProps) {
   const currentUser = useSession();
   const [isLoading, setIsLoading] = useState(false);
-  const createRequest = useDialog();
+  const dialog = useDialog();
+
   async function handleLogout(e: Event) {
     e.preventDefault();
     setIsLoading(true);
@@ -88,7 +88,7 @@ export default function UserNav({ isOpen }: UserNavProps) {
         <Button
           variant="secondary"
           size="icon"
-          onClick={() => createRequest.setCreateRequest(true)}
+          onClick={() => dialog.setActiveDialog('requestDialog')}
         >
           <SquarePen className="size-5" />
         </Button>

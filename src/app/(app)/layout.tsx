@@ -4,6 +4,11 @@ import SessionProvider from '@/components/providers/session-provider';
 import FetchDataError from '@/components/screens/fetch-data-error';
 import { currentUser } from '@/lib/actions/users';
 import { checkAuth } from '@/lib/auth/utils';
+import { NextSSRPlugin } from '@uploadthing/react/next-ssr-plugin';
+import { extractRouterConfig } from 'uploadthing/server';
+import { ourFileRouter } from '../api/uploadthing/core';
+
+import '@uploadthing/react/styles.css';
 
 export default async function AppLayout({
   children,
@@ -20,7 +25,10 @@ export default async function AppLayout({
   return (
     <SessionProvider user={data}>
       <DashboardLayout>
-        <CommandLayout>{children}</CommandLayout>
+        <CommandLayout>
+          <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
+          {children}
+        </CommandLayout>
       </DashboardLayout>
     </SessionProvider>
   );

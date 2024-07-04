@@ -1,17 +1,10 @@
 import ContentLayout from '@/components/navigations/content-layout';
 import AccountScreen from '@/components/screens/account';
-import FetchDataError from '@/components/screens/fetch-data-error';
-import { currentUser } from '@/lib/actions/users';
 import React from 'react';
 
-export default async function Page() {
-  const [data] = await currentUser();
-
-  if (!data) {
-    return <FetchDataError />;
-  }
+export default  function Page() {
   return (
-    <ContentLayout title="Settings" currentUser={data}>
+    <ContentLayout title="Settings">
       {/* <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>

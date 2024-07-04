@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import {
   Dialog,
@@ -10,11 +12,15 @@ import {
 import { ImageUp } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useDialog } from '@/lib/hooks/use-dialog';
+import ImageUploader from '../ui/image-uploader';
 
 export default function UploadProfileDialog() {
-  // const dialog = useDialog();
+  const dialog = useDialog();
   return (
-    <Dialog>
+    <Dialog
+      open={dialog.activeDialog === 'uploadImageDialog'}
+      onOpenChange={(open) => dialog.setActiveDialog(open ? 'uploadImageDialog' : '')}
+    >
       <DialogTrigger asChild>
         <Button
           variant="expandIcon"
@@ -32,6 +38,7 @@ export default function UploadProfileDialog() {
             Upload files Drag and drop your files here or click to browse.
           </DialogDescription>
         </DialogHeader>
+        <ImageUploader />
       </DialogContent>
     </Dialog>
   );
