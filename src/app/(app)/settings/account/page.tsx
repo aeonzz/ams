@@ -1,4 +1,5 @@
 import ContentLayout from '@/components/navigations/content-layout';
+import AccountScreen from '@/components/screens/account';
 import FetchDataError from '@/components/screens/fetch-data-error';
 import { currentUser } from '@/lib/actions/users';
 import React from 'react';
@@ -10,7 +11,7 @@ export default async function Page() {
     return <FetchDataError />;
   }
   return (
-    <ContentLayout title="Account" currentUser={data}>
+    <ContentLayout title="Settings" currentUser={data}>
       {/* <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -24,7 +25,7 @@ export default async function Page() {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb> */}
-      asdasd
+      <AccountScreen />
     </ContentLayout>
   );
 }

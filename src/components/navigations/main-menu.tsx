@@ -58,12 +58,8 @@ export default function MainMenu({ isOpen, currentUser }: MainMenuProps) {
                   <p className="pb-2"></p>
                 )}
                 {menus.map(
-                  ({ href, label, icon: Icon, active, submenus }, index) => {
-                    const memoizedSubmenus = useMemo(
-                      () => submenus,
-                      [submenus]
-                    );
-                    return submenus.length === 0 ? (
+                  ({ href, label, icon: Icon, active, submenus }, index) =>
+                    submenus.length === 0 ? (
                       <div className="w-full" key={index}>
                         <TooltipProvider disableHoverableContent>
                           <Tooltip delayDuration={100}>
@@ -85,17 +81,15 @@ export default function MainMenu({ isOpen, currentUser }: MainMenuProps) {
                         </TooltipProvider>
                       </div>
                     ) : (
-                      <div className="w-full" key={index}>
-                        <CollapseMenuButton
-                          icon={Icon}
-                          label={label}
-                          active={active}
-                          submenus={memoizedSubmenus}
-                          isOpen={isOpen}
-                        />
-                      </div>
-                    );
-                  }
+                      <CollapseMenuButton
+                        key={index}
+                        icon={Icon}
+                        label={label}
+                        active={active}
+                        submenus={submenus}
+                        isOpen={isOpen}
+                      />
+                    )
                 )}
               </li>
             ))}

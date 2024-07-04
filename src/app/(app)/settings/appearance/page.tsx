@@ -11,7 +11,7 @@ export default async function Page() {
     return <FetchDataError />;
   }
   return (
-    <ContentLayout title="Appearance" currentUser={data}>
+    <ContentLayout title="Settings" currentUser={data}>
       {/* <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>

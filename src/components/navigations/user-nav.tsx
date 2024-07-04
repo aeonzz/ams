@@ -37,7 +37,7 @@ export default function UserNav({ currentUser, isOpen }: UserNavProps) {
       <DropdownMenu>
         <DropdownMenuTrigger
           asChild
-          className="[&[data-state=open]>svg]:rotate-180 data-[state=open]:bg-accent"
+          className="data-[state=open]:bg-accent [&[data-state=open]>svg]:rotate-180"
         >
           <Button variant="ghost" className="w-auto space-x-2 px-3">
             <Avatar className="size-7 rounded-md">
@@ -69,7 +69,7 @@ export default function UserNav({ currentUser, isOpen }: UserNavProps) {
           <DropdownMenuLabel>My Account</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem>Profile</DropdownMenuItem>
-          <DropdownMenuItem asChild>
+          <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
             <Link href="/settings/account" prefetch>
               Settings
             </Link>

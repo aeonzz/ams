@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Slot, Slottable } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
-import { LucideProps } from 'lucide-react';
+import { LucideIcon, LucideProps } from 'lucide-react';
 
 const buttonVariants = cva(
   'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
@@ -19,7 +19,7 @@ const buttonVariants = cva(
         ghost: 'hover:bg-accent hover:text-accent-foreground',
         link: 'text-primary underline-offset-4 hover:underline',
         expandIcon:
-          'group relative text-secondary-foreground bg-secondary hover:bg-secondary/90 border border-secondary-foreground/5',
+          'group relative text-primary-foreground bg-primary hover:bg-primary/90 border border-primary-foreground/5',
         ringHover:
           'bg-secondary text-secondary-foreground transition-all duration-300 hover:bg-secondary/90 hover:ring-1 hover:ring-primary/90 hover:ring-offset-1 border',
         shine:
@@ -35,7 +35,7 @@ const buttonVariants = cva(
       },
       size: {
         default: 'h-10 px-4 py-2',
-        sm: 'h-9 rounded-md px-3',
+        sm: 'h-9 rounded-md px-4',
         lg: 'h-11 rounded-md px-8',
         icon: 'h-10 w-10',
       },
@@ -48,9 +48,7 @@ const buttonVariants = cva(
 );
 
 interface IconProps {
-  Icon: React.ForwardRefExoticComponent<
-    Omit<LucideProps, 'ref'> & React.RefAttributes<SVGSVGElement>
-  >;
+  Icon: LucideIcon;
   iconPlacement: 'left' | 'right';
 }
 
@@ -91,13 +89,13 @@ const Button = React.forwardRef<
         {...props}
       >
         {Icon && iconPlacement === 'left' && (
-          <div className="group-hover:translate-x-100 w-0 translate-x-[0%] pr-0 opacity-0 transition-all duration-200 group-hover:w-5 group-hover:pr-2 group-hover:opacity-100">
+          <div className="group-hover:translate-x-100 w-0 translate-x-[0%] pr-0 opacity-0 duration-300 ease-out-expo group-hover:w-5 group-hover:pr-2 group-hover:opacity-100">
             <Icon size={16} />
           </div>
         )}
         <Slottable>{props.children}</Slottable>
         {Icon && iconPlacement === 'right' && (
-          <div className="w-0 translate-x-[100%] pl-0 opacity-0 transition-all duration-200 group-hover:w-5 group-hover:translate-x-0 group-hover:pl-2 group-hover:opacity-100">
+          <div className="w-0 translate-x-[100%] pl-0 opacity-0 duration-300 ease-out-expo group-hover:w-5 group-hover:translate-x-0 group-hover:pl-2 group-hover:opacity-100">
             <Icon size={16} />
           </div>
         )}

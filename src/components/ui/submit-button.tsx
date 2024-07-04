@@ -13,9 +13,9 @@ import { Slot, Slottable } from '@radix-ui/react-slot';
 import { AnimatePresence, MotionProps, motion } from 'framer-motion';
 import { outExpo } from '@/lib/easings';
 
-type SubmiButtonProps = ButtonProps & ButtonIconProps & MotionProps;
+type SubmitButtonProps = ButtonProps & ButtonIconProps & MotionProps;
 
-const SubmitButton = forwardRef<HTMLButtonElement, SubmiButtonProps>(
+const SubmitButton = forwardRef<HTMLButtonElement, SubmitButtonProps>(
   (
     {
       className,

@@ -9,7 +9,6 @@ interface SubMenuButtonProps {
   label: string;
   active: boolean;
   isOpen: boolean | undefined;
-  index: number;
 }
 
 export default function SubMenuButton({
@@ -17,11 +16,9 @@ export default function SubMenuButton({
   label,
   active,
   isOpen,
-  index,
 }: SubMenuButtonProps) {
   return (
     <Button
-      key={index}
       variant={active ? 'secondary' : 'ghost'}
       className="mb-1 h-10 w-full justify-start"
       asChild
