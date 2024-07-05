@@ -6,4 +6,3 @@ export { SortOrderSchema } from './SortOrderSchema';
 export { QueryModeSchema } from './QueryModeSchema';
 export { NullsOrderSchema } from './NullsOrderSchema';
 export { RoleSchema } from './RoleSchema';
-export { FileCategorySchema } from './FileCategorySchema';

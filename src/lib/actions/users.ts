@@ -2,7 +2,6 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { FileCategory } from "@prisma/client";
 import { generateId } from "lucia";
 import { Argon2id } from "oslo/password";
 import { createServerAction } from "zsa";
@@ -11,8 +10,9 @@ import { db } from "@/lib/db/index";
 
 import { lucia, validateRequest } from "../auth/lucia";
 import { genericError, getUserAuth, setAuthCookie, validateAuthFormData } from "../auth/utils";
-import { authenticationSchema, changePasswordSchema, resetPasswordSchema, updateUserSchema } from "../db/schema/auth";
-import { fileSchema } from "../db/schema/file";
+import getBase64 from "../base64";
+import { authenticationSchema, changePasswordSchema, resetPasswordSchema } from "../db/schema/auth";
+import { updateUserSchema } from "../db/schema/user";
 import { authedProcedure } from "./procedures";
 
 interface ActionResult {
@@ -88,26 +88,26 @@ export async function signOutAction(): Promise<ActionResult> {
   redirect("/sign-in");
 }
 
-export const updateUser = authedProcedure
-  .createServerAction()
-  .input(updateUserSchema)
-  .handler(async ({ input, ctx }) => {
-    const { user } = ctx;
+// export const updateUser = authedProcedure
+//   .createServerAction()
+//   .input(updateUserSchema)
+//   .handler(async ({ input, ctx }) => {
+//     const { user } = ctx;
 
-    try {
-      await db.user.update({
-        data: {
-          name: input.name,
-          email: input.email,
-        },
-        where: { id: user.id },
-      });
-      revalidatePath("/account");
-      return { success: true, error: "" };
-    } catch (e) {
-      return genericError;
-    }
-  });
+//     try {
+//       await db.user.update({
+//         data: {
+//           name: input.name,
+//           email: input.email,
+//         },
+//         where: { id: user.id },
+//       });
+//       revalidatePath("/account");
+//       return { success: true, error: "" };
+//     } catch (e) {
+//       return genericError;
+//     }
+//   });
 
 export const resetPassword = createServerAction()
   .input(changePasswordSchema)
@@ -154,6 +154,9 @@ export const currentUser = authedProcedure.createServerAction().handler(async ({
       where: {
         id: user.id,
       },
+      include: {
+        files: true,
+      },
     });
 
     return data;
@@ -163,28 +166,24 @@ export const currentUser = authedProcedure.createServerAction().handler(async ({
   }
 });
 
-export const uploadFile = authedProcedure
+export const updateUser = authedProcedure
   .createServerAction()
-  .input(fileSchema)
+  .input(updateUserSchema)
   .handler(async ({ ctx, input }) => {
     const { user } = ctx;
-    for (const url of input.urls) {
-      const fileId = generateId(15);
 
-      try {
-        const data = await db.file.create({
-          data: {
-            id: fileId,
-            category: FileCategory.PROFILE,
-            userId: user.id,
-            url: url,
-          },
-        });
-
-        return data;
-      } catch (error) {
-        console.log(error);
-        throw "An error occurred while making the request. Please try again later";
-      }
+    try {
+      await db.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          ...input,
+        },
+      });
+      return revalidatePath("/settings/account");
+    } catch (error) {
+      console.log(error);
+      throw "An error occurred while making the request. Please try again later";
     }
   });

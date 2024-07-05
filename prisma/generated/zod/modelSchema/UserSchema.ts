@@ -9,6 +9,7 @@ export const UserSchema = z.object({
   role: RoleSchema,
   id: z.string(),
   email: z.string(),
+  profileUrl: z.string().nullable(),
   hashedPassword: z.string(),
   resetPasswordToken: z.string().nullable(),
   resetPasswordTokenExpiry: z.coerce.date().nullable(),

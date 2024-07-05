@@ -7,6 +7,7 @@ import Dropzone, { type DropzoneProps, type FileRejection } from "react-dropzone
 import { toast } from "sonner";
 
 import { useControllableState } from "@/lib/hooks/use-controllable-state";
+import { useDialog } from "@/lib/hooks/use-dialog";
 import { cn, formatBytes } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -104,6 +105,7 @@ export function FileUploader(props: FileUploaderProps) {
     ...dropzoneProps
   } = props;
 
+  const dialog = useDialog();
   const [files, setFiles] = useControllableState({
     prop: valueProp,
     onChange: onValueChange,
@@ -144,6 +146,9 @@ export function FileUploader(props: FileUploaderProps) {
           loading: `Uploading ${target}...`,
           success: () => {
             setFiles([]);
+            setTimeout(() => {
+              dialog.setActiveDialog("");
+            }, 1000);
             return `${target} uploaded`;
           },
           error: `Failed to upload ${target}`,

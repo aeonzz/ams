@@ -1,12 +1,10 @@
 import { z } from 'zod';
-import { FileCategorySchema } from '../inputTypeSchemas/FileCategorySchema'
 
 /////////////////////////////////////////
 // FILE SCHEMA
 /////////////////////////////////////////
 
 export const FileSchema = z.object({
-  category: FileCategorySchema,
   id: z.string(),
   url: z.string(),
   blurDataUrl: z.string().nullable(),

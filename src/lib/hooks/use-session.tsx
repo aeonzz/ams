@@ -1,9 +1,9 @@
 "use client";
 
 import { createContext, useContext } from "react";
-import { User } from "prisma/generated/zod";
+import { UserType } from "../types/user";
 
-export const UserSessionContext = createContext<User | undefined>(undefined);
+export const UserSessionContext = createContext<UserType | undefined>(undefined);
 
 export function useSession() {
   const session = useContext(UserSessionContext);

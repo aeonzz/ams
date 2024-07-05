@@ -34,7 +34,7 @@ export default function FileCard({ file, progress, onRemove }: FileCardProps) {
             <p className="line-clamp-1 text-sm font-medium text-foreground/80">{file.name}</p>
             <p className="text-xs text-muted-foreground">{formatBytes(file.size)}</p>
           </div>
-          {progress ? <Progress value={progress} className="h-2" /> : null}
+          {progress ? <Progress value={progress} className="h-1" /> : null}
         </div>
       </div>
       <div className="flex items-center gap-2">
