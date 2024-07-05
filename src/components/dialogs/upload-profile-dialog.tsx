@@ -22,6 +22,7 @@ export default function UploadProfileDialog() {
   const { uploadFiles, progresses, uploadedFiles, isUploading } = useUploadFile("imageUploader", {
     defaultUploadedFiles: [],
   });
+
   return (
     <Dialog
       open={dialog.activeDialog === "uploadImageDialog"}

@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { FileCategory } from "@prisma/client";
 import { generateId } from "lucia";
 import { Argon2id } from "oslo/password";
 import { createServerAction } from "zsa";
@@ -11,6 +12,7 @@ import { db } from "@/lib/db/index";
 import { lucia, validateRequest } from "../auth/lucia";
 import { genericError, getUserAuth, setAuthCookie, validateAuthFormData } from "../auth/utils";
 import { authenticationSchema, changePasswordSchema, resetPasswordSchema, updateUserSchema } from "../db/schema/auth";
+import { fileSchema } from "../db/schema/file";
 import { authedProcedure } from "./procedures";
 
 interface ActionResult {
@@ -160,3 +162,29 @@ export const currentUser = authedProcedure.createServerAction().handler(async ({
     throw "An error occurred while making the request. Please try again later";
   }
 });
+
+export const uploadFile = authedProcedure
+  .createServerAction()
+  .input(fileSchema)
+  .handler(async ({ ctx, input }) => {
+    const { user } = ctx;
+    for (const url of input.urls) {
+      const fileId = generateId(15);
+
+      try {
+        const data = await db.file.create({
+          data: {
+            id: fileId,
+            category: FileCategory.PROFILE,
+            userId: user.id,
+            url: url,
+          },
+        });
+
+        return data;
+      } catch (error) {
+        console.log(error);
+        throw "An error occurred while making the request. Please try again later";
+      }
+    }
+  });

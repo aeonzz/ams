@@ -6,10 +6,13 @@ export const authedProcedure = createServerActionProcedure().handler(async () =>
   try {
     const { session } = await getUserAuth();
 
+    if (!session) {
+      throw new Error("User not authenticated");
+    }
+
     return {
       user: {
-        email: session?.user.email,
-        id: session?.user.id,
+        id: session.user.id,
       },
     };
   } catch {

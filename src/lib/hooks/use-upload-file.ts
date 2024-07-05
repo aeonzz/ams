@@ -5,6 +5,7 @@ import type { UploadFilesOptions } from "uploadthing/types";
 import type { UploadedFile } from "@/lib/types/file";
 import { type OurFileRouter } from "@/app/api/uploadthing/core";
 
+import { uploadFile } from "../actions/users";
 import { uploadFiles } from "../uploadthing";
 import { getErrorMessage } from "./handle-errror";
 
@@ -30,7 +31,7 @@ export function useUploadFile(
       const res = await uploadFiles(endpoint, {
         ...props,
         files,
-        onUploadProgress: ({ file, progress }) => {
+        onUploadProgress: async ({ file, progress }) => {
           setProgresses((prev) => {
             return {
               ...prev,
@@ -39,7 +40,7 @@ export function useUploadFile(
           });
         },
       });
-
+      await uploadFile({ urls: res.map((url) => url.url) });
       setUploadedFiles((prev) => (prev ? [...prev, ...res] : res));
     } catch (err) {
       toast.error(getErrorMessage(err));
