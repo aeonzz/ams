@@ -25,6 +25,7 @@ datasource db {
 model User {
   id                       String    @id
   email                    String    @unique
+  profileUrl               String?
   hashedPassword           String
   resetPasswordToken       String?   @unique
   resetPasswordTokenExpiry DateTime?
@@ -46,7 +47,6 @@ model File {
   id          String       @id
   url         String
   blurDataUrl String?
-  category    FileCategory
   userId      String
   user        User         @relation(fields: [userId], references: [id])
 }
@@ -55,8 +55,4 @@ enum Role {
   USER
   ADMIN
   SYSTEMADMIN
-}
-
-enum FileCategory {
-  PROFILE
 }
