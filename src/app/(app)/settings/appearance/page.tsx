@@ -1,6 +1,7 @@
-import ContentLayout from '@/components/navigations/content-layout';
-import AppearanceScreen from '@/components/screens/settings/appearance';
-import React from 'react';
+import React from "react";
+
+import ContentLayout from "@/components/navigations/content-layout";
+import AppearanceScreen from "@/components/screens/settings/appearance";
 
 export default function Page() {
   <ContentLayout title="Settings">

@@ -3,7 +3,7 @@
  * @see https://v0.dev/t/PmwTvNfrVgf
  * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
  */
-import Link from 'next/link';
+import Link from "next/link";
 
 export default function LandingPage() {
   return (
@@ -14,16 +14,10 @@ export default function LandingPage() {
           <span className="sr-only">Acme Inc</span>
         </Link>
         <nav className="ml-auto flex gap-4 sm:gap-6">
-          <Link
-            className="text-sm font-medium underline-offset-4 hover:underline"
-            href="#features"
-          >
+          <Link className="text-sm font-medium underline-offset-4 hover:underline" href="#features">
             Features
           </Link>
-          <Link
-            className="text-sm font-medium underline-offset-4 hover:underline"
-            href="/sign-in"
-          >
+          <Link className="text-sm font-medium underline-offset-4 hover:underline" href="/sign-in">
             Sign In
           </Link>
         </nav>
@@ -40,9 +34,8 @@ export default function LandingPage() {
                     for building the Web
                   </h1>
                   <p className="max-w-[600px] text-neutral-500 dark:text-neutral-400 md:text-xl">
-                    Give your team the toolkit to stop configuring and start
-                    innovating. Securely build, deploy, and scale the best web
-                    experiences.
+                    Give your team the toolkit to stop configuring and start innovating. Securely build, deploy, and
+                    scale the best web experiences.
                   </p>
                 </div>
                 <div className="flex flex-col gap-2 min-[400px]:flex-row">
@@ -74,9 +67,8 @@ export default function LandingPage() {
                   Faster iteration. More innovation.
                 </h2>
                 <p className="max-w-[900px] text-neutral-500 dark:text-neutral-400 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  The platform for rapid progress. Let your team focus on
-                  shipping features instead of managing infrastructure with
-                  automated CI/CD.
+                  The platform for rapid progress. Let your team focus on shipping features instead of managing
+                  infrastructure with automated CI/CD.
                 </p>
               </div>
             </div>
@@ -88,8 +80,7 @@ export default function LandingPage() {
                     <div className="grid gap-1">
                       <h3 className="text-xl font-bold">Collaboration</h3>
                       <p className="text-neutral-500 dark:text-neutral-400">
-                        Make collaboration seamless with built-in code review
-                        tools.
+                        Make collaboration seamless with built-in code review tools.
                       </p>
                     </div>
                   </li>
@@ -105,8 +96,7 @@ export default function LandingPage() {
                     <div className="grid gap-1">
                       <h3 className="text-xl font-bold">Scale</h3>
                       <p className="text-neutral-500 dark:text-neutral-400">
-                        Deploy to the cloud with a single click and scale with
-                        ease.
+                        Deploy to the cloud with a single click and scale with ease.
                       </p>
                     </div>
                   </li>
@@ -120,9 +110,7 @@ export default function LandingPage() {
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
-                <h2 className="text-3xl font-bold tracking-tighter md:text-4xl">
-                  Sign Up for Updates
-                </h2>
+                <h2 className="text-3xl font-bold tracking-tighter md:text-4xl">Sign Up for Updates</h2>
                 <p className="max-w-[600px] text-neutral-500 dark:text-neutral-400 md:text-xl">
                   Stay updated with the latest product news and updates.
                 </p>
@@ -147,9 +135,7 @@ export default function LandingPage() {
         </section>
       </main>
       <footer className="flex w-full shrink-0 flex-col items-center gap-2 border-t px-4 py-6 sm:flex-row md:px-6">
-        <p className="text-xs text-neutral-500 dark:text-neutral-400">
-          © 2024 Acme Inc. All rights reserved.
-        </p>
+        <p className="text-xs text-neutral-500 dark:text-neutral-400">© 2024 Acme Inc. All rights reserved.</p>
         <nav className="flex gap-4 sm:ml-auto sm:gap-6">
           <Link className="text-xs underline-offset-4 hover:underline" href="#">
             Terms of Service

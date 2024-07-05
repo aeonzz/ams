@@ -1,10 +1,9 @@
-import { redirect } from 'next/navigation';
-import { cookies } from 'next/headers';
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { type Cookie } from "lucia";
 
-import { type Cookie } from 'lucia';
-
-import { validateRequest } from './lucia';
-import { UsernameAndPassword, authenticationSchema } from '../db/schema/auth';
+import { authenticationSchema, UsernameAndPassword } from "../db/schema/auth";
+import { validateRequest } from "./lucia";
 
 export type AuthSession = {
   session: {
@@ -32,11 +31,11 @@ export const getUserAuth = async (): Promise<AuthSession> => {
 
 export const checkAuth = async () => {
   const { session } = await validateRequest();
-  if (!session) redirect('/sign-in');
+  if (!session) redirect("/sign-in");
 };
 
 export const genericError = {
-  error: 'An error occurred while making the request. Please try again later',
+  error: "An error occurred while making the request. Please try again later",
 };
 
 export const setAuthCookie = (cookie: Cookie) => {
@@ -45,18 +44,16 @@ export const setAuthCookie = (cookie: Cookie) => {
 };
 
 const getErrorMessage = (errors: any): string => {
-  if (errors.email) return 'Invalid Email';
-  if (errors.password) return 'Invalid Password - ' + errors.password[0];
-  return ''; // return a default error message or an empty string
+  if (errors.email) return "Invalid Email";
+  if (errors.password) return "Invalid Password - " + errors.password[0];
+  return ""; // return a default error message or an empty string
 };
 
 export const validateAuthFormData = (
   formData: FormData
-):
-  | { data: UsernameAndPassword; error: null }
-  | { data: null; error: string } => {
-  const email = formData.get('email');
-  const password = formData.get('password');
+): { data: UsernameAndPassword; error: null } | { data: null; error: string } => {
+  const email = formData.get("email");
+  const password = formData.get("password");
   const result = authenticationSchema.safeParse({ email, password });
 
   if (!result.success) {

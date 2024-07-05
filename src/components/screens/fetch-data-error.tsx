@@ -1,9 +1,10 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
 
 export default function FetchDataError() {
   const router = useRouter();
@@ -17,7 +18,7 @@ export default function FetchDataError() {
   return (
     <div className="flex h-[400px] w-full flex-col items-center justify-center space-y-4">
       <svg
-        className=" h-8 w-8 text-red-500 dark:text-red-400"
+        className="h-8 w-8 text-red-500 dark:text-red-400"
         fill="none"
         height="24"
         stroke="currentColor"
@@ -32,9 +33,7 @@ export default function FetchDataError() {
         <path d="M12 9v4" />
         <path d="M12 17h.01" />
       </svg>
-      <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-300">
-        Failed to fetch data
-      </h2>
+      <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-300">Failed to fetch data</h2>
       <p className="text-sm text-gray-500 dark:text-gray-400">
         There was a problem fetching the data. Please try again.
       </p>

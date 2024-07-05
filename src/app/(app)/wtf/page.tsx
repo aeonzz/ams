@@ -1,24 +1,16 @@
-'use client';
+"use client";
 
-import { updateUser } from '@/lib/actions/users';
-import React from 'react';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+import React from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
-import { Button } from '@/components/ui/button';
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { updateUserSchema } from '@/lib/db/schema/auth';
-import { useServerActionMutation } from '@/lib/hooks/server-action-hooks';
+import { updateUser } from "@/lib/actions/users";
+import { updateUserSchema } from "@/lib/db/schema/auth";
+import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
+import { Button } from "@/components/ui/button";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 
 export default function Page() {
   const { isPending, mutate } = useServerActionMutation(updateUser);
@@ -29,9 +21,7 @@ export default function Page() {
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit((data: z.infer<typeof updateUserSchema>) =>
-          mutate(data)
-        )}
+        onSubmit={form.handleSubmit((data: z.infer<typeof updateUserSchema>) => mutate(data))}
         className="w-2/3 space-y-6"
       >
         <FormField
@@ -43,9 +33,7 @@ export default function Page() {
               <FormControl>
                 <Input placeholder="shadcn" {...field} />
               </FormControl>
-              <FormDescription>
-                This is your public display name.
-              </FormDescription>
+              <FormDescription>This is your public display name.</FormDescription>
               <FormMessage />
             </FormItem>
           )}

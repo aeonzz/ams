@@ -1,6 +1,7 @@
-import { User } from 'prisma/generated/zod';
-import { ThemeToggle } from '../ui/theme-toggle';
-import SheetMenu from './sheet-menu';
+import { User } from "prisma/generated/zod";
+
+import { ThemeToggle } from "../ui/theme-toggle";
+import SheetMenu from "./sheet-menu";
 
 interface NavbarProps {
   title: string;

@@ -1,8 +1,9 @@
-'use client';
+"use client";
 
-import { Button } from '@/components/ui/button';
-import { useTheme } from 'next-themes';
-import React from 'react';
+import React from "react";
+import { useTheme } from "next-themes";
+
+import { Button } from "@/components/ui/button";
 
 export default function AppearanceScreen() {
   const { setTheme } = useTheme();
@@ -14,16 +15,10 @@ export default function AppearanceScreen() {
         <div>
           <h3 className="text-lg font-medium">Appearance</h3>
           <p className="text-sm text-muted-foreground">
-            Customize the appearance of the app. Automatically switch between
-            day and night themes.
+            Customize the appearance of the app. Automatically switch between day and night themes.
           </p>
         </div>
-        <Button
-          asChild
-          variant={'ghost'}
-          className="h-fit w-fit"
-          onClick={() => setTheme('light')}
-        >
+        <Button asChild variant={"ghost"} className="h-fit w-fit" onClick={() => setTheme("light")}>
           <div className="flex flex-col">
             <div className="items-center rounded-md border-2 border-muted p-1 hover:border-accent">
               <div className="space-y-2 rounded-sm bg-[#ecedef] p-2">
@@ -41,17 +36,10 @@ export default function AppearanceScreen() {
                 </div>
               </div>
             </div>
-            <span className="block w-full p-2 text-center font-normal">
-              Light
-            </span>
+            <span className="block w-full p-2 text-center font-normal">Light</span>
           </div>
         </Button>
-        <Button
-          asChild
-          variant={'ghost'}
-          onClick={() => setTheme('dark')}
-          className="h-fit w-fit"
-        >
+        <Button asChild variant={"ghost"} onClick={() => setTheme("dark")} className="h-fit w-fit">
           <div className="flex flex-col">
             <div className="items-center rounded-md border-2 border-muted bg-popover p-1 hover:bg-accent hover:text-accent-foreground">
               <div className="space-y-2 rounded-sm bg-neutral-950 p-2">
@@ -69,17 +57,10 @@ export default function AppearanceScreen() {
                 </div>
               </div>
             </div>
-            <span className="block w-full p-2 text-center font-normal">
-              Dark
-            </span>
+            <span className="block w-full p-2 text-center font-normal">Dark</span>
           </div>
         </Button>
-        <Button
-          asChild
-          variant={'ghost'}
-          onClick={() => setTheme('system')}
-          className="h-fit w-fit"
-        >
+        <Button asChild variant={"ghost"} onClick={() => setTheme("system")} className="h-fit w-fit">
           <div className="flex flex-col">
             <div className="items-center rounded-md border-2 border-muted bg-popover p-1 hover:bg-accent hover:text-accent-foreground">
               <div className="space-y-2 rounded-sm bg-neutral-300 p-2">
@@ -97,9 +78,7 @@ export default function AppearanceScreen() {
                 </div>
               </div>
             </div>
-            <span className="block w-full p-2 text-center font-normal">
-              System
-            </span>
+            <span className="block w-full p-2 text-center font-normal">System</span>
           </div>
         </Button>
       </div>

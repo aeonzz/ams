@@ -1,4 +1,4 @@
-import { create } from 'zustand';
+import { create } from "zustand";
 
 export interface UseDialogStore {
   activeDialog: string;
@@ -6,7 +6,7 @@ export interface UseDialogStore {
 }
 
 export const useDialog = create<UseDialogStore>((set) => ({
-  activeDialog: '',
+  activeDialog: "",
   setActiveDialog: (activeDialog: string) => {
     set(() => ({ activeDialog }));
   },

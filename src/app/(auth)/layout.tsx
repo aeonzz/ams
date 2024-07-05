@@ -1,17 +1,10 @@
-import { getUserAuth } from '@/lib/auth/utils';
-import { redirect } from 'next/navigation';
+import { redirect } from "next/navigation";
 
-export default async function AuthLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+import { getUserAuth } from "@/lib/auth/utils";
+
+export default async function AuthLayout({ children }: { children: React.ReactNode }) {
   const session = await getUserAuth();
-  if (session?.session) redirect('/dashboard');
+  if (session?.session) redirect("/dashboard");
 
-  return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-4">
-      {children}
-    </div>
-  );
+  return <div className="flex min-h-screen flex-col items-center justify-center px-4">{children}</div>;
 }

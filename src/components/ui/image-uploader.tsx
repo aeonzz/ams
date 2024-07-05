@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { UploadButton } from '@/lib/utils';
+import { UploadButton } from "@/lib/utils";
 
 export default function ImageUploader() {
   return (
@@ -8,11 +8,11 @@ export default function ImageUploader() {
       endpoint="imageUploader"
       onClientUploadComplete={(res) => {
         // Do something with the response
-        console.log('Files: ', res);
-        alert('Upload Completed');
+        console.log("Files: ", res);
+        alert("Upload Completed");
       }}
       onUploadError={(error: Error) => {
-        console.log(error)
+        console.log(error);
         // Do something with the error.
         alert(`ERROR! ${error.message}`);
       }}

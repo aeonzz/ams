@@ -1,15 +1,15 @@
-import { db } from '@/lib/db/index';
-import React from 'react';
-import ChangePasswordForm from '@/components/forms/change-password-form';
-import ForgotPassword from '../../../../components/screens/auth/forgot-password';
+import React from "react";
+
+import { db } from "@/lib/db/index";
+import ChangePasswordForm from "@/components/forms/change-password-form";
+
+import ForgotPassword from "../../../../components/screens/auth/forgot-password";
 
 interface ResetPasswordPageProps {
   searchParams: { [key: string]: string | string[] | undefined };
 }
 
-export default async function ResetPasswordPage({
-  searchParams,
-}: ResetPasswordPageProps) {
+export default async function ResetPasswordPage({ searchParams }: ResetPasswordPageProps) {
   const token = searchParams.token as string;
 
   if (!token) {
@@ -38,7 +38,5 @@ export default async function ResetPasswordPage({
 }
 
 const ErrorMessage = ({ message }: { message: string }) => (
-  <h1 className="scroll-m-20 text-center text-2xl font-semibold tracking-tight">
-    {message}
-  </h1>
+  <h1 className="scroll-m-20 text-center text-2xl font-semibold tracking-tight">{message}</h1>
 );

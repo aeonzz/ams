@@ -1,6 +1,7 @@
-import { cn } from '@/lib/utils';
-import { Card, CardDescription, CardTitle } from '@/components/ui/card';
-import { ImageIcon } from 'lucide-react';
+import { ImageIcon } from "lucide-react";
+
+import { cn } from "@/lib/utils";
+import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 
 interface EmptyCardProps extends React.ComponentPropsWithoutRef<typeof Card> {
   title: string;
@@ -9,20 +10,10 @@ interface EmptyCardProps extends React.ComponentPropsWithoutRef<typeof Card> {
   icon?: React.ComponentType<{ className?: string }>;
 }
 
-export function EmptyCard({
-  title,
-  description,
-  icon: Icon = ImageIcon,
-  action,
-  className,
-  ...props
-}: EmptyCardProps) {
+export function EmptyCard({ title, description, icon: Icon = ImageIcon, action, className, ...props }: EmptyCardProps) {
   return (
     <Card
-      className={cn(
-        'flex w-full flex-col items-center justify-center space-y-6 bg-transparent p-16',
-        className
-      )}
+      className={cn("flex w-full flex-col items-center justify-center space-y-6 bg-transparent p-16", className)}
       {...props}
     >
       <div className="mr-4 shrink-0 rounded-full border border-dashed p-4">

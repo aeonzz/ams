@@ -1,15 +1,10 @@
-'use client';
+"use client";
 
-import {
-  Mail,
-  PanelRight,
-  Plus,
-  RocketIcon,
-  Settings,
-  Smile,
-  UserRound,
-} from 'lucide-react';
+import { useEffect } from "react";
+import { Mail, PanelRight, Plus, RocketIcon, Settings, Smile, UserRound } from "lucide-react";
 
+import { useDialog } from "@/lib/hooks/use-dialog";
+import { useSidebarToggle } from "@/lib/hooks/use-sidebar-toggle";
 import {
   CommandDialog,
   CommandEmpty,
@@ -19,10 +14,7 @@ import {
   CommandList,
   CommandSeparator,
   CommandShortcut,
-} from '@/components/ui/command';
-import { useEffect } from 'react';
-import { useSidebarToggle } from '@/lib/hooks/use-sidebar-toggle';
-import { useDialog } from '@/lib/hooks/use-dialog';
+} from "@/components/ui/command";
 
 export default function CommandSearchDialog() {
   const dialog = useDialog();
@@ -30,21 +22,21 @@ export default function CommandSearchDialog() {
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
-      if (e.key.toLowerCase() === 'k' && (e.metaKey || e.ctrlKey)) {
+      if (e.key.toLowerCase() === "k" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
-        dialog.setActiveDialog('commandDialog');
+        dialog.setActiveDialog("commandDialog");
       }
     };
 
-    document.addEventListener('keydown', down);
-    return () => document.removeEventListener('keydown', down);
+    document.addEventListener("keydown", down);
+    return () => document.removeEventListener("keydown", down);
   }, []);
 
   return (
     <>
       <CommandDialog
-      open={dialog.activeDialog === 'commandDialog'} 
-      onOpenChange={(open) => dialog.setActiveDialog(open ? 'commandDialog' : '')}
+        open={dialog.activeDialog === "commandDialog"}
+        onOpenChange={(open) => dialog.setActiveDialog(open ? "commandDialog" : "")}
       >
         <CommandInput placeholder="Type a command or search..." />
         <CommandList>
@@ -52,7 +44,7 @@ export default function CommandSearchDialog() {
           <CommandGroup heading="Request">
             <CommandItem
               onSelect={() => {
-                dialog.setActiveDialog('requestDialog');
+                dialog.setActiveDialog("requestDialog");
               }}
             >
               <Plus className="mr-2 h-4 w-4" />

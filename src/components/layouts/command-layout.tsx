@@ -1,12 +1,9 @@
-import React from 'react';
-import CreateRequest from '../screens/dashboard/create-request';
-import CommandSearchDialog from '../dialogs/command-search-dialog';
+import React from "react";
 
-export default function CommandLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+import CommandSearchDialog from "../dialogs/command-search-dialog";
+import CreateRequest from "../screens/dashboard/create-request";
+
+export default function CommandLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <CreateRequest />

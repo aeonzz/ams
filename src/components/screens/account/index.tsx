@@ -1,23 +1,16 @@
-import UploadProfileDialog from '@/components/dialogs/upload-profile-dialog';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import React from 'react';
+import React from "react";
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import UploadProfileDialog from "@/components/dialogs/upload-profile-dialog";
 
 export default function AccountScreen() {
   return (
     <div className="flex justify-center">
       <div className="w-[650px] px-5">
         <h3 className="text-2xl font-semibold">Account</h3>
-        <p className="text-sm text-muted-foreground">
-          Update your account settings
-        </p>
+        <p className="text-sm text-muted-foreground">Update your account settings</p>
         <Separator className="my-6" />
         <Card>
           <CardHeader>

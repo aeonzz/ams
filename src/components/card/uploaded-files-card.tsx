@@ -1,15 +1,10 @@
-import Image from 'next/image';
-import type { UploadedFile } from '@/lib/types/file';
+import Image from "next/image";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
-import { EmptyCard } from './empty-card';
+import type { UploadedFile } from "@/lib/types/file";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+
+import { EmptyCard } from "./empty-card";
 
 interface UploadedFilesCardProps {
   uploadedFiles: UploadedFile[];
@@ -42,11 +37,7 @@ export function UploadedFilesCard({ uploadedFiles }: UploadedFilesCardProps) {
             <ScrollBar orientation="horizontal" />
           </ScrollArea>
         ) : (
-          <EmptyCard
-            title="No files uploaded"
-            description="Upload some files to see them here"
-            className="w-full"
-          />
+          <EmptyCard title="No files uploaded" description="Upload some files to see them here" className="w-full" />
         )}
       </CardContent>
     </Card>

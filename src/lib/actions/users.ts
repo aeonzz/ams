@@ -1,28 +1,17 @@
-'use server';
+"use server";
 
-import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import { generateId } from "lucia";
+import { Argon2id } from "oslo/password";
+import { createServerAction } from "zsa";
 
-import { db } from '@/lib/db/index';
+import { db } from "@/lib/db/index";
 
-import { Argon2id } from 'oslo/password';
-import { generateId } from 'lucia';
-import { lucia, validateRequest } from '../auth/lucia';
-import {
-  genericError,
-  setAuthCookie,
-  validateAuthFormData,
-  getUserAuth,
-} from '../auth/utils';
-
-import {
-  authenticationSchema,
-  changePasswordSchema,
-  resetPasswordSchema,
-  updateUserSchema,
-} from '../db/schema/auth';
-import { createServerAction } from 'zsa';
-import { authedProcedure } from './procedures';
+import { lucia, validateRequest } from "../auth/lucia";
+import { genericError, getUserAuth, setAuthCookie, validateAuthFormData } from "../auth/utils";
+import { authenticationSchema, changePasswordSchema, resetPasswordSchema, updateUserSchema } from "../db/schema/auth";
+import { authedProcedure } from "./procedures";
 
 interface ActionResult {
   error: string;
@@ -38,16 +27,13 @@ export const signInAction = createServerAction()
       });
 
       if (!existingUser) {
-        throw 'Incorrect email or password';
+        throw "Incorrect email or password";
       }
 
-      const validPassword = await new Argon2id().verify(
-        existingUser.hashedPassword,
-        input.password
-      );
+      const validPassword = await new Argon2id().verify(existingUser.hashedPassword, input.password);
 
       if (!validPassword) {
-        throw 'Incorrect email or password';
+        throw "Incorrect email or password";
       }
 
       const session = await lucia.createSession(existingUser.id, {});
@@ -55,14 +41,11 @@ export const signInAction = createServerAction()
       setAuthCookie(sessionCookie);
     } catch (error) {
       console.log(error);
-      throw 'An error occurred while making the request. Please try again later';
+      throw "An error occurred while making the request. Please try again later";
     }
   });
 
-export async function signUpAction(
-  _: ActionResult,
-  formData: FormData
-): Promise<ActionResult> {
+export async function signUpAction(_: ActionResult, formData: FormData): Promise<ActionResult> {
   const { data, error } = validateAuthFormData(formData);
 
   if (error !== null) return { error };
@@ -85,14 +68,14 @@ export async function signUpAction(
   const session = await lucia.createSession(userId, {});
   const sessionCookie = lucia.createSessionCookie(session.id);
   setAuthCookie(sessionCookie);
-  return redirect('/dashboard');
+  return redirect("/dashboard");
 }
 
 export async function signOutAction(): Promise<ActionResult> {
   const { session } = await validateRequest();
   if (!session) {
     return {
-      error: 'Unauthorized',
+      error: "Unauthorized",
     };
   }
 
@@ -100,7 +83,7 @@ export async function signOutAction(): Promise<ActionResult> {
 
   const sessionCookie = lucia.createBlankSessionCookie();
   setAuthCookie(sessionCookie);
-  redirect('/sign-in');
+  redirect("/sign-in");
 }
 
 export const updateUser = authedProcedure
@@ -117,8 +100,8 @@ export const updateUser = authedProcedure
         },
         where: { id: user.id },
       });
-      revalidatePath('/account');
-      return { success: true, error: '' };
+      revalidatePath("/account");
+      return { success: true, error: "" };
     } catch (e) {
       return genericError;
     }
@@ -134,13 +117,13 @@ export const resetPassword = createServerAction()
     });
 
     if (!user) {
-      throw 'User not found';
+      throw "User not found";
     }
 
     const resetPasswordTokenExpiry = user.resetPasswordTokenExpiry;
 
     if (!resetPasswordTokenExpiry) {
-      throw 'Token expired';
+      throw "Token expired";
     }
 
     const hashedPassword = await new Argon2id().hash(input.password);
@@ -157,25 +140,23 @@ export const resetPassword = createServerAction()
       });
     } catch (error) {
       console.log(error);
-      throw 'An error occurred while making the request. Please try again later';
+      throw "An error occurred while making the request. Please try again later";
     }
   });
 
-export const currentUser = authedProcedure
-  .createServerAction()
-  .handler(async ({ ctx }) => {
-    const { user } = ctx;
+export const currentUser = authedProcedure.createServerAction().handler(async ({ ctx }) => {
+  const { user } = ctx;
 
-    try {
-      const data = await db.user.findUnique({
-        where: {
-          id: user.id,
-        },
-      });
+  try {
+    const data = await db.user.findUnique({
+      where: {
+        id: user.id,
+      },
+    });
 
-      return data;
-    } catch (error) {
-      console.log(error);
-      throw 'An error occurred while making the request. Please try again later';
-    }
-  });
+    return data;
+  } catch (error) {
+    console.log(error);
+    throw "An error occurred while making the request. Please try again later";
+  }
+});

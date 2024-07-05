@@ -1,16 +1,17 @@
-import * as React from 'react';
-import type { UploadedFile } from '@/lib/types/file';
-import { toast } from 'sonner';
-import type { UploadFilesOptions } from 'uploadthing/types';
+import * as React from "react";
+import { toast } from "sonner";
+import type { UploadFilesOptions } from "uploadthing/types";
 
-import { type OurFileRouter } from '@/app/api/uploadthing/core';
-import { getErrorMessage } from './handle-errror';
-import { uploadFiles } from '../uploadthing';
+import type { UploadedFile } from "@/lib/types/file";
+import { type OurFileRouter } from "@/app/api/uploadthing/core";
+
+import { uploadFiles } from "../uploadthing";
+import { getErrorMessage } from "./handle-errror";
 
 interface UseUploadFileProps
   extends Pick<
     UploadFilesOptions<OurFileRouter, keyof OurFileRouter>,
-    'headers' | 'onUploadBegin' | 'onUploadProgress' | 'skipPolling'
+    "headers" | "onUploadBegin" | "onUploadProgress" | "skipPolling"
   > {
   defaultUploadedFiles?: UploadedFile[];
 }
@@ -19,11 +20,8 @@ export function useUploadFile(
   endpoint: keyof OurFileRouter,
   { defaultUploadedFiles = [], ...props }: UseUploadFileProps = {}
 ) {
-  const [uploadedFiles, setUploadedFiles] =
-    React.useState<UploadedFile[]>(defaultUploadedFiles);
-  const [progresses, setProgresses] = React.useState<Record<string, number>>(
-    {}
-  );
+  const [uploadedFiles, setUploadedFiles] = React.useState<UploadedFile[]>(defaultUploadedFiles);
+  const [progresses, setProgresses] = React.useState<Record<string, number>>({});
   const [isUploading, setIsUploading] = React.useState(false);
 
   async function uploadThings(files: File[]) {

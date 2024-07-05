@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { useFormState, useFormStatus } from 'react-dom';
+import { useEffect } from "react";
+import { useFormState, useFormStatus } from "react-dom";
+import { toast } from "sonner";
 
-import { AccountCard, AccountCardFooter, AccountCardBody } from './AccountCard';
-import { updateUser } from '@/lib/actions/users';
+import { updateUser } from "@/lib/actions/users";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
-import { toast } from 'sonner';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { AccountCard, AccountCardBody, AccountCardFooter } from "./AccountCard";
 
 export default function UpdateEmailCard({ email }: { email: string }) {
   // const [state, formAction] = useFormState(updateUser, {
@@ -23,14 +23,13 @@ export default function UpdateEmailCard({ email }: { email: string }) {
   return (
     <AccountCard
       params={{
-        header: 'Your Email',
-        description:
-          'Please enter the email address you want to use with your account.',
+        header: "Your Email",
+        description: "Please enter the email address you want to use with your account.",
       }}
     >
-      <form >
+      <form>
         <AccountCardBody>
-          <Input defaultValue={email ?? ''} name="email" />
+          <Input defaultValue={email ?? ""} name="email" />
         </AccountCardBody>
         <AccountCardFooter description="We will email vou to verify the change.">
           <Submit />

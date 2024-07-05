@@ -1,25 +1,20 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { signInAction } from '@/lib/actions/users';
-import { Input } from '@/components/ui/input';
-import { useState } from 'react';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { authenticationSchema } from '@/lib/db/schema/auth';
-import { toast } from 'sonner';
-import { PasswordInput } from '../ui/password-input';
-import { SubmitButton } from '../ui/submit-button';
-import { MotionLayout } from '../layouts/motion-layout';
+import { useState } from "react";
+import Link from "next/link";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
+
+import { signInAction } from "@/lib/actions/users";
+import { authenticationSchema } from "@/lib/db/schema/auth";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+
+import { MotionLayout } from "../layouts/motion-layout";
+import { PasswordInput } from "../ui/password-input";
+import { SubmitButton } from "../ui/submit-button";
 
 export default function SignInForm() {
   const [isLoading, setIsLoading] = useState(false);
@@ -33,17 +28,14 @@ export default function SignInForm() {
 
     if (error) {
       setIsLoading(false);
-      toast.error('Uh oh! Something went wrong.', {
+      toast.error("Uh oh! Something went wrong.", {
         description: error.message,
       });
     }
   }
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="grid w-full gap-4"
-      >
+      <form onSubmit={form.handleSubmit(onSubmit)} className="grid w-full gap-4">
         <FormField
           control={form.control}
           name="email"
@@ -52,13 +44,7 @@ export default function SignInForm() {
               <MotionLayout>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder="m@example.com"
-                    type="email"
-                    disabled={isLoading}
-                    autoFocus
-                    {...field}
-                  />
+                  <Input placeholder="m@example.com" type="email" disabled={isLoading} autoFocus {...field} />
                 </FormControl>
               </MotionLayout>
               <FormMessage />
@@ -71,12 +57,9 @@ export default function SignInForm() {
           render={({ field }) => (
             <FormItem>
               <MotionLayout>
-                <div className="flex items-center justify-between mb-1">
+                <div className="mb-1 flex items-center justify-between">
                   <FormLabel>Password</FormLabel>
-                  <Link
-                    href="/sign-in/reset-password"
-                    className="ml-auto inline-block text-sm text-blue-500 underline"
-                  >
+                  <Link href="/sign-in/reset-password" className="ml-auto inline-block text-sm text-blue-500 underline">
                     Forgot your password?
                   </Link>
                 </div>
@@ -94,11 +77,7 @@ export default function SignInForm() {
             </FormItem>
           )}
         />
-        <SubmitButton
-          disabled={isLoading}
-          className="w-full"
-          variant="ringHover"
-        >
+        <SubmitButton disabled={isLoading} className="w-full" variant="ringHover">
           Sign in
         </SubmitButton>
       </form>

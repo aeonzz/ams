@@ -1,3 +1,4 @@
+import { currentUser } from "@/lib/actions/users";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -5,11 +6,10 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
-import ContentLayout from '@/components/navigations/content-layout';
-import DashboardScreen from '@/components/screens/dashboard';
-import { currentUser } from '@/lib/actions/users';
-import FetchDataError from '@/components/screens/fetch-data-error';
+} from "@/components/ui/breadcrumb";
+import ContentLayout from "@/components/navigations/content-layout";
+import DashboardScreen from "@/components/screens/dashboard";
+import FetchDataError from "@/components/screens/fetch-data-error";
 
 export default function DashboardPage() {
   return (

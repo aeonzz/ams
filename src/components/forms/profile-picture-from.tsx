@@ -1,68 +1,58 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { toast } from "sonner"
-import { z } from "zod"
+import * as React from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
 
-// import { useUploadFile } from "@/hooks/use-upload-file"
-import { Button } from "@/components/ui/button"
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
-// import { FileUploader } from "@/components/file-uploader"
+import { getErrorMessage } from "@/lib/hooks/handle-errror";
+import { useUploadFile } from "@/lib/hooks/use-upload-file";
+import { Button } from "@/components/ui/button";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { FileUploader } from "@/components/file-uploader";
 
-// import { UploadedFilesCard } from "./uploaded-files-card"
+import { UploadedFilesCard } from "../card/uploaded-files-card";
 
 const schema = z.object({
   images: z.array(z.instanceof(File)),
-})
+});
 
-type Schema = z.infer<typeof schema>
+type Schema = z.infer<typeof schema>;
 
-export default function ProfilePictureForm() {
-  const [loading, setLoading] = React.useState(false)
-  // const { uploadFiles, progresses, uploadedFiles, isUploading } = useUploadFile(
-  //   "imageUploader",
-  //   { defaultUploadedFiles: [] }
-  // )
+export function ProfilePictureForm() {
+  const [loading, setLoading] = React.useState(false);
+  const { uploadFiles, progresses, uploadedFiles, isUploading } = useUploadFile("imageUploader", {
+    defaultUploadedFiles: [],
+  });
   const form = useForm<Schema>({
     resolver: zodResolver(schema),
     defaultValues: {
       images: [],
     },
-  })
+  });
 
   function onSubmit(input: Schema) {
-    setLoading(true)
+    setLoading(true);
 
-    // toast.promise(uploadFiles(input.images), {
-    //   loading: "Uploading images...",
-    //   success: () => {
-    //     form.reset()
-    //     setLoading(false)
-    //     return "Images uploaded"
-    //   },
-    //   error: (err) => {
-    //     setLoading(false)
-    //     return getErrorMessage(err)
-    //   },
-    // })
+    toast.promise(uploadFiles(input.images), {
+      loading: "Uploading images...",
+      success: () => {
+        form.reset();
+        setLoading(false);
+        return "Images uploaded";
+      },
+      error: (err) => {
+        setLoading(false);
+        return getErrorMessage(err);
+      },
+    });
   }
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="flex w-full flex-col gap-6"
-      >
-        {/* <FormField
+      <form onSubmit={form.handleSubmit(onSubmit)} className="flex w-full flex-col gap-6">
+        <FormField
           control={form.control}
           name="images"
           render={({ field }) => (
@@ -83,16 +73,14 @@ export default function ProfilePictureForm() {
                 </FormControl>
                 <FormMessage />
               </FormItem>
-              {uploadedFiles.length > 0 ? (
-                <UploadedFilesCard uploadedFiles={uploadedFiles} />
-              ) : null}
+              {uploadedFiles.length > 0 ? <UploadedFilesCard uploadedFiles={uploadedFiles} /> : null}
             </div>
           )}
         />
         <Button className="w-fit" disabled={loading}>
           Save
-        </Button> */}
+        </Button>
       </form>
     </Form>
-  )
+  );
 }

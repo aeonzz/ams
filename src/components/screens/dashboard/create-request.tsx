@@ -1,6 +1,8 @@
-'use client';
+"use client";
 
-import React, { useEffect } from 'react';
+import React, { useEffect } from "react";
+
+import { useDialog } from "@/lib/hooks/use-dialog";
 import {
   Dialog,
   DialogContent,
@@ -8,35 +10,34 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
-import { useDialog } from '@/lib/hooks/use-dialog';
+} from "@/components/ui/dialog";
 
 export default function CreateRequest() {
   const dialog = useDialog();
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
-      if (e.key.toLowerCase() === 'c' && (e.metaKey || e.ctrlKey)) {
+      if (e.key.toLowerCase() === "c" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
-        dialog.setActiveDialog('requestDialog');
+        dialog.setActiveDialog("requestDialog");
       }
     };
 
-    document.addEventListener('keydown', down);
-    return () => document.removeEventListener('keydown', down);
+    document.addEventListener("keydown", down);
+    return () => document.removeEventListener("keydown", down);
   }, []);
 
   return (
-    <Dialog 
-      open={dialog.activeDialog === 'requestDialog'} 
-      onOpenChange={(open) => dialog.setActiveDialog(open ? 'requestDialog' : '')}
+    <Dialog
+      open={dialog.activeDialog === "requestDialog"}
+      onOpenChange={(open) => dialog.setActiveDialog(open ? "requestDialog" : "")}
     >
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Are you absolutely sure?</DialogTitle>
           <DialogDescription>
-            This action cannot be undone. This will permanently delete your
-            account and remove your data from our servers.
+            This action cannot be undone. This will permanently delete your account and remove your data from our
+            servers.
           </DialogDescription>
         </DialogHeader>
       </DialogContent>

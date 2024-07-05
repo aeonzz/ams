@@ -1,47 +1,28 @@
-'use client';
+"use client";
 
-import LoadingSpinner from '@/components/loaders/loading-spinner';
-import {
-  Button,
-  ButtonIconProps,
-  ButtonProps,
-  buttonVariants,
-} from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { forwardRef } from 'react';
-import { Slot, Slottable } from '@radix-ui/react-slot';
-import { AnimatePresence, MotionProps, motion } from 'framer-motion';
-import { outExpo } from '@/lib/easings';
+import { forwardRef } from "react";
+import { Slot, Slottable } from "@radix-ui/react-slot";
+import { AnimatePresence, motion, MotionProps } from "framer-motion";
+
+import { outExpo } from "@/lib/easings";
+import { cn } from "@/lib/utils";
+import { Button, ButtonIconProps, ButtonProps, buttonVariants } from "@/components/ui/button";
+import LoadingSpinner from "@/components/loaders/loading-spinner";
 
 type SubmitButtonProps = ButtonProps & ButtonIconProps & MotionProps;
 
 const SubmitButton = forwardRef<HTMLButtonElement, SubmitButtonProps>(
-  (
-    {
-      className,
-      variant,
-      size,
-      Icon,
-      iconPlacement,
-      asChild = false,
-      disabled,
-      ...props
-    },
-    ref
-  ) => {
-    const Comp = asChild ? Slot : 'button';
+  ({ className, variant, size, Icon, iconPlacement, asChild = false, disabled, ...props }, ref) => {
+    const Comp = asChild ? Slot : "button";
     return (
       <motion.div layout transition={{ duration: 0.3, ease: outExpo }}>
         <Comp
-          className={cn(
-            'relative overflow-hidden',
-            buttonVariants({ variant, size, className })
-          )}
+          className={cn("relative overflow-hidden", buttonVariants({ variant, size, className }))}
           disabled={disabled}
           ref={ref}
           {...props}
         >
-          {Icon && iconPlacement === 'left' && (
+          {Icon && iconPlacement === "left" && (
             <div className="group-hover:translate-x-100 w-0 translate-x-[0%] pr-0 opacity-0 transition-all duration-200 group-hover:w-5 group-hover:pr-2 group-hover:opacity-100">
               <Icon size={16} className="stroke-primary" />
             </div>
@@ -53,7 +34,7 @@ const SubmitButton = forwardRef<HTMLButtonElement, SubmitButtonProps>(
                 initial={{ y: -10 }}
                 animate={{ y: 0 }}
                 exit={{ y: 30, opacity: 0 }}
-                transition={{ duration: 0.3, type: 'spring' }}
+                transition={{ duration: 0.3, type: "spring" }}
               >
                 <LoadingSpinner />
               </motion.div>
@@ -63,13 +44,13 @@ const SubmitButton = forwardRef<HTMLButtonElement, SubmitButtonProps>(
                 initial={{ y: -10 }}
                 animate={{ y: 0 }}
                 exit={{ y: 30 }}
-                transition={{ duration: 0.2, type: 'spring' }}
+                transition={{ duration: 0.2, type: "spring" }}
               >
                 <Slottable>{props.children}</Slottable>
               </motion.div>
             )}
           </AnimatePresence>
-          {Icon && iconPlacement === 'right' && (
+          {Icon && iconPlacement === "right" && (
             <div className="w-0 translate-x-[100%] pl-0 opacity-0 transition-all duration-200 group-hover:w-5 group-hover:translate-x-0 group-hover:pl-2 group-hover:opacity-100">
               <Icon size={16} className="stroke-primary" />
             </div>
@@ -79,6 +60,6 @@ const SubmitButton = forwardRef<HTMLButtonElement, SubmitButtonProps>(
     );
   }
 );
-SubmitButton.displayName = 'SubmitButton';
+SubmitButton.displayName = "SubmitButton";
 
 export { SubmitButton };

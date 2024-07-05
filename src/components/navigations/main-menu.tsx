@@ -1,22 +1,18 @@
-'use client';
+"use client";
 
-import { Ellipsis, LogOut } from 'lucide-react';
-import { usePathname } from 'next/navigation';
+import React, { useMemo } from "react";
+import { usePathname } from "next/navigation";
+import { Ellipsis, LogOut } from "lucide-react";
+import { User } from "prisma/generated/zod";
 
-import { cn } from '@/lib/utils';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import {
-  Tooltip,
-  TooltipTrigger,
-  TooltipContent,
-  TooltipProvider,
-} from '@/components/ui/tooltip';
-import React, { useMemo } from 'react';
-import CollapseMenuButton from './collapse-menu-button';
-import UserNav from './user-nav';
-import { User } from 'prisma/generated/zod';
-import { getMenuList } from '@/config/menu-list';
-import MenuButton from './menu-button';
+import { getMenuList } from "@/config/menu-list";
+import { cn } from "@/lib/utils";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+
+import CollapseMenuButton from "./collapse-menu-button";
+import MenuButton from "./menu-button";
+import UserNav from "./user-nav";
 
 interface MainMenuProps {
   isOpen: boolean | undefined;
@@ -32,10 +28,7 @@ export default function MainMenu({ isOpen }: MainMenuProps) {
         <nav className="h-full w-full">
           <ul className="flex flex-col items-start space-y-1">
             {menuList.map(({ groupLabel, menus }, index) => (
-              <li
-                className={cn('w-full', groupLabel ? 'pt-1' : '')}
-                key={index}
-              >
+              <li className={cn("w-full", groupLabel ? "pt-1" : "")} key={index}>
                 {(isOpen && groupLabel) || isOpen === undefined ? (
                   <p className="max-w-[248px] truncate px-4 pb-2 text-sm font-medium text-muted-foreground">
                     {groupLabel}
@@ -56,39 +49,28 @@ export default function MainMenu({ isOpen }: MainMenuProps) {
                 ) : (
                   <p className="pb-2"></p>
                 )}
-                {menus.map(
-                  ({ href, label, icon: Icon, active, submenus }, index) =>
-                    submenus.length === 0 ? (
-                      <div className="w-full" key={index}>
-                        <TooltipProvider disableHoverableContent>
-                          <Tooltip delayDuration={100}>
-                            <TooltipTrigger asChild>
-                              <MenuButton
-                                icon={Icon}
-                                label={label}
-                                active={active}
-                                isOpen={isOpen}
-                                href={href}
-                              />
-                            </TooltipTrigger>
-                            {isOpen === false && (
-                              <TooltipContent side="right">
-                                {label}
-                              </TooltipContent>
-                            )}
-                          </Tooltip>
-                        </TooltipProvider>
-                      </div>
-                    ) : (
-                      <CollapseMenuButton
-                        key={index}
-                        icon={Icon}
-                        label={label}
-                        active={active}
-                        submenus={submenus}
-                        isOpen={isOpen}
-                      />
-                    )
+                {menus.map(({ href, label, icon: Icon, active, submenus }, index) =>
+                  submenus.length === 0 ? (
+                    <div className="w-full" key={index}>
+                      <TooltipProvider disableHoverableContent>
+                        <Tooltip delayDuration={100}>
+                          <TooltipTrigger asChild>
+                            <MenuButton icon={Icon} label={label} active={active} isOpen={isOpen} href={href} />
+                          </TooltipTrigger>
+                          {isOpen === false && <TooltipContent side="right">{label}</TooltipContent>}
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+                  ) : (
+                    <CollapseMenuButton
+                      key={index}
+                      icon={Icon}
+                      label={label}
+                      active={active}
+                      submenus={submenus}
+                      isOpen={isOpen}
+                    />
+                  )
                 )}
               </li>
             ))}

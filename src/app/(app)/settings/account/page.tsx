@@ -1,8 +1,9 @@
-import ContentLayout from '@/components/navigations/content-layout';
-import AccountScreen from '@/components/screens/account';
-import React from 'react';
+import React from "react";
 
-export default  function Page() {
+import ContentLayout from "@/components/navigations/content-layout";
+import AccountScreen from "@/components/screens/account";
+
+export default function Page() {
   return (
     <ContentLayout title="Settings">
       {/* <Breadcrumb>

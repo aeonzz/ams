@@ -1,18 +1,16 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { useFormState } from 'react-dom';
-import { useFormStatus } from 'react-dom';
+import Link from "next/link";
+import { useFormState, useFormStatus } from "react-dom";
 
-import { signUpAction } from '@/lib/actions/users';
-
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { signUpAction } from "@/lib/actions/users";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export default function SignUpPage() {
   const [state, formAction] = useFormState(signUpAction, {
-    error: '',
+    error: "",
   });
 
   return (
@@ -33,7 +31,7 @@ export default function SignUpPage() {
         <SubmitButton />
       </form>
       <div className="mt-4 text-center text-sm text-muted-foreground">
-        Already have an account?{' '}
+        Already have an account?{" "}
         <Link href="/sign-in" className="text-secondary-foreground underline">
           Sign in
         </Link>
@@ -46,7 +44,7 @@ const SubmitButton = () => {
   const { pending } = useFormStatus();
   return (
     <Button className="w-full" type="submit" disabled={pending}>
-      Sign{pending ? 'ing' : ''} up
+      Sign{pending ? "ing" : ""} up
     </Button>
   );
 };

@@ -1,2 +1,2 @@
-export * from './modelSchema';
-export * from './inputTypeSchemas';
+export * from "./modelSchema";
+export * from "./inputTypeSchemas";
