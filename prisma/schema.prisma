@@ -31,6 +31,7 @@ model User {
   name                     String?
   sessions                 Session[]
   role                     Role      @default(USER)
+  files                    File[]
 }
 
 model Session {
@@ -41,8 +42,21 @@ model Session {
   user      User     @relation(references: [id], fields: [userId], onDelete: Cascade)
 }
 
+model File {
+  id          String       @id
+  url         String
+  blurDataUrl String?
+  category    FileCategory
+  userId      String
+  user        User         @relation(fields: [userId], references: [id])
+}
+
 enum Role {
   USER
   ADMIN
   SYSTEMADMIN
+}
+
+enum FileCategory {
+  PROFILE
 }
