@@ -1,4 +1,3 @@
-import MillionLint from '@million/lint';
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   webpack: (config) => {
@@ -6,7 +5,14 @@ const nextConfig = {
     return config;
   },
   reactStrictMode: true,
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'utfs.io',
+      },
+    ],
+  },
 };
-export default MillionLint.next({
-  rsc: true,
-})(nextConfig);
+
+export default nextConfig;
