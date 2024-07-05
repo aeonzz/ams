@@ -7,7 +7,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import ImageUploader from '@/components/ui/image-uploader';
 import { Separator } from '@/components/ui/separator';
 import React from 'react';
 
@@ -34,7 +33,6 @@ export default function AccountScreen() {
             <UploadProfileDialog />
           </CardFooter>
         </Card>
-        <ImageUploader />
       </div>
     </div>
   );
