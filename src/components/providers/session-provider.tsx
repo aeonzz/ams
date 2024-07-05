@@ -1,13 +1,13 @@
 "use client";
 
 import React from "react";
-import { User } from "prisma/generated/zod";
 
 import { UserSessionContext } from "@/lib/hooks/use-session";
+import { UserType } from "@/lib/types/user";
 
 interface SessionProviderProps {
   children: React.ReactNode;
-  user: User;
+  user: UserType;
 }
 
 export default function SessionProvider({ children, user }: SessionProviderProps) {
