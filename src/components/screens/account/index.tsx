@@ -5,15 +5,16 @@ import React from "react";
 import { useSession } from "@/lib/hooks/use-session";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import UploadProfileDialog from "@/components/dialogs/upload-profile-dialog";
+import SingleInputForm from "@/components/forms/single-input-form";
 
 export default function AccountScreen() {
   const currentUser = useSession();
-  console.log(currentUser);
   return (
-    <div className="flex justify-center">
-      <div className="w-[650px] px-5">
+    <div className="flex">
+      <div className="w-[650px]">
         <h3 className="text-2xl font-semibold">Account</h3>
         <p className="text-sm text-muted-foreground">Update your account settings</p>
         <Separator className="my-6" />
@@ -31,6 +32,7 @@ export default function AccountScreen() {
             <UploadProfileDialog />
           </CardFooter>
         </Card>
+        <SingleInputForm email={currentUser.email} username={currentUser.username} />
       </div>
     </div>
   );

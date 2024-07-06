@@ -29,7 +29,7 @@ model User {
   hashedPassword           String
   resetPasswordToken       String?   @unique
   resetPasswordTokenExpiry DateTime?
-  name                     String?
+  username                 String
   sessions                 Session[]
   role                     Role      @default(USER)
   files                    File[]
@@ -44,11 +44,11 @@ model Session {
 }
 
 model File {
-  id          String       @id
+  id          String  @id
   url         String
   blurDataUrl String?
   userId      String
-  user        User         @relation(fields: [userId], references: [id])
+  user        User    @relation(fields: [userId], references: [id])
 }
 
 enum Role {

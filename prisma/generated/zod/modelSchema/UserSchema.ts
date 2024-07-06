@@ -13,7 +13,7 @@ export const UserSchema = z.object({
   hashedPassword: z.string(),
   resetPasswordToken: z.string().nullable(),
   resetPasswordTokenExpiry: z.coerce.date().nullable(),
-  name: z.string().nullable(),
+  username: z.string(),
 })
 
 export type User = z.infer<typeof UserSchema>

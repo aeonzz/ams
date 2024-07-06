@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { ImageUp } from "lucide-react";
 
 import { useDialog } from "@/lib/hooks/use-dialog";
@@ -33,14 +33,21 @@ export default function UploadProfileDialog() {
           Upload
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent
+        onInteractOutside={(e) => {
+          if (isUploading) {
+            e.preventDefault();
+          }
+        }}
+        isLoading={isUploading}
+      >
         <DialogHeader>
-          <DialogTitle>Upload files</DialogTitle>
-          <DialogDescription>Upload files Drag and drop your files here or click to browse.</DialogDescription>
+          <DialogTitle>Upload Image</DialogTitle>
+          <DialogDescription>Drag and drop your image here or click to browse.</DialogDescription>
         </DialogHeader>
         <FileUploader
           maxFiles={1}
-          maxSize={10 * 1024 * 1024}
+          maxSize={4 * 1024 * 1024}
           progresses={progresses}
           onUpload={uploadFiles}
           disabled={isUploading}

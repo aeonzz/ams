@@ -6,13 +6,13 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import { getErrorMessage } from "@/lib/hooks/handle-errror";
 import { useUploadFile } from "@/lib/hooks/use-upload-file";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { FileUploader } from "@/components/file-uploader";
 
 import { UploadedFilesCard } from "../card/uploaded-files-card";
+import { getErrorMessage } from "@/lib/handle-errror";
 
 const schema = z.object({
   images: z.array(z.instanceof(File)),

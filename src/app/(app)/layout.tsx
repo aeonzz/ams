@@ -10,8 +10,6 @@ import FetchDataError from "@/components/screens/fetch-data-error";
 
 import { ourFileRouter } from "../api/uploadthing/core";
 
-import "@uploadthing/react/styles.css";
-
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   await checkAuth();
   const [data] = await currentUser();

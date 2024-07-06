@@ -140,7 +140,7 @@ export function FileUploader(props: FileUploaderProps) {
       }
 
       if (onUpload && updatedFiles.length > 0 && updatedFiles.length <= maxFiles) {
-        const target = updatedFiles.length > 0 ? `${updatedFiles.length} files` : `file`;
+        const target = updatedFiles.length > 1 ? `${updatedFiles.length} files` : `${updatedFiles.length} file`;
 
         toast.promise(onUpload(updatedFiles), {
           loading: `Uploading ${target}...`,

@@ -50,8 +50,8 @@ export default function UserNav({ isOpen }: UserNavProps) {
                 isOpen === false ? "hidden -translate-x-96 opacity-0" : "translate-x-0 opacity-100"
               )}
             >
-              {currentUser.name?.slice(0, 10)}
-              {currentUser.name && currentUser.name.length >= 10 && "..."}
+              {currentUser.username.slice(0, 10)}
+              {currentUser.username && currentUser.username.length >= 10 && "..."}
             </p>
             {isOpen && <ChevronDown className="size-5 duration-300 ease-out-expo" />}
           </Button>

@@ -6,8 +6,8 @@ import type { UploadedFile } from "@/lib/types/file";
 import { type OurFileRouter } from "@/app/api/uploadthing/core";
 
 import { updateUser } from "../actions/users";
+import { getErrorMessage } from "../handle-errror";
 import { uploadFiles } from "../uploadthing";
-import { getErrorMessage } from "./handle-errror";
 
 interface UseUploadFileProps
   extends Pick<
@@ -40,7 +40,7 @@ export function useUploadFile(
           });
         },
       });
-      await updateUser({ profileUrl: res[0].url });
+      await updateUser({ profileUrl: res[0].url, path: "/settings/account" });
       setUploadedFiles((prev) => (prev ? [...prev, ...res] : res));
     } catch (err) {
       toast.error(getErrorMessage(err));

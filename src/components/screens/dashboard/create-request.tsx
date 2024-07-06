@@ -17,7 +17,7 @@ export default function CreateRequest() {
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
-      if (e.key.toLowerCase() === "c" && (e.metaKey || e.ctrlKey)) {
+      if (e.key.toLowerCase() === "c" && e.altKey && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
         e.preventDefault();
         dialog.setActiveDialog("requestDialog");
       }

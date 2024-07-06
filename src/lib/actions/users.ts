@@ -12,7 +12,7 @@ import { lucia, validateRequest } from "../auth/lucia";
 import { genericError, getUserAuth, setAuthCookie, validateAuthFormData } from "../auth/utils";
 import getBase64 from "../base64";
 import { authenticationSchema, changePasswordSchema, resetPasswordSchema } from "../db/schema/auth";
-import { updateUserSchema } from "../db/schema/user";
+import { serverUpdateUserSchema } from "../db/schema/user";
 import { authedProcedure } from "./procedures";
 
 interface ActionResult {
@@ -60,6 +60,7 @@ export async function signUpAction(_: ActionResult, formData: FormData): Promise
       data: {
         id: userId,
         email: data.email,
+        username: "test",
         hashedPassword,
       },
     });
@@ -168,20 +169,21 @@ export const currentUser = authedProcedure.createServerAction().handler(async ({
 
 export const updateUser = authedProcedure
   .createServerAction()
-  .input(updateUserSchema)
+  .input(serverUpdateUserSchema)
   .handler(async ({ ctx, input }) => {
     const { user } = ctx;
-
+    const { path, ...rest } = input;
     try {
       await db.user.update({
         where: {
           id: user.id,
         },
         data: {
-          ...input,
+          ...rest,
         },
       });
-      return revalidatePath("/settings/account");
+
+      return revalidatePath(path);
     } catch (error) {
       console.log(error);
       throw "An error occurred while making the request. Please try again later";

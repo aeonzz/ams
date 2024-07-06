@@ -50,7 +50,7 @@ export default function CommandSearchDialog() {
               <Plus className="mr-2 h-4 w-4" />
               <span>Create request</span>
               <div className="ml-auto space-x-1">
-                <CommandShortcut>Ctrl</CommandShortcut>
+                <CommandShortcut>Alt</CommandShortcut>
                 <CommandShortcut>C</CommandShortcut>
               </div>
             </CommandItem>
