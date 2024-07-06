@@ -15,7 +15,7 @@ import { Separator } from "../ui/separator";
 
 interface SingleInputFormProps {
   email: string;
-  username: string | undefined;
+  username: string;
 }
 
 export default function SingleInputForm({ email, username }: SingleInputFormProps) {
@@ -82,10 +82,18 @@ export default function SingleInputForm({ email, username }: SingleInputFormProp
           render={({ field }) => (
             <FormItem className="flex items-center justify-between space-y-0">
               <FormLabel>Username</FormLabel>
-              <FormMessage />
-              <FormControl className="w-60">
-                <Input placeholder="username" autoComplete="off" disabled={isPending} {...field} onBlur={handleBlur} />
-              </FormControl>
+              <div className="flex items-center space-x-3">
+                <FormMessage />
+                <FormControl className="w-60">
+                  <Input
+                    placeholder="username"
+                    autoComplete="off"
+                    disabled={isPending}
+                    {...field}
+                    onBlur={handleBlur}
+                  />
+                </FormControl>
+              </div>
             </FormItem>
           )}
         />
