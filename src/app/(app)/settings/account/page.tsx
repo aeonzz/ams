@@ -1,7 +1,7 @@
 import React from "react";
 
 import ContentLayout from "@/components/navigations/content-layout";
-import AccountScreen from "@/components/screens/account";
+import AccountScreen from "@/components/screens/settings/account";
 
 export default function Page() {
   return (

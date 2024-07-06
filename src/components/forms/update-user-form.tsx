@@ -13,12 +13,12 @@ import { Input } from "@/components/ui/input";
 
 import { Separator } from "../ui/separator";
 
-interface SingleInputFormProps {
+interface UpdateUserFormProps {
   email: string;
   username: string;
 }
 
-export default function SingleInputForm({ email, username }: SingleInputFormProps) {
+export default function UpdateUserForm({ email, username }: UpdateUserFormProps) {
   const form = useForm<z.infer<typeof clientUpdateUserSchema>>({
     resolver: zodResolver(clientUpdateUserSchema),
     defaultValues: {

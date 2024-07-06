@@ -8,7 +8,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import UploadProfileDialog from "@/components/dialogs/upload-profile-dialog";
-import SingleInputForm from "@/components/forms/single-input-form";
+import SingleInputForm from "@/components/forms/update-user-form";
 
 export default function AccountScreen() {
   const currentUser = useSession();

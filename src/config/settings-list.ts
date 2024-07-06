@@ -13,9 +13,9 @@ export function getSettingsList(pathname: string): Group[] {
           submenus: [],
         },
         {
-          href: "/settings/appearance",
-          label: "Appearance",
-          active: pathname.includes("/appearance"),
+          href: "/settings/preferences",
+          label: "Preferences",
+          active: pathname.includes("/preferences"),
           icon: "",
           submenus: [],
         },

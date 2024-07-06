@@ -9,9 +9,12 @@ export const serverUpdateUserSchema = z.object({
 
 export const clientUpdateUserSchema = z.object({
   email: z.string().email(),
-  username: z.string().min(1, {
-    message: "Username cannot be empty"
-  }),
+  username: z
+    .string()
+    .min(1, {
+      message: "Username cannot be empty",
+    })
+    .max(15),
 });
 
 export type ClientUpdateUserSchema = z.infer<typeof clientUpdateUserSchema>;

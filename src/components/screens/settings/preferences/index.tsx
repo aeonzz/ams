@@ -1,24 +1,43 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 
-import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import {
+  Section,
+  SectionTitle,
+  SectionItem,
+  SectionItemAction,
+  SectionItemDescription,
+  SectionItemHeader,
+  SectionItemTitle,
+} from "@/components/ui/section";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-export default function AppearanceScreen() {
-  const { setTheme } = useTheme();
+export default function PreferencesScreen() {
+  const { setTheme, theme } = useTheme();
+  const [value, setValue] = useState(theme || "system");
+
+  useEffect(() => {
+    setTheme(value);
+  }, [value]);
 
   return (
-    <div>
-      <h1 className="text-2xl font-semibold">Settings</h1>
-      <div className="my-4 space-y-4">
-        <div>
-          <h3 className="text-lg font-medium">Appearance</h3>
-          <p className="text-sm text-muted-foreground">
-            Customize the appearance of the app. Automatically switch between day and night themes.
-          </p>
-        </div>
-        <Button asChild variant={"ghost"} className="h-fit w-fit" onClick={() => setTheme("light")}>
+    <div className="flex">
+      <div className="w-[650px]">
+        <h3 className="text-2xl font-semibold">Preferences</h3>
+        <p className="text-sm text-muted-foreground">
+          Customize your settings and personalize your experience.
+        </p>
+        <Separator className="my-6" />
+        {/* <Button asChild variant={"ghost"} className="h-fit w-fit" onClick={() => setTheme("light")}>
           <div className="flex flex-col">
             <div className="items-center rounded-md border-2 border-muted p-1 hover:border-accent">
               <div className="space-y-2 rounded-sm bg-[#ecedef] p-2">
@@ -80,7 +99,32 @@ export default function AppearanceScreen() {
             </div>
             <span className="block w-full p-2 text-center font-normal">System</span>
           </div>
-        </Button>
+        </Button> */}
+        <Section>
+          <SectionTitle>Theme</SectionTitle>
+          <SectionItem>
+            <SectionItemHeader>
+              <SectionItemTitle>Interface theme</SectionItemTitle>
+              <SectionItemDescription>
+                Adjust the appearance of the application to suit your style.
+              </SectionItemDescription>
+            </SectionItemHeader>
+            <SectionItemAction>
+              <Select value={value} onValueChange={setValue}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Theme" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="light" onClick={() => setTheme("light")}>
+                    Light
+                  </SelectItem>
+                  <SelectItem value="dark">Dark</SelectItem>
+                  <SelectItem value="system">System</SelectItem>
+                </SelectContent>
+              </Select>
+            </SectionItemAction>
+          </SectionItem>
+        </Section>
       </div>
     </div>
   );
