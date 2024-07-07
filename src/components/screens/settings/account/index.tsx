@@ -25,7 +25,7 @@ export default function AccountScreen() {
         <p className="text-sm text-muted-foreground">
           Update your account settings
         </p>
-        <Separator className="my-6" />
+        <Separator className="my-9" />
         <Card>
           <CardHeader>
             <CardTitle>Profile picture</CardTitle>

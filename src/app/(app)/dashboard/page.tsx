@@ -1,15 +1,5 @@
-import { currentUser } from "@/lib/actions/users";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import ContentLayout from "@/components/navigations/content-layout";
+import ContentLayout from "@/components/layouts/content-layout";
 import DashboardScreen from "@/components/screens/dashboard";
-import FetchDataError from "@/components/screens/fetch-data-error";
 
 export default function DashboardPage() {
   return (

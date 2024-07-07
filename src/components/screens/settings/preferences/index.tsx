@@ -36,7 +36,7 @@ export default function PreferencesScreen() {
         <p className="text-sm text-muted-foreground">
           Customize your settings and personalize your experience.
         </p>
-        <Separator className="my-6" />
+        <Separator className="my-9" />
         {/* <Button asChild variant={"ghost"} className="h-fit w-fit" onClick={() => setTheme("light")}>
           <div className="flex flex-col">
             <div className="items-center rounded-md border-2 border-muted p-1 hover:border-accent">

@@ -26,7 +26,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           sidebar?.isOpen === false ? "lg:ml-[76px]" : "lg:ml-72"
         )}
       >
-        <div className="min-h-[calc(100vh_-_16px)] w-full overflow-hidden rounded-md border bg-secondary">
+        <div className="h-[calc(100vh_-_16px)] w-full overflow-hidden rounded-md border bg-secondary">
           {children}
         </div>
       </main>

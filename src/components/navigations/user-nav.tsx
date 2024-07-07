@@ -17,8 +17,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 import { Button } from "../ui/button";
+import CommandTooltip from "../ui/command-tooltip";
+import { CommandShortcut } from "../ui/command";
 
 interface UserNavProps {
   isOpen: boolean | undefined;
@@ -91,13 +99,25 @@ export default function UserNav({ isOpen }: UserNavProps) {
         </DropdownMenuContent>
       </DropdownMenu>
       {isOpen && (
-        <Button
-          variant="secondary"
-          size="icon"
-          onClick={() => dialog.setActiveDialog("requestDialog")}
-        >
-          <SquarePen className="size-5" />
-        </Button>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="secondary"
+                size="icon"
+                onClick={() => dialog.setActiveDialog("requestDialog")}
+              >
+                <SquarePen className="size-5" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <CommandTooltip text="Create request">
+                <CommandShortcut>Alt</CommandShortcut>
+                <CommandShortcut>C</CommandShortcut>
+              </CommandTooltip>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       )}
     </div>
   );

@@ -1,6 +1,6 @@
 import { User } from "prisma/generated/zod";
 
-import Navbar from "./navbar";
+import Navbar from "../navigations/navbar";
 
 interface ContentLayoutProps {
   title: string;
@@ -9,9 +9,11 @@ interface ContentLayoutProps {
 
 export default function ContentLayout({ title, children }: ContentLayoutProps) {
   return (
-    <div>
-      <Navbar title={title} />
-      <div className="w-full px-4 pb-8 pt-8 sm:px-8">{children}</div>
-    </div>
+    <>
+      {/* <Navbar title={title} /> */}
+      <section className="flex h-full w-full items-center justify-center">
+        {children}
+      </section>
+    </>
   );
 }

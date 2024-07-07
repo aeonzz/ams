@@ -17,7 +17,13 @@ export default function CreateRequest() {
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
-      if (e.key.toLowerCase() === "c" && e.altKey && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
+      if (
+        e.key.toLowerCase() === "c" &&
+        e.altKey &&
+        !e.ctrlKey &&
+        !e.metaKey &&
+        !e.shiftKey
+      ) {
         e.preventDefault();
         dialog.setActiveDialog("requestDialog");
       }
@@ -30,14 +36,16 @@ export default function CreateRequest() {
   return (
     <Dialog
       open={dialog.activeDialog === "requestDialog"}
-      onOpenChange={(open) => dialog.setActiveDialog(open ? "requestDialog" : "")}
+      onOpenChange={(open) =>
+        dialog.setActiveDialog(open ? "requestDialog" : "")
+      }
     >
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Are you absolutely sure?</DialogTitle>
           <DialogDescription>
-            This action cannot be undone. This will permanently delete your account and remove your data from our
-            servers.
+            This action cannot be undone. This will permanently delete your
+            account and remove your data from our servers.
           </DialogDescription>
         </DialogHeader>
       </DialogContent>

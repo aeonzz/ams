@@ -1,11 +1,11 @@
 import React from "react";
 
-import ContentLayout from "@/components/navigations/content-layout";
 import AccountScreen from "@/components/screens/settings/account";
+import SettingsLayout from "@/components/layouts/settings-layout";
 
 export default function Page() {
   return (
-    <ContentLayout title="Settings">
+    <SettingsLayout title="Settings">
       {/* <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -20,6 +20,6 @@ export default function Page() {
         </BreadcrumbList>
       </Breadcrumb> */}
       <AccountScreen />
-    </ContentLayout>
+    </SettingsLayout>
   );
 }

@@ -1,11 +1,11 @@
 import React from "react";
 
-import ContentLayout from "@/components/navigations/content-layout";
 import PreferencesScreen from "@/components/screens/settings/preferences";
+import SettingsLayout from "@/components/layouts/settings-layout";
 
 export default function Page() {
   return (
-    <ContentLayout title="Settings">
+    <SettingsLayout title="Settings">
       {/* <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -20,6 +20,6 @@ export default function Page() {
         </BreadcrumbList>
       </Breadcrumb> */}
       <PreferencesScreen />
-    </ContentLayout>
+    </SettingsLayout>
   );
 }
