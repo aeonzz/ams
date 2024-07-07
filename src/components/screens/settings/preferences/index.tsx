@@ -12,7 +12,7 @@ import {
   SectionItemDescription,
   SectionItemHeader,
   SectionItemTitle,
-} from "@/components/ui/section";
+} from "@/components/screens/settings/section";
 import {
   Select,
   SelectContent,

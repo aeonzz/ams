@@ -4,7 +4,13 @@ import React from "react";
 
 import { useSession } from "@/lib/hooks/use-session";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import UploadProfileDialog from "@/components/dialogs/upload-profile-dialog";
@@ -16,7 +22,9 @@ export default function AccountScreen() {
     <div className="flex">
       <div className="w-[650px]">
         <h3 className="text-2xl font-semibold">Account</h3>
-        <p className="text-sm text-muted-foreground">Update your account settings</p>
+        <p className="text-sm text-muted-foreground">
+          Update your account settings
+        </p>
         <Separator className="my-6" />
         <Card>
           <CardHeader>
@@ -25,14 +33,19 @@ export default function AccountScreen() {
           <CardContent className="flex justify-center">
             <Avatar className="size-32">
               <AvatarImage src={currentUser.profileUrl ?? ""} />
-              <AvatarFallback>CN</AvatarFallback>
+              <AvatarFallback className="rounded-md">
+                {currentUser.username.charAt(0).toUpperCase()}
+              </AvatarFallback>
             </Avatar>
           </CardContent>
           <CardFooter>
             <UploadProfileDialog />
           </CardFooter>
         </Card>
-        <SingleInputForm email={currentUser.email} username={currentUser.username} />
+        <SingleInputForm
+          email={currentUser.email}
+          username={currentUser.username}
+        />
       </div>
     </div>
   );

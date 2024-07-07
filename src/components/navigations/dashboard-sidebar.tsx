@@ -14,7 +14,10 @@ interface DashboardSidebarProps {
   setIsOpen: () => void;
 }
 
-export default function DashboardSidebar({ isOpen, setIsOpen }: DashboardSidebarProps) {
+export default function DashboardSidebar({
+  isOpen,
+  setIsOpen,
+}: DashboardSidebarProps) {
   const pathname = usePathname();
   return (
     <aside
@@ -23,9 +26,15 @@ export default function DashboardSidebar({ isOpen, setIsOpen }: DashboardSidebar
         isOpen === false ? "w-[76px]" : "w-72"
       )}
     >
-      {!pathname.startsWith("/settings") && <SidebarToggle isOpen={isOpen} setIsOpen={setIsOpen} />}
+      {!pathname.startsWith("/settings") && (
+        <SidebarToggle isOpen={isOpen} setIsOpen={setIsOpen} />
+      )}
       <div className="relative flex h-full flex-col overflow-y-auto px-3 py-3">
-        {pathname.startsWith("/settings") ? <SettingsMenu /> : <MainMenu isOpen={isOpen} />}
+        {pathname.startsWith("/settings") ? (
+          <SettingsMenu />
+        ) : (
+          <MainMenu isOpen={isOpen} />
+        )}
       </div>
     </aside>
   );

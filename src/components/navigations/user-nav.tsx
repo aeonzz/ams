@@ -38,25 +38,41 @@ export default function UserNav({ isOpen }: UserNavProps) {
   return (
     <div className="flex h-auto w-full items-center justify-between">
       <DropdownMenu>
-        <DropdownMenuTrigger asChild className="data-[state=open]:bg-accent [&[data-state=open]>svg]:rotate-180">
+        <DropdownMenuTrigger
+          asChild
+          className="data-[state=open]:bg-accent [&[data-state=open]>svg]:rotate-180"
+        >
           <Button variant="ghost" className="w-auto space-x-2 px-3">
             <Avatar className="size-7 rounded-md">
-              <AvatarImage src="https://github.com/shadcn.png" />
-              <AvatarFallback className="rounded-md">CN</AvatarFallback>
+              <AvatarImage src={currentUser.profileUrl ?? ""} />
+              <AvatarFallback className="rounded-md">
+                {currentUser.username.charAt(0).toUpperCase()}
+              </AvatarFallback>
             </Avatar>
             <p
               className={cn(
                 "whitespace-nowrap transition-[transform,opacity,display] duration-300 ease-out-expo",
-                isOpen === false ? "hidden -translate-x-96 opacity-0" : "translate-x-0 opacity-100"
+                isOpen === false
+                  ? "hidden -translate-x-96 opacity-0"
+                  : "translate-x-0 opacity-100"
               )}
             >
               {currentUser.username.slice(0, 10)}
-              {currentUser.username && currentUser.username.length >= 10 && "..."}
+              {currentUser.username &&
+                currentUser.username.length >= 10 &&
+                "..."}
             </p>
-            {isOpen && <ChevronDown className="size-5 duration-300 ease-out-expo" />}
+            {isOpen && (
+              <ChevronDown className="size-5 duration-300 ease-out-expo" />
+            )}
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" loop onCloseAutoFocus={(e) => e.preventDefault()} className="w-52">
+        <DropdownMenuContent
+          align="start"
+          loop
+          onCloseAutoFocus={(e) => e.preventDefault()}
+          className="w-52"
+        >
           <DropdownMenuLabel>My Account</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem>Profile</DropdownMenuItem>
@@ -66,13 +82,20 @@ export default function UserNav({ isOpen }: UserNavProps) {
             </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onSelect={(e) => handleLogout(e)} disabled={isLoading}>
+          <DropdownMenuItem
+            onSelect={(e) => handleLogout(e)}
+            disabled={isLoading}
+          >
             Log out
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
       {isOpen && (
-        <Button variant="secondary" size="icon" onClick={() => dialog.setActiveDialog("requestDialog")}>
+        <Button
+          variant="secondary"
+          size="icon"
+          onClick={() => dialog.setActiveDialog("requestDialog")}
+        >
           <SquarePen className="size-5" />
         </Button>
       )}

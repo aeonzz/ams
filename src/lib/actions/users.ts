@@ -9,11 +9,20 @@ import { createServerAction } from "zsa";
 import { db } from "@/lib/db/index";
 
 import { lucia, validateRequest } from "../auth/lucia";
-import { genericError, getUserAuth, setAuthCookie, validateAuthFormData } from "../auth/utils";
+import {
+  genericError,
+  getUserAuth,
+  setAuthCookie,
+  validateAuthFormData,
+} from "../auth/utils";
 import getBase64 from "../base64";
-import { authenticationSchema, changePasswordSchema, resetPasswordSchema } from "../db/schema/auth";
+import {
+  authenticationSchema,
+  changePasswordSchema,
+  resetPasswordSchema,
+} from "../db/schema/auth";
 import { serverUpdateUserSchema } from "../db/schema/user";
-import { authedProcedure } from "./procedures";
+import { authedProcedure, getErrorMessage } from "./utils";
 
 interface ActionResult {
   error: string;
@@ -21,7 +30,7 @@ interface ActionResult {
 
 export const signInAction = createServerAction()
   .input(authenticationSchema)
-  .timeout(10000)
+  .timeout(20000)
   .handler(async ({ input }) => {
     try {
       const existingUser = await db.user.findUnique({
@@ -32,7 +41,10 @@ export const signInAction = createServerAction()
         throw "Incorrect email or password";
       }
 
-      const validPassword = await new Argon2id().verify(existingUser.hashedPassword, input.password);
+      const validPassword = await new Argon2id().verify(
+        existingUser.hashedPassword,
+        input.password
+      );
 
       if (!validPassword) {
         throw "Incorrect email or password";
@@ -42,12 +54,14 @@ export const signInAction = createServerAction()
       const sessionCookie = lucia.createSessionCookie(session.id);
       setAuthCookie(sessionCookie);
     } catch (error) {
-      console.log(error);
-      throw "An error occurred while making the request. Please try again later";
+      getErrorMessage(error);
     }
   });
 
-export async function signUpAction(_: ActionResult, formData: FormData): Promise<ActionResult> {
+export async function signUpAction(
+  _: ActionResult,
+  formData: FormData
+): Promise<ActionResult> {
   const { data, error } = validateAuthFormData(formData);
 
   if (error !== null) return { error };
@@ -142,30 +156,30 @@ export const resetPassword = createServerAction()
         },
       });
     } catch (error) {
-      console.log(error);
-      throw "An error occurred while making the request. Please try again later";
+      getErrorMessage(error);
     }
   });
 
-export const currentUser = authedProcedure.createServerAction().handler(async ({ ctx }) => {
-  const { user } = ctx;
+export const currentUser = authedProcedure
+  .createServerAction()
+  .handler(async ({ ctx }) => {
+    const { user } = ctx;
 
-  try {
-    const data = await db.user.findUnique({
-      where: {
-        id: user.id,
-      },
-      include: {
-        files: true,
-      },
-    });
+    try {
+      const data = await db.user.findUnique({
+        where: {
+          id: user.id,
+        },
+        include: {
+          files: true,
+        },
+      });
 
-    return data;
-  } catch (error) {
-    console.log(error);
-    throw "An error occurred while making the request. Please try again later";
-  }
-});
+      return data;
+    } catch (error) {
+      getErrorMessage(error);
+    }
+  });
 
 export const updateUser = authedProcedure
   .createServerAction()
@@ -185,7 +199,6 @@ export const updateUser = authedProcedure
 
       return revalidatePath(path);
     } catch (error) {
-      console.log(error);
-      throw "An error occurred while making the request. Please try again later";
+      getErrorMessage(error);
     }
   });
