@@ -1,49 +1,75 @@
-import * as React from "react";
-import { toast } from "sonner";
-import type { UploadFilesOptions } from "uploadthing/types";
-
-import type { UploadedFile } from "@/lib/types/file";
-import { type OurFileRouter } from "@/app/api/uploadthing/core";
-
+import axios from "axios";
+import { fileToBase64 } from "../fileToBase64";
 import { updateUser } from "../actions/users";
-import { getErrorMessage } from "../handle-errror";
-import { uploadFiles } from "../uploadthing";
+import { useState } from "react";
 
-interface UseUploadFileProps
-  extends Pick<
-    UploadFilesOptions<OurFileRouter, keyof OurFileRouter>,
-    "headers" | "onUploadBegin" | "onUploadProgress" | "skipPolling"
-  > {
-  defaultUploadedFiles?: UploadedFile[];
-}
-
-export function useUploadFile(
-  endpoint: keyof OurFileRouter,
-  { defaultUploadedFiles = [], ...props }: UseUploadFileProps = {}
-) {
-  const [uploadedFiles, setUploadedFiles] = React.useState<UploadedFile[]>(defaultUploadedFiles);
-  const [progresses, setProgresses] = React.useState<Record<string, number>>({});
-  const [isUploading, setIsUploading] = React.useState(false);
-
-  async function uploadThings(files: File[]) {
-    setIsUploading(true);
+export function useUploadFile() {
+  const [progresses, setProgresses] = useState<Record<string, number>>({});
+  const [isUploading, setIsUploading] = useState(false);
+  async function handleImageUpload(files: File[]) {
     try {
-      const res = await uploadFiles(endpoint, {
-        ...props,
-        files,
-        onUploadProgress: ({ file, progress }) => {
-          setProgresses((prev) => {
-            return {
-              ...prev,
-              [file]: progress,
-            };
-          });
-        },
+      const serializedFiles = await Promise.all(
+        files.map(async (file) => ({
+          name: file.name,
+          type: file.type,
+          size: file.size,
+          lastModified: file.lastModified,
+          content: await fileToBase64(file),
+        }))
+      );
+
+      const totalSize = serializedFiles.reduce(
+        (acc, file) => acc + file.size,
+        0
+      );
+      let uploadedSize = 0;
+
+      const response = await axios.post(
+        "/api/file",
+        { files: serializedFiles },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          onUploadProgress: (progressEvent) => {
+            const percentCompleted = Math.round(
+              (progressEvent.loaded * 100) / progressEvent.total!
+            );
+
+            serializedFiles.forEach((file) => {
+              const fileProgress = Math.min(
+                100,
+                Math.round(
+                  ((uploadedSize +
+                    (progressEvent.loaded * file.size) / totalSize) *
+                    100) /
+                    file.size
+                )
+              );
+              setProgresses((prev) => ({ ...prev, [file.name]: fileProgress }));
+            });
+
+            if (progressEvent.loaded === progressEvent.total) {
+              uploadedSize += progressEvent.loaded;
+            }
+          },
+        }
+      );
+
+      setProgresses((prev) =>
+        Object.fromEntries(Object.keys(prev).map((key) => [key, 100]))
+      );
+
+      await updateUser({
+        profileUrl: response.data.results[0].path,
+        path: "/settings/account",
       });
-      await updateUser({ profileUrl: res[0].url, path: "/settings/account" });
-      setUploadedFiles((prev) => (prev ? [...prev, ...res] : res));
-    } catch (err) {
-      toast.error(getErrorMessage(err));
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.error("Axios error:", error.response?.data || error.message);
+      } else {
+        console.error("Error uploading files:", error);
+      }
     } finally {
       setProgresses({});
       setIsUploading(false);
@@ -51,9 +77,8 @@ export function useUploadFile(
   }
 
   return {
-    uploadedFiles,
+    uploadFiles: handleImageUpload,
     progresses,
-    uploadFiles: uploadThings,
     isUploading,
   };
 }

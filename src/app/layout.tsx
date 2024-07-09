@@ -4,9 +4,6 @@ import { GeistSans } from "geist/font/sans";
 
 import "./globals.css";
 
-import { Analytics } from "@vercel/analytics/react";
-import { SpeedInsights } from "@vercel/speed-insights/next";
-
 import { Toaster } from "@/components/ui/sonner";
 import QueryProvider from "@/components/providers/query-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
@@ -27,10 +24,13 @@ export default function RootLayout({
     <html lang="en">
       <body className={GeistSans.className}>
         <QueryProvider>
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
             {children}
-            <SpeedInsights />
-            <Analytics />
             <Toaster richColors />
           </ThemeProvider>
         </QueryProvider>

@@ -23,7 +23,7 @@ export default function Inbox() {
             className={cn(buttonVariants({ variant: "ghost2", size: "icon" }))}
           >
             <SlidersHorizontal className="size-5" />
-          </DropdownMenuTrigger>
+          </DropdownMenuTrigger>  
           <DropdownMenuContent
             align="end"
             sideOffset={10}

@@ -1,17 +1,20 @@
 "use client";
 
-import * as React from "react";
-import { motion } from "framer-motion";
-import { UploadIcon, X } from "lucide-react";
-import Dropzone, { type DropzoneProps, type FileRejection } from "react-dropzone";
-import { toast } from "sonner";
-
+import FileCard from "@/components/card/file-card";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { uploadImage } from "@/lib/actions/file";
 import { useControllableState } from "@/lib/hooks/use-controllable-state";
 import { useDialog } from "@/lib/hooks/use-dialog";
 import { cn, formatBytes } from "@/lib/utils";
-import { ScrollArea } from "@/components/ui/scroll-area";
-
-import FileCard from "./card/file-card";
+import { UploadIcon } from "lucide-react";
+import React, { useCallback } from "react";
+import Dropzone, {
+  DropzoneProps,
+  FileRejection,
+  useDropzone,
+} from "react-dropzone";
+import { toast } from "sonner";
 
 interface FileUploaderProps extends React.HTMLAttributes<HTMLDivElement> {
   /**
@@ -139,8 +142,15 @@ export function FileUploader(props: FileUploaderProps) {
         });
       }
 
-      if (onUpload && updatedFiles.length > 0 && updatedFiles.length <= maxFiles) {
-        const target = updatedFiles.length > 1 ? `${updatedFiles.length} files` : `${updatedFiles.length} file`;
+      if (
+        onUpload &&
+        updatedFiles.length > 0 &&
+        updatedFiles.length <= maxFiles
+      ) {
+        const target =
+          updatedFiles.length > 1
+            ? `${updatedFiles.length} files`
+            : `${updatedFiles.length} file`;
 
         toast.promise(onUpload(updatedFiles), {
           loading: `Uploading ${target}...`,
@@ -151,7 +161,10 @@ export function FileUploader(props: FileUploaderProps) {
             }, 1000);
             return `${target} uploaded`;
           },
-          error: `Failed to upload ${target}`,
+          error: (error) => {
+            console.log(error);
+            return `Failed to upload ${target}`;
+          },
         });
       }
     },
@@ -207,14 +220,22 @@ export function FileUploader(props: FileUploaderProps) {
             {isDragActive ? (
               <div className="flex flex-col items-center justify-center gap-4 sm:px-5">
                 <div className="rounded-full border border-dashed p-3">
-                  <UploadIcon className="size-7 text-muted-foreground" aria-hidden="true" />
+                  <UploadIcon
+                    className="size-7 text-muted-foreground"
+                    aria-hidden="true"
+                  />
                 </div>
-                <p className="font-medium text-muted-foreground">Drop the files here</p>
+                <p className="font-medium text-muted-foreground">
+                  Drop the files here
+                </p>
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center gap-4 sm:px-5">
                 <div className="rounded-full border border-dashed p-3">
-                  <UploadIcon className="size-7 text-muted-foreground" aria-hidden="true" />
+                  <UploadIcon
+                    className="size-7 text-muted-foreground"
+                    aria-hidden="true"
+                  />
                 </div>
                 <div className="space-y-px">
                   <p className="font-medium text-muted-foreground">
@@ -237,23 +258,26 @@ export function FileUploader(props: FileUploaderProps) {
         <ScrollArea className="h-fit w-full px-3">
           <div className="max-h-48 space-y-4">
             {files?.map((file, index) => (
-              <motion.div
-                key={file.name}
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.1 }}
-              >
-                <FileCard file={file} onRemove={() => onRemove(index)} progress={progresses?.[file.name]} />
-              </motion.div>
+              <FileCard
+                key={index}
+                file={file}
+                onRemove={() => onRemove(index)}
+                progress={progresses?.[file.name]}
+              />
             ))}
           </div>
         </ScrollArea>
       ) : null}
     </div>
+    // <form onSubmit={handleImageUpload}>
+    //   <input type="file" name="file" accept="image/*" />
+    //   <Button type="submit">Upload</Button>
+    // </form>
   );
 }
 
-export function isFileWithPreview(file: File): file is File & { preview: string } {
+export function isFileWithPreview(
+  file: File
+): file is File & { preview: string } {
   return "preview" in file && typeof file.preview === "string";
 }

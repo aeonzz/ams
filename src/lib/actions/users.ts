@@ -15,7 +15,6 @@ import {
   setAuthCookie,
   validateAuthFormData,
 } from "../auth/utils";
-import getBase64 from "../base64";
 import {
   authenticationSchema,
   changePasswordSchema,

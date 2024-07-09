@@ -22,7 +22,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <SessionProvider user={data}>
       <DashboardLayout>
         <CommandLayout>
-          <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
+          {/* <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} /> */}
           {children}
         </CommandLayout>
       </DashboardLayout>

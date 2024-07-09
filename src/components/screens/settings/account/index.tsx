@@ -11,10 +11,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import UploadProfileDialog from "@/components/dialogs/upload-profile-dialog";
-import SingleInputForm from "@/components/forms/update-user-form";
+import UpdateUserForm from "@/components/forms/update-user-form";
 
 export default function AccountScreen() {
   const currentUser = useSession();
@@ -42,7 +41,7 @@ export default function AccountScreen() {
             <UploadProfileDialog />
           </CardFooter>
         </Card>
-        <SingleInputForm
+        <UpdateUserForm
           email={currentUser.email}
           username={currentUser.username}
         />
