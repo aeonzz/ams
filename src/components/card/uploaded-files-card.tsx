@@ -1,19 +1,18 @@
 import Image from "next/image";
 
-import type { UploadedFile } from "@/lib/types/file";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 import { EmptyCard } from "./empty-card";
 
 interface UploadedFilesCardProps {
-  uploadedFiles: UploadedFile[];
+  uploadedFiles: string[];
 }
 
 export function UploadedFilesCard({ uploadedFiles }: UploadedFilesCardProps) {
   return (
     <Card>
-      <CardHeader>
+      {/* <CardHeader>
         <CardTitle>Uploaded files</CardTitle>
         <CardDescription>View the uploaded files here</CardDescription>
       </CardHeader>
@@ -39,7 +38,7 @@ export function UploadedFilesCard({ uploadedFiles }: UploadedFilesCardProps) {
         ) : (
           <EmptyCard title="No files uploaded" description="Upload some files to see them here" className="w-full" />
         )}
-      </CardContent>
+      </CardContent> */}
     </Card>
   );
 }

@@ -3,7 +3,6 @@
 import FileCard from "@/components/card/file-card";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { uploadImage } from "@/lib/actions/file";
 import { useControllableState } from "@/lib/hooks/use-controllable-state";
 import { useDialog } from "@/lib/hooks/use-dialog";
 import { cn, formatBytes } from "@/lib/utils";
@@ -269,10 +268,6 @@ export function FileUploader(props: FileUploaderProps) {
         </ScrollArea>
       ) : null}
     </div>
-    // <form onSubmit={handleImageUpload}>
-    //   <input type="file" name="file" accept="image/*" />
-    //   <Button type="submit">Upload</Button>
-    // </form>
   );
 }
 

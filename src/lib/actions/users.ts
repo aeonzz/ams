@@ -233,39 +233,3 @@ export const updateUser = authedProcedure
       getErrorMessage(error);
     }
   });
-
-export const getAvatar = authedProcedure
-  .createServerAction()
-  .input(imageSchema)
-  .handler(async ({ ctx, input }) => {
-    try {
-      const filePath = path.join("/tmp", input.filename);
-      const fileBuffer = await readFile(filePath);
-      const fileExtension = path.extname(input.filename).toLowerCase();
-
-      let mimeType;
-      switch (fileExtension) {
-        case ".svg":
-          mimeType = "image/svg+xml";
-          break;
-        case ".png":
-          mimeType = "image/png";
-          break;
-        case ".jpg":
-        case ".jpeg":
-          mimeType = "image/jpeg";
-          break;
-        case ".gif":
-          mimeType = "image/gif";
-          break;
-        default:
-          mimeType = "application/octet-stream";
-      }
-
-      const base64 = fileBuffer.toString("base64");
-      return `data:${mimeType};base64,${base64}`;
-    } catch (error) {
-      getErrorMessage(error);
-      return null;
-    }
-  });

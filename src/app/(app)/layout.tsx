@@ -5,11 +5,14 @@ import DashboardLayout from "@/components/layouts/dashboard-layout";
 import SessionProvider from "@/components/providers/session-provider";
 import FetchDataError from "@/components/screens/fetch-data-error";
 
-
-export default async function AppLayout({ children }: { children: React.ReactNode }) {
+export default async function AppLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   await checkAuth();
   const [data] = await currentUser();
-  console.log(data)
+
   if (!data) {
     return <FetchDataError />;
   }
@@ -18,7 +21,6 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <SessionProvider user={data}>
       <DashboardLayout>
         <CommandLayout>
-          {/* <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} /> */}
           {children}
         </CommandLayout>
       </DashboardLayout>
