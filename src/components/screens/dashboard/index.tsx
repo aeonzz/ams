@@ -12,6 +12,7 @@ import { useDialog } from "@/lib/hooks/use-dialog";
 
 export default function DashboardScreen() {
   const currentUser = useSession();
+  console.log(currentUser)
   const dialog = useDialog();
   const username = `${currentUser.username.charAt(0).toUpperCase()}${currentUser.username.slice(1)}`;
 

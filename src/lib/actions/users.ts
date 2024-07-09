@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 import { generateId } from "lucia";
 import { Argon2id } from "oslo/password";
 import { createServerAction } from "zsa";
+import { readFile } from "fs/promises";
+import path from "path";
 
 import { db } from "@/lib/db/index";
 
@@ -22,6 +24,7 @@ import {
 } from "../db/schema/auth";
 import { serverUpdateUserSchema } from "../db/schema/user";
 import { authedProcedure, getErrorMessage } from "./utils";
+import { imageSchema } from "../db/schema/file";
 
 interface ActionResult {
   error: string;
@@ -174,7 +177,36 @@ export const currentUser = authedProcedure
         },
       });
 
-      return data;
+      if (!data) {
+        throw "User not found";
+      }
+
+      let profileImageData = null;
+      if (data.profileUrl) {
+        const filename = path.basename(data.profileUrl);
+        const filePath = path.join("/tmp", filename);
+        const fileBuffer = await readFile(filePath);
+        const fileExtension = path.extname(filename).toLowerCase() as
+          | ".svg"
+          | ".png"
+          | ".jpg"
+          | ".jpeg"
+          | ".gif";
+
+        const mimeTypes: Record<string, string> = {
+          ".svg": "image/svg+xml",
+          ".png": "image/png",
+          ".jpg": "image/jpeg",
+          ".jpeg": "image/jpeg",
+          ".gif": "image/gif",
+        };
+        const mimeType = mimeTypes[fileExtension] || "application/octet-stream";
+
+        const base64 = fileBuffer.toString("base64");
+        profileImageData = `data:${mimeType};base64,${base64}`;
+      }
+
+      return { ...data, profileImageData };
     } catch (error) {
       getErrorMessage(error);
     }
@@ -202,4 +234,38 @@ export const updateUser = authedProcedure
     }
   });
 
-  
+export const getAvatar = authedProcedure
+  .createServerAction()
+  .input(imageSchema)
+  .handler(async ({ ctx, input }) => {
+    try {
+      const filePath = path.join("/tmp", input.filename);
+      const fileBuffer = await readFile(filePath);
+      const fileExtension = path.extname(input.filename).toLowerCase();
+
+      let mimeType;
+      switch (fileExtension) {
+        case ".svg":
+          mimeType = "image/svg+xml";
+          break;
+        case ".png":
+          mimeType = "image/png";
+          break;
+        case ".jpg":
+        case ".jpeg":
+          mimeType = "image/jpeg";
+          break;
+        case ".gif":
+          mimeType = "image/gif";
+          break;
+        default:
+          mimeType = "application/octet-stream";
+      }
+
+      const base64 = fileBuffer.toString("base64");
+      return `data:${mimeType};base64,${base64}`;
+    } catch (error) {
+      getErrorMessage(error);
+      return null;
+    }
+  });

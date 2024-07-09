@@ -1,3 +1,5 @@
-import { z } from "zod";
+import { string, z } from "zod";
 
-export const fileSchema = z.instanceof(File);
+export const imageSchema = z.object({
+  filename: string().min(1),
+});

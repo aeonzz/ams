@@ -31,7 +31,7 @@ export default function AccountScreen() {
           </CardHeader>
           <CardContent className="flex justify-center">
             <Avatar className="size-32">
-              <AvatarImage src={currentUser.profileUrl ?? ""} />
+              <AvatarImage src={currentUser.profileImageData ?? ""} />
               <AvatarFallback className="rounded-md">
                 {currentUser.username.charAt(0).toUpperCase()}
               </AvatarFallback>

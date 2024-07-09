@@ -47,6 +47,7 @@
     "next": "14.2.4",
     "next-themes": "^0.3.0",
     "oslo": "^1.2.1",
+    "path-browserify": "^1.0.1",
     "react": "^18",
     "react-dom": "^18",
     "react-dropzone": "^14.2.3",
@@ -67,6 +68,7 @@
   "devDependencies": {
     "@ianvs/prettier-plugin-sort-imports": "^4.3.0",
     "@types/node": "^20",
+    "@types/path-browserify": "^1.0.2",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "eslint": "^8",
