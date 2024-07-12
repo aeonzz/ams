@@ -14,16 +14,15 @@ import {
 import { Separator } from "@/components/ui/separator";
 import UploadProfileDialog from "@/components/dialogs/upload-profile-dialog";
 import UpdateUserForm from "@/components/forms/update-user-form";
+import { H2, P } from "@/components/typography/text";
 
 export default function AccountScreen() {
   const currentUser = useSession();
   return (
     <div className="flex">
       <div className="w-[650px]">
-        <h3 className="text-2xl font-semibold">Account</h3>
-        <p className="text-sm text-muted-foreground">
-          Update your account settings
-        </p>
+        <H2 className="font-semibold">Account</H2>
+        <P className="text-muted-foreground">Update your account settings</P>
         <Separator className="my-9" />
         <Card>
           <CardHeader>

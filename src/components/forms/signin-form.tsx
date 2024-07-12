@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 import { signInAction } from "@/lib/actions/users";
-import { authenticationSchema } from "@/lib/db/schema/auth";
+import { AuthenticationSchema } from "@/lib/db/schema/auth";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
@@ -18,11 +18,11 @@ import { SubmitButton } from "../ui/submit-button";
 
 export default function SignInForm() {
   const [isLoading, setIsLoading] = useState(false);
-  const form = useForm<z.infer<typeof authenticationSchema>>({
-    resolver: zodResolver(authenticationSchema),
+  const form = useForm<z.infer<typeof AuthenticationSchema>>({
+    resolver: zodResolver(AuthenticationSchema),
   });
 
-  async function onSubmit(values: z.infer<typeof authenticationSchema>) {
+  async function onSubmit(values: z.infer<typeof AuthenticationSchema>) {
     setIsLoading(true);
     const [data, error] = await signInAction(values);
 

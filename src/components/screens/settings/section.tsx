@@ -1,5 +1,6 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
+import { H4, H5, P } from "@/components/typography/text";
 
 const Section = React.forwardRef<
   HTMLDivElement,
@@ -7,7 +8,7 @@ const Section = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex flex-col space-y-3", className)}
+    className={cn("my-9 flex flex-col space-y-3", className)}
     {...props}
   />
 ));
@@ -17,11 +18,7 @@ const SectionTitle = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn("text-xl font-semibold", className)}
-    {...props}
-  />
+  <H4 ref={ref} className={cn("font-semibold", className)} {...props} />
 ));
 SectionTitle.displayName = "SectionTitle";
 
@@ -53,7 +50,7 @@ const SectionItemTitle = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("text-md", className)} {...props} />
+  <H5 ref={ref} className={cn(className)} {...props} />
 ));
 SectionItemTitle.displayName = "SectionItemTitle";
 
@@ -61,11 +58,7 @@ const SectionItemDescription = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn("text-sm text-muted-foreground", className)}
-    {...props}
-  />
+  <P ref={ref} className={cn("text-muted-foreground", className)} {...props} />
 ));
 SectionItemDescription.displayName = "SectionItemDescription";
 

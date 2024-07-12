@@ -10,6 +10,13 @@ interface SessionProviderProps {
   user: UserType;
 }
 
-export default function SessionProvider({ children, user }: SessionProviderProps) {
-  return <UserSessionContext.Provider value={user}>{children}</UserSessionContext.Provider>;
+export default function SessionProvider({
+  children,
+  user,
+}: SessionProviderProps) {
+  return (
+    <UserSessionContext.Provider value={user}>
+      {children}
+    </UserSessionContext.Provider>
+  );
 }

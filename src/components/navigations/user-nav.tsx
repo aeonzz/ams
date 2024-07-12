@@ -27,6 +27,7 @@ import {
 import { Button } from "../ui/button";
 import CommandTooltip from "../ui/command-tooltip";
 import { CommandShortcut } from "../ui/command";
+import { useFontSize } from "@/lib/hooks/use-font-size";
 
 interface UserNavProps {
   isOpen: boolean | undefined;
@@ -34,6 +35,7 @@ interface UserNavProps {
 
 export default function UserNav({ isOpen }: UserNavProps) {
   const currentUser = useSession();
+  const { fontSize } = useFontSize();
   const [isLoading, setIsLoading] = useState(false);
   const dialog = useDialog();
 
@@ -79,10 +81,7 @@ export default function UserNav({ isOpen }: UserNavProps) {
           align="start"
           loop
           onCloseAutoFocus={(e) => e.preventDefault()}
-          className="w-52"
         >
-          <DropdownMenuLabel>My Account</DropdownMenuLabel>
-          <DropdownMenuSeparator />
           <DropdownMenuItem>Profile</DropdownMenuItem>
           <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
             <Link href="/settings/account" prefetch>

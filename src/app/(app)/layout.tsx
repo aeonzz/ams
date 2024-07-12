@@ -4,6 +4,7 @@ import CommandLayout from "@/components/layouts/command-layout";
 import DashboardLayout from "@/components/layouts/dashboard-layout";
 import SessionProvider from "@/components/providers/session-provider";
 import FetchDataError from "@/components/screens/fetch-data-error";
+import FontSizeProvider from "@/components/providers/font-size-context";
 
 export default async function AppLayout({
   children,
@@ -19,11 +20,11 @@ export default async function AppLayout({
 
   return (
     <SessionProvider user={data}>
-      <DashboardLayout>
-        <CommandLayout>
-          {children}
-        </CommandLayout>
-      </DashboardLayout>
+      <FontSizeProvider font={data.setting?.fontSize}>
+        <DashboardLayout>
+          <CommandLayout>{children}</CommandLayout>
+        </DashboardLayout>
+      </FontSizeProvider>
     </SessionProvider>
   );
 }

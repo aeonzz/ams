@@ -18,20 +18,19 @@ import {
   validateAuthFormData,
 } from "../auth/utils";
 import {
-  authenticationSchema,
-  changePasswordSchema,
-  resetPasswordSchema,
+  AuthenticationSchema,
+  ChangePasswordSchema,
+  ResetPasswordSchema,
 } from "../db/schema/auth";
 import { serverUpdateUserSchema } from "../db/schema/user";
 import { authedProcedure, getErrorMessage } from "./utils";
-import { imageSchema } from "../db/schema/file";
 
 interface ActionResult {
   error: string;
 }
 
 export const signInAction = createServerAction()
-  .input(authenticationSchema)
+  .input(AuthenticationSchema)
   .timeout(20000)
   .handler(async ({ input }) => {
     try {
@@ -127,7 +126,7 @@ export async function signOutAction(): Promise<ActionResult> {
 //   });
 
 export const resetPassword = createServerAction()
-  .input(changePasswordSchema)
+  .input(ChangePasswordSchema)
   .handler(async ({ input }) => {
     const user = await db.user.findUnique({
       where: {
@@ -174,6 +173,7 @@ export const currentUser = authedProcedure
         },
         include: {
           files: true,
+          setting: true,
         },
       });
 

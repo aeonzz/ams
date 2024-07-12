@@ -1,7 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
-
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -23,3 +22,19 @@ export function formatBytes(
     sizeType === "accurate" ? accurateSizes[i] ?? "Bytest" : sizes[i] ?? "Bytes"
   }`;
 }
+
+export const getFontSizeClass = (
+  fontSize: string,
+  defaultSize: string,
+  smallSize: string,
+  largeSize: string
+) => {
+  switch (fontSize) {
+    case "small":
+      return smallSize;
+    case "large":
+      return largeSize;
+    default:
+      return defaultSize;
+  }
+};

@@ -33,6 +33,7 @@ model User {
   sessions                 Session[]
   role                     Role      @default(USER)
   files                    File[]
+  setting                  Setting?
 }
 
 model Session {
@@ -49,6 +50,15 @@ model File {
   blurDataUrl String?
   userId      String
   user        User    @relation(fields: [userId], references: [id])
+}
+
+model Setting {
+  id        String   @id
+  userId    String   @unique
+  fontSize  String   @default("default")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum Role {

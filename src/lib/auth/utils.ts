@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { type Cookie } from "lucia";
 
-import { authenticationSchema, UsernameAndPassword } from "../db/schema/auth";
+import { AuthenticationSchema, UsernameAndPassword } from "../db/schema/auth";
 import { validateRequest } from "./lucia";
 
 export type AuthSession = {
@@ -52,7 +52,7 @@ export const validateAuthFormData = (
 ): { data: UsernameAndPassword; error: null } | { data: null; error: string } => {
   const email = formData.get("email");
   const password = formData.get("password");
-  const result = authenticationSchema.safeParse({ email, password });
+  const result = AuthenticationSchema.safeParse({ email, password });
 
   if (!result.success) {
     return {

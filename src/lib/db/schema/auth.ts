@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const authenticationSchema = z.object({
+export const AuthenticationSchema = z.object({
   email: z.string().email().min(5).max(64),
   password: z
     .string()
@@ -8,12 +8,12 @@ export const authenticationSchema = z.object({
     .max(15, { message: "Cannot be more than 15 characters long" }),
 });
 
-export const updateUserSchema = z.object({
+export const UpdateUserSchema = z.object({
   name: z.string().min(1).optional(),
   email: z.string().email().min(1).optional(),
 });
 
-export const resetPasswordSchema = z
+export const ResetPasswordSchema = z
   .object({
     password: z
       .string()
@@ -26,7 +26,7 @@ export const resetPasswordSchema = z
     message: "Password do not match",
   });
 
-export const changePasswordSchema = z.object({
+export const ChangePasswordSchema = z.object({
   password: z
     .string()
     .min(4, { message: "Must be at least 4 characters long" })
@@ -34,4 +34,4 @@ export const changePasswordSchema = z.object({
   resetPasswordToken: z.string().min(1),
 });
 
-export type UsernameAndPassword = z.infer<typeof authenticationSchema>;
+export type UsernameAndPassword = z.infer<typeof AuthenticationSchema>;

@@ -20,8 +20,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import FontSizeItem from "./font-size-item";
+import { useFontSize } from "@/lib/hooks/use-font-size";
+import { cn } from "@/lib/utils";
+import { H2, P } from "@/components/typography/text";
 
 export default function PreferencesScreen() {
+  const { fontSize } = useFontSize();
   const { setTheme, theme } = useTheme();
   const [value, setValue] = useState(theme || "system");
 
@@ -32,74 +37,15 @@ export default function PreferencesScreen() {
   return (
     <div className="flex">
       <div className="w-[650px]">
-        <h3 className="text-2xl font-semibold">Preferences</h3>
-        <p className="text-sm text-muted-foreground">
+        <H2 className="font-semibold">Preferences</H2>
+        <P className="text-muted-foreground">
           Customize your settings and personalize your experience.
-        </p>
-        <Separator className="my-9" />
-        {/* <Button asChild variant={"ghost"} className="h-fit w-fit" onClick={() => setTheme("light")}>
-          <div className="flex flex-col">
-            <div className="items-center rounded-md border-2 border-muted p-1 hover:border-accent">
-              <div className="space-y-2 rounded-sm bg-[#ecedef] p-2">
-                <div className="space-y-2 rounded-md bg-white p-2 shadow-sm">
-                  <div className="h-2 w-[80px] rounded-lg bg-[#ecedef]" />
-                  <div className="h-2 w-[100px] rounded-lg bg-[#ecedef]" />
-                </div>
-                <div className="flex items-center space-x-2 rounded-md bg-white p-2 shadow-sm">
-                  <div className="h-4 w-4 rounded-full bg-[#ecedef]" />
-                  <div className="h-2 w-[100px] rounded-lg bg-[#ecedef]" />
-                </div>
-                <div className="flex items-center space-x-2 rounded-md bg-white p-2 shadow-sm">
-                  <div className="h-4 w-4 rounded-full bg-[#ecedef]" />
-                  <div className="h-2 w-[100px] rounded-lg bg-[#ecedef]" />
-                </div>
-              </div>
-            </div>
-            <span className="block w-full p-2 text-center font-normal">Light</span>
-          </div>
-        </Button>
-        <Button asChild variant={"ghost"} onClick={() => setTheme("dark")} className="h-fit w-fit">
-          <div className="flex flex-col">
-            <div className="items-center rounded-md border-2 border-muted bg-popover p-1 hover:bg-accent hover:text-accent-foreground">
-              <div className="space-y-2 rounded-sm bg-neutral-950 p-2">
-                <div className="space-y-2 rounded-md bg-neutral-800 p-2 shadow-sm">
-                  <div className="h-2 w-[80px] rounded-lg bg-neutral-400" />
-                  <div className="h-2 w-[100px] rounded-lg bg-neutral-400" />
-                </div>
-                <div className="flex items-center space-x-2 rounded-md bg-neutral-800 p-2 shadow-sm">
-                  <div className="h-4 w-4 rounded-full bg-neutral-400" />
-                  <div className="h-2 w-[100px] rounded-lg bg-neutral-400" />
-                </div>
-                <div className="flex items-center space-x-2 rounded-md bg-neutral-800 p-2 shadow-sm">
-                  <div className="h-4 w-4 rounded-full bg-neutral-400" />
-                  <div className="h-2 w-[100px] rounded-lg bg-neutral-400" />
-                </div>
-              </div>
-            </div>
-            <span className="block w-full p-2 text-center font-normal">Dark</span>
-          </div>
-        </Button>
-        <Button asChild variant={"ghost"} onClick={() => setTheme("system")} className="h-fit w-fit">
-          <div className="flex flex-col">
-            <div className="items-center rounded-md border-2 border-muted bg-popover p-1 hover:bg-accent hover:text-accent-foreground">
-              <div className="space-y-2 rounded-sm bg-neutral-300 p-2">
-                <div className="space-y-2 rounded-md bg-neutral-600 p-2 shadow-sm">
-                  <div className="h-2 w-[80px] rounded-lg bg-neutral-400" />
-                  <div className="h-2 w-[100px] rounded-lg bg-neutral-400" />
-                </div>
-                <div className="flex items-center space-x-2 rounded-md bg-neutral-600 p-2 shadow-sm">
-                  <div className="h-4 w-4 rounded-full bg-neutral-400" />
-                  <div className="h-2 w-[100px] rounded-lg bg-neutral-400" />
-                </div>
-                <div className="flex items-center space-x-2 rounded-md bg-neutral-600 p-2 shadow-sm">
-                  <div className="h-4 w-4 rounded-full bg-neutral-400" />
-                  <div className="h-2 w-[100px] rounded-lg bg-neutral-400" />
-                </div>
-              </div>
-            </div>
-            <span className="block w-full p-2 text-center font-normal">System</span>
-          </div>
-        </Button> */}
+        </P>
+        <Separator className="mt-9" />
+        <Section>
+          <SectionTitle>Display</SectionTitle>
+          <FontSizeItem />
+        </Section>
         <Section>
           <SectionTitle>Theme</SectionTitle>
           <SectionItem>
@@ -115,9 +61,7 @@ export default function PreferencesScreen() {
                   <SelectValue placeholder="Theme" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="light" onClick={() => setTheme("light")}>
-                    Light
-                  </SelectItem>
+                  <SelectItem value="light">Light</SelectItem>
                   <SelectItem value="dark">Dark</SelectItem>
                   <SelectItem value="system">System</SelectItem>
                 </SelectContent>
