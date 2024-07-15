@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
-import { H4 } from "../typography/text";
+import { H4, P } from "../typography/text";
 
 const Card = React.forwardRef<
   HTMLDivElement,
@@ -46,11 +46,7 @@ const CardDescription = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, ...props }, ref) => (
-  <p
-    ref={ref}
-    className={cn("text-sm text-muted-foreground", className)}
-    {...props}
-  />
+  <P ref={ref} className={cn("text-muted-foreground", className)} {...props} />
 ));
 CardDescription.displayName = "CardDescription";
 

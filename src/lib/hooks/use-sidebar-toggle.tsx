@@ -15,7 +15,7 @@ export const useSidebarToggle = create(
       },
     }),
     {
-      name: "sidebarOpen",
+      name: "sidebar",
       storage: createJSONStorage(() => localStorage),
     }
   )

@@ -75,17 +75,13 @@ export default function UserNav({ isOpen }: UserNavProps) {
             )}
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent
-          align="start"
-          loop
-          onCloseAutoFocus={(e) => e.preventDefault()}
-        >
+        <DropdownMenuContent align="start" loop>
           <DropdownMenuItem>Profile</DropdownMenuItem>
-          <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
-            <Link href="/settings/account" prefetch>
+          <Link href="/settings/account" prefetch>
+            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
               Settings
-            </Link>
-          </DropdownMenuItem>
+            </DropdownMenuItem>
+          </Link>
           <DropdownMenuSeparator />
           <DropdownMenuItem
             onSelect={(e) => handleLogout(e)}

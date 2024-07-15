@@ -15,7 +15,7 @@ export const useFontSize = create(
       },
     }),
     {
-      name: "fontSize",
+      name: "font",
       storage: createJSONStorage(() => localStorage),
     }
   )

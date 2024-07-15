@@ -4,6 +4,23 @@ import { useFontSize } from "@/lib/hooks/use-font-size";
 import { cn, getFontSizeClass } from "@/lib/utils";
 import React, { forwardRef } from "react";
 
+const H1 = forwardRef<
+  HTMLHeadingElement,
+  React.HTMLAttributes<HTMLHeadingElement>
+>(({ className, ...props }, ref) => {
+  const { fontSize } = useFontSize();
+
+  const fontSizeClass = getFontSizeClass(
+    fontSize,
+    "text-3xl",
+    "text-2xl",
+    "text-4xl"
+  );
+
+  return <h1 ref={ref} className={cn(fontSizeClass, className)} {...props} />;
+});
+H1.displayName = "H1";
+
 const H2 = forwardRef<
   HTMLHeadingElement,
   React.HTMLAttributes<HTMLHeadingElement>
@@ -89,4 +106,22 @@ const P = forwardRef<
 });
 P.displayName = "P";
 
-export { H2, H3, H4, H5, P };
+const Tspan = forwardRef<SVGTSpanElement, React.SVGProps<SVGTSpanElement>>(
+  ({ className, ...props }, ref) => {
+    const { fontSize } = useFontSize();
+
+    const fontSizeClass = getFontSizeClass(
+      fontSize,
+      "text-xs",
+      "text-xs",
+      "text-sm"
+    );
+
+    return (
+      <tspan ref={ref} className={cn(fontSizeClass, className)} {...props} />
+    );
+  }
+);
+Tspan.displayName = "Tspan";
+
+export { H1, H2, H3, H4, H5, P, Tspan };

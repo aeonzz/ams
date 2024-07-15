@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 import { resetPassword } from "@/lib/actions/users";
-import { resetPasswordSchema } from "@/lib/db/schema/auth";
+import { ResetPasswordSchema } from "@/lib/db/schema/auth";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -23,11 +23,11 @@ interface ChangePasswordFormProps {
 export default function ChangePasswordForm({ resetPasswordToken }: ChangePasswordFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const form = useForm<z.infer<typeof resetPasswordSchema>>({
-    resolver: zodResolver(resetPasswordSchema),
+  const form = useForm<z.infer<typeof ResetPasswordSchema>>({
+    resolver: zodResolver(ResetPasswordSchema),
   });
 
-  async function onSubmit(values: z.infer<typeof resetPasswordSchema>) {
+  async function onSubmit(values: z.infer<typeof ResetPasswordSchema>) {
     setIsLoading(true);
 
     const [data, error] = await resetPassword({
