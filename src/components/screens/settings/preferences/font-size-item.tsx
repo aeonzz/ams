@@ -13,18 +13,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useStore } from "zustand";
 import { useFontSize } from "@/lib/hooks/use-font-size";
-import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
 
 export default function FontSizeItem() {
-  const { fontSize, setFontSize } = useFontSize();
-  const [value, setValue] = useState<string | undefined>(fontSize);
-  // const { data, mutate } = useServerActionMutation(helloWorldAction)
-
-
-  useEffect(() => {
-    setFontSize(value);
-  }, [value]);
+  const font = useStore(useFontSize, (state) => state);
 
   return (
     <SectionItem>
@@ -33,7 +26,7 @@ export default function FontSizeItem() {
         <SectionItemDescription>Adjust font size.</SectionItemDescription>
       </SectionItemHeader>
       <SectionItemAction>
-        <Select value={value} onValueChange={setValue}>
+        <Select value={font.fontSize} onValueChange={font.setFontSize}>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Font" />
           </SelectTrigger>

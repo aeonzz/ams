@@ -49,7 +49,9 @@ const getErrorMessage = (errors: any): string => {
 
 export const validateAuthFormData = (
   formData: FormData
-): { data: UsernameAndPassword; error: null } | { data: null; error: string } => {
+):
+  | { data: UsernameAndPassword; error: null }
+  | { data: null; error: string } => {
   const email = formData.get("email");
   const password = formData.get("password");
   const result = AuthenticationSchema.safeParse({ email, password });

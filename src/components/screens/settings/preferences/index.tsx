@@ -21,12 +21,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import FontSizeItem from "./font-size-item";
-import { useFontSize } from "@/lib/hooks/use-font-size";
-import { cn } from "@/lib/utils";
 import { H2, P } from "@/components/typography/text";
 
 export default function PreferencesScreen() {
-  const { fontSize } = useFontSize();
   const { setTheme, theme } = useTheme();
   const [value, setValue] = useState(theme || "system");
 

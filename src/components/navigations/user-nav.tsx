@@ -27,7 +27,6 @@ import {
 import { Button } from "../ui/button";
 import CommandTooltip from "../ui/command-tooltip";
 import { CommandShortcut } from "../ui/command";
-import { useFontSize } from "@/lib/hooks/use-font-size";
 
 interface UserNavProps {
   isOpen: boolean | undefined;
@@ -35,7 +34,6 @@ interface UserNavProps {
 
 export default function UserNav({ isOpen }: UserNavProps) {
   const currentUser = useSession();
-  const { fontSize } = useFontSize();
   const [isLoading, setIsLoading] = useState(false);
   const dialog = useDialog();
 
