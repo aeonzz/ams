@@ -5,8 +5,8 @@ import { z } from 'zod';
 /////////////////////////////////////////
 
 export const BorrowRequestSchema = z.object({
-  id: z.number().int(),
-  requestId: z.number().int(),
+  id: z.string(),
+  requestId: z.string(),
   itemType: z.string(),
   quantity: z.number().int(),
   returnDate: z.coerce.date(),

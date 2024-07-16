@@ -5,8 +5,8 @@ import { z } from 'zod';
 /////////////////////////////////////////
 
 export const VenueRequestSchema = z.object({
-  id: z.number().int(),
-  requestId: z.number().int(),
+  id: z.string(),
+  requestId: z.string(),
   venueName: z.string(),
   startTime: z.coerce.date(),
   endTime: z.coerce.date(),

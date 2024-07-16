@@ -5,8 +5,8 @@ import { z } from 'zod';
 /////////////////////////////////////////
 
 export const JobRequestSchema = z.object({
-  id: z.number().int(),
-  requestId: z.number().int(),
+  id: z.string(),
+  requestId: z.string(),
   jobType: z.string(),
   description: z.string().nullable(),
   itemType: z.string().nullable(),

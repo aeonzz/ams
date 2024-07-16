@@ -31,7 +31,7 @@ model User {
   resetPasswordTokenExpiry DateTime?
   username                 String
   sessions                 Session[]
-  role                     Role      @default(USER)
+  role                     RoleType  @default(USER)
   files                    File[]
   setting                  Setting?
   request                  Request[]
@@ -64,9 +64,12 @@ model Setting {
 
 model Request {
   id            String         @id
+  approvedAt    DateTime?
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
+  priority      PriorityType
   type          String
+  notes         String
   status        String
   userId        String
   user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -103,8 +106,14 @@ model BorrowRequest {
   returnDate DateTime
 }
 
-enum Role {
+enum RoleType {
   USER
   ADMIN
   SYSTEMADMIN
+}
+
+enum PriorityType {
+  LOW
+  MEDIUM
+  HIGH
 }
