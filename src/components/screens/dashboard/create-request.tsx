@@ -40,12 +40,12 @@ export default function CreateRequest() {
         dialog.setActiveDialog(open ? "requestDialog" : "")
       }
     >
-      <DialogContent>
+      <DialogContent className="max-w-3xl">
         <DialogHeader>
-          <DialogTitle>Are you absolutely sure?</DialogTitle>
+          <DialogTitle>New Request</DialogTitle>
           <DialogDescription>
-            This action cannot be undone. This will permanently delete your
-            account and remove your data from our servers.
+            Submit a new request for resources, venues, or assistance. Please
+            provide the necessary details to process your request efficiently.
           </DialogDescription>
         </DialogHeader>
       </DialogContent>
