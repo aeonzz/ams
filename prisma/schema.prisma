@@ -63,7 +63,7 @@ model Setting {
 }
 
 model Request {
-  id            Int            @id @default(autoincrement())
+  id            String         @id
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   type          String
@@ -77,8 +77,8 @@ model Request {
 }
 
 model JobRequest {
-  id          Int     @id @default(autoincrement())
-  requestId   Int     @unique
+  id          String  @id
+  requestId   String  @unique
   request     Request @relation(fields: [requestId], references: [id])
   jobType     String
   description String?
@@ -86,8 +86,8 @@ model JobRequest {
 }
 
 model VenueRequest {
-  id        Int      @id @default(autoincrement())
-  requestId Int      @unique
+  id        String   @id
+  requestId String   @unique
   request   Request  @relation(fields: [requestId], references: [id])
   venueName String
   startTime DateTime
@@ -95,8 +95,8 @@ model VenueRequest {
 }
 
 model BorrowRequest {
-  id         Int      @id @default(autoincrement())
-  requestId  Int      @unique
+  id         String   @id
+  requestId  String   @unique
   request    Request  @relation(fields: [requestId], references: [id])
   itemType   String
   quantity   Int
