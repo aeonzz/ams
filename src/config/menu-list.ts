@@ -1,4 +1,12 @@
-import { Bookmark, LayoutGrid, Settings, SquarePen, Tag, Users } from "lucide-react";
+import {
+  Bookmark,
+  LayoutGrid,
+  Mails,
+  Settings,
+  SquarePen,
+  Tag,
+  Users,
+} from "lucide-react";
 
 import { Group } from "@/lib/types/menu";
 
@@ -38,10 +46,10 @@ export function getMenuList(pathname: string): Group[] {
           ],
         },
         {
-          href: "/categories",
-          label: "Categories",
-          active: pathname.includes("/categories"),
-          icon: Bookmark,
+          href: "/requests",
+          label: "Requests",
+          active: pathname.includes("/requests"),
+          icon: Mails,
           submenus: [],
         },
         {

@@ -83,7 +83,6 @@ export function ActiveRequestChart() {
                 }}
               />
             </PolarRadiusAxis>
-
             <RadialBar
               dataKey="job"
               stackId="a"
