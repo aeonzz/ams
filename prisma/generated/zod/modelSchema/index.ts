@@ -5,4 +5,4 @@ export * from './SettingSchema';
 export * from './RequestSchema';
 export * from './JobRequestSchema';
 export * from './VenueRequestSchema';
-export * from './BorrowRequestSchema';
+export * from './ResourceRequestSchema';

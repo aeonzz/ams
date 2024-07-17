@@ -1,10 +1,10 @@
 import { z } from 'zod';
 
 /////////////////////////////////////////
-// BORROW REQUEST SCHEMA
+// RESOURCE REQUEST SCHEMA
 /////////////////////////////////////////
 
-export const BorrowRequestSchema = z.object({
+export const ResourceRequestSchema = z.object({
   id: z.string(),
   requestId: z.string(),
   itemType: z.string(),
@@ -12,6 +12,6 @@ export const BorrowRequestSchema = z.object({
   returnDate: z.coerce.date(),
 })
 
-export type BorrowRequest = z.infer<typeof BorrowRequestSchema>
+export type ResourceRequest = z.infer<typeof ResourceRequestSchema>
 
-export default BorrowRequestSchema;
+export default ResourceRequestSchema;

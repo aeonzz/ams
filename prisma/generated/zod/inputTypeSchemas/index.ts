@@ -6,7 +6,7 @@ export { SettingScalarFieldEnumSchema } from './SettingScalarFieldEnumSchema';
 export { RequestScalarFieldEnumSchema } from './RequestScalarFieldEnumSchema';
 export { JobRequestScalarFieldEnumSchema } from './JobRequestScalarFieldEnumSchema';
 export { VenueRequestScalarFieldEnumSchema } from './VenueRequestScalarFieldEnumSchema';
-export { BorrowRequestScalarFieldEnumSchema } from './BorrowRequestScalarFieldEnumSchema';
+export { ResourceRequestScalarFieldEnumSchema } from './ResourceRequestScalarFieldEnumSchema';
 export { SortOrderSchema } from './SortOrderSchema';
 export { QueryModeSchema } from './QueryModeSchema';
 export { NullsOrderSchema } from './NullsOrderSchema';
