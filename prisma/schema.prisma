@@ -63,20 +63,20 @@ model Setting {
 }
 
 model Request {
-  id            String         @id
-  approvedAt    DateTime?
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  priority      PriorityType
-  type          String
-  notes         String
-  status        String
-  userId        String
-  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  department    String
-  jobRequest    JobRequest?
-  venueRequest  VenueRequest?
-  borrowRequest BorrowRequest?
+  id              String           @id
+  approvedAt      DateTime?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  priority        PriorityType
+  type            String
+  notes           String
+  status          String
+  userId          String
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  department      String
+  jobRequest      JobRequest?
+  venueRequest    VenueRequest?
+  resourceRequest ResourceRequest?
 }
 
 model JobRequest {
@@ -97,7 +97,7 @@ model VenueRequest {
   endTime   DateTime
 }
 
-model BorrowRequest {
+model ResourceRequest {
   id         String   @id
   requestId  String   @unique
   request    Request  @relation(fields: [requestId], references: [id])
@@ -116,4 +116,5 @@ enum PriorityType {
   LOW
   MEDIUM
   HIGH
+  URGENT
 }

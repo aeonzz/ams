@@ -1,12 +1,12 @@
 import { z } from 'zod';
-import { RoleSchema } from '../inputTypeSchemas/RoleSchema'
+import { RoleTypeSchema } from '../inputTypeSchemas/RoleTypeSchema'
 
 /////////////////////////////////////////
 // USER SCHEMA
 /////////////////////////////////////////
 
 export const UserSchema = z.object({
-  role: RoleSchema,
+  role: RoleTypeSchema,
   id: z.string(),
   email: z.string(),
   profileUrl: z.string().nullable(),

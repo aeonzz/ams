@@ -38,3 +38,22 @@ export const getFontSizeClass = (
       return defaultSize;
   }
 };
+
+
+// export function calculatePriority(request) {
+//   let score = 0;
+//   const weights = {
+//     type: { JOB: 3, VENUE: 2, RESOURCE: 1 },
+//     department: { ICT: 3, MAINTENANCE: 2, OTHERS: 1 },
+//     timeSensitivity: 0.5,
+//   };
+  
+//   score += weights.type[request.type] || 0;
+//   score += weights.department[request.department] || 0;
+//   score += Math.max(0, 5 - request.daysUntilNeeded) * weights.timeSensitivity;
+  
+//   if (score > 8) return 'URGENT';
+//   if (score > 6) return 'HIGH';
+//   if (score > 4) return 'MEDIUM';
+//   return 'LOW';
+// }

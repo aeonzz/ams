@@ -14,14 +14,32 @@ interface MenuButtonProps {
   href: string;
 }
 
-export default function MenuButton({ icon: Icon, label, active, isOpen, href }: MenuButtonProps) {
+export default function MenuButton({
+  icon: Icon,
+  label,
+  active,
+  isOpen,
+  href,
+}: MenuButtonProps) {
   return (
-    <Button variant={active ? "secondary" : "ghost"} className="mb-1 h-10 w-full justify-start" asChild>
+    <Button
+      variant="ghost"
+      className={cn(
+        active && "bg-tertiary hover:bg-tertiary",
+        "mb-1 h-10 w-full justify-start"
+      )}
+      asChild
+    >
       <Link href={href} prefetch>
         <span className={cn(isOpen === false ? "" : "mr-4")}>
           <Icon className="size-5" />
         </span>
-        <p className={cn("max-w-[200px] truncate", isOpen === false ? "-translate-x-96" : "translate-x-0 opacity-100")}>
+        <p
+          className={cn(
+            "max-w-[200px] truncate",
+            isOpen === false ? "-translate-x-96" : "translate-x-0 opacity-100"
+          )}
+        >
           {label}
         </p>
       </Link>

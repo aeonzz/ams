@@ -11,9 +11,20 @@ interface SettingsMenuButtonProps {
   label: string;
 }
 
-export default function SettingsMenuButton({ active, href, label }: SettingsMenuButtonProps) {
+export default function SettingsMenuButton({
+  active,
+  href,
+  label,
+}: SettingsMenuButtonProps) {
   return (
-    <Button variant={active ? "secondary" : "ghost"} className="mb-1 h-10 w-full justify-start" asChild>
+    <Button
+      variant="ghost"
+      className={cn(
+        active && "bg-tertiary hover:bg-tertiary",
+        "mb-1 h-10 w-full justify-start"
+      )}
+      asChild
+    >
       <Link href={href} prefetch>
         <p className={cn("max-w-[200px] truncate")}>{label}</p>
       </Link>

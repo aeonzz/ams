@@ -1,5 +1,5 @@
 import { z } from 'zod';
 
-export const RequestScalarFieldEnumSchema = z.enum(['id','createdAt','updatedAt','type','status','userId','department']);
+export const RequestScalarFieldEnumSchema = z.enum(['id','approvedAt','createdAt','updatedAt','priority','type','notes','status','userId','department']);
 
 export default RequestScalarFieldEnumSchema;
