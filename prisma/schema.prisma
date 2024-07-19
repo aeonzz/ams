@@ -63,16 +63,16 @@ model Setting {
 }
 
 model Request {
-  id              String           @id
+  id              String            @id
   approvedAt      DateTime?
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
   priority        PriorityType
   type            String
   notes           String
-  status          String
+  status          RequestStatusType @default(PENDING)
   userId          String
-  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   department      String
   jobRequest      JobRequest?
   venueRequest    VenueRequest?
@@ -117,4 +117,17 @@ enum PriorityType {
   MEDIUM
   HIGH
   URGENT
+}
+
+enum RequestStatusType {
+  PENDING
+  APPROVED
+  IN_PROGRESS
+  COMPLETED
+  REJECTED
+  CANCELLED
+  ON_HOLD
+  DELAYED
+  UNDER_REVIEW
+  SCHEDULED
 }

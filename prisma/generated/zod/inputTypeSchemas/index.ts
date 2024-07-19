@@ -12,3 +12,4 @@ export { QueryModeSchema } from './QueryModeSchema';
 export { NullsOrderSchema } from './NullsOrderSchema';
 export { RoleTypeSchema } from './RoleTypeSchema';
 export { PriorityTypeSchema } from './PriorityTypeSchema';
+export { RequestStatusTypeSchema } from './RequestStatusTypeSchema';
