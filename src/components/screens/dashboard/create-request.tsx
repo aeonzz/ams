@@ -12,10 +12,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Textarea } from "@/components/ui/text-area";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import RequestTypeOption from "./request-type-option";
 import {
   ChevronLeft,
   Lightbulb,
@@ -23,27 +20,28 @@ import {
   Theater,
   Wrench,
 } from "lucide-react";
-import ServiceRequestInput from "@/components/screens/dashboard/service-request-input";
+import JobRequestInput from "./job-request-input";
+import { RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTypeSchema";
 
-export type RequestType = {
-  value: "service" | "venue" | "resource";
+export type ReqType = {
+  value: RequestTypeType;
   label: string;
   icon: LucideIcon;
 };
 
-const RequestTypes: RequestType[] = [
+const RequestTypes: ReqType[] = [
   {
-    value: "service",
-    label: "Service",
+    value: "JOB",
+    label: "Job",
     icon: Wrench,
   },
   {
-    value: "venue",
+    value: "VENUE",
     label: "Venue",
     icon: Theater,
   },
   {
-    value: "resource",
+    value: "RESOURCE",
     label: "Resource",
     icon: Lightbulb,
   },
@@ -51,7 +49,7 @@ const RequestTypes: RequestType[] = [
 
 export default function CreateRequest() {
   const dialog = useDialog();
-  const [type, setType] = useState<RequestType | null>(null);
+  const [type, setType] = useState<ReqType | null>(null);
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -85,8 +83,8 @@ export default function CreateRequest() {
       }}
     >
       <DialogContent className="max-w-3xl">
-        {type?.value === "service" ? (
-          <ServiceRequestInput setType={setType} />
+        {type?.value === "JOB" ? (
+          <JobRequestInput setType={setType} type={type} />
         ) : (
           <>
             <DialogHeader>

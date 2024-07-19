@@ -10,6 +10,7 @@ export { ResourceRequestScalarFieldEnumSchema } from './ResourceRequestScalarFie
 export { SortOrderSchema } from './SortOrderSchema';
 export { QueryModeSchema } from './QueryModeSchema';
 export { NullsOrderSchema } from './NullsOrderSchema';
+export { RequestTypeSchema } from './RequestTypeSchema';
 export { RoleTypeSchema } from './RoleTypeSchema';
 export { PriorityTypeSchema } from './PriorityTypeSchema';
 export { RequestStatusTypeSchema } from './RequestStatusTypeSchema';

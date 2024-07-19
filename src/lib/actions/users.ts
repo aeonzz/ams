@@ -22,7 +22,7 @@ import {
   ChangePasswordSchema,
   ResetPasswordSchema,
 } from "../db/schema/auth";
-import { serverUpdateUserSchema } from "../db/schema/user";
+import { ServerUpdateUserSchema } from "../db/schema/user";
 import { authedProcedure, getErrorMessage } from "./utils";
 
 interface ActionResult {
@@ -214,7 +214,7 @@ export const currentUser = authedProcedure
 
 export const updateUser = authedProcedure
   .createServerAction()
-  .input(serverUpdateUserSchema)
+  .input(ServerUpdateUserSchema)
   .handler(async ({ ctx, input }) => {
     const { user } = ctx;
     const { path, ...rest } = input;

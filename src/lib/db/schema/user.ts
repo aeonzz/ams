@@ -1,13 +1,13 @@
 import { z } from "zod";
 
-export const serverUpdateUserSchema = z.object({
+export const ServerUpdateUserSchema = z.object({
   email: z.string().email().optional(),
   profileUrl: z.string().optional(),
   username: z.string().optional(),
   path: z.string(),
 });
 
-export const clientUpdateUserSchema = z.object({
+export const ClientUpdateUserSchema = z.object({
   email: z.string().email(),
   username: z
     .string()
@@ -17,4 +17,4 @@ export const clientUpdateUserSchema = z.object({
     .max(15),
 });
 
-export type ClientUpdateUserSchema = z.infer<typeof clientUpdateUserSchema>;
+export type User = z.infer<typeof ClientUpdateUserSchema>;

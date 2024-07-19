@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 import { updateUser } from "@/lib/actions/users";
-import { clientUpdateUserSchema } from "@/lib/db/schema/user";
+import { ClientUpdateUserSchema, User } from "@/lib/db/schema/user";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -19,8 +19,8 @@ interface UpdateUserFormProps {
 }
 
 export default function UpdateUserForm({ email, username }: UpdateUserFormProps) {
-  const form = useForm<z.infer<typeof clientUpdateUserSchema>>({
-    resolver: zodResolver(clientUpdateUserSchema),
+  const form = useForm<User>({
+    resolver: zodResolver(ClientUpdateUserSchema),
     defaultValues: {
       email: email,
       username: username,
@@ -41,7 +41,7 @@ export default function UpdateUserForm({ email, username }: UpdateUserFormProps)
     },
   });
 
-  function onSubmit(data: z.infer<typeof clientUpdateUserSchema>) {
+  function onSubmit(data: User) {
     if (data.email !== email || data.username !== username) {
       mutate({ ...data, path: "/settings/account" });
     }

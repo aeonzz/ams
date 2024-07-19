@@ -8,8 +8,18 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 import { signInAction } from "@/lib/actions/users";
-import { AuthenticationSchema } from "@/lib/db/schema/auth";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  AuthenticationSchema,
+  UsernameAndPassword,
+} from "@/lib/db/schema/auth";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
 import { MotionLayout } from "../layouts/motion-layout";
@@ -18,11 +28,11 @@ import { SubmitButton } from "../ui/submit-button";
 
 export default function SignInForm() {
   const [isLoading, setIsLoading] = useState(false);
-  const form = useForm<z.infer<typeof AuthenticationSchema>>({
+  const form = useForm<UsernameAndPassword>({
     resolver: zodResolver(AuthenticationSchema),
   });
 
-  async function onSubmit(values: z.infer<typeof AuthenticationSchema>) {
+  async function onSubmit(values: UsernameAndPassword) {
     setIsLoading(true);
     const [data, error] = await signInAction(values);
 
@@ -35,7 +45,10 @@ export default function SignInForm() {
   }
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="grid w-full gap-4">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="grid w-full gap-4"
+      >
         <FormField
           control={form.control}
           name="email"
@@ -44,7 +57,13 @@ export default function SignInForm() {
               <MotionLayout>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input placeholder="m@example.com" type="email" disabled={isLoading} autoFocus {...field} />
+                  <Input
+                    placeholder="m@example.com"
+                    type="email"
+                    disabled={isLoading}
+                    autoFocus
+                    {...field}
+                  />
                 </FormControl>
               </MotionLayout>
               <FormMessage />
@@ -59,7 +78,10 @@ export default function SignInForm() {
               <MotionLayout>
                 <div className="mb-1 flex items-center justify-between">
                   <FormLabel>Password</FormLabel>
-                  <Link href="/sign-in/reset-password" className="ml-auto inline-block text-sm text-blue-500 underline">
+                  <Link
+                    href="/sign-in/reset-password"
+                    className="ml-auto inline-block text-sm text-blue-500 underline"
+                  >
                     Forgot your password?
                   </Link>
                 </div>
@@ -77,7 +99,11 @@ export default function SignInForm() {
             </FormItem>
           )}
         />
-        <SubmitButton disabled={isLoading} className="w-full" variant="ringHover">
+        <SubmitButton
+          disabled={isLoading}
+          className="w-full"
+          variant="ringHover"
+        >
           Sign in
         </SubmitButton>
       </form>

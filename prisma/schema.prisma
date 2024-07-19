@@ -106,6 +106,12 @@ model ResourceRequest {
   returnDate DateTime
 }
 
+enum RequestType {
+  JOB
+  RESOURCE
+  VENUE
+}
+
 enum RoleType {
   USER
   ADMIN

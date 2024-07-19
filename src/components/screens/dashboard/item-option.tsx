@@ -16,40 +16,40 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { CheckIcon } from "lucide-react";
+import {
+  CheckIcon,
+  CircleArrowUp,
+  Cog,
+  Construction,
+  FileQuestion,
+  Hammer,
+  LucideIcon,
+  Paintbrush,
+  PocketKnife,
+  Wrench,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
-type Type = {
+export type Item = {
   value: string;
   label: string;
 };
 
-const types: Type[] = [
+export const items: Item[] = [
   {
-    value: "backlog",
-    label: "Backlog",
+    value: "repair",
+    label: "Repair",
   },
   {
-    value: "todo",
-    label: "Todo",
-  },
-  {
-    value: "in progress",
-    label: "In Progress",
-  },
-  {
-    value: "done",
-    label: "Done",
-  },
-  {
-    value: "canceled",
-    label: "Canceled",
+    value: "maintenance",
+    label: "Maintenance",
   },
 ];
 
-export default function RequestTypeOption() {
+export default function ItemOption() {
+  const [value, setValue] = useState("");
   const [open, setOpen] = useState(false);
-  const [selectedType, setSelectedType] = useState<Type | null>(null);
+  let Icon = null;
 
   return (
     <Popover open={open} onOpenChange={setOpen} modal>
@@ -59,24 +59,27 @@ export default function RequestTypeOption() {
           size="sm"
           role="combobox"
           aria-expanded={open}
+          className="px-2"
         >
-          {selectedType ? <>{selectedType.label}</> : <>+ Set type</>}
+          {value ? (
+            <>{items.find((item) => item.value === value)?.label}</>
+          ) : (
+            <>Job type</>
+          )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="p-0" align="start">
+      <PopoverContent className="w-[230px] p-0" align="start">
         <Command>
-          <CommandInput placeholder="Choose Request type..." />
+          <CommandInput placeholder="Choose job type..." />
           <CommandList>
             <CommandEmpty>No results found.</CommandEmpty>
             <CommandGroup>
-              {types.map((type) => (
+              {items.map((type) => (
                 <CommandItem
                   key={type.value}
                   value={type.value}
                   onSelect={(value) => {
-                    setSelectedType(
-                      types.find((priority) => priority.value === value) || null
-                    );
+                    setValue(value === value ? "" : value);
                     setOpen(false);
                   }}
                 >
@@ -84,9 +87,7 @@ export default function RequestTypeOption() {
                   <CheckIcon
                     className={cn(
                       "ml-auto h-4 w-4",
-                      selectedType?.value === type.value
-                        ? "opacity-100"
-                        : "opacity-0"
+                      value === type.value ? "opacity-100" : "opacity-0"
                     )}
                   />
                 </CommandItem>
