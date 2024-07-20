@@ -9,7 +9,7 @@ export const JobRequestSchema = z.object({
   requestId: z.string(),
   jobType: z.string(),
   description: z.string().nullable(),
-  itemType: z.string().nullable(),
+  repItemId: z.string(),
 })
 
 export type JobRequest = z.infer<typeof JobRequestSchema>

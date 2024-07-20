@@ -29,6 +29,7 @@ import {
   Wrench,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { P } from "@/components/typography/text";
 
 interface JobTypeOptionProps {
   jobType: Job | undefined;
@@ -91,64 +92,67 @@ export default function JobTypeOption({
   }
 
   return (
-    <Popover open={open} onOpenChange={setOpen} modal>
-      <PopoverTrigger asChild>
-        <Button
-          variant="secondary"
-          size="sm"
-          role="combobox"
-          aria-expanded={open}
-          className="px-2"
-        >
-          {jobType ? (
-            <>
-              {Icon && <Icon className="mr-2 size-4" />}
-              {jobType.label}
-            </>
-          ) : (
-            <>
-              <Hammer className="mr-2 size-4" />
-              Job type
-            </>
-          )}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-[230px] p-0" align="start">
-        <Command>
-          <CommandInput placeholder="Choose job type..." />
-          <CommandList>
-            <CommandEmpty>No results found.</CommandEmpty>
-            <CommandGroup>
-              {Jobs.map((type) => {
-                const { icon: Icon } = type;
-                return (
-                  <CommandItem
-                    key={type.value}
-                    value={type.value}
-                    onSelect={(value) => {
-                      setJobType(
-                        Jobs.find((type) => type.value === value) || undefined
-                      );
-                      setOpen(false);
-                    }}
-                  >
-                    <Icon className="mr-2 size-4" />
-                    {type.label}
-                    <CheckIcon
-                      className={cn(
-                        "ml-auto h-4 w-4",
-                        jobType?.value === type.value
-                          ? "opacity-100"
-                          : "opacity-0"
-                      )}
-                    />
-                  </CommandItem>
-                );
-              })}
-            </CommandGroup>
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
+    <div className="space-y-1">
+      <P className="text-muted-foreground">Job type</P>
+      <Popover open={open} onOpenChange={setOpen} modal>
+        <PopoverTrigger asChild>
+          <Button
+            variant="secondary"
+            size="sm"
+            role="combobox"
+            aria-expanded={open}
+            className="px-2"
+          >
+            {jobType ? (
+              <>
+                {Icon && <Icon className="mr-2 size-4" />}
+                {jobType.label}
+              </>
+            ) : (
+              <>
+                <Hammer className="mr-2 size-4" />
+                Job type
+              </>
+            )}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-[230px] p-0" align="start">
+          <Command className="max-h-72">
+            <CommandInput placeholder="Choose job type..." />
+            <CommandList>
+              <CommandEmpty>No results found.</CommandEmpty>
+              <CommandGroup>
+                {Jobs.map((type) => {
+                  const { icon: Icon } = type;
+                  return (
+                    <CommandItem
+                      key={type.value}
+                      value={type.value}
+                      onSelect={(value) => {
+                        setJobType(
+                          Jobs.find((type) => type.value === value) || undefined
+                        );
+                        setOpen(false);
+                      }}
+                    >
+                      <Icon className="mr-2 size-4" />
+                      {type.label}
+                      <CheckIcon
+                        className={cn(
+                          "ml-auto h-4 w-4",
+                          jobType?.value === type.value
+                            ? "opacity-100"
+                            : "opacity-0"
+                        )}
+                      />
+                    </CommandItem>
+                  );
+                })}
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
+    </div>
   );
 }

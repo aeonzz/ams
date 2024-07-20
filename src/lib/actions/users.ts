@@ -172,7 +172,6 @@ export const currentUser = authedProcedure
           id: user.id,
         },
         include: {
-          files: true,
           setting: true,
         },
       });

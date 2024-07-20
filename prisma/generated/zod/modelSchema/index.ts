@@ -3,6 +3,8 @@ export * from './SessionSchema';
 export * from './FileSchema';
 export * from './SettingSchema';
 export * from './RequestSchema';
+export * from './ItemCategorySchema';
+export * from './RepItemSchema';
 export * from './JobRequestSchema';
 export * from './VenueRequestSchema';
 export * from './ResourceRequestSchema';

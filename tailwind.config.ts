@@ -89,7 +89,8 @@ module.exports = {
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "collapsible-down": "collapsible-down 0.3s cubic-bezier(0.19, 1, 0.22, 1)",
+        "collapsible-down":
+          "collapsible-down 0.3s cubic-bezier(0.19, 1, 0.22, 1)",
         "collapsible-up": "collapsible-up 0.3s cubic-bezier(0.19, 1, 0.22, 1)",
         shine: "shine 8s ease-in-out infinite",
       },
@@ -103,5 +104,8 @@ module.exports = {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate"),
+    require("tailwind-scrollbar")({ nocompatible: true }),
+  ],
 };

@@ -6,6 +6,7 @@ import { authedProcedure, getErrorMessage } from "./utils";
 
 import { db } from "@/lib/db/index";
 import { revalidatePath } from "next/cache";
+import { RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTypeSchema";
 
 export const createRequest = authedProcedure
   .createServerAction()
@@ -25,17 +26,29 @@ export const createRequest = authedProcedure
         data: {
           id: requestId,
           userId: user.id,
-          ...rest,
+          priority: rest.priority,
+          type: rest.type,
+          notes: rest.notes,
+          department: rest.department,
         },
       });
 
-      if (rest.type === "job") {
+      if (rest.type === ("JOB" satisfies RequestTypeType)) {
         const jobRequestId = `JRQ-${generateId(15)}`;
-        await db.jobRequest.create({
+        const repItemId = `RIM-${generateId(15)}`;
+        await db.repItem.create({
           data: {
-            id: jobRequestId,
-            requestId: request.id,
-            jobType: jobType,
+            id: repItemId,
+            name: rest.name,
+            itemCategory: rest.itemCategory,
+            issueDescription: rest.issueDescription,
+            jobRequest: {
+              create: {
+                id: jobRequestId,
+                requestId: request.id,
+                jobType: jobType,
+              },
+            },
           },
         });
       }

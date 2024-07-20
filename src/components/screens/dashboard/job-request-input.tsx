@@ -25,7 +25,10 @@ import {
 } from "@/components/ui/form";
 import { Request, RequestSchema } from "@/lib/db/schema/request";
 import { MotionLayout } from "@/components/layouts/motion-layout";
-import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
+import {
+  useServerActionMutation,
+  useServerActionQuery,
+} from "@/lib/hooks/server-action-hooks";
 import { toast } from "sonner";
 import { createRequest } from "@/lib/actions/request";
 import { PriorityTypeSchema } from "prisma/generated/zod";
@@ -33,7 +36,9 @@ import JobTypeOption, { Jobs, Job } from "./job-type-option";
 import { usePathname } from "next/navigation";
 import { useDialog } from "@/lib/hooks/use-dialog";
 import { ReqType } from "./create-request";
-import ItemOption from "./item-option";
+import CategoryOption, { Category, categoryTypes } from "./category-option";
+import { categoryItems } from "./item-option";
+import { SubmitButton } from "@/components/ui/submit-button";
 
 interface JobRequestInputProps {
   setType: (type: ReqType | null) => void;
@@ -46,11 +51,16 @@ export default function JobRequestInput({
 }: JobRequestInputProps) {
   const dialog = useDialog();
   const pathname = usePathname();
+  const [item, setItem] = useState<string>(categoryItems[0].items[0].value);
+
   const [jobType, setJobType] = useState<Job | undefined>(
     Jobs.find((job) => job.value === "repair")
   );
+
+  const [category, setCategory] = useState<Category>(categoryTypes[0]);
   const { value } = type;
   const deparment = "IT";
+
   const { isPending, mutate } = useServerActionMutation(createRequest, {
     onSuccess: () => {
       dialog.setActiveDialog("");
@@ -78,7 +88,10 @@ export default function JobRequestInput({
       type: value,
       department: deparment,
       jobType: jobType?.value,
+      name: item,
       path: pathname,
+      itemCategory: category?.value,
+      issueDescription: "wtf",
     };
     mutate(data);
   }
@@ -102,7 +115,7 @@ export default function JobRequestInput({
       </DialogHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <div className="px-4">
+          <div className="space-y-2 px-4">
             <FormField
               control={form.control}
               name="notes"
@@ -111,9 +124,9 @@ export default function JobRequestInput({
                   <FormControl>
                     <Textarea
                       rows={1}
-                      maxRows={8}
-                      placeholder="Add description..."
-                      className="min-h-24 border-none px-[2px] py-0 focus-visible:ring-0"
+                      maxRows={12}
+                      placeholder="Description..."
+                      className="min-h-20 border-none bg-background focus-visible:ring-0"
                       {...field}
                     />
                   </FormControl>
@@ -121,18 +134,26 @@ export default function JobRequestInput({
                 </FormItem>
               )}
             />
-            <MotionLayout className="flex space-x-2">
+            <MotionLayout className="flex space-x-3">
               <JobTypeOption jobType={jobType} setJobType={setJobType} />
-              <ItemOption />
+              <CategoryOption
+                item={item}
+                setItem={setItem}
+                category={category}
+                setCategory={setCategory}
+              />
             </MotionLayout>
           </div>
           <MotionLayout>
             <Separator className="my-4" />
             <DialogFooter>
               <div></div>
-              <Button type="submit" disabled={isPending}>
+              <SubmitButton
+                disabled={isPending}
+                className="w-full"
+              >
                 Submit
-              </Button>
+              </SubmitButton>
             </DialogFooter>
           </MotionLayout>
         </form>

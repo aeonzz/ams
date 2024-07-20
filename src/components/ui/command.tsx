@@ -75,7 +75,7 @@ const CommandList = React.forwardRef<
   <CommandPrimitive.List
     ref={ref}
     className={cn(
-      "h-min-cmdk-list overflow-y-auto overflow-x-hidden duration-300 ease-out-expo",
+      "scroll-bar h-min-cmdk-list overflow-y-auto overflow-x-hidden duration-300 ease-out-expo",
       className
     )}
     {...props}

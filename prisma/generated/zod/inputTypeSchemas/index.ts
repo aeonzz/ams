@@ -4,6 +4,8 @@ export { SessionScalarFieldEnumSchema } from './SessionScalarFieldEnumSchema';
 export { FileScalarFieldEnumSchema } from './FileScalarFieldEnumSchema';
 export { SettingScalarFieldEnumSchema } from './SettingScalarFieldEnumSchema';
 export { RequestScalarFieldEnumSchema } from './RequestScalarFieldEnumSchema';
+export { ItemCategoryScalarFieldEnumSchema } from './ItemCategoryScalarFieldEnumSchema';
+export { RepItemScalarFieldEnumSchema } from './RepItemScalarFieldEnumSchema';
 export { JobRequestScalarFieldEnumSchema } from './JobRequestScalarFieldEnumSchema';
 export { VenueRequestScalarFieldEnumSchema } from './VenueRequestScalarFieldEnumSchema';
 export { ResourceRequestScalarFieldEnumSchema } from './ResourceRequestScalarFieldEnumSchema';

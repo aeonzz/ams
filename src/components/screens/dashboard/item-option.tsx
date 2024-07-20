@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -16,40 +16,91 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-  CheckIcon,
-  CircleArrowUp,
-  Cog,
-  Construction,
-  FileQuestion,
-  Hammer,
-  LucideIcon,
-  Paintbrush,
-  PocketKnife,
-  Wrench,
-} from "lucide-react";
+import { CheckIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { CategoryType, Item } from "./category-option";
+import { Textarea } from "@/components/ui/text-area";
 
-export type Item = {
-  value: string;
-  label: string;
+interface ItemOptionProps {
+  item: string;
+  setItem: (item: string) => void;
+  category?: CategoryType;
+}
+
+type CategoryItems = {
+  category: CategoryType;
+  items: Item[];
 };
 
-export const items: Item[] = [
+export const categoryItems: CategoryItems[] = [
   {
-    value: "repair",
-    label: "Repair",
+    category: "electronics",
+    items: [
+      {
+        value: "aircon",
+        label: "Aircon",
+      },
+      {
+        value: "phone",
+        label: "Phone",
+      },
+      {
+        value: "other",
+        label: "Other",
+      },
+    ],
   },
   {
-    value: "maintenance",
-    label: "Maintenance",
+    category: "furniture",
+    items: [
+      {
+        value: "table",
+        label: "Table",
+      },
+      {
+        value: "chair",
+        label: "Chair",
+      },
+      {
+        value: "other",
+        label: "Other",
+      },
+    ],
+  },
+  {
+    category: "other",
+    items: [
+      {
+        value: "table",
+        label: "Table",
+      },
+      {
+        value: "chair",
+        label: "Chair",
+      },
+      {
+        value: "other",
+        label: "Other",
+      },
+    ],
   },
 ];
 
-export default function ItemOption() {
-  const [value, setValue] = useState("");
+export default function ItemOption({
+  item,
+  setItem,
+  category,
+}: ItemOptionProps) {
   const [open, setOpen] = useState(false);
-  let Icon = null;
+  const [openTextbox, setOpenTextbox] = useState(false);
+
+  const categoryData = categoryItems.find((cat) => cat.category === category);
+  const items = categoryData ? categoryData.items : [];
+  const currentItem = items.find((value) => value.value === item);
+
+  useEffect(() => {
+    setItem("");
+  }, [category]);
 
   return (
     <Popover open={open} onOpenChange={setOpen} modal>
@@ -61,16 +112,18 @@ export default function ItemOption() {
           aria-expanded={open}
           className="px-2"
         >
-          {value ? (
-            <>{items.find((item) => item.value === value)?.label}</>
-          ) : (
-            <>Job type</>
-          )}
+          {item ? <>{currentItem?.label ?? item}</> : <>{items[0].label}</>}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[230px] p-0" align="start">
-        <Command>
-          <CommandInput placeholder="Choose job type..." />
+      <PopoverContent
+        className="w-[230px] p-0"
+        align="start"
+        onInteractOutside={() => {
+          setOpenTextbox(false);
+        }}
+      >
+        <Command className="max-h-72">
+          <CommandInput placeholder="Choose item..." />
           <CommandList>
             <CommandEmpty>No results found.</CommandEmpty>
             <CommandGroup>
@@ -79,20 +132,45 @@ export default function ItemOption() {
                   key={type.value}
                   value={type.value}
                   onSelect={(value) => {
-                    setValue(value === value ? "" : value);
-                    setOpen(false);
+                    if (type.value === "other") {
+                      setOpenTextbox(true);
+                    } else {
+                      setOpenTextbox(false);
+                      setItem(
+                        items.find((item) => item.value === value)?.value ?? ""
+                      );
+                      setOpen(false);
+                    }
                   }}
                 >
                   {type.label}
                   <CheckIcon
                     className={cn(
                       "ml-auto h-4 w-4",
-                      value === type.value ? "opacity-100" : "opacity-0"
+                      item === type.value ? "opacity-100" : "opacity-0"
                     )}
                   />
                 </CommandItem>
               ))}
             </CommandGroup>
+            {openTextbox && (
+              <div className="p-1">
+                <Textarea
+                  rows={1}
+                  maxRows={8}
+                  onChange={(e) => {
+                    setItem(
+                      `${e.target.value.charAt(0).toUpperCase()}${e.target.value.slice(1)}`
+                    );
+                  }}
+                  placeholder="Specify the item"
+                  className="min-h-20"
+                  defaultSize="text-sm"
+                  small="text-xs"
+                  large="text-base"
+                />
+              </div>
+            )}
           </CommandList>
         </Command>
       </PopoverContent>

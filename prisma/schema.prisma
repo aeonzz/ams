@@ -32,7 +32,6 @@ model User {
   username                 String
   sessions                 Session[]
   role                     RoleType  @default(USER)
-  files                    File[]
   setting                  Setting?
   request                  Request[]
 }
@@ -49,8 +48,6 @@ model File {
   id          String  @id
   url         String
   blurDataUrl String?
-  userId      String
-  user        User    @relation(fields: [userId], references: [id])
 }
 
 model Setting {
@@ -79,19 +76,40 @@ model Request {
   resourceRequest ResourceRequest?
 }
 
+model ItemCategory {
+  id        String   @id
+  name      String
+  label     String
+  createdAt DateTime @default(now())
+}
+
+model RepItem {
+  id               String      @id
+  name             String
+  itemCategory     String
+  brand            String?
+  model            String?
+  serialNumber     String?
+  issueDescription String
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  jobRequest       JobRequest?
+}
+
 model JobRequest {
   id          String  @id
   requestId   String  @unique
-  request     Request @relation(fields: [requestId], references: [id])
+  request     Request @relation(fields: [requestId], references: [id], onDelete: Cascade)
   jobType     String
   description String?
-  itemType    String?
+  repItem     RepItem @relation(fields: [repItemId], references: [id])
+  repItemId   String  @unique
 }
 
 model VenueRequest {
   id        String   @id
   requestId String   @unique
-  request   Request  @relation(fields: [requestId], references: [id])
+  request   Request  @relation(fields: [requestId], references: [id], onDelete: Cascade)
   venueName String
   startTime DateTime
   endTime   DateTime
@@ -100,7 +118,7 @@ model VenueRequest {
 model ResourceRequest {
   id         String   @id
   requestId  String   @unique
-  request    Request  @relation(fields: [requestId], references: [id])
+  request    Request  @relation(fields: [requestId], references: [id], onDelete: Cascade)
   itemType   String
   quantity   Int
   returnDate DateTime

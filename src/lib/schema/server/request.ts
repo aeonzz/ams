@@ -8,4 +8,10 @@ export const RequestSchema = z.object({
   department: z.string(),
   jobType: z.string().optional(),
   path: z.string(),
+  name: z.string(),
+  itemCategory: z.string(),
+  brand: z.string().optional(),
+  model: z.string().optional(),
+  serialNumber: z.string().optional(),
+  issueDescription: z.string(),
 });

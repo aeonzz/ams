@@ -5,19 +5,50 @@ import { Slot, Slottable } from "@radix-ui/react-slot";
 import { AnimatePresence, motion, MotionProps } from "framer-motion";
 
 import { outExpo } from "@/lib/easings";
-import { cn } from "@/lib/utils";
-import { Button, ButtonIconProps, ButtonProps, buttonVariants } from "@/components/ui/button";
+import { cn, getFontSizeClass } from "@/lib/utils";
+import {
+  Button,
+  ButtonIconProps,
+  ButtonProps,
+  buttonVariants,
+} from "@/components/ui/button";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
+import { useFontSize } from "@/lib/hooks/use-font-size";
 
 type SubmitButtonProps = ButtonProps & ButtonIconProps & MotionProps;
 
 const SubmitButton = forwardRef<HTMLButtonElement, SubmitButtonProps>(
-  ({ className, variant, size, Icon, iconPlacement, asChild = false, disabled, ...props }, ref) => {
+  (
+    {
+      className,
+      variant,
+      size,
+      Icon,
+      iconPlacement,
+      asChild = false,
+      disabled,
+      ...props
+    },
+    ref
+  ) => {
     const Comp = asChild ? Slot : "button";
+
+    const { fontSize } = useFontSize();
+
+    const fontSizeClass = getFontSizeClass(
+      fontSize,
+      "text-sm",
+      "text-xs",
+      "text-base"
+    );
     return (
       <motion.div layout transition={{ duration: 0.3, ease: outExpo }}>
         <Comp
-          className={cn("relative overflow-hidden", buttonVariants({ variant, size, className }))}
+          className={cn(
+            "relative overflow-hidden",
+            fontSizeClass,
+            buttonVariants({ variant, size, className })
+          )}
           disabled={disabled}
           ref={ref}
           {...props}
