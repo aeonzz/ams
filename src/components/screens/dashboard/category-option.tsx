@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -18,56 +18,34 @@ import {
 } from "@/components/ui/popover";
 import { CheckIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { ItemCategory } from "prisma/generated/zod";
-import ItemOption from "./item-option";
 import { P } from "@/components/typography/text";
+import { Selection } from "./job-request-input";
+import ItemOption from "./item-option";
 
 interface CategoryOptionProps {
-  item: string;
-  setItem: (item: string) => void;
-  category: Category;
-  setCategory: (category: Category) => void;
+  selection: Selection;
+  setSelection: React.Dispatch<React.SetStateAction<Selection>>;
 }
 
-export type Item = {
-  value: string;
-  label: string;
-};
-
-export type CategoryType = "other" | "electronics" | "furniture";
-
-export type Category = {
-  value: CategoryType;
-  label: string;
-};
-
-export const categoryTypes: Category[] = [
-  {
-    value: "electronics",
-    label: "Electronics",
-  },
-  {
-    value: "furniture",
-    label: "Furniture",
-  },
-  {
-    value: "other",
-    label: "Other",
-  },
-];
-
 export default function CategoryOption({
-  item,
-  setItem,
-  category,
-  setCategory,
+  selection,
+  setSelection,
 }: CategoryOptionProps) {
+  const { jobType, category } = selection;
+  const { categories } = jobType;
   const [open, setOpen] = useState(false);
 
+  useEffect(() => {
+    setSelection({
+      ...selection,
+      category: categories[0],
+    });
+  }, [jobType]);
+
   return (
-    <div className="space-y-1">
-      <P className="text-muted-foreground">Item to repair</P>
-      <div className="space-x-1">
+    <>
+      <div className="space-y-1">
+        <P className="text-muted-foreground">Category</P>
         <Popover open={open} onOpenChange={setOpen} modal>
           <PopoverTrigger asChild>
             <Button
@@ -77,7 +55,7 @@ export default function CategoryOption({
               aria-expanded={open}
               className="px-2"
             >
-              {category ? <>{category.label}</> : <>Category</>}
+              {category ? <>{category.label}</> : <>{categories[0].label}</>}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-[230px] p-0" align="start">
@@ -86,16 +64,17 @@ export default function CategoryOption({
               <CommandList>
                 <CommandEmpty>No results found.</CommandEmpty>
                 <CommandGroup>
-                  {categoryTypes.map((type) => (
+                  {categories.map((type) => (
                     <CommandItem
                       key={type.value}
                       value={type.value}
                       onSelect={(value) => {
-                        setCategory(
-                          categoryTypes.find(
-                            (category) => category.value === value
-                          ) || categoryTypes[0]
-                        );
+                        setSelection({
+                          ...selection,
+                          category:
+                            categories.find((type) => type.value === value) ??
+                            category,
+                        });
                         setOpen(false);
                       }}
                     >
@@ -115,8 +94,8 @@ export default function CategoryOption({
             </Command>
           </PopoverContent>
         </Popover>
-        <ItemOption item={item} setItem={setItem} category={category?.value} />
       </div>
-    </div>
+      <ItemOption selection={selection} setSelection={setSelection} />
+    </>
   );
 }

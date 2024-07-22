@@ -18,162 +18,116 @@ import {
 } from "@/components/ui/popover";
 import { CheckIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { CategoryType, Item } from "./category-option";
 import { Textarea } from "@/components/ui/text-area";
+import { Selection } from "./job-request-input";
+import { P } from "@/components/typography/text";
 
 interface ItemOptionProps {
-  item: string;
-  setItem: (item: string) => void;
-  category?: CategoryType;
+  selection: Selection;
+  setSelection: React.Dispatch<React.SetStateAction<Selection>>;
 }
 
-type CategoryItems = {
-  category: CategoryType;
-  items: Item[];
-};
-
-export const categoryItems: CategoryItems[] = [
-  {
-    category: "electronics",
-    items: [
-      {
-        value: "aircon",
-        label: "Aircon",
-      },
-      {
-        value: "phone",
-        label: "Phone",
-      },
-      {
-        value: "other",
-        label: "Other",
-      },
-    ],
-  },
-  {
-    category: "furniture",
-    items: [
-      {
-        value: "table",
-        label: "Table",
-      },
-      {
-        value: "chair",
-        label: "Chair",
-      },
-      {
-        value: "other",
-        label: "Other",
-      },
-    ],
-  },
-  {
-    category: "other",
-    items: [
-      {
-        value: "table",
-        label: "Table",
-      },
-      {
-        value: "chair",
-        label: "Chair",
-      },
-      {
-        value: "other",
-        label: "Other",
-      },
-    ],
-  },
-];
-
 export default function ItemOption({
-  item,
-  setItem,
-  category,
+  selection,
+  setSelection,
 }: ItemOptionProps) {
   const [open, setOpen] = useState(false);
   const [openTextbox, setOpenTextbox] = useState(false);
 
-  const categoryData = categoryItems.find((cat) => cat.category === category);
-  const items = categoryData ? categoryData.items : [];
-  const currentItem = items.find((value) => value.value === item);
+  const { category, item } = selection;
+  const { items } = category;
 
   useEffect(() => {
-    setItem("");
+    setSelection({
+      ...selection,
+      item: category.items[0].value,
+    });
   }, [category]);
 
   return (
-    <Popover open={open} onOpenChange={setOpen} modal>
-      <PopoverTrigger asChild>
-        <Button
-          variant="secondary"
-          size="sm"
-          role="combobox"
-          aria-expanded={open}
-          className="px-2"
-        >
-          {item ? <>{currentItem?.label ?? item}</> : <>{items[0].label}</>}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent
-        className="w-[230px] p-0"
-        align="start"
-        onInteractOutside={() => {
-          setOpenTextbox(false);
-        }}
-      >
-        <Command className="max-h-72">
-          <CommandInput placeholder="Choose item..." />
-          <CommandList>
-            <CommandEmpty>No results found.</CommandEmpty>
-            <CommandGroup>
-              {items.map((type) => (
-                <CommandItem
-                  key={type.value}
-                  value={type.value}
-                  onSelect={(value) => {
-                    if (type.value === "other") {
-                      setOpenTextbox(true);
-                    } else {
-                      setOpenTextbox(false);
-                      setItem(
-                        items.find((item) => item.value === value)?.value ?? ""
-                      );
-                      setOpen(false);
-                    }
-                  }}
-                >
-                  {type.label}
-                  <CheckIcon
-                    className={cn(
-                      "ml-auto h-4 w-4",
-                      item === type.value ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                </CommandItem>
-              ))}
-            </CommandGroup>
-            {openTextbox && (
-              <div className="p-1">
-                <Textarea
-                  rows={1}
-                  maxRows={8}
-                  onChange={(e) => {
-                    setItem(
-                      `${e.target.value.charAt(0).toUpperCase()}${e.target.value.slice(1)}`
-                    );
-                  }}
-                  placeholder="Specify the item"
-                  className="min-h-20"
-                  defaultSize="text-sm"
-                  small="text-xs"
-                  large="text-base"
-                />
-              </div>
+    <div className="space-y-1">
+      <P className="text-muted-foreground">Specific Issue</P>
+      <Popover open={open} onOpenChange={setOpen} modal>
+        <PopoverTrigger asChild>
+          <Button
+            variant="secondary"
+            size="sm"
+            role="combobox"
+            aria-expanded={open}
+            className="px-2"
+          >
+            {item ? (
+              <>{`${item.charAt(0).toUpperCase()}${item.slice(1)}`}</>
+            ) : (
+              <>{items[0].label}</>
             )}
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent
+          className="w-[230px] p-0"
+          align="start"
+          onInteractOutside={() => {
+            setOpenTextbox(false);
+          }}
+        >
+          <Command className="max-h-72">
+            <CommandInput placeholder="Choose issue..." />
+            <CommandList>
+              <CommandEmpty>No results found.</CommandEmpty>
+              <CommandGroup>
+                {items.map((type) => (
+                  <CommandItem
+                    key={type.value}
+                    value={type.value}
+                    onSelect={(value) => {
+                      if (type.value === "other") {
+                        setOpenTextbox(true);
+                      } else {
+                        setOpenTextbox(false);
+                        setSelection({
+                          ...selection,
+                          item:
+                            items.find((type) => type.value === value)?.value ??
+                            item,
+                        });
+                        setOpen(false);
+                      }
+                    }}
+                  >
+                    {type.label}
+                    <CheckIcon
+                      className={cn(
+                        "ml-auto h-4 w-4",
+                        item === type.value ? "opacity-100" : "opacity-0"
+                      )}
+                    />
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+              {openTextbox && (
+                <div className="p-1">
+                  <Textarea
+                    rows={1}
+                    maxRows={8}
+                    onChange={(e) => {
+                      setSelection({
+                        ...selection,
+                        item: `${e.target.value.charAt(0).toUpperCase()}${e.target.value.slice(1)}`,
+                      });
+                    }}
+                    placeholder="Specify the issue"
+                    className="min-h-20"
+                    maxLength={20}
+                    defaultSize="text-sm"
+                    small="text-xs"
+                    large="text-base"
+                  />
+                </div>
+              )}
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
+    </div>
   );
 }

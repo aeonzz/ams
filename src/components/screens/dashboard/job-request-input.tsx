@@ -10,7 +10,6 @@ import {
 import { Button } from "../../ui/button";
 import { ChevronLeft } from "lucide-react";
 import { Textarea } from "../../ui/text-area";
-import RequestTypeOption from "./request-type-option";
 import { Separator } from "../../ui/separator";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -25,57 +24,40 @@ import {
 } from "@/components/ui/form";
 import { Request, RequestSchema } from "@/lib/db/schema/request";
 import { MotionLayout } from "@/components/layouts/motion-layout";
-import {
-  useServerActionMutation,
-  useServerActionQuery,
-} from "@/lib/hooks/server-action-hooks";
-import { toast } from "sonner";
-import { createRequest } from "@/lib/actions/request";
 import { PriorityTypeSchema } from "prisma/generated/zod";
-import JobTypeOption, { Jobs, Job } from "./job-type-option";
 import { usePathname } from "next/navigation";
-import { useDialog } from "@/lib/hooks/use-dialog";
 import { ReqType } from "./create-request";
-import CategoryOption, { Category, categoryTypes } from "./category-option";
-import { categoryItems } from "./item-option";
 import { SubmitButton } from "@/components/ui/submit-button";
+import { useCreateRequest } from "@/lib/hooks/use-create-request";
+import JobTypeOption from "./job-type-option";
+import { Category, Item, Job, jobs } from "@/config/job-list";
 
 interface JobRequestInputProps {
-  setType: (type: ReqType | null) => void;
+  setType: React.Dispatch<React.SetStateAction<ReqType | null>>;
   type: ReqType;
 }
+
+export type Selection = {
+  jobType: Job;
+  category: Category;
+  item: string;
+};
 
 export default function JobRequestInput({
   setType,
   type,
 }: JobRequestInputProps) {
-  const dialog = useDialog();
   const pathname = usePathname();
-  const [item, setItem] = useState<string>(categoryItems[0].items[0].value);
 
-  const [jobType, setJobType] = useState<Job | undefined>(
-    Jobs.find((job) => job.value === "repair")
-  );
-
-  const [category, setCategory] = useState<Category>(categoryTypes[0]);
-  const { value } = type;
-  const deparment = "IT";
-
-  const { isPending, mutate } = useServerActionMutation(createRequest, {
-    onSuccess: () => {
-      dialog.setActiveDialog("");
-      toast.success("Request Successful!", {
-        description:
-          "Your request has been submitted and is awaiting approval.",
-      });
-    },
-    onError: (err) => {
-      console.log(err);
-      toast.error("Uh oh! Something went wrong.", {
-        description: "Something went wrong, please try again later.",
-      });
-    },
+  const [selection, setSelection] = useState<Selection>({
+    jobType: jobs[0],
+    category: jobs[0].categories[0],
+    item: jobs[0].categories[0].items[0].value,
   });
+
+  const { value } = type;
+  const department = "IT";
+  const { isPending, mutate } = useCreateRequest();
 
   const form = useForm<Request>({
     resolver: zodResolver(RequestSchema),
@@ -86,12 +68,11 @@ export default function JobRequestInput({
       ...values,
       priority: PriorityTypeSchema.Enum.LOW,
       type: value,
-      department: deparment,
-      jobType: jobType?.value,
-      name: item,
+      department: department,
+      jobType: selection.jobType.value,
+      name: selection.item,
       path: pathname,
-      itemCategory: category?.value,
-      issueDescription: "wtf",
+      itemCategory: selection.category.value,
     };
     mutate(data);
   }
@@ -126,7 +107,7 @@ export default function JobRequestInput({
                       rows={1}
                       maxRows={12}
                       placeholder="Description..."
-                      className="min-h-20 border-none bg-background focus-visible:ring-0"
+                      className="min-h-20 bg-tertiary focus-visible:ring-0"
                       {...field}
                     />
                   </FormControl>
@@ -135,12 +116,9 @@ export default function JobRequestInput({
               )}
             />
             <MotionLayout className="flex space-x-3">
-              <JobTypeOption jobType={jobType} setJobType={setJobType} />
-              <CategoryOption
-                item={item}
-                setItem={setItem}
-                category={category}
-                setCategory={setCategory}
+              <JobTypeOption
+                selection={selection}
+                setSelection={setSelection}
               />
             </MotionLayout>
           </div>
@@ -148,10 +126,7 @@ export default function JobRequestInput({
             <Separator className="my-4" />
             <DialogFooter>
               <div></div>
-              <SubmitButton
-                disabled={isPending}
-                className="w-full"
-              >
+              <SubmitButton disabled={isPending} className="w-28">
                 Submit
               </SubmitButton>
             </DialogFooter>

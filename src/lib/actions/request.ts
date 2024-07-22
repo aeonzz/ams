@@ -41,7 +41,6 @@ export const createRequest = authedProcedure
             id: repItemId,
             name: rest.name,
             itemCategory: rest.itemCategory,
-            issueDescription: rest.issueDescription,
             jobRequest: {
               create: {
                 id: jobRequestId,

@@ -13,5 +13,4 @@ export const RequestSchema = z.object({
   brand: z.string().optional(),
   model: z.string().optional(),
   serialNumber: z.string().optional(),
-  issueDescription: z.string(),
 });

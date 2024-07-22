@@ -48,10 +48,10 @@
     --background: 240 5% 4%;
     --foreground: 0 0% 98%;
 
-    --card: 234 7% 11%;
+    --card: 234 7% 9%;
     --card-foreground: 0 0% 98%;
 
-    --popover: 234 7% 11%;
+    --popover: 234 7% 9%;
     --popover-foreground: 0 0% 98%;
 
     --primary: 234 56% 59%;
@@ -60,7 +60,7 @@
     --secondary: 234 8% 7%;
     --secondary-foreground: 0 0% 98%;
 
-    --tertiary: 234 7% 11%;
+    --tertiary: 234 7% 9%;
     --tertiary-foreground: 0 0% 98%;
 
     --muted: 0 0% 14.9%;
