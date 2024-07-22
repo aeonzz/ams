@@ -77,6 +77,7 @@ export async function signUpAction(
         email: data.email,
         username: "test",
         hashedPassword,
+        department: "test",
       },
     });
   } catch (e) {

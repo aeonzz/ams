@@ -45,7 +45,6 @@ export default function CategoryOption({
   return (
     <>
       <div className="space-y-1">
-        <P className="text-muted-foreground">Category</P>
         <Popover open={open} onOpenChange={setOpen} modal>
           <PopoverTrigger asChild>
             <Button
@@ -94,6 +93,7 @@ export default function CategoryOption({
             </Command>
           </PopoverContent>
         </Popover>
+        <P className="text-muted-foreground">Issue</P>
       </div>
       <ItemOption selection={selection} setSelection={setSelection} />
     </>

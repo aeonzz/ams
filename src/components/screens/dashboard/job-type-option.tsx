@@ -39,7 +39,6 @@ export default function JobTypeOption({
   return (
     <>
       <div className="space-y-1">
-        <P className="text-muted-foreground">Service Type</P>
         <Popover open={open} onOpenChange={setOpen} modal>
           <PopoverTrigger asChild>
             <Button
@@ -102,6 +101,7 @@ export default function JobTypeOption({
             </Command>
           </PopoverContent>
         </Popover>
+        <P className="text-muted-foreground">Service Type</P>
       </div>
       <CategoryOption selection={selection} setSelection={setSelection} />
     </>

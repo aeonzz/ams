@@ -31,6 +31,7 @@ import { SubmitButton } from "@/components/ui/submit-button";
 import { useCreateRequest } from "@/lib/hooks/use-create-request";
 import JobTypeOption from "./job-type-option";
 import { Category, Item, Job, jobs } from "@/config/job-list";
+import PriorityOption from "./priority-option";
 
 interface JobRequestInputProps {
   setType: React.Dispatch<React.SetStateAction<ReqType | null>>;
@@ -115,11 +116,12 @@ export default function JobRequestInput({
                 </FormItem>
               )}
             />
-            <MotionLayout className="flex space-x-3">
+            <MotionLayout className="flex space-x-2">
               <JobTypeOption
                 selection={selection}
                 setSelection={setSelection}
               />
+              <PriorityOption />
             </MotionLayout>
           </div>
           <MotionLayout>
