@@ -30,6 +30,7 @@ model User {
   resetPasswordToken       String?   @unique
   resetPasswordTokenExpiry DateTime?
   username                 String
+  department               String
   sessions                 Session[]
   role                     RoleType  @default(USER)
   setting                  Setting?
@@ -84,16 +85,15 @@ model ItemCategory {
 }
 
 model RepItem {
-  id               String      @id
-  name             String
-  itemCategory     String
-  brand            String?
-  model            String?
-  serialNumber     String?
-  issueDescription String
-  createdAt        DateTime    @default(now())
-  updatedAt        DateTime    @updatedAt
-  jobRequest       JobRequest?
+  id           String      @id
+  name         String
+  itemCategory String
+  brand        String?
+  model        String?
+  serialNumber String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  jobRequest   JobRequest?
 }
 
 model JobRequest {

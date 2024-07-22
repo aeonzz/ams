@@ -14,6 +14,7 @@ export const UserSchema = z.object({
   resetPasswordToken: z.string().nullable(),
   resetPasswordTokenExpiry: z.coerce.date().nullable(),
   username: z.string(),
+  department: z.string(),
 })
 
 export type User = z.infer<typeof UserSchema>
