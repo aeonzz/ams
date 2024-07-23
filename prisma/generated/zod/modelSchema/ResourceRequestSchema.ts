@@ -6,10 +6,10 @@ import { z } from 'zod';
 
 export const ResourceRequestSchema = z.object({
   id: z.string(),
-  requestId: z.string(),
   itemType: z.string(),
   quantity: z.number().int(),
   returnDate: z.coerce.date(),
+  requestId: z.string(),
 })
 
 export type ResourceRequest = z.infer<typeof ResourceRequestSchema>

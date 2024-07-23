@@ -46,9 +46,11 @@ model Session {
 }
 
 model File {
-  id          String  @id
-  url         String
-  blurDataUrl String?
+  id           String      @id
+  url          String
+  blurDataUrl  String?
+  JobRequest   JobRequest? @relation(fields: [jobRequestId], references: [id])
+  jobRequestId String?
 }
 
 model Setting {
@@ -86,29 +88,30 @@ model ItemCategory {
 
 model JobRequest {
   id        String  @id
-  requestId String  @unique
-  request   Request @relation(fields: [requestId], references: [id], onDelete: Cascade)
   jobType   String
   category  String
   name      String
+  files     File[]
+  requestId String  @unique
+  request   Request @relation(fields: [requestId], references: [id], onDelete: Cascade)
 }
 
 model VenueRequest {
   id        String   @id
-  requestId String   @unique
-  request   Request  @relation(fields: [requestId], references: [id], onDelete: Cascade)
   venueName String
   startTime DateTime
   endTime   DateTime
+  requestId String   @unique
+  request   Request  @relation(fields: [requestId], references: [id], onDelete: Cascade)
 }
 
 model ResourceRequest {
   id         String   @id
-  requestId  String   @unique
-  request    Request  @relation(fields: [requestId], references: [id], onDelete: Cascade)
   itemType   String
   quantity   Int
   returnDate DateTime
+  requestId  String   @unique
+  request    Request  @relation(fields: [requestId], references: [id], onDelete: Cascade)
 }
 
 enum RequestType {
