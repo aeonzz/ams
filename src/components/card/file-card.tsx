@@ -46,7 +46,6 @@ export default function FileCard({ file, progress, onRemove }: FileCardProps) {
           size="icon"
           className="size-7"
           onClick={onRemove}
-          disabled={progress !== null}
         >
           <X className="size-4" aria-hidden="true" />
           <span className="sr-only">Remove file</span>

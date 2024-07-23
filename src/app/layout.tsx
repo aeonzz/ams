@@ -7,6 +7,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import QueryProvider from "@/components/providers/query-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 // const inter = Inter({ subsets: ['latin'] });
 
@@ -30,7 +31,9 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            {children}
+            <TooltipProvider disableHoverableContent delayDuration={600}>
+              {children}
+            </TooltipProvider>
             <Toaster richColors />
           </ThemeProvider>
         </QueryProvider>

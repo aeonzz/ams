@@ -4,6 +4,7 @@ import { updateUser } from "../actions/users";
 import { useState } from "react";
 
 export function useUploadFile() {
+  const [uploadedFiles, setUploadedFiles] = useState<string[]>([]);
   const [progresses, setProgresses] = useState<Record<string, number>>({});
   const [isUploading, setIsUploading] = useState(false);
   async function handleImageUpload(files: File[]) {
@@ -60,10 +61,12 @@ export function useUploadFile() {
         Object.fromEntries(Object.keys(prev).map((key) => [key, 100]))
       );
 
-      await updateUser({
-        profileUrl: response.data.results[0].path,
-        path: "/settings/account",
-      });
+      const paths = response.data.results.map(
+        (result: { path: string }) => result.path
+      );
+      setUploadedFiles(paths);
+
+      return response.data.results;
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.error("Axios error:", error.response?.data || error.message);
@@ -77,6 +80,7 @@ export function useUploadFile() {
   }
 
   return {
+    uploadedFiles,
     uploadFiles: handleImageUpload,
     progresses,
     isUploading,

@@ -7,10 +7,11 @@ export const RequestSchema = z.object({
   type: z.string(),
   department: z.string(),
   jobType: z.string().optional(),
-  path: z.string(),
   name: z.string(),
-  itemCategory: z.string(),
-  brand: z.string().optional(),
-  model: z.string().optional(),
-  serialNumber: z.string().optional(),
+  category: z.string(),
+  files: z.array(z.string()),
+  path: z.string(),
 });
+
+
+export type RequestSchemaType = z.infer<typeof RequestSchema>

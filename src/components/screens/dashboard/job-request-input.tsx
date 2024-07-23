@@ -31,7 +31,13 @@ import { SubmitButton } from "@/components/ui/submit-button";
 import { useCreateRequest } from "@/lib/hooks/use-create-request";
 import JobTypeOption from "./job-type-option";
 import { Category, Item, Job, jobs } from "@/config/job-list";
-import PriorityOption from "./priority-option";
+import PriorityOption, { priorities, Priority } from "./priority-option";
+import UploadAttachment from "./upload-attachment";
+import { useUploadFile } from "@/lib/hooks/use-upload-file";
+import { FileUploader } from "@/components/file-uploader";
+import { RequestSchemaType } from "@/lib/schema/server/request";
+import { toast } from "sonner";
+import { UploadedFilesCard } from "@/components/card/uploaded-files-card";
 
 interface JobRequestInputProps {
   setType: React.Dispatch<React.SetStateAction<ReqType | null>>;
@@ -49,31 +55,38 @@ export default function JobRequestInput({
   type,
 }: JobRequestInputProps) {
   const pathname = usePathname();
+  const { value } = type;
+  const department = "IT";
 
   const [selection, setSelection] = useState<Selection>({
     jobType: jobs[0],
     category: jobs[0].categories[0],
     item: jobs[0].categories[0].items[0].value,
   });
-
-  const { value } = type;
-  const department = "IT";
-  const { isPending, mutate } = useCreateRequest();
+  const [prio, setPrio] = useState<Priority>(priorities[0]);
+  const [isLoading, setIsLoading] = useState(false);
+  const { uploadFiles, progresses, isUploading, uploadedFiles } =
+    useUploadFile();
+  const { mutate } = useCreateRequest();
 
   const form = useForm<Request>({
     resolver: zodResolver(RequestSchema),
   });
 
-  function onSubmit(values: Request) {
-    const data = {
-      ...values,
-      priority: PriorityTypeSchema.Enum.LOW,
+  async function onSubmit(values: Request) {
+    setIsLoading(true);
+    await uploadFiles(values.images ?? []);
+
+    const data: RequestSchemaType = {
+      notes: values.notes,
+      priority: prio.value,
       type: value,
       department: department,
       jobType: selection.jobType.value,
+      category: selection.category.value,
       name: selection.item,
       path: pathname,
-      itemCategory: selection.category.value,
+      files: uploadedFiles,
     };
     mutate(data);
   }
@@ -106,7 +119,7 @@ export default function JobRequestInput({
                   <FormControl>
                     <Textarea
                       rows={1}
-                      maxRows={12}
+                      maxRows={8}
                       placeholder="Description..."
                       className="min-h-20 bg-tertiary focus-visible:ring-0"
                       {...field}
@@ -121,14 +134,36 @@ export default function JobRequestInput({
                 selection={selection}
                 setSelection={setSelection}
               />
-              <PriorityOption />
+              <PriorityOption prio={prio} setPrio={setPrio} />
+              <FormField
+                control={form.control}
+                name="images"
+                render={({ field }) => (
+                  <div className="space-y-6">
+                    <FormItem className="w-full">
+                      <FormControl>
+                        <FileUploader
+                          value={field.value}
+                          onValueChange={field.onChange}
+                          maxFiles={4}
+                          maxSize={4 * 1024 * 1024}
+                          progresses={progresses}
+                          disabled={isUploading}
+                          drop={false}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  </div>
+                )}
+              />
             </MotionLayout>
           </div>
           <MotionLayout>
             <Separator className="my-4" />
             <DialogFooter>
               <div></div>
-              <SubmitButton disabled={isPending} className="w-28">
+              <SubmitButton disabled={isLoading} className="w-28">
                 Submit
               </SubmitButton>
             </DialogFooter>

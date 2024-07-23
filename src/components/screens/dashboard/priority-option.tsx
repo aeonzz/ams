@@ -22,19 +22,30 @@ import { PriorityTypeType } from "prisma/generated/zod/inputTypeSchemas/Priority
 import {
   CheckIcon,
   LucideIcon,
+  Minus,
   SignalHigh,
   SignalLow,
   SignalMedium,
   TriangleAlert,
 } from "lucide-react";
 
-type Priority = {
+interface PriorityOptionProps {
+  prio: Priority;
+  setPrio: React.Dispatch<React.SetStateAction<Priority>>;
+}
+
+export type Priority = {
   value: PriorityTypeType;
   label: string;
   icon: LucideIcon;
 };
 
-const priorities: Priority[] = [
+export const priorities: Priority[] = [
+  {
+    value: "NOPRIORITY",
+    label: "No priority",
+    icon: Minus,
+  },
   {
     value: "URGENT",
     label: "Urgent",
@@ -57,9 +68,8 @@ const priorities: Priority[] = [
   },
 ];
 
-export default function PriorityOption() {
+export default function PriorityOption({ prio, setPrio }: PriorityOptionProps) {
   const [open, setOpen] = useState(false);
-  const [prio, setPrio] = useState<Priority>(priorities[0]);
   return (
     <div className="space-y-1">
       <Popover open={open} onOpenChange={setOpen} modal>
@@ -73,7 +83,12 @@ export default function PriorityOption() {
           >
             {prio ? (
               <>
-                <prio.icon className="mr-2 size-4" />
+                <prio.icon
+                  className={cn(
+                    "mr-2 size-4",
+                    prio.value === "URGENT" && "text-amber-500"
+                  )}
+                />
                 {prio.label}
               </>
             ) : (

@@ -6,14 +6,18 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useControllableState } from "@/lib/hooks/use-controllable-state";
 import { useDialog } from "@/lib/hooks/use-dialog";
 import { cn, formatBytes } from "@/lib/utils";
-import { UploadIcon } from "lucide-react";
-import React, { useCallback } from "react";
+import { Paperclip, UploadIcon } from "lucide-react";
+import React, { createRef, useCallback, useRef } from "react";
 import Dropzone, {
   DropzoneProps,
+  DropzoneRef,
+  ErrorCode,
   FileRejection,
   useDropzone,
 } from "react-dropzone";
 import { toast } from "sonner";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import { P } from "./typography/text";
 
 interface FileUploaderProps extends React.HTMLAttributes<HTMLDivElement> {
   /**
@@ -90,6 +94,8 @@ interface FileUploaderProps extends React.HTMLAttributes<HTMLDivElement> {
    * @example disabled
    */
   disabled?: boolean;
+
+  drop?: boolean;
 }
 
 export function FileUploader(props: FileUploaderProps) {
@@ -104,10 +110,11 @@ export function FileUploader(props: FileUploaderProps) {
     multiple = false,
     disabled = false,
     className,
+    drop = true,
     ...dropzoneProps
   } = props;
 
-  const dialog = useDialog();
+  const dropzoneRef = useRef<DropzoneRef>(null);
   const [files, setFiles] = useControllableState({
     prop: valueProp,
     onChange: onValueChange,
@@ -136,8 +143,20 @@ export function FileUploader(props: FileUploaderProps) {
       setFiles(updatedFiles);
 
       if (rejectedFiles.length > 0) {
-        rejectedFiles.forEach(({ file }) => {
-          toast.error(`File ${file.name} was rejected`);
+        rejectedFiles.forEach((file) => {
+          const getErrorDescription = (errorCodes: string[]) => {
+            if (errorCodes.includes("file-too-large")) {
+              return `Maximum allowed size: ${formatBytes(maxSize)}`;
+            } else if (errorCodes.includes("too-many-files")) {
+              return `Maximum allowed files: ${maxFiles}`;
+            } else {
+              return `Errors: ${errorCodes.join(", ")}`;
+            }
+          };
+
+          toast.error(`File ${file.file.name} was rejected`, {
+            description: getErrorDescription(file.errors.map((f) => f.code)),
+          });
         });
       }
 
@@ -155,9 +174,6 @@ export function FileUploader(props: FileUploaderProps) {
           loading: `Uploading ${target}...`,
           success: () => {
             setFiles([]);
-            setTimeout(() => {
-              dialog.setActiveDialog("");
-            }, 1000);
             return `${target} uploaded`;
           },
           error: (error) => {
@@ -193,81 +209,145 @@ export function FileUploader(props: FileUploaderProps) {
 
   const isDisabled = disabled || (files?.length ?? 0) >= maxFiles;
 
+  const openDialog = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.preventDefault();
+    if (dropzoneRef.current) {
+      dropzoneRef.current.open();
+    }
+  };
+
   return (
-    <div className="relative flex flex-col gap-6 overflow-hidden">
-      <Dropzone
-        onDrop={onDrop}
-        accept={accept}
-        maxSize={maxSize}
-        maxFiles={maxFiles}
-        multiple={maxFiles > 1 || multiple}
-        disabled={isDisabled}
-      >
-        {({ getRootProps, getInputProps, isDragActive }) => (
-          <div
-            {...getRootProps()}
-            className={cn(
-              "group relative grid h-52 w-full cursor-pointer place-items-center rounded-lg border-2 border-dashed border-muted-foreground/25 px-5 py-2.5 text-center transition hover:bg-muted/25",
-              "ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-              isDragActive && "border-muted-foreground/50",
-              isDisabled && "pointer-events-none opacity-60",
-              className
-            )}
-            {...dropzoneProps}
+    <>
+      {drop ? (
+        <div className="relative flex flex-col gap-6 overflow-hidden">
+          <Dropzone
+            onDrop={onDrop}
+            accept={accept}
+            maxSize={maxSize}
+            maxFiles={maxFiles}
+            multiple={maxFiles > 1 || multiple}
+            disabled={isDisabled}
           >
-            <input {...getInputProps()} />
-            {isDragActive ? (
-              <div className="flex flex-col items-center justify-center gap-4 sm:px-5">
-                <div className="rounded-full border border-dashed p-3">
-                  <UploadIcon
-                    className="size-7 text-muted-foreground"
-                    aria-hidden="true"
-                  />
-                </div>
-                <p className="font-medium text-muted-foreground">
-                  Drop the files here
-                </p>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center gap-4 sm:px-5">
-                <div className="rounded-full border border-dashed p-3">
-                  <UploadIcon
-                    className="size-7 text-muted-foreground"
-                    aria-hidden="true"
-                  />
-                </div>
-                <div className="space-y-px">
-                  <p className="font-medium text-muted-foreground">
-                    Drag {`'n'`} drop files here, or click to select files
-                  </p>
-                  <p className="text-sm text-muted-foreground/70">
-                    You can upload
-                    {maxFiles > 1
-                      ? ` ${maxFiles === Infinity ? "multiple" : maxFiles}
+            {({ getRootProps, getInputProps, isDragActive }) => (
+              <div
+                {...getRootProps()}
+                className={cn(
+                  "group relative grid h-52 w-full cursor-pointer place-items-center rounded-lg border-2 border-dashed border-muted-foreground/25 px-5 py-2.5 text-center transition hover:bg-muted/25",
+                  "ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                  isDragActive && "border-muted-foreground/50",
+                  isDisabled && "pointer-events-none opacity-60",
+                  className
+                )}
+                {...dropzoneProps}
+              >
+                <input {...getInputProps()} />
+                {isDragActive ? (
+                  <div className="flex flex-col items-center justify-center gap-4 sm:px-5">
+                    <div className="rounded-full border border-dashed p-3">
+                      <UploadIcon
+                        className="size-7 text-muted-foreground"
+                        aria-hidden="true"
+                      />
+                    </div>
+                    <p className="font-medium text-muted-foreground">
+                      Drop the files here
+                    </p>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center gap-4 sm:px-5">
+                    <div className="rounded-full border border-dashed p-3">
+                      <UploadIcon
+                        className="size-7 text-muted-foreground"
+                        aria-hidden="true"
+                      />
+                    </div>
+                    <div className="space-y-px">
+                      <p className="font-medium text-muted-foreground">
+                        Drag {`'n'`} drop files here, or click to select files
+                      </p>
+                      <p className="text-sm text-muted-foreground/70">
+                        You can upload
+                        {maxFiles > 1
+                          ? ` ${maxFiles === Infinity ? "multiple" : maxFiles}
                       files (up to ${formatBytes(maxSize)} each)`
-                      : ` a file with ${formatBytes(maxSize)}`}
-                  </p>
-                </div>
+                          : ` a file with ${formatBytes(maxSize)}`}
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
-          </div>
-        )}
-      </Dropzone>
-      {files?.length ? (
-        <ScrollArea className="h-fit w-full px-3">
-          <div className="max-h-48 space-y-4">
-            {files?.map((file, index) => (
-              <FileCard
-                key={index}
-                file={file}
-                onRemove={() => onRemove(index)}
-                progress={progresses?.[file.name]}
-              />
-            ))}
-          </div>
-        </ScrollArea>
-      ) : null}
-    </div>
+          </Dropzone>
+          {files?.length ? (
+            <ScrollArea className="h-fit w-full px-3">
+              <div className="max-h-48 space-y-4">
+                {files?.map((file, index) => (
+                  <FileCard
+                    key={index}
+                    file={file}
+                    onRemove={() => onRemove(index)}
+                    progress={progresses?.[file.name]}
+                  />
+                ))}
+              </div>
+            </ScrollArea>
+          ) : null}
+        </div>
+      ) : (
+        <div className="flex space-x-2">
+          <Dropzone
+            ref={dropzoneRef}
+            onDrop={onDrop}
+            accept={accept}
+            maxSize={maxSize}
+            maxFiles={maxFiles}
+            multiple={maxFiles > 1 || multiple}
+            disabled={isDisabled}
+            noClick
+            noKeyboard
+          >
+            {({ getRootProps, getInputProps }) => {
+              return (
+                <div {...getRootProps({ className: "dropzone" })}>
+                  <input {...getInputProps()} />
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="icon"
+                        disabled={isDisabled}
+                        className="size-8"
+                        onClick={(e) => openDialog(e)}
+                      >
+                        <Paperclip className="size-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <P>Attach files</P>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+              );
+            }}
+          </Dropzone>
+          {files?.length ? (
+            <ScrollArea className="h-fit w-full px-3">
+              <div className="max-h-32 space-y-4">
+                {files?.map((file, index) => (
+                  <FileCard
+                    key={index}
+                    file={file}
+                    onRemove={() => onRemove(index)}
+                    progress={progresses?.[file.name]}
+                  />
+                ))}
+              </div>
+            </ScrollArea>
+          ) : null}
+        </div>
+      )}
+    </>
   );
 }
 

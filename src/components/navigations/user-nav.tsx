@@ -20,7 +20,6 @@ import {
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
@@ -92,25 +91,23 @@ export default function UserNav({ isOpen }: UserNavProps) {
         </DropdownMenuContent>
       </DropdownMenu>
       {isOpen && (
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="secondary"
-                size="icon"
-                onClick={() => dialog.setActiveDialog("requestDialog")}
-              >
-                <SquarePen className="size-5" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <CommandTooltip text="Create request">
-                <CommandShortcut>Alt</CommandShortcut>
-                <CommandShortcut>C</CommandShortcut>
-              </CommandTooltip>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="secondary"
+              size="icon"
+              onClick={() => dialog.setActiveDialog("requestDialog")}
+            >
+              <SquarePen className="size-5" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <CommandTooltip text="Create request">
+              <CommandShortcut>Alt</CommandShortcut>
+              <CommandShortcut>C</CommandShortcut>
+            </CommandTooltip>
+          </TooltipContent>
+        </Tooltip>
       )}
     </div>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { ImageUp } from "lucide-react";
 
 import { useDialog } from "@/lib/hooks/use-dialog";
@@ -16,10 +16,29 @@ import {
 import { Button } from "../ui/button";
 import { useUploadFile } from "@/lib/hooks/use-upload-file";
 import { FileUploader } from "../file-uploader";
+import { updateUser } from "@/lib/actions/users";
+import { toast } from "sonner";
 
 export default function UploadProfileDialog() {
   const dialog = useDialog();
   const { uploadFiles, progresses, isUploading } = useUploadFile();
+
+  const handleUpload = useCallback(
+    async (files: File[]) => {
+      try {
+        const results = await uploadFiles(files);
+        await updateUser({
+          profileUrl: results[0].path,
+          path: "/settings/account",
+        });
+      } catch (error) {
+        toast.error("Uh oh! Something went wrong.", {
+          description: "Could not update user, please try again later.",
+        });
+      }
+    },
+    [uploadFiles]
+  );
 
   return (
     <Dialog
@@ -53,9 +72,9 @@ export default function UploadProfileDialog() {
           </DialogDescription>
         </DialogHeader>
         <FileUploader
-          maxFiles={1}
+          maxFiles={2}
           maxSize={4 * 1024 * 1024}
-          onUpload={uploadFiles}
+          onUpload={handleUpload}
           progresses={progresses}
           disabled={isUploading}
         />

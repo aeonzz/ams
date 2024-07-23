@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { writeFile } from 'fs/promises';
+import { generateId } from "lucia";
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,7 +20,7 @@ export async function POST(request: NextRequest) {
       const buffer = Buffer.from(base64Data, 'base64');
 
       // Generate a unique filename
-      const filename = `${Date.now()}-${file.name}`;
+      const filename = `${generateId(10)}-${file.name}`;
       const path = `/tmp/${filename}`;
 
       // Write the file

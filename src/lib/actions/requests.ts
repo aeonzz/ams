@@ -35,21 +35,23 @@ export const createRequest = authedProcedure
 
       if (rest.type === ("JOB" satisfies RequestTypeType)) {
         const jobRequestId = `JRQ-${generateId(15)}`;
-        const repItemId = `RIM-${generateId(15)}`;
-        await db.repItem.create({
+
+        const a = await db.jobRequest.create({
           data: {
-            id: repItemId,
+            id: jobRequestId,
+            requestId: request.id,
+            jobType: jobType,
+            category: rest.category,
             name: rest.name,
-            itemCategory: rest.itemCategory,
-            jobRequest: {
-              create: {
-                id: jobRequestId,
-                requestId: request.id,
-                jobType: jobType,
-              },
+            files: {
+              create: rest.files.map((fileName) => ({
+                id: `JRQ-${generateId(15)}`,
+                url: fileName,
+              })),
             },
           },
         });
+        console.log(a)
       }
 
       return revalidatePath(path);
