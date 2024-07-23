@@ -1,5 +1,5 @@
 import { z } from 'zod';
 
-export const JobRequestScalarFieldEnumSchema = z.enum(['id','requestId','jobType','description','repItemId']);
+export const JobRequestScalarFieldEnumSchema = z.enum(['id','requestId','jobType','category','name']);
 
 export default JobRequestScalarFieldEnumSchema;
