@@ -7,7 +7,7 @@ import { useControllableState } from "@/lib/hooks/use-controllable-state";
 import { useDialog } from "@/lib/hooks/use-dialog";
 import { cn, formatBytes } from "@/lib/utils";
 import { Paperclip, UploadIcon } from "lucide-react";
-import React, { createRef, useCallback, useRef } from "react";
+import React, { createRef, useCallback, useEffect, useRef } from "react";
 import Dropzone, {
   DropzoneProps,
   DropzoneRef,
@@ -120,7 +120,7 @@ export function FileUploader(props: FileUploaderProps) {
     onChange: onValueChange,
   });
 
-  const onDrop = React.useCallback(
+  const onDrop = useCallback(
     (acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
       if (!multiple && maxFiles === 1 && acceptedFiles.length > 1) {
         toast.error("Cannot upload more than 1 file at a time");
@@ -195,7 +195,7 @@ export function FileUploader(props: FileUploaderProps) {
   }
 
   // Revoke preview url when component unmounts
-  React.useEffect(() => {
+  useEffect(() => {
     return () => {
       if (!files) return;
       files.forEach((file) => {
@@ -332,8 +332,8 @@ export function FileUploader(props: FileUploaderProps) {
             }}
           </Dropzone>
           {files?.length ? (
-            <ScrollArea className="h-fit w-full px-3">
-              <div className="max-h-32 space-y-4">
+            <ScrollArea className="h-fit w-full">
+              <div className="max-h-32 w-full space-y-2">
                 {files?.map((file, index) => (
                   <FileCard
                     key={index}

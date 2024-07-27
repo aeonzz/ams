@@ -12,7 +12,7 @@ export default function UploadAttachment() {
   const handleUpload = useCallback(
     async (files: File[]) => {
       try {
-        const results = await uploadFiles(files);
+        await uploadFiles(files);
       } catch (error) {
         showErrorToast(error);
       }

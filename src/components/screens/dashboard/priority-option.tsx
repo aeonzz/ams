@@ -79,7 +79,10 @@ export default function PriorityOption({ prio, setPrio }: PriorityOptionProps) {
             size="sm"
             role="combobox"
             aria-expanded={open}
-            className="px-2"
+            className={cn(
+              prio.value === "NOPRIORITY" && "text-muted-foreground",
+              "px-2"
+            )}
           >
             {prio ? (
               <>

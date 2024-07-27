@@ -17,7 +17,7 @@ interface FileCardProps {
 
 export default function FileCard({ file, progress, onRemove }: FileCardProps) {
   return (
-    <div className="relative flex items-center space-x-4">
+    <div className="relative flex w-full items-center space-x-4 rounded-md border bg-card p-2">
       <div className="flex flex-1 space-x-4">
         {isFileWithPreview(file) ? (
           <Image
@@ -31,10 +31,12 @@ export default function FileCard({ file, progress, onRemove }: FileCardProps) {
         ) : null}
         <div className="flex w-full flex-col gap-2">
           <div className="space-y-px">
-            <p className="line-clamp-1 text-sm break-all font-medium text-foreground/80">
+            <p className="line-clamp-1 break-all text-sm font-medium text-foreground/80">
               {file.name}
             </p>
-            <p className="text-xs text-muted-foreground">{formatBytes(file.size)}</p>
+            <p className="text-xs text-muted-foreground">
+              {formatBytes(file.size)}
+            </p>
           </div>
           {progress ? <Progress value={progress} className="h-1" /> : null}
         </div>
@@ -42,12 +44,12 @@ export default function FileCard({ file, progress, onRemove }: FileCardProps) {
       <div className="flex items-center gap-2">
         <Button
           type="button"
-          variant="outline"
+          variant="ghost2"
           size="icon"
           className="size-7"
           onClick={onRemove}
         >
-          <X className="size-4" aria-hidden="true" />
+          <X className="size-4 text-destructive" aria-hidden="true" />
           <span className="sr-only">Remove file</span>
         </Button>
       </div>

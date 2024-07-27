@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import {
   DialogFooter,
@@ -36,8 +36,7 @@ import UploadAttachment from "./upload-attachment";
 import { useUploadFile } from "@/lib/hooks/use-upload-file";
 import { FileUploader } from "@/components/file-uploader";
 import { RequestSchemaType } from "@/lib/schema/server/request";
-import { toast } from "sonner";
-import { UploadedFilesCard } from "@/components/card/uploaded-files-card";
+import { useIsFormDirty } from "@/lib/hooks/use-form-dirty";
 
 interface JobRequestInputProps {
   setType: React.Dispatch<React.SetStateAction<ReqType | null>>;
@@ -57,6 +56,9 @@ export default function JobRequestInput({
   const pathname = usePathname();
   const { value } = type;
   const department = "IT";
+  const form = useForm<Request>({
+    resolver: zodResolver(RequestSchema),
+  });
 
   const [selection, setSelection] = useState<Selection>({
     jobType: jobs[0],
@@ -65,13 +67,11 @@ export default function JobRequestInput({
   });
   const [prio, setPrio] = useState<Priority>(priorities[0]);
   const [isLoading, setIsLoading] = useState(false);
+
   const { uploadFiles, progresses, isUploading, uploadedFiles } =
     useUploadFile();
   const { mutate } = useCreateRequest();
-
-  const form = useForm<Request>({
-    resolver: zodResolver(RequestSchema),
-  });
+  const { setIsFormDirty } = useIsFormDirty();
 
   async function onSubmit(values: Request) {
     setIsLoading(true);
@@ -90,6 +90,22 @@ export default function JobRequestInput({
     };
     mutate(data);
   }
+
+  useEffect(() => {
+    if (
+      form.getFieldState("notes").isDirty ||
+      form.getFieldState("images").isDirty
+    ) {
+      setIsFormDirty(true);
+    }
+
+    return () => {
+      setIsFormDirty(false);
+    };
+  }, [
+    form.getFieldState("notes").isDirty,
+    form.getFieldState("images").isDirty,
+  ]);
 
   return (
     <>
@@ -139,22 +155,20 @@ export default function JobRequestInput({
                 control={form.control}
                 name="images"
                 render={({ field }) => (
-                  <div className="space-y-6">
-                    <FormItem className="w-full">
-                      <FormControl>
-                        <FileUploader
-                          value={field.value}
-                          onValueChange={field.onChange}
-                          maxFiles={4}
-                          maxSize={4 * 1024 * 1024}
-                          progresses={progresses}
-                          disabled={isUploading}
-                          drop={false}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  </div>
+                  <FormItem className="w-full">
+                    <FormControl>
+                      <FileUploader
+                        value={field.value}
+                        onValueChange={field.onChange}
+                        maxFiles={4}
+                        maxSize={4 * 1024 * 1024}
+                        progresses={progresses}
+                        disabled={isUploading}
+                        drop={false}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )}
               />
             </MotionLayout>
