@@ -28,6 +28,7 @@ export const createRequest = authedProcedure
           userId: user.id,
           priority: rest.priority,
           type: rest.type,
+          title: rest.title,
           notes: rest.notes,
           department: rest.department,
         },

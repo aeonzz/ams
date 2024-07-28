@@ -4,7 +4,6 @@ import FileCard from "@/components/card/file-card";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useControllableState } from "@/lib/hooks/use-controllable-state";
-import { useDialog } from "@/lib/hooks/use-dialog";
 import { cn, formatBytes } from "@/lib/utils";
 import { Paperclip, UploadIcon } from "lucide-react";
 import React, { createRef, useCallback, useEffect, useRef } from "react";
@@ -294,7 +293,7 @@ export function FileUploader(props: FileUploaderProps) {
           ) : null}
         </div>
       ) : (
-        <div className="flex space-x-2">
+        <div className="flex flex-col items-end space-y-2">
           <Dropzone
             ref={dropzoneRef}
             onDrop={onDrop}
@@ -332,8 +331,8 @@ export function FileUploader(props: FileUploaderProps) {
             }}
           </Dropzone>
           {files?.length ? (
-            <ScrollArea className="h-fit w-full">
-              <div className="max-h-32 w-full space-y-2">
+            <div className="scroll-bar h-fit w-full overflow-y-scroll">
+              <div className="max-h-24 w-full space-y-2">
                 {files?.map((file, index) => (
                   <FileCard
                     key={index}
@@ -343,7 +342,7 @@ export function FileUploader(props: FileUploaderProps) {
                   />
                 ))}
               </div>
-            </ScrollArea>
+            </div>
           ) : null}
         </div>
       )}

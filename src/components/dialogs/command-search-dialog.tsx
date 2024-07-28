@@ -1,7 +1,15 @@
 "use client";
 
 import { useEffect } from "react";
-import { Mail, PanelRight, Plus, RocketIcon, Settings, Smile, UserRound } from "lucide-react";
+import {
+  Mail,
+  PanelRight,
+  Plus,
+  RocketIcon,
+  Settings,
+  Smile,
+  UserRound,
+} from "lucide-react";
 
 import { useDialog } from "@/lib/hooks/use-dialog";
 import { useSidebarToggle } from "@/lib/hooks/use-sidebar-toggle";
@@ -15,10 +23,12 @@ import {
   CommandSeparator,
   CommandShortcut,
 } from "@/components/ui/command";
+import { useRouter } from "next/navigation";
 
 export default function CommandSearchDialog() {
   const dialog = useDialog();
   const sidebar = useSidebarToggle();
+  const router = useRouter();
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -36,7 +46,9 @@ export default function CommandSearchDialog() {
     <>
       <CommandDialog
         open={dialog.activeDialog === "commandDialog"}
-        onOpenChange={(open) => dialog.setActiveDialog(open ? "commandDialog" : "")}
+        onOpenChange={(open) =>
+          dialog.setActiveDialog(open ? "commandDialog" : "")
+        }
       >
         <CommandInput placeholder="Type a command or search..." />
         <CommandList>
@@ -75,7 +87,12 @@ export default function CommandSearchDialog() {
               <span>Mail</span>
               <CommandShortcut>⌘B</CommandShortcut>
             </CommandItem>
-            <CommandItem>
+            <CommandItem
+              onSelect={() => {
+                router.push("/settings/account");
+                dialog.setActiveDialog("");
+              }}
+            >
               <Settings className="mr-2 h-4 w-4" />
               <span>Settings</span>
               <CommandShortcut>⌘S</CommandShortcut>

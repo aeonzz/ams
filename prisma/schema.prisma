@@ -69,6 +69,7 @@ model Request {
   updatedAt       DateTime          @updatedAt
   priority        PriorityType
   type            String
+  title           String
   notes           String
   status          RequestStatusType @default(PENDING)
   userId          String
