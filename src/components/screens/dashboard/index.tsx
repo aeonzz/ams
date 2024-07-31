@@ -10,8 +10,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { CirclePlus } from "lucide-react";
 import { useDialog } from "@/lib/hooks/use-dialog";
 import { H1, P } from "@/components/typography/text";
-import { ActiveRequestChart } from "@/components/charts/active-request-chart";
-import { TotalRequestChart } from "@/components/charts/total-request-chart";
+import ActiveRequestChart from "@/components/card/active-request-chart";
+import TotalRequestChart from "@/components/card/total-request-chart";
 
 export default function DashboardScreen() {
   const currentUser = useSession();
