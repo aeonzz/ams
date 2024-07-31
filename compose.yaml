@@ -1,0 +1,47 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        DATABASE_URL: re_HeZYNG4V_AZJpjitY2Z1ptGfXJuneVjRr
+        RESEND_API_KEY: postgresql://postgres:Aeonz@db:5432/AMS
+    ports:
+      - "3000:3000"
+    develop:
+      watch: 
+        - path: ./package.json
+          action: rebuild
+        - path: ./next.config.mjs
+          action: rebuild
+        - path: ./package-lock.json
+          action: rebuild
+        - path: .
+          target: /app
+          action: sync
+    environment:
+        RESEND_API_KEY: re_HeZYNG4V_AZJpjitY2Z1ptGfXJuneVjRr
+        DATABASE_URL: postgresql://postgres:Aeonz@db:5432/AMS
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Aeonz
+      POSTGRES_DB: AMS
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    expose:
+      - 5432
+    healthcheck:
+      test: ["CMD", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+volumes:
+  db-data:
