@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { writeFile } from 'fs/promises';
 import { generateId } from "lucia";
+import path from 'path';
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,6 +10,8 @@ export async function POST(request: NextRequest) {
     if (!files || !Array.isArray(files) || files.length === 0) {
       return NextResponse.json({ success: false, message: 'No files received' }, { status: 400 });
     }
+    
+    const uploadPath = '/app/uploads';
 
     const results = await Promise.all(files.map(async (file) => {
       if (!file.content.startsWith('data:image/')) {
@@ -21,13 +24,13 @@ export async function POST(request: NextRequest) {
 
       // Generate a unique filename
       const filename = `${generateId(10)}-${file.name}`;
-      const path = `/tmp/${filename}`;
+      const filePath = path.join(uploadPath, filename);
 
       // Write the file
-      await writeFile(path, buffer);
-      console.log(`File saved: ${path}`);
+      await writeFile(filePath , buffer);
+      console.log(`File saved: ${filePath }`);
 
-      return { name: file.name, success: true, path };
+      return { name: file.name, success: true, filePath  };
     }));
 
     return NextResponse.json({ success: true, results });

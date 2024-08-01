@@ -62,7 +62,7 @@ export function useUploadFile() {
       );
 
       const paths = response.data.results.map(
-        (result: { path: string }) => result.path
+        (result: { filePath: string }) => result.filePath
       );
       setUploadedFiles(paths);
 

@@ -27,8 +27,9 @@ export default function UploadProfileDialog() {
     async (files: File[]) => {
       try {
         const results = await uploadFiles(files);
+        console.log(results)
         await updateUser({
-          profileUrl: results[0].path,
+          profileUrl: results[0].filePath,
           path: "/settings/account",
         });
       } catch (error) {

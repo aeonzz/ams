@@ -184,7 +184,7 @@ export const currentUser = authedProcedure
       let profileImageData = null;
       if (data.profileUrl) {
         const filename = path.basename(data.profileUrl);
-        const filePath = path.join("/tmp", filename);
+        const filePath = path.join("/app/uploads", filename);
         const fileBuffer = await readFile(filePath);
         const fileExtension = path.extname(filename).toLowerCase() as
           | ".svg"
