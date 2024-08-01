@@ -1,5 +1,6 @@
 services:
-  frontend:
+  app:
+    container_name: app
     build:
       context: .
       dockerfile: Dockerfile
@@ -9,7 +10,7 @@ services:
     ports:
       - "3000:3000"
     develop:
-      watch: 
+      watch:
         - path: ./package.json
           action: rebuild
         - path: ./next.config.mjs
@@ -20,13 +21,36 @@ services:
           target: /app
           action: sync
     environment:
-        RESEND_API_KEY: re_HeZYNG4V_AZJpjitY2Z1ptGfXJuneVjRr
-        DATABASE_URL: postgresql://postgres:Aeonz@db:5432/AMS
+      RESEND_API_KEY: re_HeZYNG4V_AZJpjitY2Z1ptGfXJuneVjRr
+      DATABASE_URL: postgresql://postgres:Aeonz@db:5432/AMS
+      UPLOAD_PATH: /app/uploads
+    volumes:
+      - uploads:/app/uploads
     depends_on:
       db:
         condition: service_healthy
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    restart: always
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: christiancaneos1@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:80 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
   db:
     image: postgres
+    container_name: db
     restart: always
     environment:
       POSTGRES_USER: postgres
@@ -40,8 +64,10 @@ services:
       - 5432
     healthcheck:
       test: ["CMD", "pg_isready"]
-      interval: 10s
-      timeout: 5s
+      interval: 30s
+      timeout: 10s
       retries: 5
 volumes:
   db-data:
+  pgadmin-data:
+  uploads:

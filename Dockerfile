@@ -17,7 +17,8 @@ ENV RESEND_API_KEY=${RESEND_API_KEY}
 
 RUN npx prisma generate
 
-RUN apk update && apk add --no-cache git
+# install git 
+# RUN apk update && apk add --no-cache git
 
 RUN npm run build
 
