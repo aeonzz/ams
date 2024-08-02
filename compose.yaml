@@ -5,8 +5,8 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        DATABASE_URL: re_HeZYNG4V_AZJpjitY2Z1ptGfXJuneVjRr
-        RESEND_API_KEY: postgresql://postgres:Aeonz@db:5432/AMS
+        DATABASE_URL: ${DATABASE_URL}
+        RESEND_API_KEY: ${RESEND_API_KEY}
     ports:
       - "3000:3000"
     develop:
@@ -21,9 +21,9 @@ services:
           target: /app
           action: sync
     environment:
-      RESEND_API_KEY: re_HeZYNG4V_AZJpjitY2Z1ptGfXJuneVjRr
-      DATABASE_URL: postgresql://postgres:Aeonz@db:5432/AMS
-      UPLOAD_PATH: /app/uploads
+      - DATABASE_URL
+      - RESEND_API_KEY
+      - UPLOAD_PATH
     volumes:
       - uploads:/app/uploads
     depends_on:
@@ -36,8 +36,8 @@ services:
     ports:
       - "5050:80"
     environment:
-      PGADMIN_DEFAULT_EMAIL: christiancaneos1@gmail.com
-      PGADMIN_DEFAULT_PASSWORD: admin
+      - PGADMIN_DEFAULT_EMAIL
+      - PGADMIN_DEFAULT_PASSWORD
     volumes:
       - pgadmin-data:/var/lib/pgadmin
     depends_on:
@@ -53,9 +53,9 @@ services:
     container_name: db
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: Aeonz
-      POSTGRES_DB: AMS
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_DB
     volumes:
       - db-data:/var/lib/postgresql/data
     ports:
