@@ -79,7 +79,6 @@ export default function JobRequestInput({
     await uploadFiles(values.images ?? []);
 
     const data: RequestSchemaType = {
-      title: values.title,
       notes: values.notes,
       priority: prio.value,
       type: value,
@@ -96,8 +95,7 @@ export default function JobRequestInput({
   useEffect(() => {
     if (
       form.getFieldState("notes").isDirty ||
-      form.getFieldState("images").isDirty ||
-      form.getFieldState("title").isDirty
+      form.getFieldState("images").isDirty
     ) {
       setIsFormDirty(true);
     }
@@ -108,7 +106,6 @@ export default function JobRequestInput({
   }, [
     form.getFieldState("notes").isDirty,
     form.getFieldState("images").isDirty,
-    form.getFieldState("title").isDirty,
   ]);
 
   return (
@@ -131,26 +128,6 @@ export default function JobRequestInput({
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="space-y-2 px-4 relative">
-            <FormField
-              control={form.control}
-              name="title"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Textarea
-                      rows={1}
-                      maxRows={1}
-                      maxLength={50}
-                      placeholder="Request title"
-                      autoFocus
-                      className="min-h-fit border-none p-0 text-xl placeholder:font-medium focus-visible:ring-0"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
             <FormField
               control={form.control}
               name="notes"

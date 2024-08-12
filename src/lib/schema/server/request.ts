@@ -2,7 +2,6 @@ import { PriorityTypeSchema } from "prisma/generated/zod";
 import { z } from "zod";
 
 export const RequestSchema = z.object({
-  title: z.string(),
   notes: z.string(),
   priority: PriorityTypeSchema,
   type: z.string(),
