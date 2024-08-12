@@ -20,7 +20,7 @@ RUN npx prisma generate
 # install git 
 # RUN apk update && apk add --no-cache git
 
-RUN npm run build
+# RUN npm run build
 
 # USER root
 

@@ -6,6 +6,7 @@
 import Link from "next/link";
 
 export default function LandingPage() {
+
   return (
     <div className="flex min-h-screen flex-col">
       <header className="flex h-14 items-center px-4 lg:px-6">
