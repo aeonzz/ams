@@ -3,12 +3,19 @@ import { Group } from "@/lib/types/menu";
 export function getSettingsList(pathname: string): Group[] {
   return [
     {
-      groupLabel: "My Account",
+      groupLabel: "",
       menus: [
         {
-          href: "/settings/account",
-          label: "Account",
-          active: pathname.includes("/account"),
+          href: "/settings/profile",
+          label: "Profile",
+          active: pathname.includes("/profile"),
+          icon: "",
+          submenus: [],
+        },
+        {
+          href: "/settings/password",
+          label: "Password",
+          active: pathname.includes("/password"),
           icon: "",
           submenus: [],
         },

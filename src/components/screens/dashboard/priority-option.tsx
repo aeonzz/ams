@@ -32,6 +32,7 @@ import {
 interface PriorityOptionProps {
   prio: Priority;
   setPrio: React.Dispatch<React.SetStateAction<Priority>>;
+  isLoading: boolean;
 }
 
 export type Priority = {
@@ -68,7 +69,7 @@ export const priorities: Priority[] = [
   },
 ];
 
-export default function PriorityOption({ prio, setPrio }: PriorityOptionProps) {
+export default function PriorityOption({ prio, setPrio, isLoading }: PriorityOptionProps) {
   const [open, setOpen] = useState(false);
   return (
     <div className="space-y-1">
@@ -83,6 +84,7 @@ export default function PriorityOption({ prio, setPrio }: PriorityOptionProps) {
               prio.value === "NOPRIORITY" && "text-muted-foreground",
               "px-2"
             )}
+            disabled={isLoading}
           >
             {prio ? (
               <>

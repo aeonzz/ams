@@ -1,12 +1,12 @@
 import React from "react";
 
-import PreferencesScreen from "@/components/screens/settings/preferences";
 import SettingsLayout from "@/components/layouts/settings-layout";
+import ProfileScreen from "@/components/screens/settings/profile";
 
-export default function PreferencesPage() {
+export default function ProfilePage() {
   return (
     <SettingsLayout title="Settings">
-      <PreferencesScreen />
+      <ProfileScreen />
     </SettingsLayout>
   );
 }

@@ -26,11 +26,13 @@ import { jobs } from "@/config/job-list";
 interface JobTypeOptionProps {
   selection: Selection;
   setSelection: React.Dispatch<React.SetStateAction<Selection>>;
+  isLoading: boolean;
 }
 
 export default function JobTypeOption({
   selection,
   setSelection,
+  isLoading,
 }: JobTypeOptionProps) {
   const [open, setOpen] = useState(false);
 
@@ -47,6 +49,7 @@ export default function JobTypeOption({
               role="combobox"
               aria-expanded={open}
               className="px-2"
+              disabled={isLoading}
             >
               {selection.jobType ? (
                 <>
@@ -103,7 +106,7 @@ export default function JobTypeOption({
         </Popover>
         <P className="text-muted-foreground">Service Type</P>
       </div>
-      <CategoryOption selection={selection} setSelection={setSelection} />
+      <CategoryOption selection={selection} setSelection={setSelection} isLoading={isLoading} />
     </>
   );
 }

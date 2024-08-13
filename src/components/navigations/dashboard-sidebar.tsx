@@ -1,12 +1,6 @@
-"use client";
-
-import { usePathname } from "next/navigation";
-import { User } from "prisma/generated/zod";
-
 import { cn } from "@/lib/utils";
 
 import MainMenu from "./main-menu";
-import SettingsMenu from "./settings-menu";
 import SidebarToggle from "./sidebar-toggle";
 
 interface DashboardSidebarProps {
@@ -18,7 +12,6 @@ export default function DashboardSidebar({
   isOpen,
   setIsOpen,
 }: DashboardSidebarProps) {
-  const pathname = usePathname();
   return (
     <aside
       className={cn(
@@ -26,15 +19,9 @@ export default function DashboardSidebar({
         isOpen === false ? "w-[76px]" : "w-72"
       )}
     >
-      {!pathname.startsWith("/settings") && (
-        <SidebarToggle isOpen={isOpen} setIsOpen={setIsOpen} />
-      )}
+      <SidebarToggle isOpen={isOpen} setIsOpen={setIsOpen} />
       <div className="relative flex h-full flex-col overflow-y-auto px-3 py-3">
-        {pathname.startsWith("/settings") ? (
-          <SettingsMenu />
-        ) : (
-          <MainMenu isOpen={isOpen} />
-        )}
+        <MainMenu isOpen={isOpen} />
       </div>
     </aside>
   );

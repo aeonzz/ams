@@ -7,6 +7,7 @@ services:
       args:
         DATABASE_URL: ${DATABASE_URL}
         RESEND_API_KEY: ${RESEND_API_KEY}
+        COHERE_API_KEY: ${COHERE_API_KEY}
     ports:
       - "3000:3000"
     develop:
@@ -23,6 +24,7 @@ services:
     environment:
       - DATABASE_URL
       - RESEND_API_KEY
+      - COHERE_API_KEY
       - UPLOAD_PATH
     volumes:
       - uploads:/app/uploads

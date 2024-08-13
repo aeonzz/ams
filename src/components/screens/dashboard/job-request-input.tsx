@@ -28,7 +28,6 @@ import { PriorityTypeSchema } from "prisma/generated/zod";
 import { usePathname } from "next/navigation";
 import { ReqType } from "./create-request";
 import { SubmitButton } from "@/components/ui/submit-button";
-import { useCreateRequest } from "@/lib/hooks/use-create-request";
 import JobTypeOption from "./job-type-option";
 import { Category, Item, Job, jobs } from "@/config/job-list";
 import PriorityOption, { priorities, Priority } from "./priority-option";
@@ -38,6 +37,10 @@ import { FileUploader } from "@/components/file-uploader";
 import { RequestSchemaType } from "@/lib/schema/server/request";
 import { useIsFormDirty } from "@/lib/hooks/use-form-dirty";
 import { Input } from "@/components/ui/input";
+import { useDialog } from "@/lib/hooks/use-dialog";
+import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
+import { toast } from "sonner";
+import { createRequest } from "@/lib/actions/requests";
 
 interface JobRequestInputProps {
   setType: React.Dispatch<React.SetStateAction<ReqType | null>>;
@@ -54,6 +57,7 @@ export default function JobRequestInput({
   setType,
   type,
 }: JobRequestInputProps) {
+  const dialog = useDialog();
   const pathname = usePathname();
   const { value } = type;
   const department = "IT";
@@ -71,7 +75,23 @@ export default function JobRequestInput({
 
   const { uploadFiles, progresses, isUploading, uploadedFiles } =
     useUploadFile();
-  const { mutate } = useCreateRequest();
+
+  const { mutate } = useServerActionMutation(createRequest, {
+    onSuccess: () => {
+      dialog.setActiveDialog("");
+      toast.success("Request Successful!", {
+        description:
+          "Your request has been submitted and is awaiting approval.",
+      });
+    },
+    onError: (err) => {
+      console.log(err);
+      setIsLoading(false);
+      toast.error("Uh oh! Something went wrong.", {
+        description: "Something went wrong, please try again later.",
+      });
+    },
+  });
   const { setIsFormDirty } = useIsFormDirty();
 
   async function onSubmit(values: Request) {
@@ -127,7 +147,7 @@ export default function JobRequestInput({
       </DialogHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <div className="space-y-2 px-4 relative">
+          <div className="relative space-y-2 px-4">
             <FormField
               control={form.control}
               name="notes"
@@ -158,7 +178,7 @@ export default function JobRequestInput({
                       maxFiles={4}
                       maxSize={4 * 1024 * 1024}
                       progresses={progresses}
-                      disabled={isUploading}
+                      disabled={isUploading || isLoading}
                       drop={false}
                     />
                   </FormControl>
@@ -170,8 +190,9 @@ export default function JobRequestInput({
               <JobTypeOption
                 selection={selection}
                 setSelection={setSelection}
+                isLoading={isLoading}
               />
-              <PriorityOption prio={prio} setPrio={setPrio} />
+              <PriorityOption prio={prio} setPrio={setPrio} isLoading={isLoading} />
             </MotionLayout>
           </div>
           <MotionLayout>

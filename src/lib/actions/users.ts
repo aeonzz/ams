@@ -162,6 +162,30 @@ export const resetPassword = createServerAction()
     }
   });
 
+export const changePassword = authedProcedure
+  .createServerAction()
+  .input(
+    ChangePasswordSchema.omit({
+      resetPasswordToken: true,
+    })
+  )
+  .handler(async ({ ctx, input }) => {
+    const hashedPassword = await new Argon2id().hash(input.password);
+    try {
+      await db.user.update({
+        where: {
+          id: ctx.user.id,
+        },
+        data: {
+          hashedPassword,
+          resetPasswordToken: null,
+          resetPasswordTokenExpiry: null,
+        },
+      });
+    } catch (error) {
+      getErrorMessage(error);
+    }
+  });
 export const currentUser = authedProcedure
   .createServerAction()
   .handler(async ({ ctx }) => {

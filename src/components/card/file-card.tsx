@@ -13,9 +13,10 @@ interface FileCardProps {
   file: File;
   onRemove: () => void;
   progress?: number;
+  disabled: boolean;
 }
 
-export default function FileCard({ file, progress, onRemove }: FileCardProps) {
+export default function FileCard({ file, progress, onRemove, disabled }: FileCardProps) {
   return (
     <div className="relative flex w-full items-center space-x-4 rounded-md border bg-card p-2">
       <div className="flex flex-1 space-x-4">
@@ -48,6 +49,7 @@ export default function FileCard({ file, progress, onRemove }: FileCardProps) {
           size="icon"
           className="size-7"
           onClick={onRemove}
+          disabled={disabled}
         >
           <X className="size-4 text-destructive" aria-hidden="true" />
           <span className="sr-only">Remove file</span>

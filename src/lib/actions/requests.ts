@@ -26,39 +26,43 @@ export const createRequest = authedProcedure
       throw "Jobtype is undefined";
     }
 
-    const { text } = await generateText({
-      model: cohere("command-r-plus"),
-      prompt: `Create a clear and concise title for a request based on these details:
-    
-    Notes: ${input.notes}
-    Job Type: ${input.jobType}
-    Category: ${input.category}
-    Name: ${input.name}
-    
-    Guidelines:
-    1. Keep it under 20 characters
-    2. Include the job type, category, and name in the title
-    3. Capture the main purpose of the request
-    4. Use action-oriented language
-    5. Be specific to the request's context
-    6. Make it easy to understand at a glance
-    7. Use title case
-    
-    Example: 
-    If given:
-    Notes: Fix leaking faucet in the main office bathroom
-    Job Type: Maintenance
-    Category: Building
-    Name: Plumbing
-    
-    A good title might be:
-    "Urgent Plumbing Maintenance: Office Bathroom Faucet Repair"
-    
-    Now, create a title for the request using the provided details above.`
-    });
-
     try {
+      const { text } = await generateText({
+        model: cohere("command-r-plus"),
+        system: `You are an expert at creating concise, informative titles for work requests. 
+                 Your task is to generate clear, action-oriented titles that quickly convey 
+                 the nature of the request. Always consider the job type, category, and specific 
+                 name of the task when crafting the title. Aim for brevity and clarity. Remove the quotes`,
+        prompt: `Create a clear and concise title for a request based on these details:
+                 Notes: ${input.notes}
+                 Job Type: ${input.jobType}
+                 Category: ${input.category}
+                 Name: ${input.name}
+                 
+                 Guidelines:
+                 1. Keep it under 20 characters
+                 2. Include the job type, category, and name in the title
+                 3. Capture the main purpose of the request
+                 4. Use action-oriented language
+                 5. Be specific to the request's context
+                 6. Make it easy to understand at a glance
+                 7. Use title case
+                 
+                 Example: 
+                 If given:
+                 Notes: Fix leaking faucet in the main office bathroom
+                 Job Type: Maintenance
+                 Category: Building
+                 Name: Plumbing
+                 
+                 A good title might be:
+                 "Urgent Plumbing Maintenance: Office Bathroom Faucet Repair"
+                 
+                 Now, create a title for the request using the provided details above.`,
+      });
+
       const requestId = `REQ-${generateId(15)}`;
+
       const request = await db.request.create({
         data: {
           id: requestId,

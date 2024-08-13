@@ -1,7 +1,3 @@
-import { User } from "prisma/generated/zod";
-
-import Navbar from "../navigations/navbar";
-
 interface ContentLayoutProps {
   title: string;
   children: React.ReactNode;

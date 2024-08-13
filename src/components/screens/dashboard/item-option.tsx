@@ -25,11 +25,13 @@ import { P } from "@/components/typography/text";
 interface ItemOptionProps {
   selection: Selection;
   setSelection: React.Dispatch<React.SetStateAction<Selection>>;
+  isLoading: boolean;
 }
 
 export default function ItemOption({
   selection,
   setSelection,
+  isLoading,
 }: ItemOptionProps) {
   const [open, setOpen] = useState(false);
   const [openTextbox, setOpenTextbox] = useState(false);
@@ -53,6 +55,7 @@ export default function ItemOption({
           role="combobox"
           aria-expanded={open}
           className="px-2"
+          disabled={isLoading}
         >
           {item ? (
             <>{`${item.charAt(0).toUpperCase()}${item.slice(1)}`}</>

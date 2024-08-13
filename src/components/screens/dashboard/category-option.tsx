@@ -25,11 +25,13 @@ import ItemOption from "./item-option";
 interface CategoryOptionProps {
   selection: Selection;
   setSelection: React.Dispatch<React.SetStateAction<Selection>>;
+  isLoading: boolean;
 }
 
 export default function CategoryOption({
   selection,
   setSelection,
+  isLoading,
 }: CategoryOptionProps) {
   const { jobType, category } = selection;
   const { categories } = jobType;
@@ -53,6 +55,7 @@ export default function CategoryOption({
               role="combobox"
               aria-expanded={open}
               className="px-2"
+              disabled={isLoading}
             >
               {category ? <>{category.label}</> : <>{categories[0].label}</>}
             </Button>
@@ -95,7 +98,7 @@ export default function CategoryOption({
         </Popover>
         <P className="text-muted-foreground">Issue</P>
       </div>
-      <ItemOption selection={selection} setSelection={setSelection} />
+      <ItemOption selection={selection} setSelection={setSelection} isLoading={isLoading} />
     </>
   );
 }

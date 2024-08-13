@@ -286,6 +286,7 @@ export function FileUploader(props: FileUploaderProps) {
                     file={file}
                     onRemove={() => onRemove(index)}
                     progress={progresses?.[file.name]}
+                    disabled={disabled}
                   />
                 ))}
               </div>
@@ -339,6 +340,7 @@ export function FileUploader(props: FileUploaderProps) {
                     file={file}
                     onRemove={() => onRemove(index)}
                     progress={progresses?.[file.name]}
+                    disabled={disabled}
                   />
                 ))}
               </div>

@@ -1,12 +1,12 @@
 import React from "react";
 
-import PreferencesScreen from "@/components/screens/settings/preferences";
 import SettingsLayout from "@/components/layouts/settings-layout";
+import PasswordScreen from "@/components/screens/settings/password";
 
-export default function PreferencesPage() {
+export default function PasswordPage() {
   return (
     <SettingsLayout title="Settings">
-      <PreferencesScreen />
+      <PasswordScreen />
     </SettingsLayout>
   );
 }

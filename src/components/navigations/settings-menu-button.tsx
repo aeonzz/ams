@@ -4,6 +4,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 import { Button } from "../ui/button";
+import { P } from "../typography/text";
 
 interface SettingsMenuButtonProps {
   active: boolean;
@@ -18,15 +19,17 @@ export default function SettingsMenuButton({
 }: SettingsMenuButtonProps) {
   return (
     <Button
-      variant="ghost"
+      variant="link"
       className={cn(
-        active && "bg-tertiary hover:bg-tertiary",
-        "mb-1 h-10 w-full justify-start"
+        active && "border-primary",
+        "-ml-[1px] w-40 justify-start rounded-none border-l text-foreground hover:bg-transparent hover:no-underline"
       )}
       asChild
     >
       <Link href={href} prefetch>
-        <p className={cn("max-w-[200px] truncate")}>{label}</p>
+        <P className={cn(active && "text-primary", "max-w-[200px] truncate")}>
+          {label}
+        </P>
       </Link>
     </Button>
   );
