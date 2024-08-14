@@ -2,14 +2,14 @@ import React from "react";
 
 import { cn } from "@/lib/utils";
 
-export default function LoadingSpinner({ className }: { className?: string | undefined }) {
+export default function LoadingSpinner({ className }: { className?: string }) {
   return (
     <svg
       width="16"
       height="16"
       viewBox="0 0 24 24"
       xmlns="http://www.w3.org/2000/svg"
-      className={cn("fill-white", className)}
+      className={cn("dark:fill-white fill:black", className)}
     >
       <g>
         <rect x="11" y="1" width="2" height="5" opacity=".14" />

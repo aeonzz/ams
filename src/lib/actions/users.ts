@@ -186,6 +186,7 @@ export const changePassword = authedProcedure
       getErrorMessage(error);
     }
   });
+  
 export const currentUser = authedProcedure
   .createServerAction()
   .handler(async ({ ctx }) => {

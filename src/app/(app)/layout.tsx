@@ -3,7 +3,7 @@ import { checkAuth } from "@/lib/auth/utils";
 import CommandLayout from "@/components/layouts/command-layout";
 import DashboardLayout from "@/components/layouts/dashboard-layout";
 import SessionProvider from "@/components/providers/session-provider";
-import FetchDataError from "@/components/screens/fetch-data-error";
+import FetchDataError from "@/components/screens/error";
 
 export default async function AppLayout({
   children,

@@ -65,6 +65,7 @@ export default function CreateRequest() {
   const { isFormDirty } = useIsFormDirty();
   const [type, setType] = useState<ReqType | null>(null);
   const [alertOpen, setAlertOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -99,17 +100,24 @@ export default function CreateRequest() {
     >
       <DialogContent
         onInteractOutside={(e) => {
-          if (isFormDirty) {
+          if (isLoading) {
+            e.preventDefault();
+          }
+          if (isFormDirty && !isLoading) {
             e.preventDefault();
             setAlertOpen(true);
           }
         }}
         className="max-w-3xl"
+        isLoading={isLoading}
       >
         <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
-          {isFormDirty && (
-            <AlertDialogTrigger asChild>
-              <button className="absolute right-4 top-4 z-50 cursor-pointer rounded-sm opacity-70 ring-offset-background transition-opacity data-[state=open]:bg-accent data-[state=open]:text-muted-foreground hover:opacity-100 focus:outline-none focus:ring-0 focus:ring-ring focus:ring-offset-0 active:scale-95 disabled:pointer-events-none">
+          {isFormDirty && isLoading && (
+            <AlertDialogTrigger disabled={isLoading} asChild>
+              <button
+                disabled={isLoading}
+                className="absolute right-4 top-4 z-50 cursor-pointer rounded-sm opacity-70 ring-offset-background transition-opacity data-[state=open]:bg-accent data-[state=open]:text-muted-foreground hover:opacity-100 focus:outline-none focus:ring-0 focus:ring-ring focus:ring-offset-0 active:scale-95 disabled:pointer-events-none"
+              >
                 <X className="h-5 w-5" />
               </button>
             </AlertDialogTrigger>
@@ -137,7 +145,12 @@ export default function CreateRequest() {
           </AlertDialogContent>
         </AlertDialog>
         {type?.value === "JOB" ? (
-          <JobRequestInput setType={setType} type={type} />
+          <JobRequestInput
+            isLoading={isLoading}
+            setIsLoading={setIsLoading}
+            setType={setType}
+            type={type}
+          />
         ) : (
           <>
             <DialogHeader>

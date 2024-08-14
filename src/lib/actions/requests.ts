@@ -9,6 +9,7 @@ import { revalidatePath } from "next/cache";
 import { RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTypeSchema";
 import { createCohere } from "@ai-sdk/cohere";
 import { generateText } from "ai";
+import { z } from "zod";
 
 const cohere = createCohere({
   apiKey: process.env.COHERE_API_KEY,
@@ -40,7 +41,7 @@ export const createRequest = authedProcedure
                  Name: ${input.name}
                  
                  Guidelines:
-                 1. Keep it under 20 characters
+                 1. Keep it under 50 characters
                  2. Include the job type, category, and name in the title
                  3. Capture the main purpose of the request
                  4. Use action-oriented language
@@ -96,6 +97,58 @@ export const createRequest = authedProcedure
       }
 
       return revalidatePath(path);
+    } catch (error) {
+      getErrorMessage(error);
+    }
+  });
+
+export const getPendingReq = authedProcedure
+  .createServerAction()
+  .input(
+    z.object({
+      message: z.string().optional(),
+    })
+  )
+  .handler(async ({ ctx }) => {
+    const { user } = ctx;
+
+    try {
+      const result = await db.request.findMany({
+        where: {
+          userId: user.id,
+          status: "PENDING",
+        },
+        include: {
+          jobRequest: true,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
+
+      return result;
+    } catch (error) {
+      getErrorMessage(error);
+    }
+  });
+
+export const getUserReqcount = authedProcedure
+  .createServerAction()
+  .input(
+    z.object({
+      message: z.string().optional(),
+    })
+  )
+  .handler(async ({ ctx }) => {
+    const { user } = ctx;
+    try {
+      const result = await db.request.count({
+        where: {
+          userId: user.id,
+        },
+      });
+
+      return result;
     } catch (error) {
       getErrorMessage(error);
     }

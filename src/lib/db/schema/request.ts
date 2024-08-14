@@ -4,7 +4,7 @@ export const RequestSchema = z.object({
   notes: z
     .string()
     .min(10, { message: "Must be at least 10 characters long" })
-    .max(400, { message: "Cannot be more than 400 characters long" }),
+    .max(600, { message: "Cannot be more than 600 characters long" }),
   images: z.array(z.instanceof(File)).optional(),
 });
 

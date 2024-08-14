@@ -41,8 +41,11 @@ import { useDialog } from "@/lib/hooks/use-dialog";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
 import { toast } from "sonner";
 import { createRequest } from "@/lib/actions/requests";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface JobRequestInputProps {
+  isLoading: boolean;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setType: React.Dispatch<React.SetStateAction<ReqType | null>>;
   type: ReqType;
 }
@@ -54,6 +57,8 @@ export type Selection = {
 };
 
 export default function JobRequestInput({
+  isLoading,
+  setIsLoading,
   setType,
   type,
 }: JobRequestInputProps) {
@@ -71,13 +76,13 @@ export default function JobRequestInput({
     item: jobs[0].categories[0].items[0].value,
   });
   const [prio, setPrio] = useState<Priority>(priorities[0]);
-  const [isLoading, setIsLoading] = useState(false);
 
   const { uploadFiles, progresses, isUploading, uploadedFiles } =
     useUploadFile();
 
   const { mutate } = useServerActionMutation(createRequest, {
     onSuccess: () => {
+      setIsLoading(false);
       dialog.setActiveDialog("");
       toast.success("Request Successful!", {
         description:
@@ -139,6 +144,7 @@ export default function JobRequestInput({
             onClick={() => {
               setType(null);
             }}
+            disabled={isLoading}
           >
             <ChevronLeft className="size-5" />
           </Button>
@@ -159,6 +165,7 @@ export default function JobRequestInput({
                       maxRows={5}
                       placeholder="Add description..."
                       className="min-h-20 border-none px-0 py-2 focus-visible:ring-0"
+                      disabled={isLoading}
                       {...field}
                     />
                   </FormControl>
@@ -192,7 +199,11 @@ export default function JobRequestInput({
                 setSelection={setSelection}
                 isLoading={isLoading}
               />
-              <PriorityOption prio={prio} setPrio={setPrio} isLoading={isLoading} />
+              <PriorityOption
+                prio={prio}
+                setPrio={setPrio}
+                isLoading={isLoading}
+              />
             </MotionLayout>
           </div>
           <MotionLayout>

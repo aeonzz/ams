@@ -6,7 +6,7 @@ import { Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
-export default function FetchDataError() {
+export default function Error() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
