@@ -1,5 +1,24 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import {
+  AlertTriangle,
+  CheckCircle,
+  Hourglass,
+  Calendar,
+  XCircle,
+  PauseCircle,
+  Clock,
+  Eye,
+  CalendarCheck,
+  CircleIcon,
+  Minus,
+  SignalLow,
+  SignalMedium,
+  SignalHigh,
+  TriangleAlert,
+} from "lucide-react";
+import { RequestStatusTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestStatusTypeSchema";
+import { PriorityTypeType } from "prisma/generated/zod/inputTypeSchemas/PriorityTypeSchema";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -39,6 +58,46 @@ export const getFontSizeClass = (
   }
 };
 
+export function formatDate(
+  date: Date | string | number,
+  opts: Intl.DateTimeFormatOptions = {}
+) {
+  return new Intl.DateTimeFormat("en-US", {
+    month: opts.month ?? "long",
+    day: opts.day ?? "numeric",
+    year: opts.year ?? "numeric",
+    ...opts,
+  }).format(new Date(date));
+}
+
+export function getStatusIcon(status: RequestStatusTypeType) {
+  const statusIcons = {
+    PENDING: Hourglass,
+    APPROVED: CheckCircle,
+    IN_PROGRESS: Clock,
+    COMPLETED: CheckCircle,
+    REJECTED: XCircle,
+    CANCELLED: XCircle,
+    ON_HOLD: PauseCircle,
+    DELAYED: AlertTriangle,
+    UNDER_REVIEW: Eye,
+    SCHEDULED: CalendarCheck,
+  };
+
+  return statusIcons[status] || Calendar;
+}
+
+export function getPriorityIcon(priority: PriorityTypeType) {
+  const priorityIcons = {
+    NO_PRIORITY: Minus,
+    LOW: SignalLow,
+    MEDIUM: SignalMedium,
+    HIGH: SignalHigh,
+    URGENT: TriangleAlert,
+  };
+
+  return priorityIcons[priority] || CircleIcon
+}
 
 // export function calculatePriority(request) {
 //   let score = 0;
@@ -47,11 +106,11 @@ export const getFontSizeClass = (
 //     department: { ICT: 3, MAINTENANCE: 2, OTHERS: 1 },
 //     timeSensitivity: 0.5,
 //   };
-  
+
 //   score += weights.type[request.type] || 0;
 //   score += weights.department[request.department] || 0;
 //   score += Math.max(0, 5 - request.daysUntilNeeded) * weights.timeSensitivity;
-  
+
 //   if (score > 8) return 'URGENT';
 //   if (score > 6) return 'HIGH';
 //   if (score > 4) return 'MEDIUM';

@@ -43,7 +43,7 @@ export type Priority = {
 
 export const priorities: Priority[] = [
   {
-    value: "NOPRIORITY",
+    value: "NO_PRIORITY",
     label: "No priority",
     icon: Minus,
   },
@@ -81,7 +81,7 @@ export default function PriorityOption({ prio, setPrio, isLoading }: PriorityOpt
             role="combobox"
             aria-expanded={open}
             className={cn(
-              prio.value === "NOPRIORITY" && "text-muted-foreground",
+              prio.value === "NO_PRIORITY" && "text-muted-foreground",
               "px-2"
             )}
             disabled={isLoading}

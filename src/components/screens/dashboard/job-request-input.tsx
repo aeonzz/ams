@@ -62,6 +62,7 @@ export default function JobRequestInput({
   setType,
   type,
 }: JobRequestInputProps) {
+  const queryClient = useQueryClient();
   const dialog = useDialog();
   const pathname = usePathname();
   const { value } = type;
@@ -88,6 +89,10 @@ export default function JobRequestInput({
         description:
           "Your request has been submitted and is awaiting approval.",
       });
+
+      queryClient.invalidateQueries({ queryKey: ["pending-req-overview"] });
+      queryClient.invalidateQueries({ queryKey: ["pending-req"] });
+      queryClient.invalidateQueries({ queryKey: ["total-req-overview"] });
     },
     onError: (err) => {
       console.log(err);

@@ -10,6 +10,9 @@ import { RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTy
 import { createCohere } from "@ai-sdk/cohere";
 import { generateText } from "ai";
 import { z } from "zod";
+import { GetRequestsSchema, getRequestsSchema } from "../schema";
+import { unstable_noStore as noStore } from "next/cache";
+import { Request } from "prisma/generated/zod";
 
 const cohere = createCohere({
   apiKey: process.env.COHERE_API_KEY,
@@ -153,3 +156,123 @@ export const getUserReqcount = authedProcedure
       getErrorMessage(error);
     }
   });
+
+// export const getRequests = authedProcedure
+//   .createServerAction()
+//   .input(getRequestsSchema)
+//   .handler(async ({ ctx, input }) => {
+//     noStore();
+//     const { user } = ctx;
+
+//     const {
+//       page,
+//       per_page,
+//       sort,
+//       title,
+//       status,
+//       priority,
+//       operator,
+//       from,
+//       to,
+//     } = input;
+//     try {
+//       const skip = (page - 1) * per_page;
+
+//       const [column, order] = (sort?.split(".") ?? ["createdAt", "desc"]) as [
+//         keyof Request | undefined,
+//         "asc" | "desc" | undefined,
+//       ];
+
+//       const where: any = {
+//         userId: user.id,
+//       };
+
+//       if (title) {
+//         where.title = { contains: title, mode: "insensitive" };
+//       }
+
+//       if (status) {
+//         where.status = status;
+//       }
+
+//       if (priority) {
+//         where.priority = priority;
+//       }
+
+//       if (from && to) {
+//         where.createdAt = {
+//           gte: new Date(from),
+//           lte: new Date(to),
+//         };
+//       }
+
+//       const [data, total] = await db.$transaction([
+//         db.request.findMany({
+//           where,
+//           take: per_page,
+//           skip,
+//           orderBy: {
+//             [column || "createdAt"]: order || "desc",
+//           },
+//         }),
+//         db.request.count({ where }),
+//       ]);
+//       const pageCount = Math.ceil(total / per_page);
+//       return { data, pageCount };
+//     } catch (err) {
+//       console.error(err);
+//       return { data: [], pageCount: 0 };
+//     }
+//   });
+
+export async function getRequests(input: GetRequestsSchema) {
+  const { page, per_page, sort, title, status, priority, operator, from, to } =
+    input;
+
+  try {
+    const skip = (page - 1) * per_page;
+
+    const [column, order] = (sort?.split(".") ?? ["createdAt", "desc"]) as [
+      keyof Request | undefined,
+      "asc" | "desc" | undefined,
+    ];
+
+    const where: any = {};
+
+    if (title) {
+      where.title = { contains: title, mode: "insensitive" };
+    }
+
+    if (status) {
+      where.status = status;
+    }
+
+    if (priority) {
+      where.priority = priority;
+    }
+
+    if (from && to) {
+      where.createdAt = {
+        gte: new Date(from),
+        lte: new Date(to),
+      };
+    }
+
+    const [data, total] = await db.$transaction([
+      db.request.findMany({
+        where,
+        take: per_page,
+        skip,
+        orderBy: {
+          [column || "createdAt"]: order || "desc",
+        },
+      }),
+      db.request.count({ where }),
+    ]);
+    const pageCount = Math.ceil(total / per_page);
+    return { data, pageCount };
+  } catch (err) {
+    console.error(err);
+    return { data: [], pageCount: 0 };
+  }
+}

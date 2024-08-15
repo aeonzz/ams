@@ -128,7 +128,7 @@ enum RoleType {
 }
 
 enum PriorityType {
-  NOPRIORITY
+  NO_PRIORITY
   LOW
   MEDIUM
   HIGH
@@ -138,12 +138,12 @@ enum PriorityType {
 enum RequestStatusType {
   PENDING
   APPROVED
-  IN_PROGRESS
+  IN_PROGRESS 
   COMPLETED
   REJECTED
   CANCELLED
-  ON_HOLD
+  ON_HOLD     
   DELAYED
-  UNDER_REVIEW
+  UNDER_REVIEW 
   SCHEDULED
 }

@@ -13,14 +13,31 @@ interface SubMenuButtonProps {
   isOpen: boolean | undefined;
 }
 
-export default function SubMenuButton({ href, label, active, isOpen }: SubMenuButtonProps) {
+export default function SubMenuButton({
+  href,
+  label,
+  active,
+  isOpen,
+}: SubMenuButtonProps) {
   return (
-    <Button variant={active ? "secondary" : "ghost"} className="mb-1 h-10 w-full justify-start" asChild>
+    <Button
+      variant="ghost"
+      className={cn(
+        active && "bg-tertiary hover:bg-tertiary",
+        "mb-1 h-10 w-full justify-start"
+      )}
+      asChild
+    >
       <Link href={href}>
         <span className="ml-2 mr-4">
           <Dot size={18} />
         </span>
-        <p className={cn("max-w-[170px] truncate", isOpen ? "translate-x-0 opacity-100" : "-translate-x-96 opacity-0")}>
+        <p
+          className={cn(
+            "max-w-[170px] truncate",
+            isOpen ? "translate-x-0 opacity-100" : "-translate-x-96 opacity-0"
+          )}
+        >
           {label}
         </p>
       </Link>

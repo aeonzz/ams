@@ -65,8 +65,10 @@ export default function CollapseMenuButton({
             asChild
           >
             <Button
-              variant={active ? "secondary" : "ghost"}
-              className="h-10 w-full justify-start"
+              variant="ghost"
+              className={cn(
+                "h-10 w-full justify-start"
+              )}
             >
               <div className="flex w-full items-center justify-between">
                 <div className="flex items-center">
@@ -118,8 +120,11 @@ export default function CollapseMenuButton({
             <TooltipTrigger asChild>
               <DropdownMenuTrigger asChild>
                 <Button
-                  variant={active ? "secondary" : "ghost"}
-                  className="mb-1 h-10 w-full justify-start"
+                  variant="ghost"
+                  className={cn(
+                    active && "bg-tertiary hover:bg-tertiary",
+                    "mb-1 h-10 w-full justify-start"
+                  )}
                 >
                   <div className="flex w-full items-center justify-between">
                     <div className="flex items-center">
