@@ -1,9 +1,10 @@
 import { currentUser } from "@/lib/actions/users";
 import { checkAuth } from "@/lib/auth/utils";
 import CommandLayout from "@/components/layouts/command-layout";
-import DashboardLayout from "@/components/layouts/dashboard-layout";
 import SessionProvider from "@/components/providers/session-provider";
 import FetchDataError from "@/components/screens/error";
+import { redirect } from "next/navigation";
+import AdminDashboardLayout from "@/components/layouts/admin-dashboard-layout";
 
 export default async function AppLayout({
   children,
@@ -17,15 +18,15 @@ export default async function AppLayout({
     return <FetchDataError />;
   }
 
-  // if (data.role === "SYSTEMADMIN") {
-  //   return redirect("/admin");
+  // if (data.role !== "SYSTEMADMIN") {
+  //   return redirect("/dashboard");
   // }
 
   return (
     <SessionProvider user={data}>
-      <DashboardLayout>
+      <AdminDashboardLayout>
         <CommandLayout>{children}</CommandLayout>
-      </DashboardLayout>
+      </AdminDashboardLayout>
     </SessionProvider>
   );
 }

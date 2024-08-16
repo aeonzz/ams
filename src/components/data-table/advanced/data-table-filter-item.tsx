@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/select"
 
 import { DataTableAdvancedFacetedFilter } from "./data-table-advanced-faceted-filter"
-import { DataTableFilterOption } from "@/lib/types"
+import type { DataTableFilterOption } from "@/lib/types"
 import { useDebounce } from "@/lib/hooks/use-debounce"
 
 interface DataTableFilterItemProps<TData> {
@@ -118,7 +118,7 @@ export function DataTableFilterItem<TData>({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
-          variant="outline"
+          variant="secondary"
           size="sm"
           className={cn(
             "h-7 gap-0 truncate rounded-full",
@@ -155,7 +155,7 @@ export function DataTableFilterItem<TData>({
             <Select
               value={selectedOperator?.value}
               onValueChange={(value) =>
-                setSelectedOperator(operators.find((c) => c.value === value))
+                setSelectedOperator(operators.find((c) => c.value === value) || operators[0])
               }
             >
               <SelectTrigger className="h-auto w-fit truncate border-none px-2 py-0.5 text-xs hover:bg-muted/50">

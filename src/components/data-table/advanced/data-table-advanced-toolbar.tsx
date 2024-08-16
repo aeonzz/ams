@@ -82,7 +82,7 @@ export function DataTableAdvancedToolbar<TData>({
         {(options.length > 0 && selectedOptions.length > 0) ||
         openFilterBuilder ? (
           <Button
-            variant="outline"
+            variant="secondary"
             size="sm"
             onClick={() => setOpenFilterBuilder(!openFilterBuilder)}
           >
@@ -142,7 +142,7 @@ export function DataTableAdvancedToolbar<TData>({
             onSelect={onFilterComboboxItemSelect}
           >
             <Button
-              variant="outline"
+              variant="secondary"
               size="sm"
               role="combobox"
               className="h-7 rounded-full"

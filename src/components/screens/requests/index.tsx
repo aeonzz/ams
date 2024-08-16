@@ -8,7 +8,7 @@ import { DateRangePicker } from "@/components/date-range-picker";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DataTableSkeleton } from "@/components/data-table/data-table-skeleton";
 import { TasksTable } from "./task-table";
-import { GetRequestsSchema, searchParamsSchema } from "@/lib/schema";
+import { GetRequestsSchema } from "@/lib/schema";
 import { getRequests } from "@/lib/actions/requests";
 
 interface MyRequestScreenProps {

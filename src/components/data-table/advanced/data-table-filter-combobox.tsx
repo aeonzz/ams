@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import type { DataTableFilterOption } from "@/types"
+import type { DataTableFilterOption } from "@/lib/types"
 import {
   CaretSortIcon,
   ChevronDownIcon,
@@ -53,7 +53,7 @@ export function DataTableFilterCombobox<TData>({
       <PopoverTrigger asChild>
         {children ?? (
           <Button
-            variant="outline"
+            variant="secondary"
             size="sm"
             role="combobox"
             className="capitalize"

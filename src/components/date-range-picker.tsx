@@ -120,7 +120,7 @@ export function DateRangePicker({
   }, [date?.from, date?.to])
 
   return (
-    <div className="grid gap-2 mb-3">
+    <div className="grid gap-2">
       <Popover>
         <PopoverTrigger asChild>
           <Button

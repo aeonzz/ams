@@ -63,14 +63,6 @@ interface UseDataTableProps<TData>
    */
   filterFields?: DataTableFilterField<TData>[]
 
-  /**
-   * Enable notion like column filters.
-   * Advanced filters and column filters cannot be used at the same time.
-   * @default false
-   * @type boolean
-   */
-  enableAdvancedFilter?: boolean
-
   initialState?: Omit<Partial<TableState>, "sorting"> & {
     sorting?: {
       id: Extract<keyof TData, string>
@@ -88,7 +80,6 @@ const searchParamsSchema = z.object({
 export function useDataTable<TData>({
   pageCount = -1,
   filterFields = [],
-  enableAdvancedFilter = false,
   ...props
 }: UseDataTableProps<TData>) {
   const router = useRouter()
@@ -226,8 +217,6 @@ export function useDataTable<TData>({
   const [mounted, setMounted] = React.useState(false)
 
   React.useEffect(() => {
-    // Opt out when advanced filter is enabled, because it contains additional params
-    if (enableAdvancedFilter) return
 
     // Prevent resetting the page on initial render
     if (!mounted) {

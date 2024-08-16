@@ -7,11 +7,13 @@ import { Argon2id } from "oslo/password";
 import { createServerAction } from "zsa";
 import { readFile } from "fs/promises";
 import path from "path";
+import { unstable_noStore as noStore } from "next/cache";
 
 import { db } from "@/lib/db/index";
 
 import { lucia, validateRequest } from "../auth/lucia";
 import {
+  checkAuth,
   genericError,
   getUserAuth,
   setAuthCookie,
@@ -24,6 +26,10 @@ import {
 } from "../db/schema/auth";
 import { ServerUpdateUserSchema } from "../db/schema/user";
 import { authedProcedure, getErrorMessage } from "./utils";
+import { GetUsersSchema } from "../schema";
+import {
+  extendedUserInputSchema,
+} from "../schema/client/user";
 
 interface ActionResult {
   error: string;
@@ -186,7 +192,7 @@ export const changePassword = authedProcedure
       getErrorMessage(error);
     }
   });
-  
+
 export const currentUser = authedProcedure
   .createServerAction()
   .handler(async ({ ctx }) => {
@@ -255,6 +261,90 @@ export const updateUser = authedProcedure
 
       return revalidatePath(path);
     } catch (error) {
+      getErrorMessage(error);
+    }
+  });
+
+export async function getUsers(input: GetUsersSchema) {
+  await checkAuth()
+  noStore();
+  const { page, per_page, sort, department, email, role, username, from, to } =
+    input;
+
+  try {
+    const skip = (page - 1) * per_page;
+
+    const [column, order] = (sort?.split(".") ?? ["createdAt", "desc"]) as [
+      keyof Request | undefined,
+      "asc" | "desc" | undefined,
+    ];
+
+    const where: any = {};
+
+    if (email) {
+      where.email = { contains: email, mode: "insensitive" };
+    }
+
+    if (department) {
+      where.department = { contains: department, mode: "insensitive" };
+    }
+
+    if (username) {
+      where.username = { contains: username, mode: "insensitive" };
+    }
+
+    if (role) {
+      where.role = { in: role.split(".") };
+    }
+
+    if (from && to) {
+      where.createdAt = {
+        gte: new Date(from),
+        lte: new Date(to),
+      };
+    }
+
+    const [data, total] = await db.$transaction([
+      db.user.findMany({
+        where,
+        take: per_page,
+        skip,
+        orderBy: {
+          [column || "createdAt"]: order || "desc",
+        },
+      }),
+      db.user.count({ where }),
+    ]);
+    const pageCount = Math.ceil(total / per_page);
+    return { data, pageCount };
+  } catch (err) {
+    console.error(err);
+    return { data: [], pageCount: 0 };
+  }
+}
+
+export const createUser = authedProcedure
+  .createServerAction()
+  .input(extendedUserInputSchema)
+  .handler(async ({ input }) => {
+    const { confirmPassword, password, path, ...rest } = input;
+    try {
+      const userId = generateId(15);
+      const hashedPassword = await new Argon2id().hash(password);
+
+      const result = db.user.create({
+        data: {
+          id: userId,
+          hashedPassword: hashedPassword,
+          ...rest,
+        },
+      });
+
+      revalidatePath(path);
+
+      return result;
+    } catch (error) {
+      console.log(error);
       getErrorMessage(error);
     }
   });

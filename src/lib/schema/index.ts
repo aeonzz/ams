@@ -1,6 +1,6 @@
 import * as z from "zod"
 
-export const searchParamsSchema = z.object({
+export const requestSearchParamsSchema = z.object({
   page: z.coerce.number().default(1),
   per_page: z.coerce.number().default(10),
   sort: z.string().optional(),
@@ -9,12 +9,23 @@ export const searchParamsSchema = z.object({
   priority: z.string().optional(),
   from: z.string().optional(),
   to: z.string().optional(),
-  operator: z.enum(["and", "or"]).optional(),
 })
 
-export const getRequestsSchema = searchParamsSchema
+export type GetRequestsSchema = z.infer<typeof requestSearchParamsSchema>
 
-export type GetRequestsSchema = z.infer<typeof getRequestsSchema>
+export const userSearchParamsSchema = z.object({
+  page: z.coerce.number().default(1),
+  per_page: z.coerce.number().default(10),
+  sort: z.string().optional(),
+  email: z.string().optional(),
+  username: z.string().optional(),
+  department: z.string().optional(),
+  role: z.string().optional(),
+  from: z.string().optional(),
+  to: z.string().optional(),
+})
+
+export type GetUsersSchema = z.infer<typeof userSearchParamsSchema>
 
 // export const createTaskSchema = z.object({
 //   title: z.string(),

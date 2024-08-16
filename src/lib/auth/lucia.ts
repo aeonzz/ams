@@ -19,6 +19,7 @@ export const lucia = new Lucia(adapter, {
       // attributes has the type of DatabaseUserAttributes
       email: attributes.email,
       name: attributes.name,
+      role: attributes.role
     };
   },
 });
@@ -33,6 +34,7 @@ declare module "lucia" {
 interface DatabaseUserAttributes {
   email: string;
   name: string;
+  role: string;
 }
 
 export const validateRequest = cache(

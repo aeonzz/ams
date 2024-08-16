@@ -16,9 +16,13 @@ import {
   SignalMedium,
   SignalHigh,
   TriangleAlert,
+  UserIcon,
+  Shield,
+  ShieldCheck,
 } from "lucide-react";
 import { RequestStatusTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestStatusTypeSchema";
 import { PriorityTypeType } from "prisma/generated/zod/inputTypeSchemas/PriorityTypeSchema";
+import { RoleTypeType } from "prisma/generated/zod/inputTypeSchemas/RoleTypeSchema";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -87,6 +91,16 @@ export function getStatusIcon(status: RequestStatusTypeType) {
   return statusIcons[status] || Calendar;
 }
 
+export function getRoleIcon(role: RoleTypeType) {
+  const roleIcons = {
+    USER: UserIcon,
+    ADMIN: Shield,
+    SYSTEMADMIN: ShieldCheck,
+  };
+
+  return roleIcons[role] || UserIcon;
+}
+
 export function getPriorityIcon(priority: PriorityTypeType) {
   const priorityIcons = {
     NO_PRIORITY: Minus,
@@ -96,7 +110,7 @@ export function getPriorityIcon(priority: PriorityTypeType) {
     URGENT: TriangleAlert,
   };
 
-  return priorityIcons[priority] || CircleIcon
+  return priorityIcons[priority] || CircleIcon;
 }
 
 // export function calculatePriority(request) {

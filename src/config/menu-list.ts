@@ -1,10 +1,14 @@
 import {
   Bell,
+  BookOpen,
+  Briefcase,
+  Building,
   Calendar,
   HelpCircle,
   LayoutGrid,
   Mails,
   Settings,
+  Truck,
 } from "lucide-react";
 
 import { Group } from "@/lib/types/menu";
@@ -68,6 +72,39 @@ export function getMenuList(pathname: string): Group[] {
               active: pathname === "/my-reservations/new",
             },
           ],
+        },
+      ],
+    },
+    {
+      groupLabel: "Resources",
+      menus: [
+        {
+          href: "/facilities",
+          label: "Facilities",
+          active: pathname.includes("/facilities"),
+          icon: Building,
+          submenus: [],
+        },
+        {
+          href: "/equipment",
+          label: "Equipment",
+          active: pathname.includes("/equipment"),
+          icon: Briefcase,
+          submenus: [],
+        },
+        {
+          href: "/materials",
+          label: "Materials",
+          active: pathname.includes("/materials"),
+          icon: BookOpen,
+          submenus: [],
+        },
+        {
+          href: "/vehicles",
+          label: "Vehicles",
+          active: pathname.includes("/vehicles"),
+          icon: Truck,
+          submenus: [],
         },
       ],
     },

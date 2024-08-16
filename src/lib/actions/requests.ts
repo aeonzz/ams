@@ -10,7 +10,7 @@ import { RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTy
 import { createCohere } from "@ai-sdk/cohere";
 import { generateText } from "ai";
 import { z } from "zod";
-import { GetRequestsSchema, getRequestsSchema } from "../schema";
+import { GetRequestsSchema} from "../schema";
 import { unstable_noStore as noStore } from "next/cache";
 import { Request } from "prisma/generated/zod";
 
@@ -226,7 +226,7 @@ export const getUserReqcount = authedProcedure
 //   });
 
 export async function getRequests(input: GetRequestsSchema) {
-  const { page, per_page, sort, title, status, priority, operator, from, to } =
+  const { page, per_page, sort, title, status, priority, from, to } =
     input;
 
   try {

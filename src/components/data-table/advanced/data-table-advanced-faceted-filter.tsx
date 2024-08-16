@@ -1,4 +1,4 @@
-import type { DataTableFilterOption, Option } from "@/types"
+import type { DataTableFilterOption, Option } from "@/lib/types"
 import { CheckIcon } from "@radix-ui/react-icons"
 import type { Column } from "@tanstack/react-table"
 
