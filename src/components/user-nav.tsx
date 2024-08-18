@@ -23,9 +23,9 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-import { Button } from "../ui/button";
-import CommandTooltip from "../ui/command-tooltip";
-import { CommandShortcut } from "../ui/command";
+import { Button } from "./ui/button";
+import CommandTooltip from "./ui/command-tooltip";
+import { CommandShortcut } from "./ui/command";
 
 interface UserNavProps {
   isOpen: boolean | undefined;

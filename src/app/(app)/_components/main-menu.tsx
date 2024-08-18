@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Ellipsis, LogOut } from "lucide-react";
 import { User } from "prisma/generated/zod";
 
+import { getMenuList } from "@/config/menu-list";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -13,18 +14,17 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-import CollapseMenuButton from "./collapse-menu-button";
-import MenuButton from "./menu-button";
-import UserNav from "./user-nav";
-import { getAdminMenuList } from "@/config/admin-menu-list";
+import CollapseMenuButton from "../../../components/collapse-menu-button";
+import MenuButton from "../../../components/menu-button";
+import UserNav from "../../../components/user-nav";
 
-interface AdminMainMenuProps {
+interface MainMenuProps {
   isOpen: boolean | undefined;
 }
 
-export default function AdminMainMenu({ isOpen }: AdminMainMenuProps) {
+export default function MainMenu({ isOpen }: MainMenuProps) {
   const pathname = usePathname();
-  const menuList = getAdminMenuList(pathname);
+  const menuList = getMenuList(pathname);
   return (
     <>
       <UserNav isOpen={isOpen} />

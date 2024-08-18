@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 
 import MainMenu from "./main-menu";
-import SidebarToggle from "./sidebar-toggle";
+import SidebarToggle from "../../../components/sidebar-toggle";
 
 interface DashboardSidebarProps {
   isOpen: boolean | undefined;

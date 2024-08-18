@@ -5,7 +5,7 @@ import { useSidebarToggle } from "@/lib/hooks/use-sidebar-toggle";
 import { useStore } from "@/lib/hooks/use-store";
 import { cn } from "@/lib/utils";
 
-import AdminDashboardSidebar from "../navigations/admin-dashboard-sidebar";
+import AdminDashboardSidebar from "./admin-dashboard-sidebar";
 
 interface AdminDashboardLayoutProps {
   children: React.ReactNode;

@@ -2,9 +2,9 @@ import { currentUser } from "@/lib/actions/users";
 import { checkAuth } from "@/lib/auth/utils";
 import CommandLayout from "@/components/layouts/command-layout";
 import SessionProvider from "@/components/providers/session-provider";
-import FetchDataError from "@/components/screens/error";
 import { redirect } from "next/navigation";
-import AdminDashboardLayout from "@/components/layouts/admin-dashboard-layout";
+import AdminDashboardLayout from "@/app/(admin)/_components/admin-dashboard-layout";
+import Error from "@/components/error";
 
 export default async function AppLayout({
   children,
@@ -15,7 +15,7 @@ export default async function AppLayout({
   const [data] = await currentUser();
 
   if (!data) {
-    return <FetchDataError />;
+    return <Error />;
   }
 
   // if (data.role !== "SYSTEMADMIN") {
