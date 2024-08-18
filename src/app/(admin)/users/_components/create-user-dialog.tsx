@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import * as React from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -35,8 +35,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useFormState } from "react-hook-form";
 
 export default function CreateUserDialog() {
-  const [open, setOpen] = useState(false);
-  const [alertOpen, setAlertOpen] = useState(false);
+  const [open, setOpen] = React.useState(false);
+  const [alertOpen, setAlertOpen] = React.useState(false);
   const form = useForm<CreateUserSchema>({
     resolver: zodResolver(createUserSchema),
   });
@@ -58,7 +58,7 @@ export default function CreateUserDialog() {
     },
   });
 
-  useEffect(() => {
+  React.useEffect(() => {
     form.reset();
   }, [open]);
 

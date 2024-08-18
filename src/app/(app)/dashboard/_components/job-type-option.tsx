@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -34,7 +34,7 @@ export default function JobTypeOption({
   setSelection,
   isLoading,
 }: JobTypeOptionProps) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = React.useState(false);
 
   const Icon = selection.jobType.icon;
 

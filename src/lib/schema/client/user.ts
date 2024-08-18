@@ -26,23 +26,16 @@ export const extendedUserInputSchema = createUserSchemaBase.extend({
 });
 
 export const updateUserSchemaBase = z.object({
-  email: z
-    .string()
-    .min(1, "Email is required")
-    .email("Invalid email")
-    .optional(),
-  department: z.string().min(1, "Department is required").optional(),
-  username: z.string().min(1, "Username is required").optional(),
+  email: z.string().email("Invalid email").optional(),
+  department: z.string().optional(),
+  username: z.string().optional(),
+  profileUrl: z.string().optional(),
   role: RoleTypeSchema.optional(),
   password: z
     .string()
-    .min(4, { message: "Must be at least 4 characters long" })
     .max(15, { message: "Cannot be more than 15 characters long" })
     .optional(),
-  confirmPassword: z
-    .string()
-    .min(1, "Password confirmation is required")
-    .optional(),
+  confirmPassword: z.string().optional(),
 });
 
 export const updateUserSchema = updateUserSchemaBase.refine(
@@ -60,4 +53,4 @@ export const extendedUpdateUserSchema = updateUserSchemaBase.extend({
 export type CreateUserSchema = z.infer<typeof createUserSchema>;
 export type ExtendedUserInputSchema = z.infer<typeof extendedUserInputSchema>;
 export type UpdateUserSchema = z.infer<typeof updateUserSchema>;
-export type ExtendedUpdateUserSchema = z.infer<typeof extendedUserInputSchema>;
+export type ExtendedUpdateUserSchema = z.infer<typeof extendedUpdateUserSchema>;

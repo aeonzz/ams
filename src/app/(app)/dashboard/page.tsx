@@ -1,5 +1,5 @@
 import ContentLayout from "@/components/layouts/content-layout";
-import DashboardScreen from "@/components/screens/dashboard";
+import DashboardScreen from "./_components";
 
 export default function DashboardPage() {
   return (

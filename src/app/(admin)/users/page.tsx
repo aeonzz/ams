@@ -1,9 +1,9 @@
 "use memo";
 
 import ContentLayout from "@/components/layouts/content-layout";
-import UsersScreen from "@/components/screens/users";
 import { userSearchParamsSchema } from "@/lib/schema";
 import { SearchParams } from "@/lib/types";
+import UsersScreen from "./_components";
 
 export interface MyRequestPage {
   searchParams: SearchParams;

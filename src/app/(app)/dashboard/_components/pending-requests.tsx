@@ -9,12 +9,14 @@ import { useServerActionQuery } from "@/lib/hooks/server-action-hooks";
 import React from "react";
 
 export default function PendingRequest() {
-  const { isLoading, data, isError, refetch } =
-    useServerActionQuery(getPendingReq, {
+  const { isLoading, data, isError, refetch } = useServerActionQuery(
+    getPendingReq,
+    {
       input: {},
       queryKey: ["pending-req"],
       refetchOnWindowFocus: false,
-    });
+    }
+  );
 
   return (
     <div className="flex min-h-60 flex-col items-center justify-center space-y-2 pb-10">

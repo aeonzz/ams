@@ -1,18 +1,14 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "../../ui/button";
 import { ChevronLeft } from "lucide-react";
-import { Textarea } from "../../ui/text-area";
-import { Separator } from "../../ui/separator";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { UseFormReturn } from "react-hook-form";
 import {
   Form,
   FormControl,
@@ -22,32 +18,32 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Request, RequestSchema } from "@/lib/db/schema/request";
+import { Request} from "@/lib/db/schema/request";
 import { MotionLayout } from "@/components/layouts/motion-layout";
-import { PriorityTypeSchema } from "prisma/generated/zod";
 import { usePathname } from "next/navigation";
 import { ReqType } from "./create-request";
 import { SubmitButton } from "@/components/ui/submit-button";
 import JobTypeOption from "./job-type-option";
 import { Category, Item, Job, jobs } from "@/config/job-list";
 import PriorityOption, { priorities, Priority } from "./priority-option";
-import UploadAttachment from "./upload-attachment";
 import { useUploadFile } from "@/lib/hooks/use-upload-file";
 import { FileUploader } from "@/components/file-uploader";
 import { RequestSchemaType } from "@/lib/schema/server/request";
-import { useIsFormDirty } from "@/lib/hooks/use-form-dirty";
-import { Input } from "@/components/ui/input";
 import { useDialog } from "@/lib/hooks/use-dialog";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
 import { toast } from "sonner";
 import { createRequest } from "@/lib/actions/requests";
 import { useQueryClient } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/text-area";
+import { Separator } from "@/components/ui/separator";
 
 interface JobRequestInputProps {
   isLoading: boolean;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
-  setType: React.Dispatch<React.SetStateAction<ReqType | null>>;
   type: ReqType;
+  setType: React.Dispatch<React.SetStateAction<ReqType | null>>;
+  form: UseFormReturn<Request>;
 }
 
 export type Selection = {
@@ -61,22 +57,20 @@ export default function JobRequestInput({
   setIsLoading,
   setType,
   type,
+  form,
 }: JobRequestInputProps) {
   const queryClient = useQueryClient();
   const dialog = useDialog();
   const pathname = usePathname();
   const { value } = type;
   const department = "IT";
-  const form = useForm<Request>({
-    resolver: zodResolver(RequestSchema),
-  });
 
-  const [selection, setSelection] = useState<Selection>({
+  const [selection, setSelection] = React.useState<Selection>({
     jobType: jobs[0],
     category: jobs[0].categories[0],
     item: jobs[0].categories[0].items[0].value,
   });
-  const [prio, setPrio] = useState<Priority>(priorities[0]);
+  const [prio, setPrio] = React.useState<Priority>(priorities[0]);
 
   const { uploadFiles, progresses, isUploading, uploadedFiles } =
     useUploadFile();
@@ -102,7 +96,6 @@ export default function JobRequestInput({
       });
     },
   });
-  const { setIsFormDirty } = useIsFormDirty();
 
   async function onSubmit(values: Request) {
     setIsLoading(true);
@@ -121,22 +114,6 @@ export default function JobRequestInput({
     };
     mutate(data);
   }
-
-  useEffect(() => {
-    if (
-      form.getFieldState("notes").isDirty ||
-      form.getFieldState("images").isDirty
-    ) {
-      setIsFormDirty(true);
-    }
-
-    return () => {
-      setIsFormDirty(false);
-    };
-  }, [
-    form.getFieldState("notes").isDirty,
-    form.getFieldState("images").isDirty,
-  ]);
 
   return (
     <>

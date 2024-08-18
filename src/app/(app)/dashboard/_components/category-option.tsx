@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -35,9 +35,9 @@ export default function CategoryOption({
 }: CategoryOptionProps) {
   const { jobType, category } = selection;
   const { categories } = jobType;
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = React.useState(false);
 
-  useEffect(() => {
+  React.useEffect(() => {
     setSelection({
       ...selection,
       category: categories[0],

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 import { useDialog } from "@/lib/hooks/use-dialog";
 import {
@@ -23,7 +23,6 @@ import {
 } from "lucide-react";
 import JobRequestInput from "./job-request-input";
 import { RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTypeSchema";
-import { useIsFormDirty } from "@/lib/hooks/use-form-dirty";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -35,6 +34,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { useForm, useFormState } from "react-hook-form";
+import { Request, RequestSchema } from "@/lib/db/schema/request";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 export type ReqType = {
   value: RequestTypeType;
@@ -62,12 +64,17 @@ const RequestTypes: ReqType[] = [
 
 export default function CreateRequest() {
   const dialog = useDialog();
-  const { isFormDirty } = useIsFormDirty();
-  const [type, setType] = useState<ReqType | null>(null);
-  const [alertOpen, setAlertOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [type, setType] = React.useState<ReqType | null>(null);
+  const [alertOpen, setAlertOpen] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
 
-  useEffect(() => {
+  const form = useForm<Request>({
+    resolver: zodResolver(RequestSchema),
+  });
+  const { dirtyFields } = useFormState({ control: form.control });
+  const isFieldsDirty = Object.keys(dirtyFields).length > 0;
+
+  React.useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (
         e.key.toLowerCase() === "c" &&
@@ -84,6 +91,10 @@ export default function CreateRequest() {
     document.addEventListener("keydown", down);
     return () => document.removeEventListener("keydown", down);
   }, []);
+
+  React.useEffect(() => {
+    form.reset();
+  }, [dialog]);
 
   return (
     <Dialog
@@ -103,7 +114,7 @@ export default function CreateRequest() {
           if (isLoading) {
             e.preventDefault();
           }
-          if (isFormDirty && !isLoading) {
+          if (isFieldsDirty && !isLoading) {
             e.preventDefault();
             setAlertOpen(true);
           }
@@ -112,7 +123,7 @@ export default function CreateRequest() {
         isLoading={isLoading}
       >
         <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
-          {isFormDirty && isLoading && (
+          {isFieldsDirty && isLoading && (
             <AlertDialogTrigger disabled={isLoading} asChild>
               <button
                 disabled={isLoading}
@@ -146,6 +157,7 @@ export default function CreateRequest() {
         </AlertDialog>
         {type?.value === "JOB" ? (
           <JobRequestInput
+            form={form}
             isLoading={isLoading}
             setIsLoading={setIsLoading}
             setType={setType}

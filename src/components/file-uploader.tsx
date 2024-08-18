@@ -6,7 +6,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useControllableState } from "@/lib/hooks/use-controllable-state";
 import { cn, formatBytes } from "@/lib/utils";
 import { Paperclip, UploadIcon } from "lucide-react";
-import React, { createRef, useCallback, useEffect, useRef } from "react";
+import React from "react";
 import Dropzone, {
   DropzoneProps,
   DropzoneRef,
@@ -113,13 +113,13 @@ export function FileUploader(props: FileUploaderProps) {
     ...dropzoneProps
   } = props;
 
-  const dropzoneRef = useRef<DropzoneRef>(null);
+  const dropzoneRef = React.useRef<DropzoneRef>(null);
   const [files, setFiles] = useControllableState({
     prop: valueProp,
     onChange: onValueChange,
   });
 
-  const onDrop = useCallback(
+  const onDrop = React.useCallback(
     (acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
       if (!multiple && maxFiles === 1 && acceptedFiles.length > 1) {
         toast.error("Cannot upload more than 1 file at a time");
@@ -194,7 +194,7 @@ export function FileUploader(props: FileUploaderProps) {
   }
 
   // Revoke preview url when component unmounts
-  useEffect(() => {
+  React.useEffect(() => {
     return () => {
       if (!files) return;
       files.forEach((file) => {

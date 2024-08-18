@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -69,8 +69,12 @@ export const priorities: Priority[] = [
   },
 ];
 
-export default function PriorityOption({ prio, setPrio, isLoading }: PriorityOptionProps) {
-  const [open, setOpen] = useState(false);
+export default function PriorityOption({
+  prio,
+  setPrio,
+  isLoading,
+}: PriorityOptionProps) {
+  const [open, setOpen] = React.useState(false);
   return (
     <div className="space-y-1">
       <Popover open={open} onOpenChange={setOpen} modal>

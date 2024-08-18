@@ -28,6 +28,7 @@ import { ServerUpdateUserSchema } from "../db/schema/user";
 import { authedProcedure, getErrorMessage } from "./utils";
 import { GetUsersSchema } from "../schema";
 import {
+  extendedUpdateUserSchema,
   extendedUserInputSchema,
 } from "../schema/client/user";
 
@@ -245,7 +246,7 @@ export const currentUser = authedProcedure
 
 export const updateUser = authedProcedure
   .createServerAction()
-  .input(ServerUpdateUserSchema)
+  .input(extendedUpdateUserSchema)
   .handler(async ({ ctx, input }) => {
     const { user } = ctx;
     const { path, ...rest } = input;

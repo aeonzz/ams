@@ -4,7 +4,7 @@ import React from "react";
 
 import { db } from "@/lib/db/index";
 
-import ForgotPassword from "../../../../components/screens/auth/forgot-password";
+import ForgotPassword from "../../_components/forgot-password";
 import ResetPasswordForm from "@/components/forms/reset-password-form";
 import { MotionLayout } from "@/components/layouts/motion-layout";
 

@@ -7,7 +7,7 @@ import {
   SectionItemDescription,
   SectionItemHeader,
   SectionItemTitle,
-} from "../section";
+} from "../../_components/section";
 import {
   Select,
   SelectContent,

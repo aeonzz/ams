@@ -2,8 +2,6 @@ import { Card, CardHeader } from "@/components/ui/card";
 import { Badge } from "../ui/badge";
 import { Briefcase, Calendar, Clock } from "lucide-react";
 import { H3, H4, H5, P } from "../typography/text";
-import { Request, RequestTypeSchema } from "prisma/generated/zod";
-import { JobRequest } from "@prisma/client";
 import { RequestJoin } from "@/lib/types/request";
 import { format } from "date-fns";
 

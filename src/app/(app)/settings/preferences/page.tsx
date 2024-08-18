@@ -1,6 +1,6 @@
 import React from "react";
 
-import PreferencesScreen from "@/components/screens/settings/preferences";
+import PreferencesScreen from "@/app/(app)/settings/preferences/_components";
 import SettingsLayout from "@/components/layouts/settings-layout";
 
 export default function PreferencesPage() {

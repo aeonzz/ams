@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -33,13 +33,13 @@ export default function ItemOption({
   setSelection,
   isLoading,
 }: ItemOptionProps) {
-  const [open, setOpen] = useState(false);
-  const [openTextbox, setOpenTextbox] = useState(false);
+  const [open, setOpen] = React.useState(false);
+  const [openTextbox, setOpenTextbox] = React.useState(false);
 
   const { category, item } = selection;
   const { items } = category;
 
-  useEffect(() => {
+  React.useEffect(() => {
     setSelection({
       ...selection,
       item: category.items[0].value,
