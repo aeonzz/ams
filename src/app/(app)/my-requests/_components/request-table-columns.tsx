@@ -5,7 +5,6 @@ import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { type ColumnDef } from "@tanstack/react-table";
 import { toast } from "sonner";
 
-// import { getErrorMessage } from "@/lib/handle-error"
 import { formatDate, getPriorityIcon, getStatusIcon } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -25,14 +24,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 
-// import { updateTask } from "../_lib/actions"
-// import { getPriorityIcon, getStatusIcon } from "../_lib/utils"
-// import { DeleteTasksDialog } from "./delete-tasks-dialog"
-// import { UpdateTaskSheet } from "./update-task-sheet"
 import { Request, RequestSchema } from "prisma/generated/zod";
 import { P } from "@/components/typography/text";
 
-export function getColumns(): ColumnDef<Request>[] {
+export function getRequestColumns(): ColumnDef<Request>[] {
   return [
     {
       id: "select",

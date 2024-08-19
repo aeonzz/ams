@@ -7,34 +7,28 @@ import { DataTableAdvancedToolbar } from "@/components/data-table/advanced/data-
 import { DataTable } from "@/components/data-table/data-table";
 import { DataTableToolbar } from "@/components/data-table/data-table-toolbar";
 
-// import { TasksTableFloatingBar } from "./tasks-table-floating-bar";
 import { useDataTable } from "@/lib/hooks/use-data-table";
 import { type DataTableFilterField } from "@/lib/types";
-import { getColumns } from "./task-table-columns";
-import { RequestsFilter } from "@/lib/types/request";
+import { getRequestColumns } from "./request-table-columns";
 import {
   PriorityTypeSchema,
   Request,
   RequestStatusTypeSchema,
 } from "prisma/generated/zod";
-import { useTasksTable } from "@/components/providers/task-table-provider";
-import { TasksTableToolbarActions } from "./task-table-toolbar-actions";
+import { RequestTableToolbarActions } from "./request-table-toolbar-actions";
 import { getRequests } from "@/lib/actions/requests";
 import { getPriorityIcon, getStatusIcon } from "@/lib/utils";
-import { TasksTableFloatingBar } from "./task-table-floating-bar";
+import { RequestTableFloatingBar } from "./request-table-floating-bar";
 
-interface TasksTableProps {
-  tasksPromise: ReturnType<typeof getRequests>;
+interface RequestTableProps {
+  requestPromise: ReturnType<typeof getRequests>;
 }
 
-export function TasksTable({ tasksPromise }: TasksTableProps) {
-  // Feature flags for showcasing some additional features. Feel free to remove them.
-  const { featureFlags } = useTasksTable();
-
-  const { data, pageCount } = React.use(tasksPromise);
+export function RequestTable({ requestPromise }: RequestTableProps) {
+  const { data, pageCount } = React.use(requestPromise);
 
   // Memoize the columns so they don't re-render on every render
-  const columns = React.useMemo(() => getColumns(), []);
+  const columns = React.useMemo(() => getRequestColumns(), []);
 
   /**
    * This component can render either a faceted filter or a search filter based on the `options` prop.
@@ -85,7 +79,6 @@ export function TasksTable({ tasksPromise }: TasksTableProps) {
     pageCount,
     /* optional props */
     filterFields,
-    enableAdvancedFilter: featureFlags.includes("advancedFilter"),
     initialState: {
       sorting: [{ id: "createdAt", desc: true }],
       columnPinning: { right: ["actions"] },
@@ -98,21 +91,11 @@ export function TasksTable({ tasksPromise }: TasksTableProps) {
   return (
     <DataTable
       table={table}
-      floatingBar={
-        featureFlags.includes("floatingBar") ? (
-          <TasksTableFloatingBar table={table} />
-        ) : null
-      }
+      floatingBar={<RequestTableFloatingBar table={table} />}
     >
-      {featureFlags.includes("advancedFilter") ? (
-        <DataTableAdvancedToolbar table={table} filterFields={filterFields}>
-          <TasksTableToolbarActions table={table} />
-        </DataTableAdvancedToolbar>
-      ) : (
-        <DataTableToolbar table={table} filterFields={filterFields}>
-          <TasksTableToolbarActions table={table} />
-        </DataTableToolbar>
-      )}
+      <DataTableToolbar table={table} filterFields={filterFields}>
+        <RequestTableToolbarActions table={table} />
+      </DataTableToolbar>
     </DataTable>
   );
 }

@@ -21,7 +21,6 @@ interface UsersTableProps {
 }
 
 export function UsersTable({ usersPromise }: UsersTableProps) {
-  // Feature flags for showcasing some additional features. Feel free to remove them.
 
   const { data, pageCount } = React.use(usersPromise);
 

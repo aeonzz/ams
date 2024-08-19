@@ -19,21 +19,19 @@ import {
 import { Request } from "prisma/generated/zod";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
 
-// import { deleteTasks } from "../_lib/actions"
-
-interface DeleteTasksDialogProps
+interface DeleteRequestDialogProps
   extends React.ComponentPropsWithoutRef<typeof Dialog> {
-  tasks: Row<Request>["original"][];
+  request: Row<Request>["original"][];
   showTrigger?: boolean;
   onSuccess?: () => void;
 }
 
-export function DeleteTasksDialog({
-  tasks,
+export function DeleteRequestDialog({
+  request,
   showTrigger = true,
   onSuccess,
   ...props
-}: DeleteTasksDialogProps) {
+}: DeleteRequestDialogProps) {
   const [isDeletePending, startDeleteTransition] = React.useTransition();
 
   // function onDelete() {
@@ -59,7 +57,7 @@ export function DeleteTasksDialog({
         <DialogTrigger asChild>
           <Button variant="outline" size="sm">
             <TrashIcon className="mr-2 size-4" aria-hidden="true" />
-            Delete ({tasks.length})
+            Delete ({request.length})
           </Button>
         </DialogTrigger>
       ) : null}
@@ -68,8 +66,8 @@ export function DeleteTasksDialog({
           <DialogTitle>Are you absolutely sure?</DialogTitle>
           <DialogDescription>
             This action cannot be undone. This will permanently delete your{" "}
-            <span className="font-medium">{tasks.length}</span>
-            {tasks.length === 1 ? " task" : " tasks"} from our servers.
+            <span className="font-medium">{request.length}</span>
+            {request.length === 1 ? " task" : " tasks"} from our servers.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="gap-2 sm:space-x-0">

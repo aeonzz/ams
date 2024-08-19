@@ -1,4 +1,4 @@
-import * as React from "react"
+import * as React from "react";
 import {
   ArrowUpIcon,
   CheckCircledIcon,
@@ -6,55 +6,59 @@ import {
   DownloadIcon,
   ReloadIcon,
   TrashIcon,
-} from "@radix-ui/react-icons"
-import { SelectTrigger } from "@radix-ui/react-select"
-import { type Table } from "@tanstack/react-table"
-import { toast } from "sonner"
+} from "@radix-ui/react-icons";
+import { SelectTrigger } from "@radix-ui/react-select";
+import { type Table } from "@tanstack/react-table";
+import { toast } from "sonner";
 
-import { exportTableToCSV } from "@/lib/export"
-import { Button } from "@/components/ui/button"
+import { exportTableToCSV } from "@/lib/export";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
   SelectGroup,
   SelectItem,
-} from "@/components/ui/select"
-import { Separator } from "@/components/ui/separator"
+} from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from "@/components/ui/tooltip"
-// import { Kbd } from "@/components/kbd"
+} from "@/components/ui/tooltip";
 
-// import { deleteTasks, updateTasks } from "../_lib/actions"
-import { PriorityTypeSchema, Request, RequestStatusTypeSchema } from "prisma/generated/zod"
-import { RequestStatusTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestStatusTypeSchema"
-import { PriorityTypeType } from "prisma/generated/zod/inputTypeSchemas/PriorityTypeSchema"
+import {
+  PriorityTypeSchema,
+  Request,
+  RequestStatusTypeSchema,
+} from "prisma/generated/zod";
+import { RequestStatusTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestStatusTypeSchema";
+import { PriorityTypeType } from "prisma/generated/zod/inputTypeSchemas/PriorityTypeSchema";
 
-interface TasksTableFloatingBarProps {
-  table: Table<Request>
+interface RequestTableFloatingBarProps {
+  table: Table<Request>;
 }
 
-export function TasksTableFloatingBar({ table }: TasksTableFloatingBarProps) {
-  const rows = table.getFilteredSelectedRowModel().rows
+export function RequestTableFloatingBar({
+  table,
+}: RequestTableFloatingBarProps) {
+  const rows = table.getFilteredSelectedRowModel().rows;
 
-  const [isPending, startTransition] = React.useTransition()
+  const [isPending, startTransition] = React.useTransition();
   const [method, setMethod] = React.useState<
     "update-status" | "update-priority" | "export" | "delete"
-  >()
+  >();
 
   // Clear selection on Escape key press
   React.useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
-        table.toggleAllRowsSelected(false)
+        table.toggleAllRowsSelected(false);
       }
     }
 
-    window.addEventListener("keydown", handleKeyDown)
-    return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [table])
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [table]);
 
   return (
     <div className="fixed inset-x-0 bottom-4 z-50 mx-auto w-fit px-4">
@@ -91,7 +95,7 @@ export function TasksTableFloatingBar({ table }: TasksTableFloatingBarProps) {
           <div className="flex items-center gap-1.5">
             <Select
               onValueChange={(value: RequestStatusTypeType) => {
-                setMethod("update-status")
+                setMethod("update-status");
 
                 // startTransition(async () => {
                 //   const { error } = await updateTasks({
@@ -151,7 +155,7 @@ export function TasksTableFloatingBar({ table }: TasksTableFloatingBarProps) {
             </Select>
             <Select
               onValueChange={(value: PriorityTypeType) => {
-                setMethod("update-priority")
+                setMethod("update-priority");
 
                 // startTransition(async () => {
                 //   const { error } = await updateTasks({
@@ -213,14 +217,14 @@ export function TasksTableFloatingBar({ table }: TasksTableFloatingBarProps) {
                   size="icon"
                   className="size-7 border"
                   onClick={() => {
-                    setMethod("export")
+                    setMethod("export");
 
                     startTransition(() => {
                       exportTableToCSV(table, {
                         excludeColumns: ["select", "actions"],
                         onlySelected: true,
-                      })
-                    })
+                      });
+                    });
                   }}
                   disabled={isPending}
                 >
@@ -245,7 +249,7 @@ export function TasksTableFloatingBar({ table }: TasksTableFloatingBarProps) {
                   size="icon"
                   className="size-7 border"
                   onClick={() => {
-                    setMethod("delete")
+                    setMethod("delete");
 
                     // startTransition(async () => {
                     //   const { error } = await deleteTasks({
@@ -280,5 +284,5 @@ export function TasksTableFloatingBar({ table }: TasksTableFloatingBarProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }
