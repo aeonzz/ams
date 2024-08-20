@@ -3,8 +3,8 @@ import { checkAuth } from "@/lib/auth/utils";
 import CommandLayout from "@/components/layouts/command-layout";
 import SessionProvider from "@/components/providers/session-provider";
 import { redirect } from "next/navigation";
-import AdminDashboardLayout from "@/app/(admin)/_components/admin-dashboard-layout";
 import Error from "@/components/error";
+import AdminDashboardLayout from "./_components/admin-dashboard-layout";
 
 export default async function AppLayout({
   children,

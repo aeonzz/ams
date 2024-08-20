@@ -1,13 +1,6 @@
 "use client";
 
 import {
-  SectionItem,
-  SectionItemAction,
-  SectionItemDescription,
-  SectionItemHeader,
-  SectionItemTitle,
-} from "@/components/screens/settings/section";
-import {
   Select,
   SelectContent,
   SelectItem,
@@ -16,6 +9,13 @@ import {
 } from "@/components/ui/select";
 import { useTheme } from "next-themes";
 import React, { useEffect, useState } from "react";
+import {
+  SectionItem,
+  SectionItemAction,
+  SectionItemDescription,
+  SectionItemHeader,
+  SectionItemTitle,
+} from "../../_components/section";
 
 export default function ThemeItem() {
   const { setTheme, theme } = useTheme();

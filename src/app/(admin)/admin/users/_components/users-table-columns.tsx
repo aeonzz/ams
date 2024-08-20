@@ -32,6 +32,13 @@ import { DataTableColumnHeader } from "@/components/data-table/data-table-column
 import { P } from "@/components/typography/text";
 import { User } from "prisma/generated/zod";
 import { UpdateUserSheet } from "./update-user-sheet";
+import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
+import { updateUser } from "@/lib/actions/users";
+import RoleTypeSchema, {
+  RoleTypeType,
+} from "prisma/generated/zod/inputTypeSchemas/RoleTypeSchema";
+import { usePathname } from "next/navigation";
+import { DeleteUsersDialog } from "./delete-users-dialog";
 
 export function getUsersColumns(): ColumnDef<User>[] {
   return [
@@ -124,11 +131,13 @@ export function getUsersColumns(): ColumnDef<User>[] {
     {
       id: "actions",
       cell: function Cell({ row }) {
-        const [isUpdatePending, startUpdateTransition] = React.useTransition();
+        const pathname = usePathname();
         const [showUpdateTaskSheet, setShowUpdateTaskSheet] =
           React.useState(false);
         const [showDeleteTaskDialog, setShowDeleteTaskDialog] =
           React.useState(false);
+
+        const { isPending, mutateAsync } = useServerActionMutation(updateUser);
 
         return (
           <>
@@ -137,13 +146,13 @@ export function getUsersColumns(): ColumnDef<User>[] {
               onOpenChange={setShowUpdateTaskSheet}
               user={row.original}
             />
-            {/* <DeleteTasksDialog
+            <DeleteUsersDialog
               open={showDeleteTaskDialog}
               onOpenChange={setShowDeleteTaskDialog}
-              tasks={[row.original]}
+              users={[row.original]}
               showTrigger={false}
               onSuccess={() => row.toggleSelected(false)}
-            /> */}
+            />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -158,46 +167,50 @@ export function getUsersColumns(): ColumnDef<User>[] {
                 <DropdownMenuItem onSelect={() => setShowUpdateTaskSheet(true)}>
                   Edit
                 </DropdownMenuItem>
-                {/* <DropdownMenuSub>
-                  <DropdownMenuSubTrigger>Labels</DropdownMenuSubTrigger>
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>Roles</DropdownMenuSubTrigger>
                   <DropdownMenuSubContent>
                     <DropdownMenuRadioGroup
-                      value={row.original.label}
+                      value={row.original.role}
                       onValueChange={(value) => {
-                        startUpdateTransition(() => {
-                          toast.promise(
-                            updateTask({
-                              id: row.original.id,
-                              label: value as Task["label"],
-                            }),
-                            {
-                              loading: "Updating...",
-                              success: "Label updated",
-                              // error: (err) => getErrorMessage(err),
-                            }
-                          )
-                        })
+                        toast.promise(
+                          mutateAsync({
+                            id: row.original.id,
+                            role: value as RoleTypeType,
+                            path: pathname,
+                          }),
+                          {
+                            loading: "Saving...",
+                            success: () => {
+                              return "Role updated successfully";
+                            },
+                            error: (err) => {
+                              console.log(err);
+                              return err.message;
+                            },
+                          }
+                        );
                       }}
                     >
-                      {tasks.label.enumValues.map((label) => (
+                      {RoleTypeSchema.options.map((role) => (
                         <DropdownMenuRadioItem
-                          key={label}
-                          value={label}
+                          key={role}
+                          value={role}
                           className="capitalize"
-                          disabled={isUpdatePending}
+                          disabled={isPending}
                         >
-                          {label}
+                          {role}
                         </DropdownMenuRadioItem>
                       ))}
                     </DropdownMenuRadioGroup>
                   </DropdownMenuSubContent>
-                </DropdownMenuSub> */}
+                </DropdownMenuSub>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onSelect={() => setShowDeleteTaskDialog(true)}
+                  className="focus:bg-destructive focus:text-destructive-foreground"
                 >
                   Delete
-                  <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

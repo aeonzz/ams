@@ -33,9 +33,21 @@ import CommandTooltip from "@/components/ui/command-tooltip";
 import { CommandShortcut } from "@/components/ui/command";
 import { P } from "@/components/typography/text";
 import { User2 } from "lucide-react";
-// import { Kbd } from "@/components/kbd"
-
-// import { deleteTasks, updateTasks } from "../_lib/actions"
+import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
+import { deleteUsers, updateUsers } from "@/lib/actions/users";
+import { usePathname } from "next/navigation";
+import LoadingSpinner from "@/components/loaders/loading-spinner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface UsersTableFloatingBarProps {
   table: Table<User>;
@@ -43,11 +55,16 @@ interface UsersTableFloatingBarProps {
 
 export function UsersTableFloatingBar({ table }: UsersTableFloatingBarProps) {
   const rows = table.getFilteredSelectedRowModel().rows;
+  const pathname = usePathname();
 
-  const [isPending, startTransition] = React.useTransition();
+  const [isLoading, startTransition] = React.useTransition();
   const [method, setMethod] = React.useState<
     "update-role" | "export" | "delete"
   >();
+
+  const { isPending, mutateAsync } = useServerActionMutation(updateUsers);
+  const { isPending: isPendingDeletion, mutateAsync: deleteUsersMutateAsync } =
+    useServerActionMutation(deleteUsers);
 
   // Clear selection on Escape key press
   React.useEffect(() => {
@@ -65,10 +82,8 @@ export function UsersTableFloatingBar({ table }: UsersTableFloatingBarProps) {
     <div className="fixed inset-x-0 bottom-4 z-50 mx-auto w-fit px-4">
       <div className="w-full overflow-x-auto">
         <div className="mx-auto flex w-fit items-center gap-2 rounded-md border bg-secondary p-2 shadow-2xl">
-          <div className="flex h-10 items-center rounded-md border border-dashed pl-2.5 pr-1 bg-tertiary">
-            <P className="whitespace-nowrap">
-              {rows.length} selected
-            </P>
+          <div className="flex h-10 items-center rounded-md border border-dashed bg-tertiary pl-2.5 pr-1">
+            <P className="whitespace-nowrap">{rows.length} selected</P>
             <Separator orientation="vertical" className="ml-2 mr-1" />
             <Tooltip>
               <TooltipTrigger asChild>
@@ -96,20 +111,23 @@ export function UsersTableFloatingBar({ table }: UsersTableFloatingBarProps) {
             <Select
               onValueChange={(value: RoleTypeType) => {
                 setMethod("update-role");
-
-                // startTransition(async () => {
-                //   const { error } = await updateTasks({
-                //     ids: rows.map((row) => row.original.id),
-                //     status: value,
-                //   })
-
-                //   if (error) {
-                //     toast.error(error)
-                //     return
-                //   }
-
-                //   toast.success("Tasks updated")
-                // })
+                toast.promise(
+                  mutateAsync({
+                    ids: rows.map((row) => row.original.id),
+                    role: value as RoleTypeType,
+                    path: pathname,
+                  }),
+                  {
+                    loading: "Saving...",
+                    success: () => {
+                      return "Role updated successfully";
+                    },
+                    error: (err) => {
+                      console.log(err);
+                      return err.message;
+                    },
+                  }
+                );
               }}
             >
               <Tooltip delayDuration={250}>
@@ -119,18 +137,13 @@ export function UsersTableFloatingBar({ table }: UsersTableFloatingBarProps) {
                       variant="secondary"
                       size="icon"
                       className="size-10 border data-[state=open]:bg-accent data-[state=open]:text-accent-foreground"
-                      disabled={isPending}
+                      disabled={isPending || isPendingDeletion}
                     >
-                      {isPending && method === "update-role" ? (
-                        <ReloadIcon
-                          className="size-5 animate-spin"
-                          aria-hidden="true"
-                        />
+                      {isPending ||
+                      (isPendingDeletion && method === "update-role") ? (
+                        <LoadingSpinner />
                       ) : (
-                        <User2
-                          className="size-5"
-                          aria-hidden="true"
-                        />
+                        <User2 className="size-5" aria-hidden="true" />
                       )}
                     </Button>
                   </TooltipTrigger>
@@ -149,63 +162,6 @@ export function UsersTableFloatingBar({ table }: UsersTableFloatingBarProps) {
                 </SelectGroup>
               </SelectContent>
             </Select>
-            {/* <Select
-              onValueChange={(value: PriorityTypeType) => {
-                setMethod("update-priority")
-
-                // startTransition(async () => {
-                //   const { error } = await updateTasks({
-                //     ids: rows.map((row) => row.original.id),
-                //     priority: value,
-                //   })
-
-                //   if (error) {
-                //     toast.error(error)
-                //     return
-                //   }
-
-                //   toast.success("Tasks updated")
-                // })
-              }}
-            >
-              <Tooltip delayDuration={250}>
-                <SelectTrigger asChild>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="secondary"
-                      size="icon"
-                      className="size-7 border data-[state=open]:bg-accent data-[state=open]:text-accent-foreground"
-                      disabled={isPending}
-                    >
-                      {isPending && method === "update-priority" ? (
-                        <ReloadIcon
-                          className="size-3.5 animate-spin"
-                          aria-hidden="true"
-                        />
-                      ) : (
-                        <ArrowUpIcon className="size-3.5" aria-hidden="true" />
-                      )}
-                    </Button>
-                  </TooltipTrigger>
-                </SelectTrigger>
-                <TooltipContent className="border bg-accent font-semibold text-foreground dark:bg-zinc-900">
-                  <p>Update priority</p>
-                </TooltipContent>
-              </Tooltip>
-              <SelectContent align="center">
-                <SelectGroup>
-                  {PriorityTypeSchema.options.map((priority) => (
-                    <SelectItem
-                      key={priority}
-                      value={priority}
-                      className="capitalize"
-                    >
-                      {priority}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select> */}
             <Tooltip delayDuration={250}>
               <TooltipTrigger asChild>
                 <Button
@@ -214,7 +170,6 @@ export function UsersTableFloatingBar({ table }: UsersTableFloatingBarProps) {
                   className="size-10 border"
                   onClick={() => {
                     setMethod("export");
-
                     startTransition(() => {
                       exportTableToCSV(table, {
                         excludeColumns: ["select", "actions"],
@@ -222,13 +177,10 @@ export function UsersTableFloatingBar({ table }: UsersTableFloatingBarProps) {
                       });
                     });
                   }}
-                  disabled={isPending}
+                  disabled={isPending || isLoading || isPendingDeletion}
                 >
-                  {isPending && method === "export" ? (
-                    <ReloadIcon
-                      className="size-5 animate-spin"
-                      aria-hidden="true"
-                    />
+                  {isLoading && method === "export" ? (
+                    <LoadingSpinner />
                   ) : (
                     <DownloadIcon className="size-5" aria-hidden="true" />
                   )}
@@ -240,37 +192,64 @@ export function UsersTableFloatingBar({ table }: UsersTableFloatingBarProps) {
             </Tooltip>
             <Tooltip delayDuration={250}>
               <TooltipTrigger asChild>
-                <Button
-                  variant="secondary"
-                  size="icon"
-                  className="size-10 border"
-                  onClick={() => {
-                    setMethod("delete");
-
-                    // startTransition(async () => {
-                    //   const { error } = await deleteTasks({
-                    //     ids: rows.map((row) => row.original.id),
-                    //   })
-
-                    //   if (error) {
-                    //     toast.error(error)
-                    //     return
-                    //   }
-
-                    //   table.toggleAllRowsSelected(false)
-                    // })
-                  }}
-                  disabled={isPending}
-                >
-                  {isPending && method === "delete" ? (
-                    <ReloadIcon
-                      className="size-5 animate-spin"
-                      aria-hidden="true"
-                    />
-                  ) : (
-                    <TrashIcon className="size-5" aria-hidden="true" />
-                  )}
-                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="secondary"
+                      size="icon"
+                      className="size-10 border"
+                      disabled={isPending || isPendingDeletion}
+                    >
+                      {isPending ||
+                      (isPendingDeletion && method === "delete") ? (
+                        <LoadingSpinner />
+                      ) : (
+                        <TrashIcon className="size-5" aria-hidden="true" />
+                      )}
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent bgOpacity="bg-black/50">
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        Are you absolutely sure?
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This action cannot be undone. This will permanently
+                        delete the selected user/s and all related records from
+                        our servers.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => {
+                          setMethod("delete");
+                          toast.promise(
+                            deleteUsersMutateAsync({
+                              ids: rows.map((row) => row.original.id),
+                              path: pathname,
+                            }),
+                            {
+                              loading: "Deleting...",
+                              success: () => {
+                                table.toggleAllRowsSelected(false);
+                                return "user/s deleted successfully";
+                              },
+                              error: (err) => {
+                                console.log(err);
+                                return err.message;
+                              },
+                            }
+                          );
+                        }}
+                        className="bg-destructive hover:bg-destructive/90"
+                        disabled={isPending || isPendingDeletion}
+                      >
+                        Delete
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </TooltipTrigger>
               <TooltipContent className="border bg-accent font-semibold text-foreground dark:bg-zinc-900">
                 <P>Delete users</P>

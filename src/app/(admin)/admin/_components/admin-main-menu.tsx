@@ -13,10 +13,10 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-import CollapseMenuButton from "../../../components/collapse-menu-button";
-import MenuButton from "../../../components/menu-button";
-import UserNav from "../../../components/user-nav";
 import { getAdminMenuList } from "@/config/admin-menu-list";
+import MenuButton from "@/components/menu-button";
+import CollapseMenuButton from "@/components/collapse-menu-button";
+import UserNav from "@/components/user-nav";
 
 interface AdminMainMenuProps {
   isOpen: boolean | undefined;

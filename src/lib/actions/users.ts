@@ -28,9 +28,11 @@ import { ServerUpdateUserSchema } from "../db/schema/user";
 import { authedProcedure, getErrorMessage } from "./utils";
 import { GetUsersSchema } from "../schema";
 import {
+  deleteUsersSchema,
   extendedUpdateUserSchema,
   extendedUserInputSchema,
-} from "../schema/client/user";
+  updateUsersSchema,
+} from "../schema/user";
 
 interface ActionResult {
   error: string;
@@ -244,31 +246,8 @@ export const currentUser = authedProcedure
     }
   });
 
-export const updateUser = authedProcedure
-  .createServerAction()
-  .input(extendedUpdateUserSchema)
-  .handler(async ({ ctx, input }) => {
-    const { user } = ctx;
-    const { path, ...rest } = input;
-    try {
-      await db.user.update({
-        where: {
-          id: user.id,
-        },
-        data: {
-          ...rest,
-        },
-      });
-
-      return revalidatePath(path);
-    } catch (error) {
-      getErrorMessage(error);
-    }
-  });
-
 export async function getUsers(input: GetUsersSchema) {
-  await checkAuth()
-  noStore();
+  await checkAuth();
   const { page, per_page, sort, department, email, role, username, from, to } =
     input;
 
@@ -324,6 +303,72 @@ export async function getUsers(input: GetUsersSchema) {
   }
 }
 
+export const updateUser = authedProcedure
+  .createServerAction()
+  .input(extendedUpdateUserSchema)
+  .handler(async ({ ctx, input }) => {
+    const { user } = ctx;
+    const { path, email, ...rest } = input;
+    const userId = input.id || user.id;
+    try {
+      const currentUser = await db.user.findUnique({
+        where: { id: userId },
+        select: { email: true },
+      });
+
+      if (!currentUser) {
+        throw "User not found";
+      }
+
+      const dataToUpdate = {
+        ...rest,
+        ...(email && email !== currentUser.email ? { email } : {}),
+      };
+
+      if (email && email !== currentUser.email) {
+        const isEmailTaken = await db.user.findUnique({
+          where: { email },
+        });
+
+        if (isEmailTaken) {
+          throw "Email is already taken";
+        }
+      }
+
+      await db.user.update({
+        where: { id: userId },
+        data: dataToUpdate,
+      });
+
+      return revalidatePath(path);
+    } catch (error) {
+      getErrorMessage(error);
+    }
+  });
+
+export const updateUsers = authedProcedure
+  .createServerAction()
+  .input(updateUsersSchema)
+  .handler(async ({ input }) => {
+    const { path, ...rest } = input;
+    try {
+      await db.user.updateMany({
+        where: {
+          id: {
+            in: rest.ids,
+          },
+        },
+        data: {
+          ...(rest.role !== undefined && { role: rest.role }),
+        },
+      });
+
+      return revalidatePath(path);
+    } catch (error) {
+      getErrorMessage(error);
+    }
+  });
+
 export const createUser = authedProcedure
   .createServerAction()
   .input(extendedUserInputSchema)
@@ -333,7 +378,7 @@ export const createUser = authedProcedure
       const userId = generateId(15);
       const hashedPassword = await new Argon2id().hash(password);
 
-      const result = db.user.create({
+      await db.user.create({
         data: {
           id: userId,
           hashedPassword: hashedPassword,
@@ -341,9 +386,29 @@ export const createUser = authedProcedure
         },
       });
 
-      revalidatePath(path);
+      return revalidatePath(path);
+    } catch (error) {
+      console.log(error);
+      getErrorMessage(error);
+    }
+  });
 
-      return result;
+export const deleteUsers = authedProcedure
+  .createServerAction()
+  .input(deleteUsersSchema)
+  .handler(async ({ input }) => {
+    const { path, ...rest } = input;
+
+    try {
+      await db.user.deleteMany({
+        where: {
+          id: {
+            in: rest.ids,
+          },
+        },
+      });
+
+      return revalidatePath(path);
     } catch (error) {
       console.log(error);
       getErrorMessage(error);

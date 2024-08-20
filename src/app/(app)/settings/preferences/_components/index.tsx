@@ -1,9 +1,9 @@
 import { Separator } from "@/components/ui/separator";
-import { Section, SectionTitle } from "@/components/screens/settings/section";
 import FontSizeItem from "./font-size-item";
 import { H2, P } from "@/components/typography/text";
 import ThemeItem from "./theme-item";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Section, SectionTitle } from "../../_components/section";
 
 export default function PreferencesScreen() {
   return (

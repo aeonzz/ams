@@ -29,7 +29,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { createUserSchema, CreateUserSchema } from "@/lib/schema/client/user";
+import { createUserSchema, CreateUserSchema } from "@/lib/schema/user";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useFormState } from "react-hook-form";
@@ -43,20 +43,7 @@ export default function CreateUserDialog() {
   const { dirtyFields } = useFormState({ control: form.control });
   const isFieldsDirty = Object.keys(dirtyFields).length > 0;
 
-  const { mutate, isPending } = useServerActionMutation(createUser, {
-    onSuccess: () => {
-      setOpen(false);
-      toast.success("User Created Successfully!", {
-        description: "The new user has been created successfully.",
-      });
-    },
-    onError: (err) => {
-      console.log(err);
-      toast.error("Uh oh! Something went wrong.", {
-        description: "Something went wrong, please try again later.",
-      });
-    },
-  });
+  const { mutateAsync, isPending } = useServerActionMutation(createUser);
 
   React.useEffect(() => {
     form.reset();
@@ -115,7 +102,7 @@ export default function CreateUserDialog() {
           </DialogDescription>
         </DialogHeader>
         <CreateUserForm
-          mutate={mutate}
+          mutateAsync={mutateAsync}
           isPending={isPending}
           isFieldsDirty={isFieldsDirty}
           setAlertOpen={setAlertOpen}

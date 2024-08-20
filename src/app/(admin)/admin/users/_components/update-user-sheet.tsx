@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, useFormState } from "react-hook-form";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -33,12 +33,13 @@ import {
 } from "@/components/ui/sheet";
 
 import { RoleTypeSchema, User } from "prisma/generated/zod";
-import { updateUserSchema, UpdateUserSchema } from "@/lib/schema/client/user";
+import { updateUserSchema, UpdateUserSchema } from "@/lib/schema/user";
 import { Input } from "@/components/ui/input";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
 import { usePathname } from "next/navigation";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { updateUser } from "@/lib/actions/users";
+import { Separator } from "@/components/ui/separator";
 
 interface UpdateUserSheetProps
   extends React.ComponentPropsWithRef<typeof Sheet> {
@@ -57,20 +58,9 @@ export function UpdateUserSheet({ user, ...props }: UpdateUserSheetProps) {
     },
   });
 
-  const { mutate, isPending } = useServerActionMutation(updateUser, {
-    onSuccess: () => {
-      props.onOpenChange?.(false);
-      toast.success("User Created Successfully!", {
-        description: "The new user has been created successfully.",
-      });
-    },
-    onError: (err) => {
-      console.log(err);
-      toast.error("Uh oh! Something went wrong.", {
-        description: "Something went wrong, please try again later.",
-      });
-    },
-  });
+  const { dirtyFields } = useFormState({ control: form.control });
+
+  const { isPending, mutateAsync } = useServerActionMutation(updateUser);
 
   React.useEffect(() => {
     form.reset({
@@ -85,13 +75,31 @@ export function UpdateUserSheet({ user, ...props }: UpdateUserSheetProps) {
     const data = {
       ...values,
       path: pathname,
+      id: user.id,
     };
-    mutate(data);
+
+    toast.promise(mutateAsync(data), {
+      loading: "Saving...",
+      success: () => {
+        props.onOpenChange?.(false);
+        return "User updated successfully";
+      },
+      error: (err) => {
+        console.log(err);
+        return "Something went wrong, please try again later.";
+      },
+    });
   }
 
   return (
     <Sheet {...props}>
-      <SheetContent className="flex flex-col gap-6 sm:max-w-md">
+      <SheetContent
+        onInteractOutside={(e) => {
+          if (isPending) {
+            e.preventDefault();
+          }
+        }}
+      >
         <SheetHeader className="text-left">
           <SheetTitle>Update task</SheetTitle>
           <SheetDescription>
@@ -101,7 +109,7 @@ export function UpdateUserSheet({ user, ...props }: UpdateUserSheetProps) {
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="flex flex-col gap-4"
+            className="flex h-screen flex-col justify-between"
           >
             <div className="relative space-y-2 px-4">
               <FormField
@@ -198,16 +206,23 @@ export function UpdateUserSheet({ user, ...props }: UpdateUserSheetProps) {
                 )}
               />
             </div>
-            <SheetFooter className="gap-2 pt-2 sm:space-x-0">
-              <SheetClose asChild>
-                <Button type="button" variant="outline">
-                  Cancel
+            <div>
+              <Separator className="my-2" />
+              <SheetFooter className="gap-2 pt-2 sm:space-x-0">
+                <SheetClose asChild>
+                  <Button type="button" variant="outline" disabled={isPending}>
+                    Cancel
+                  </Button>
+                </SheetClose>
+                <Button
+                  disabled={Object.keys(dirtyFields).length === 0 || isPending}
+                  type="submit"
+                  className="w-20"
+                >
+                  Save
                 </Button>
-              </SheetClose>
-              <SubmitButton disabled={isPending} type="submit" className="w-20">
-                Create
-              </SubmitButton>
-            </SheetFooter>
+              </SheetFooter>
+            </div>
           </form>
         </Form>
       </SheetContent>

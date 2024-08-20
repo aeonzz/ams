@@ -1,5 +1,5 @@
-import { PriorityTypeSchema } from "prisma/generated/zod";
 import { z } from "zod";
+import { PriorityTypeSchema } from "prisma/generated/zod";
 
 export const RequestSchema = z.object({
   notes: z.string(),

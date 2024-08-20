@@ -25,6 +25,9 @@ export const extendedUserInputSchema = createUserSchemaBase.extend({
   path: z.string(),
 });
 
+export type CreateUserSchema = z.infer<typeof createUserSchema>;
+export type ExtendedUserInputSchema = z.infer<typeof extendedUserInputSchema>;
+
 export const updateUserSchemaBase = z.object({
   email: z.string().email("Invalid email").optional(),
   department: z.string().optional(),
@@ -48,9 +51,23 @@ export const updateUserSchema = updateUserSchemaBase.refine(
 
 export const extendedUpdateUserSchema = updateUserSchemaBase.extend({
   path: z.string(),
+  id: z.string().optional(),
 });
 
-export type CreateUserSchema = z.infer<typeof createUserSchema>;
-export type ExtendedUserInputSchema = z.infer<typeof extendedUserInputSchema>;
 export type UpdateUserSchema = z.infer<typeof updateUserSchema>;
 export type ExtendedUpdateUserSchema = z.infer<typeof extendedUpdateUserSchema>;
+
+export const deleteUsersSchema = z.object({
+  ids: z.string().array(),
+  path: z.string(),
+});
+
+export type DeleteUsersSchema = z.infer<typeof deleteUsersSchema>;
+
+export const updateUsersSchema = z.object({
+  ids: z.string().array(),
+  role: RoleTypeSchema.optional(),
+  path: z.string(),
+});
+
+export type UpdateUsersSchema = z.infer<typeof updateUsersSchema>;

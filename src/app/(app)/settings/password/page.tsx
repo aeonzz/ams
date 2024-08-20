@@ -1,7 +1,7 @@
 import React from "react";
 
-import SettingsLayout from "@/components/layouts/settings-layout";
-import PasswordScreen from "@/components/screens/settings/password";
+import SettingsLayout from "../_components/settings-layout";
+import PasswordScreen from "./_components";
 
 export default function PasswordPage() {
   return (

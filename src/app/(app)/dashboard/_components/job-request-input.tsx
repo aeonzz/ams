@@ -28,7 +28,6 @@ import { Category, Item, Job, jobs } from "@/config/job-list";
 import PriorityOption, { priorities, Priority } from "./priority-option";
 import { useUploadFile } from "@/lib/hooks/use-upload-file";
 import { FileUploader } from "@/components/file-uploader";
-import { RequestSchemaType } from "@/lib/schema/server/request";
 import { useDialog } from "@/lib/hooks/use-dialog";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
 import { toast } from "sonner";
@@ -37,6 +36,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/text-area";
 import { Separator } from "@/components/ui/separator";
+import { RequestSchemaType } from "@/lib/schema/request";
 
 interface JobRequestInputProps {
   isLoading: boolean;

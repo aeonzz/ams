@@ -1,7 +1,6 @@
 "use server";
 
 import { generateId } from "lucia";
-import { RequestSchema } from "../schema/server/request";
 import { authedProcedure, getErrorMessage } from "./utils";
 
 import { db } from "@/lib/db/index";
@@ -13,6 +12,7 @@ import { z } from "zod";
 import { GetRequestsSchema} from "../schema";
 import { unstable_noStore as noStore } from "next/cache";
 import { Request } from "prisma/generated/zod";
+import { RequestSchema } from "../schema/request";
 
 const cohere = createCohere({
   apiKey: process.env.COHERE_API_KEY,

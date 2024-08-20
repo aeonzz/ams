@@ -21,7 +21,7 @@ import { PlusIcon } from "lucide-react";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CreateUserSchema } from "../../lib/schema/client/user";
+import { CreateUserSchema } from "../../lib/schema/user";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
@@ -31,14 +31,17 @@ import { DialogFooter } from "../ui/dialog";
 import { RoleTypeSchema } from "prisma/generated/zod";
 import { SubmitButton } from "../ui/submit-button";
 import { PasswordInput } from "../ui/password-input";
-import { UseMutateFunction } from "@tanstack/react-query";
+import {
+  UseMutateFunction,
+  UseMutateAsyncFunction,
+} from "@tanstack/react-query";
 import { UseFormReturn } from "react-hook-form";
 import { usePathname } from "next/navigation";
 
 interface CreateUserFormProps {
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setAlertOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  mutate: UseMutateFunction<
+  mutateAsync: UseMutateAsyncFunction<
     any,
     Error,
     Parameters<typeof createUser>[0],
@@ -51,7 +54,7 @@ interface CreateUserFormProps {
 
 export default function CreateUserForm({
   setIsOpen,
-  mutate,
+  mutateAsync,
   isPending,
   form,
   isFieldsDirty,
@@ -65,7 +68,17 @@ export default function CreateUserForm({
       path: pathname,
     };
 
-    mutate(data);
+    toast.promise(mutateAsync(data), {
+      loading: "Creating...",
+      success: () => {
+        setIsOpen(false);
+        return "User created successfully";
+      },
+      error: (err) => {
+        console.log(err);
+        return "Something went wrong, please try again later.";
+      },
+    });
   }
 
   return (

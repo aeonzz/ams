@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 
-import SidebarToggle from "../../../components/sidebar-toggle";
 import AdminMainMenu from "./admin-main-menu";
+import SidebarToggle from "@/components/sidebar-toggle";
 
 interface AdminDashboardSidebarProps {
   isOpen: boolean | undefined;

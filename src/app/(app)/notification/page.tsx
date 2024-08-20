@@ -1,6 +1,6 @@
 import ContentLayout from '@/components/layouts/content-layout'
-import NotificationScreen from '@/components/screens/notification'
 import React from 'react'
+import NotificationScreen from './_components'
 
 export default function NotificationPage() {
   return (

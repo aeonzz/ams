@@ -1,6 +1,6 @@
 
 import ContentLayout from "@/components/layouts/content-layout";
-import AdminDashboardScreen from "./_components/index";
+import AdminDashboardScreen from "./_components";
 
 export default function AdminDashboardPage() {
   return (
