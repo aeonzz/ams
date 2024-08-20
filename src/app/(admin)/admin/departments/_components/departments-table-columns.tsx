@@ -5,9 +5,6 @@ import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { type ColumnDef } from "@tanstack/react-table";
 import { toast } from "sonner";
 
-// import { getErrorMessage } from "@/lib/handle-error"
-import { formatDate, getPriorityIcon, getStatusIcon } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -25,22 +22,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 
-// import { updateTask } from "../_lib/actions"
-// import { getPriorityIcon, getStatusIcon } from "../_lib/utils"
-// import { DeleteTasksDialog } from "./delete-tasks-dialog"
-// import { UpdateTaskSheet } from "./update-task-sheet"
 import { P } from "@/components/typography/text";
-import { User } from "prisma/generated/zod";
-import { UpdateUserSheet } from "./update-user-sheet";
-import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
-import { updateUser } from "@/lib/actions/users";
-import RoleTypeSchema, {
-  RoleTypeType,
-} from "prisma/generated/zod/inputTypeSchemas/RoleTypeSchema";
 import { usePathname } from "next/navigation";
-import { DeleteUsersDialog } from "./delete-users-dialog";
+import { Department } from "prisma/generated/zod";
+import { UpdateDepartmentSheet } from "./update-department-sheet";
+import { DeleteDepartmentsDialog } from "./delete-departments-dialog";
+import { formatDate } from "@/lib/utils";
 
-export function getUsersColumns(): ColumnDef<User>[] {
+export function getDepartmentsColumns(): ColumnDef<Department>[] {
   return [
     {
       id: "select",
@@ -76,28 +65,14 @@ export function getUsersColumns(): ColumnDef<User>[] {
       enableHiding: false,
     },
     {
-      accessorKey: "email",
+      accessorKey: "label",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Email" />
-      ),
-      cell: ({ row }) => {
-        return (
-          <div className="flex space-x-2">
-            <Badge variant="outline">{row.original.department}</Badge>
-            <P className="truncate font-medium">{row.getValue("email")}</P>
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: "username",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Username" />
+        <DataTableColumnHeader column={column} title="Label" />
       ),
       cell: ({ row }) => {
         return (
           <div className="flex items-center">
-            <P>{row.original.username}</P>
+            <P>{row.original.label}</P>
           </div>
         );
       },
@@ -106,14 +81,14 @@ export function getUsersColumns(): ColumnDef<User>[] {
       },
     },
     {
-      accessorKey: "role",
+      accessorKey: "name",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Role" />
+        <DataTableColumnHeader column={column} title="Name" />
       ),
       cell: ({ row }) => {
         return (
           <div className="flex items-center">
-            <P>{row.original.role}</P>
+            <P>{row.original.name}</P>
           </div>
         );
       },
@@ -137,19 +112,18 @@ export function getUsersColumns(): ColumnDef<User>[] {
         const [showDeleteTaskDialog, setShowDeleteTaskDialog] =
           React.useState(false);
 
-        const { isPending, mutateAsync } = useServerActionMutation(updateUser);
 
         return (
           <div className="grid place-items-center">
-            <UpdateUserSheet
+            <UpdateDepartmentSheet
               open={showUpdateTaskSheet}
               onOpenChange={setShowUpdateTaskSheet}
-              user={row.original}
+              department={row.original}
             />
-            <DeleteUsersDialog
+            <DeleteDepartmentsDialog
               open={showDeleteTaskDialog}
               onOpenChange={setShowDeleteTaskDialog}
-              users={[row.original]}
+              departments={[row.original]}
               showTrigger={false}
               onSuccess={() => row.toggleSelected(false)}
             />
@@ -167,44 +141,6 @@ export function getUsersColumns(): ColumnDef<User>[] {
                 <DropdownMenuItem onSelect={() => setShowUpdateTaskSheet(true)}>
                   Edit
                 </DropdownMenuItem>
-                <DropdownMenuSub>
-                  <DropdownMenuSubTrigger>Roles</DropdownMenuSubTrigger>
-                  <DropdownMenuSubContent>
-                    <DropdownMenuRadioGroup
-                      value={row.original.role}
-                      onValueChange={(value) => {
-                        toast.promise(
-                          mutateAsync({
-                            id: row.original.id,
-                            role: value as RoleTypeType,
-                            path: pathname,
-                          }),
-                          {
-                            loading: "Saving...",
-                            success: () => {
-                              return "Role updated successfully";
-                            },
-                            error: (err) => {
-                              console.log(err);
-                              return err.message;
-                            },
-                          }
-                        );
-                      }}
-                    >
-                      {RoleTypeSchema.options.map((role) => (
-                        <DropdownMenuRadioItem
-                          key={role}
-                          value={role}
-                          className="capitalize"
-                          disabled={isPending}
-                        >
-                          {role}
-                        </DropdownMenuRadioItem>
-                      ))}
-                    </DropdownMenuRadioGroup>
-                  </DropdownMenuSubContent>
-                </DropdownMenuSub>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onSelect={() => setShowDeleteTaskDialog(true)}

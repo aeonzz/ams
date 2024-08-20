@@ -1,7 +1,7 @@
-import * as React from "react"
-import { flexRender, type Table as TanstackTable } from "@tanstack/react-table"
+import * as React from "react";
+import { flexRender, type Table as TanstackTable } from "@tanstack/react-table";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 import {
   Table,
   TableBody,
@@ -9,16 +9,16 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { DataTablePagination } from "@/components/data-table/data-table-pagination"
-import { getCommonPinningStyles } from "@/lib/data-table"
+} from "@/components/ui/table";
+import { DataTablePagination } from "@/components/data-table/data-table-pagination";
+import { getCommonPinningStyles } from "@/lib/data-table";
 
 interface DataTableProps<TData> extends React.HTMLAttributes<HTMLDivElement> {
   /**
    * The table instance returned from useDataTable hook with pagination, sorting, filtering, etc.
    * @type TanstackTable<TData>
    */
-  table: TanstackTable<TData>
+  table: TanstackTable<TData>;
 
   /**
    * The floating bar to render at the bottom of the table on row selection.
@@ -26,7 +26,7 @@ interface DataTableProps<TData> extends React.HTMLAttributes<HTMLDivElement> {
    * @type React.ReactNode | null
    * @example floatingBar={<TasksTableFloatingBar table={table} />}
    */
-  floatingBar?: React.ReactNode | null
+  floatingBar?: React.ReactNode | null;
 }
 
 export function DataTable<TData>({
@@ -42,6 +42,10 @@ export function DataTable<TData>({
       {...props}
     >
       {children}
+      <div className="flex flex-col gap-2.5 px-5">
+        <DataTablePagination table={table} />
+        {table.getFilteredSelectedRowModel().rows.length > 0 && floatingBar}
+      </div>
       <div className="overflow-hidden border-y">
         <Table>
           <TableHeader>
@@ -64,7 +68,7 @@ export function DataTable<TData>({
                             header.getContext()
                           )}
                     </TableHead>
-                  )
+                  );
                 })}
               </TableRow>
             ))}
@@ -105,10 +109,6 @@ export function DataTable<TData>({
           </TableBody>
         </Table>
       </div>
-      <div className="flex flex-col gap-2.5 px-5">
-        <DataTablePagination table={table} />
-        {table.getFilteredSelectedRowModel().rows.length > 0 && floatingBar}
-      </div>
     </div>
-  )
+  );
 }

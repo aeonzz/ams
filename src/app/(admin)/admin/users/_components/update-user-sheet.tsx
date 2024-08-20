@@ -35,11 +35,13 @@ import {
 import { RoleTypeSchema, User } from "prisma/generated/zod";
 import { updateUserSchema, UpdateUserSchema } from "@/lib/schema/user";
 import { Input } from "@/components/ui/input";
-import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
+import { useServerActionMutation, useServerActionQuery } from "@/lib/hooks/server-action-hooks";
 import { usePathname } from "next/navigation";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { updateUser } from "@/lib/actions/users";
 import { Separator } from "@/components/ui/separator";
+import LoadingSpinner from "@/components/loaders/loading-spinner";
+import { loadDepartments } from "@/lib/actions/department";
 
 interface UpdateUserSheetProps
   extends React.ComponentPropsWithRef<typeof Sheet> {
@@ -59,6 +61,13 @@ export function UpdateUserSheet({ user, ...props }: UpdateUserSheetProps) {
   });
 
   const { dirtyFields } = useFormState({ control: form.control });
+  const { isLoading, data } = useServerActionQuery(loadDepartments, {
+    input: {},
+    queryKey: ["asd"],
+    refetchOnWindowFocus: false,
+  });
+
+  console.log(data)
 
   const { isPending, mutateAsync } = useServerActionMutation(updateUser);
 
@@ -156,14 +165,48 @@ export function UpdateUserSheet({ user, ...props }: UpdateUserSheetProps) {
                   render={({ field }) => (
                     <FormItem className="flex-1">
                       <FormLabel>Department</FormLabel>
-                      <FormControl>
-                        <Input
-                          autoComplete="off"
-                          placeholder="IT"
-                          disabled={isPending}
-                          {...field}
-                        />
-                      </FormControl>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger
+                            className="bg-secondary capitalize"
+                            disabled={isPending}
+                          >
+                            <SelectValue
+                              placeholder={
+                                isLoading ? (
+                                  <LoadingSpinner />
+                                ) : (
+                                  "Select a department"
+                                )
+                              }
+                            />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent className="bg-secondary">
+                          <SelectGroup>
+                            {data?.length === 0 ? (
+                              <p className="p-4 text-center text-sm">
+                                No departments yet
+                              </p>
+                            ) : (
+                              <>
+                                {data?.map((item) => (
+                                  <SelectItem
+                                    key={item.id}
+                                    value={item.name}
+                                    className="capitalize"
+                                  >
+                                    {item.name}
+                                  </SelectItem>
+                                ))}
+                              </>
+                            )}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}

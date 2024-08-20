@@ -14,6 +14,7 @@ import {
   BarChart,
   ShieldAlert,
   Wrench,
+  BriefcaseBusiness,
 } from "lucide-react";
 
 import { Group } from "@/lib/types/menu";
@@ -94,27 +95,18 @@ export function getAdminMenuList(pathname: string): Group[] {
       groupLabel: "User Management",
       menus: [
         {
-          href: "/users",
+          href: "/admin/users",
           label: "User Accounts",
-          active: pathname.includes("/users"),
+          active: pathname.includes("/admin/users"),
           icon: Users,
-          submenus: [
-            {
-              href: "/users/students",
-              label: "Student Accounts",
-              active: pathname === "/users/students",
-            },
-            {
-              href: "/users/faculty",
-              label: "Faculty Accounts",
-              active: pathname === "/users/faculty",
-            },
-            {
-              href: "/users/staff",
-              label: "Staff Accounts",
-              active: pathname === "/users/staff",
-            },
-          ],
+          submenus: [],
+        },
+        {
+          href: "/admin/departments",
+          label: "Departments",
+          active: pathname.includes("/admin/departments"),
+          icon: BriefcaseBusiness,
+          submenus: [],
         },
         {
           href: "/roles",

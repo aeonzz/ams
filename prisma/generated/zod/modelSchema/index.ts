@@ -1,4 +1,5 @@
 export * from './UserSchema';
+export * from './DepartmentSchema';
 export * from './SessionSchema';
 export * from './FileSchema';
 export * from './SettingSchema';

@@ -24,7 +24,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { CreateUserSchema } from "../../lib/schema/user";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
+import {
+  useServerActionMutation,
+  useServerActionQuery,
+} from "@/lib/hooks/server-action-hooks";
 import { createUser } from "@/lib/actions/users";
 import { Separator } from "../ui/separator";
 import { DialogFooter } from "../ui/dialog";
@@ -37,6 +40,8 @@ import {
 } from "@tanstack/react-query";
 import { UseFormReturn } from "react-hook-form";
 import { usePathname } from "next/navigation";
+import { loadDepartments } from "@/lib/actions/department";
+import LoadingSpinner from "../loaders/loading-spinner";
 
 interface CreateUserFormProps {
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -62,6 +67,12 @@ export default function CreateUserForm({
 }: CreateUserFormProps) {
   const pathname = usePathname();
 
+  const { isLoading, data } = useServerActionQuery(loadDepartments, {
+    input: {},
+    queryKey: ["departments"],
+    refetchOnWindowFocus: false,
+  });
+
   async function onSubmit(values: CreateUserSchema) {
     const data = {
       ...values,
@@ -76,7 +87,7 @@ export default function CreateUserForm({
       },
       error: (err) => {
         console.log(err);
-        return "Something went wrong, please try again later.";
+        return err.message;
       },
     });
   }
@@ -104,21 +115,57 @@ export default function CreateUserForm({
               </FormItem>
             )}
           />
+          <FormField
+            control={form.control}
+            name="username"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Username</FormLabel>
+                <FormControl>
+                  <Input
+                    autoComplete="off"
+                    placeholder="Aeonz"
+                    disabled={isPending}
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <div className="flex justify-between space-x-3">
             <FormField
               control={form.control}
-              name="username"
+              name="role"
               render={({ field }) => (
                 <FormItem className="flex-1">
-                  <FormLabel>Username</FormLabel>
-                  <FormControl>
-                    <Input
-                      autoComplete="off"
-                      placeholder="Aeonz"
-                      disabled={isPending}
-                      {...field}
-                    />
-                  </FormControl>
+                  <FormLabel>Role</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger
+                        className="bg-secondary capitalize"
+                        disabled={isPending}
+                      >
+                        <SelectValue placeholder="Select a role" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent className="bg-secondary">
+                      <SelectGroup>
+                        {RoleTypeSchema.options.map((item) => (
+                          <SelectItem
+                            key={item}
+                            value={item}
+                            className="capitalize"
+                          >
+                            {item}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
@@ -129,55 +176,53 @@ export default function CreateUserForm({
               render={({ field }) => (
                 <FormItem className="flex-1">
                   <FormLabel>Department</FormLabel>
-                  <FormControl>
-                    <Input
-                      autoComplete="off"
-                      placeholder="IT"
-                      disabled={isPending}
-                      {...field}
-                    />
-                  </FormControl>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger
+                        className="bg-secondary capitalize"
+                        disabled={isPending}
+                      >
+                        <SelectValue
+                          placeholder={
+                            isLoading ? (
+                              <LoadingSpinner />
+                            ) : (
+                              "Select a department"
+                            )
+                          }
+                        />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent className="bg-secondary">
+                      <SelectGroup>
+                        {data?.length === 0 ? (
+                          <p className="p-4 text-center text-sm">
+                            No departments yet
+                          </p>
+                        ) : (
+                          <>
+                            {data?.map((item) => (
+                              <SelectItem
+                                key={item.id}
+                                value={item.name}
+                                className="capitalize"
+                              >
+                                {item.name}
+                              </SelectItem>
+                            ))}
+                          </>
+                        )}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
             />
           </div>
-          <FormField
-            control={form.control}
-            name="role"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Role</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger
-                      className="bg-secondary capitalize"
-                      disabled={isPending}
-                    >
-                      <SelectValue placeholder="Select a role" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent className="bg-secondary">
-                    <SelectGroup>
-                      {RoleTypeSchema.options.map((item) => (
-                        <SelectItem
-                          key={item}
-                          value={item}
-                          className="capitalize"
-                        >
-                          {item}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
           <FormField
             control={form.control}
             name="password"

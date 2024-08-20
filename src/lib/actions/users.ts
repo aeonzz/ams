@@ -373,14 +373,23 @@ export const createUser = authedProcedure
   .createServerAction()
   .input(extendedUserInputSchema)
   .handler(async ({ input }) => {
-    const { confirmPassword, password, path, ...rest } = input;
+    const { confirmPassword, password, path, email, ...rest } = input;
     try {
+      const existingUser = await db.user.findUnique({
+        where: { email: email },
+      });
+
+      if (existingUser) {
+        throw ('Email already exists');
+      }
+
       const userId = generateId(15);
       const hashedPassword = await new Argon2id().hash(password);
 
       await db.user.create({
         data: {
           id: userId,
+          email: email,
           hashedPassword: hashedPassword,
           ...rest,
         },
@@ -414,3 +423,4 @@ export const deleteUsers = authedProcedure
       getErrorMessage(error);
     }
   });
+

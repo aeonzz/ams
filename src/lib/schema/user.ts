@@ -55,7 +55,6 @@ export const extendedUpdateUserSchema = updateUserSchemaBase.extend({
 });
 
 export type UpdateUserSchema = z.infer<typeof updateUserSchema>;
-export type ExtendedUpdateUserSchema = z.infer<typeof extendedUpdateUserSchema>;
 
 export const deleteUsersSchema = z.object({
   ids: z.string().array(),
@@ -71,3 +70,4 @@ export const updateUsersSchema = z.object({
 });
 
 export type UpdateUsersSchema = z.infer<typeof updateUsersSchema>;
+

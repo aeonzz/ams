@@ -1,5 +1,6 @@
 export { TransactionIsolationLevelSchema } from './TransactionIsolationLevelSchema';
 export { UserScalarFieldEnumSchema } from './UserScalarFieldEnumSchema';
+export { DepartmentScalarFieldEnumSchema } from './DepartmentScalarFieldEnumSchema';
 export { SessionScalarFieldEnumSchema } from './SessionScalarFieldEnumSchema';
 export { FileScalarFieldEnumSchema } from './FileScalarFieldEnumSchema';
 export { SettingScalarFieldEnumSchema } from './SettingScalarFieldEnumSchema';

@@ -14,11 +14,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { PlusIcon, X } from "lucide-react";
-import CreateUserForm from "@/components/forms/create-user-form";
 import {
   useServerActionMutation,
 } from "@/lib/hooks/server-action-hooks";
-import { createUser } from "@/lib/actions/users";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,20 +28,22 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { createUserSchema, CreateUserSchema } from "@/lib/schema/user";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useFormState } from "react-hook-form";
+import { createDepartmentSchema, CreateDepartmentSchema } from "@/lib/schema/department";
+import { createDepartment } from "@/lib/actions/department";
+import CreateDepartmentForm from "@/components/forms/create-department-form";
 
-export default function CreateUserDialog() {
+export default function CreateDepartmentDialog() {
   const [open, setOpen] = React.useState(false);
   const [alertOpen, setAlertOpen] = React.useState(false);
-  const form = useForm<CreateUserSchema>({
-    resolver: zodResolver(createUserSchema),
+  const form = useForm<CreateDepartmentSchema>({
+    resolver: zodResolver(createDepartmentSchema),
   });
   const { dirtyFields } = useFormState({ control: form.control });
   const isFieldsDirty = Object.keys(dirtyFields).length > 0;
-  const { mutateAsync, isPending } = useServerActionMutation(createUser);
+  const { mutateAsync, isPending } = useServerActionMutation(createDepartment);
 
   React.useEffect(() => {
     form.reset();
@@ -54,7 +54,7 @@ export default function CreateUserDialog() {
       <DialogTrigger asChild>
         <Button variant="secondary" size="sm">
           <PlusIcon className="mr-2 size-4" aria-hidden="true" />
-          New user
+          New department
         </Button>
       </DialogTrigger>
       <DialogContent
@@ -96,12 +96,12 @@ export default function CreateUserDialog() {
           </AlertDialogContent>
         </AlertDialog>
         <DialogHeader>
-          <DialogTitle>Create user</DialogTitle>
+          <DialogTitle>Create department</DialogTitle>
           <DialogDescription>
-            Fill in the details below to create a new user.
+            Fill in the details below to create a new department.
           </DialogDescription>
         </DialogHeader>
-        <CreateUserForm
+        <CreateDepartmentForm
           mutateAsync={mutateAsync}
           isPending={isPending}
           isFieldsDirty={isFieldsDirty}

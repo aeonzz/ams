@@ -1,4 +1,4 @@
-import * as z from "zod"
+import * as z from "zod";
 
 export const requestSearchParamsSchema = z.object({
   page: z.coerce.number().default(1),
@@ -9,9 +9,9 @@ export const requestSearchParamsSchema = z.object({
   priority: z.string().optional(),
   from: z.string().optional(),
   to: z.string().optional(),
-})
+});
 
-export type GetRequestsSchema = z.infer<typeof requestSearchParamsSchema>
+export type GetRequestsSchema = z.infer<typeof requestSearchParamsSchema>;
 
 export const userSearchParamsSchema = z.object({
   page: z.coerce.number().default(1),
@@ -23,24 +23,17 @@ export const userSearchParamsSchema = z.object({
   role: z.string().optional(),
   from: z.string().optional(),
   to: z.string().optional(),
-})
+});
 
-export type GetUsersSchema = z.infer<typeof userSearchParamsSchema>
+export type GetUsersSchema = z.infer<typeof userSearchParamsSchema>;
 
-// export const createTaskSchema = z.object({
-//   title: z.string(),
-//   label: z.enum(tasks.label.enumValues),
-//   status: z.enum(tasks.status.enumValues),
-//   priority: z.enum(tasks.priority.enumValues),
-// })
+export const departmentSearchParamsSchema = z.object({
+  page: z.coerce.number().default(1),
+  per_page: z.coerce.number().default(10),
+  sort: z.string().optional(),
+  name: z.string().optional(),
+  from: z.string().optional(),
+  to: z.string().optional(),
+});
 
-// export type CreateTaskSchema = z.infer<typeof createTaskSchema>
-
-// export const updateTaskSchema = z.object({
-//   title: z.string().optional(),
-//   label: z.enum(tasks.label.enumValues).optional(),
-//   status: z.enum(tasks.status.enumValues).optional(),
-//   priority: z.enum(tasks.priority.enumValues).optional(),
-// })
-
-// export type UpdateTaskSchema = z.infer<typeof updateTaskSchema>
+export type GetDepartmentsSchema = z.infer<typeof departmentSearchParamsSchema>;
