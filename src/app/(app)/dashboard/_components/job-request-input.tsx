@@ -18,17 +18,15 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Request} from "@/lib/db/schema/request";
+import { Request } from "@/lib/db/schema/request";
 import { MotionLayout } from "@/components/layouts/motion-layout";
 import { usePathname } from "next/navigation";
-import { ReqType } from "./create-request";
 import { SubmitButton } from "@/components/ui/submit-button";
 import JobTypeOption from "./job-type-option";
 import { Category, Item, Job, jobs } from "@/config/job-list";
 import PriorityOption, { priorities, Priority } from "./priority-option";
 import { useUploadFile } from "@/lib/hooks/use-upload-file";
 import { FileUploader } from "@/components/file-uploader";
-import { useDialog } from "@/lib/hooks/use-dialog";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
 import { toast } from "sonner";
 import { createRequest } from "@/lib/actions/requests";
@@ -37,13 +35,15 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/text-area";
 import { Separator } from "@/components/ui/separator";
 import { RequestSchemaType } from "@/lib/schema/request";
+import { type RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTypeSchema";
+import { DialogState } from "@/lib/hooks/use-dialog-manager";
 
 interface JobRequestInputProps {
   isLoading: boolean;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
-  type: ReqType;
-  setType: React.Dispatch<React.SetStateAction<ReqType | null>>;
+  type: RequestTypeType;
   form: UseFormReturn<Request>;
+  dialogManager: DialogState;
 }
 
 export type Selection = {
@@ -55,14 +55,12 @@ export type Selection = {
 export default function JobRequestInput({
   isLoading,
   setIsLoading,
-  setType,
   type,
   form,
+  dialogManager,
 }: JobRequestInputProps) {
   const queryClient = useQueryClient();
-  const dialog = useDialog();
   const pathname = usePathname();
-  const { value } = type;
   const department = "IT";
 
   const [selection, setSelection] = React.useState<Selection>({
@@ -78,7 +76,7 @@ export default function JobRequestInput({
   const { mutate } = useServerActionMutation(createRequest, {
     onSuccess: () => {
       setIsLoading(false);
-      dialog.setActiveDialog("");
+      dialogManager.setActiveDialog(null);
       toast.success("Request Successful!", {
         description:
           "Your request has been submitted and is awaiting approval.",
@@ -104,7 +102,7 @@ export default function JobRequestInput({
     const data: RequestSchemaType = {
       notes: values.notes,
       priority: prio.value,
-      type: value,
+      type: type,
       department: department,
       jobType: selection.jobType.value,
       category: selection.category.value,
@@ -117,21 +115,8 @@ export default function JobRequestInput({
 
   return (
     <>
-      <DialogHeader className="px-2">
-        <div className="flex items-center space-x-1">
-          <Button
-            size="icon"
-            className="size-7"
-            variant="ghost2"
-            onClick={() => {
-              setType(null);
-            }}
-            disabled={isLoading}
-          >
-            <ChevronLeft className="size-5" />
-          </Button>
-          <DialogTitle>Job Request</DialogTitle>
-        </div>
+      <DialogHeader>
+        <DialogTitle>Job Request</DialogTitle>
       </DialogHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>

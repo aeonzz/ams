@@ -3,7 +3,6 @@
 import React, { useCallback, useState } from "react";
 import { ImageUp } from "lucide-react";
 
-import { useDialog } from "@/lib/hooks/use-dialog";
 import {
   Dialog,
   DialogContent,
@@ -20,14 +19,14 @@ import { updateUser } from "@/lib/actions/users";
 import { toast } from "sonner";
 
 export default function UploadProfileDialog() {
-  const dialog = useDialog();
+
   const { uploadFiles, progresses, isUploading } = useUploadFile();
 
   const handleUpload = useCallback(
     async (files: File[]) => {
       try {
         const results = await uploadFiles(files);
-        console.log(results)
+        console.log(results);
         await updateUser({
           profileUrl: results[0].filePath,
           path: "/settings/account",
@@ -42,12 +41,7 @@ export default function UploadProfileDialog() {
   );
 
   return (
-    <Dialog
-      open={dialog.activeDialog === "uploadImageDialog"}
-      onOpenChange={(open) =>
-        dialog.setActiveDialog(open ? "uploadImageDialog" : "")
-      }
-    >
+    <Dialog>
       <DialogTrigger asChild>
         <Button
           variant="expandIcon"

@@ -35,7 +35,10 @@ import {
 import { RoleTypeSchema, User } from "prisma/generated/zod";
 import { updateUserSchema, UpdateUserSchema } from "@/lib/schema/user";
 import { Input } from "@/components/ui/input";
-import { useServerActionMutation, useServerActionQuery } from "@/lib/hooks/server-action-hooks";
+import {
+  useServerActionMutation,
+  useServerActionQuery,
+} from "@/lib/hooks/server-action-hooks";
 import { usePathname } from "next/navigation";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { updateUser } from "@/lib/actions/users";
@@ -66,8 +69,6 @@ export function UpdateUserSheet({ user, ...props }: UpdateUserSheetProps) {
     queryKey: ["asd"],
     refetchOnWindowFocus: false,
   });
-
-  console.log(data)
 
   const { isPending, mutateAsync } = useServerActionMutation(updateUser);
 

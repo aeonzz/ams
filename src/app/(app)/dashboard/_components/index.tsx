@@ -8,15 +8,15 @@ import Inbox from "./inbox";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { CirclePlus } from "lucide-react";
-import { useDialog } from "@/lib/hooks/use-dialog";
 import { H1, H2, H3, P } from "@/components/typography/text";
 import PendingRequestOverview from "@/components/card/pending-request-overview";
 import PendingRequest from "./pending-requests";
 import TotalRequestOverview from "@/components/card/total-request-overview";
+import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 
 export default function DashboardScreen() {
   const currentUser = useSession();
-  const dialog = useDialog();
+  const dialogManager = useDialogManager();
   const username = `${currentUser.username.charAt(0).toUpperCase()}${currentUser.username.slice(1)}`;
 
   return (
@@ -33,7 +33,7 @@ export default function DashboardScreen() {
             </H1>
             <Button
               variant="shine"
-              onClick={() => dialog.setActiveDialog("requestDialog")}
+              onClick={() => dialogManager.setActiveDialog("requestDialog")}
             >
               <CirclePlus className="mr-2 size-5" />
               Create request

@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import {
   Mail,
+  PaletteIcon,
   PanelRight,
   Plus,
   RocketIcon,
@@ -11,7 +12,6 @@ import {
   UserRound,
 } from "lucide-react";
 
-import { useDialog } from "@/lib/hooks/use-dialog";
 import { useSidebarToggle } from "@/lib/hooks/use-sidebar-toggle";
 import {
   CommandDialog,
@@ -24,31 +24,42 @@ import {
   CommandShortcut,
 } from "@/components/ui/command";
 import { useRouter } from "next/navigation";
+import { useHotkeys } from "react-hotkeys-hook";
+import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 
-export default function CommandSearchDialog() {
-  const dialog = useDialog();
+interface CommandSearchDialogProps {
+  children: React.ReactNode;
+}
+
+export default function CommandSearchDialog({
+  children,
+}: CommandSearchDialogProps) {
+  const dialogManager = useDialogManager();
   const sidebar = useSidebarToggle();
   const router = useRouter();
 
-  useEffect(() => {
-    const down = (e: KeyboardEvent) => {
-      if (e.key.toLowerCase() === "k" && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault();
-        dialog.setActiveDialog("commandDialog");
+  useHotkeys(
+    "mod+k",
+    (event) => {
+      event.preventDefault();
+      if (!dialogManager.isAnyDialogOpen()) {
+        dialogManager.setActiveDialog("commandDialog");
       }
-    };
+    },
+    { enableOnFormTags: true }
+  );
 
-    document.addEventListener("keydown", down);
-    return () => document.removeEventListener("keydown", down);
-  }, []);
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      dialogManager.setActiveDialog(null);
+    }
+  };
 
   return (
     <>
       <CommandDialog
-        open={dialog.activeDialog === "commandDialog"}
-        onOpenChange={(open) =>
-          dialog.setActiveDialog(open ? "commandDialog" : "")
-        }
+        open={dialogManager.activeDialog === "commandDialog"}
+        onOpenChange={handleOpenChange}
       >
         <CommandInput placeholder="Type a command or search..." />
         <CommandList>
@@ -56,13 +67,12 @@ export default function CommandSearchDialog() {
           <CommandGroup heading="Request">
             <CommandItem
               onSelect={() => {
-                dialog.setActiveDialog("requestDialog");
+                dialogManager.setActiveDialog("requestDialog");
               }}
             >
               <Plus className="mr-2 h-4 w-4" />
               <span>Create request</span>
               <div className="ml-auto space-x-1">
-                <CommandShortcut>Alt</CommandShortcut>
                 <CommandShortcut>C</CommandShortcut>
               </div>
             </CommandItem>
@@ -89,17 +99,28 @@ export default function CommandSearchDialog() {
             </CommandItem>
             <CommandItem
               onSelect={() => {
-                router.push("/settings/account");
-                dialog.setActiveDialog("");
+                dialogManager.setActiveDialog("settingsDialog");
               }}
             >
               <Settings className="mr-2 h-4 w-4" />
               <span>Settings</span>
-              <CommandShortcut>⌘S</CommandShortcut>
+            </CommandItem>
+            <CommandItem
+              onSelect={() => {
+                dialogManager.setActiveDialog("themeCommand");
+              }}
+            >
+              <PaletteIcon className="mr-2 h-4 w-4" />
+              <span>Change theme</span>
             </CommandItem>
           </CommandGroup>
           <CommandGroup heading="Miscellaneous">
-            <CommandItem onSelect={() => sidebar.setIsOpen()}>
+            <CommandItem
+              onSelect={() => {
+                dialogManager.setActiveDialog(null);
+                sidebar.setIsOpen();
+              }}
+            >
               <PanelRight className="mr-2 h-4 w-4" />
               <span>Collapse navigation sidebar</span>
               <CommandShortcut>[</CommandShortcut>
@@ -107,6 +128,7 @@ export default function CommandSearchDialog() {
           </CommandGroup>
         </CommandList>
       </CommandDialog>
+      {children}
     </>
   );
 }

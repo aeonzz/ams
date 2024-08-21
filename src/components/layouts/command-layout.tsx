@@ -1,7 +1,9 @@
 import React from "react";
 
 import CommandSearchDialog from "../dialogs/command-search-dialog";
-import CreateRequest from "@/app/(app)/dashboard/_components/create-request";
+import ThemeDialog from "../dialogs/theme-dialog";
+import RequestOption from "@/app/(app)/dashboard/_components/request-option";
+import SettingsDialog from "../dialogs/settings-dialog";
 
 export default function CommandLayout({
   children,
@@ -10,8 +12,11 @@ export default function CommandLayout({
 }) {
   return (
     <>
-      <CreateRequest />
-      <CommandSearchDialog />
+      <CommandSearchDialog>
+        <ThemeDialog />
+        <SettingsDialog />
+      </CommandSearchDialog>
+      <RequestOption />
       {children}
     </>
   );

@@ -5,7 +5,6 @@ import React, { useState } from "react";
 import { useSession } from "@/lib/hooks/use-session";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useDialog } from "@/lib/hooks/use-dialog";
 import { H1, H2, H3, P } from "@/components/typography/text";
 
 export default function AdminDashboardScreen() {

@@ -5,7 +5,6 @@ import Link from "next/link";
 import { ChevronDown, SquarePen } from "lucide-react";
 
 import { signOutAction } from "@/lib/actions/users";
-import { useDialog } from "@/lib/hooks/use-dialog";
 import { useSession } from "@/lib/hooks/use-session";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -26,15 +25,16 @@ import {
 import { Button } from "./ui/button";
 import CommandTooltip from "./ui/command-tooltip";
 import { CommandShortcut } from "./ui/command";
+import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 
 interface UserNavProps {
   isOpen: boolean | undefined;
 }
 
 export default function UserNav({ isOpen }: UserNavProps) {
+  const dialogManager = useDialogManager();
   const currentUser = useSession();
   const [isLoading, setIsLoading] = useState(false);
-  const dialog = useDialog();
 
   async function handleLogout(e: Event) {
     e.preventDefault();
@@ -96,7 +96,7 @@ export default function UserNav({ isOpen }: UserNavProps) {
             <Button
               variant="secondary"
               size="icon"
-              onClick={() => dialog.setActiveDialog("requestDialog")}
+              onClick={() => dialogManager.setActiveDialog("requestDialog")}
             >
               <SquarePen className="size-5" />
             </Button>
