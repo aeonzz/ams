@@ -19,10 +19,14 @@ import {
   UserIcon,
   Shield,
   ShieldCheck,
+  Briefcase,
+  Package,
+  MapPin,
 } from "lucide-react";
 import { RequestStatusTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestStatusTypeSchema";
 import { PriorityTypeType } from "prisma/generated/zod/inputTypeSchemas/PriorityTypeSchema";
 import { RoleTypeType } from "prisma/generated/zod/inputTypeSchemas/RoleTypeSchema";
+import { RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTypeSchema";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -42,7 +46,9 @@ export function formatBytes(
   if (bytes === 0) return "0 Byte";
   const i = Math.floor(Math.log(bytes) / Math.log(1024));
   return `${(bytes / Math.pow(1024, i)).toFixed(decimals)} ${
-    sizeType === "accurate" ? accurateSizes[i] ?? "Bytest" : sizes[i] ?? "Bytes"
+    sizeType === "accurate"
+      ? (accurateSizes[i] ?? "Bytest")
+      : (sizes[i] ?? "Bytes")
   }`;
 }
 
@@ -111,6 +117,16 @@ export function getPriorityIcon(priority: PriorityTypeType) {
   };
 
   return priorityIcons[priority] || CircleIcon;
+}
+
+export function getRequestTypeIcon(requestType: RequestTypeType) {
+  const requestTypeIcons = {
+    JOB: Briefcase,
+    RESOURCE: Package,
+    VENUE: MapPin,
+  };
+
+  return requestTypeIcons[requestType] || CircleIcon;
 }
 
 // export function calculatePriority(request) {

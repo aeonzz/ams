@@ -39,9 +39,7 @@ export const createRequest = authedProcedure
                  name of the task when crafting the title. Aim for brevity and clarity. Remove the quotes`,
         prompt: `Create a clear and concise title for a request based on these details:
                  Notes: ${input.notes}
-                 Job Type: ${input.jobType}
-                 Category: ${input.category}
-                 Name: ${input.name}
+
                  
                  Guidelines:
                  1. Keep it under 50 characters
@@ -76,6 +74,7 @@ export const createRequest = authedProcedure
           title: text,
           notes: rest.notes,
           department: rest.department,
+          dueDate: rest.dueDate,
         },
       });
 

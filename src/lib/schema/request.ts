@@ -1,10 +1,11 @@
 import { z } from "zod";
-import { PriorityTypeSchema } from "prisma/generated/zod";
+import { PriorityTypeSchema, RequestTypeSchema } from "prisma/generated/zod";
 
 export const RequestSchema = z.object({
   notes: z.string(),
   priority: PriorityTypeSchema,
-  type: z.string(),
+  dueDate: z.date(),
+  type: RequestTypeSchema,
   department: z.string(),
   jobType: z.string().optional(),
   name: z.string(),

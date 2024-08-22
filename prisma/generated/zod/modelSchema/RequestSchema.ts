@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { PriorityTypeSchema } from '../inputTypeSchemas/PriorityTypeSchema'
+import { RequestTypeSchema } from '../inputTypeSchemas/RequestTypeSchema'
 import { RequestStatusTypeSchema } from '../inputTypeSchemas/RequestStatusTypeSchema'
 
 /////////////////////////////////////////
@@ -8,12 +9,13 @@ import { RequestStatusTypeSchema } from '../inputTypeSchemas/RequestStatusTypeSc
 
 export const RequestSchema = z.object({
   priority: PriorityTypeSchema,
+  type: RequestTypeSchema,
   status: RequestStatusTypeSchema,
   id: z.string(),
   approvedAt: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
-  type: z.string(),
+  dueDate: z.coerce.date(),
   title: z.string(),
   notes: z.string(),
   userId: z.string(),

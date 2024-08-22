@@ -7,7 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ChevronLeft } from "lucide-react";
+import { CalendarIcon, ChevronLeft } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
 import {
   Form,
@@ -18,6 +18,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Request } from "@/lib/db/schema/request";
 import { MotionLayout } from "@/components/layouts/motion-layout";
 import { usePathname } from "next/navigation";
@@ -37,6 +44,14 @@ import { Separator } from "@/components/ui/separator";
 import { RequestSchemaType } from "@/lib/schema/request";
 import { type RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTypeSchema";
 import { DialogState } from "@/lib/hooks/use-dialog-manager";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { addDays, format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 interface JobRequestInputProps {
   isLoading: boolean;
@@ -102,6 +117,7 @@ export default function JobRequestInput({
     const data: RequestSchemaType = {
       notes: values.notes,
       priority: prio.value,
+      dueDate: values.dueDate,
       type: type,
       department: department,
       jobType: selection.jobType.value,
@@ -170,6 +186,64 @@ export default function JobRequestInput({
                 prio={prio}
                 setPrio={setPrio}
                 isLoading={isLoading}
+              />
+              <FormField
+                control={form.control}
+                name="dueDate"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={"secondary"}
+                            size="sm"
+                            className={cn(
+                              "w-[200px] justify-start px-2 text-left font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                            disabled={isLoading}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {field.value ? (
+                              format(field.value, "PPP")
+                            ) : (
+                              <span>Due date</span>
+                            )}
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="flex w-auto flex-col space-y-2 p-2">
+                        <Select
+                          onValueChange={(value) =>
+                            field.onChange(addDays(new Date(), parseInt(value)))
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select" />
+                          </SelectTrigger>
+                          <SelectContent position="popper">
+                            <SelectItem value="0">Today</SelectItem>
+                            <SelectItem value="1">Tomorrow</SelectItem>
+                            <SelectItem value="3">In 3 days</SelectItem>
+                            <SelectItem value="7">In a week</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <div className="rounded-md border">
+                          <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            disabled={(date) =>
+                              date > new Date() || date < new Date("1900-01-01")
+                            }
+                          />
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
             </MotionLayout>
           </div>

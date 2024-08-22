@@ -23,7 +23,7 @@ export default function MyRequestScreenParams({
       input: {
         id: params,
       },
-      queryKey: ["get-request-by-id"],
+      queryKey: [params],
     }
   );
 
