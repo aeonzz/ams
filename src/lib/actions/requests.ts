@@ -9,7 +9,7 @@ import { RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTy
 import { createCohere } from "@ai-sdk/cohere";
 import { generateText } from "ai";
 import { z } from "zod";
-import { GetRequestsSchema} from "../schema";
+import { GetRequestsSchema } from "../schema";
 import { unstable_noStore as noStore } from "next/cache";
 import { Request } from "prisma/generated/zod";
 import { RequestSchema } from "../schema/request";
@@ -226,8 +226,7 @@ export const getUserReqcount = authedProcedure
 //   });
 
 export async function getRequests(input: GetRequestsSchema) {
-  const { page, per_page, sort, title, status, priority, from, to } =
-    input;
+  const { page, per_page, sort, title, status, priority, from, to } = input;
 
   try {
     const skip = (page - 1) * per_page;
@@ -276,3 +275,30 @@ export async function getRequests(input: GetRequestsSchema) {
     return { data: [], pageCount: 0 };
   }
 }
+
+export const getRequestById = authedProcedure
+  .createServerAction()
+  .input(
+    z.object({
+      id: z.string(),
+    })
+  )
+  .handler(async ({ input }) => {
+    const { id } = input;
+    try {
+      const request = await db.request.findFirst({
+        where: {
+          id: id,
+        },
+        include: {
+          jobRequest: true,
+          resourceRequest: true,
+          venueRequest: true,
+        },
+      });
+
+      return request;
+    } catch (error) {
+      getErrorMessage(error);
+    }
+  });

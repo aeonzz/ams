@@ -29,30 +29,30 @@ import { P } from "@/components/typography/text";
 
 export function getRequestColumns(): ColumnDef<Request>[] {
   return [
-    {
-      id: "select",
-      header: ({ table }) => (
-        <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
-          }
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
-          className="translate-y-0.5"
-        />
-      ),
-      cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
-          className="translate-y-0.5 "
-        />
-      ),
-      enableSorting: false,
-      enableHiding: false,
-    },
+    // {
+    //   id: "select",
+    //   header: ({ table }) => (
+    //     <Checkbox
+    //       checked={
+    //         table.getIsAllPageRowsSelected() ||
+    //         (table.getIsSomePageRowsSelected() && "indeterminate")
+    //       }
+    //       onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+    //       aria-label="Select all"
+    //       className="translate-y-0.5"
+    //     />
+    //   ),
+    //   cell: ({ row }) => (
+    //     <Checkbox
+    //       checked={row.getIsSelected()}
+    //       onCheckedChange={(value) => row.toggleSelected(!!value)}
+    //       aria-label="Select row"
+    //       className="translate-y-0.5 "
+    //     />
+    //   ),
+    //   enableSorting: false,
+    //   enableHiding: false,
+    // },
     {
       accessorKey: "id",
       header: ({ column }) => (
@@ -136,90 +136,90 @@ export function getRequestColumns(): ColumnDef<Request>[] {
       ),
       cell: ({ cell }) => formatDate(cell.getValue() as Date),
     },
-    {
-      id: "actions",
-      cell: function Cell({ row }) {
-        const [isUpdatePending, startUpdateTransition] = React.useTransition();
-        const [showUpdateTaskSheet, setShowUpdateTaskSheet] =
-          React.useState(false);
-        const [showDeleteTaskDialog, setShowDeleteTaskDialog] =
-          React.useState(false);
+    // {
+    //   id: "actions",
+    //   cell: function Cell({ row }) {
+    //     const [isUpdatePending, startUpdateTransition] = React.useTransition();
+    //     const [showUpdateTaskSheet, setShowUpdateTaskSheet] =
+    //       React.useState(false);
+    //     const [showDeleteTaskDialog, setShowDeleteTaskDialog] =
+    //       React.useState(false);
 
-        return (
-          <>
-            {/* <UpdateTaskSheet
-              open={showUpdateTaskSheet}
-              onOpenChange={setShowUpdateTaskSheet}
-              task={row.original}
-            /> */}
-            {/* <DeleteTasksDialog
-              open={showDeleteTaskDialog}
-              onOpenChange={setShowDeleteTaskDialog}
-              tasks={[row.original]}
-              showTrigger={false}
-              onSuccess={() => row.toggleSelected(false)}
-            /> */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  aria-label="Open menu"
-                  variant="ghost"
-                  className="flex size-8 p-0 data-[state=open]:bg-muted"
-                >
-                  <DotsHorizontalIcon className="size-4" aria-hidden="true" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-40">
-                <DropdownMenuItem onSelect={() => setShowUpdateTaskSheet(true)}>
-                  Edit
-                </DropdownMenuItem>
-                {/* <DropdownMenuSub>
-                  <DropdownMenuSubTrigger>Labels</DropdownMenuSubTrigger>
-                  <DropdownMenuSubContent>
-                    <DropdownMenuRadioGroup
-                      value={row.original.label}
-                      onValueChange={(value) => {
-                        startUpdateTransition(() => {
-                          toast.promise(
-                            updateTask({
-                              id: row.original.id,
-                              label: value as Task["label"],
-                            }),
-                            {
-                              loading: "Updating...",
-                              success: "Label updated",
-                              // error: (err) => getErrorMessage(err),
-                            }
-                          )
-                        })
-                      }}
-                    >
-                      {tasks.label.enumValues.map((label) => (
-                        <DropdownMenuRadioItem
-                          key={label}
-                          value={label}
-                          className="capitalize"
-                          disabled={isUpdatePending}
-                        >
-                          {label}
-                        </DropdownMenuRadioItem>
-                      ))}
-                    </DropdownMenuRadioGroup>
-                  </DropdownMenuSubContent>
-                </DropdownMenuSub> */}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onSelect={() => setShowDeleteTaskDialog(true)}
-                >
-                  Delete
-                  <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </>
-        );
-      },
-      size: 40,
-    },
+    //     return (
+    //       <>
+    //         {/* <UpdateTaskSheet
+    //           open={showUpdateTaskSheet}
+    //           onOpenChange={setShowUpdateTaskSheet}
+    //           task={row.original}
+    //         /> */}
+    //         {/* <DeleteTasksDialog
+    //           open={showDeleteTaskDialog}
+    //           onOpenChange={setShowDeleteTaskDialog}
+    //           tasks={[row.original]}
+    //           showTrigger={false}
+    //           onSuccess={() => row.toggleSelected(false)}
+    //         /> */}
+    //         <DropdownMenu>
+    //           <DropdownMenuTrigger asChild>
+    //             <Button
+    //               aria-label="Open menu"
+    //               variant="ghost"
+    //               className="flex size-8 p-0 data-[state=open]:bg-muted"
+    //             >
+    //               <DotsHorizontalIcon className="size-4" aria-hidden="true" />
+    //             </Button>
+    //           </DropdownMenuTrigger>
+    //           <DropdownMenuContent align="end" className="w-40">
+    //             <DropdownMenuItem onSelect={() => setShowUpdateTaskSheet(true)}>
+    //               Edit
+    //             </DropdownMenuItem>
+    //             {/* <DropdownMenuSub>
+    //               <DropdownMenuSubTrigger>Labels</DropdownMenuSubTrigger>
+    //               <DropdownMenuSubContent>
+    //                 <DropdownMenuRadioGroup
+    //                   value={row.original.label}
+    //                   onValueChange={(value) => {
+    //                     startUpdateTransition(() => {
+    //                       toast.promise(
+    //                         updateTask({
+    //                           id: row.original.id,
+    //                           label: value as Task["label"],
+    //                         }),
+    //                         {
+    //                           loading: "Updating...",
+    //                           success: "Label updated",
+    //                           // error: (err) => getErrorMessage(err),
+    //                         }
+    //                       )
+    //                     })
+    //                   }}
+    //                 >
+    //                   {tasks.label.enumValues.map((label) => (
+    //                     <DropdownMenuRadioItem
+    //                       key={label}
+    //                       value={label}
+    //                       className="capitalize"
+    //                       disabled={isUpdatePending}
+    //                     >
+    //                       {label}
+    //                     </DropdownMenuRadioItem>
+    //                   ))}
+    //                 </DropdownMenuRadioGroup>
+    //               </DropdownMenuSubContent>
+    //             </DropdownMenuSub> */}
+    //             <DropdownMenuSeparator />
+    //             <DropdownMenuItem
+    //               onSelect={() => setShowDeleteTaskDialog(true)}
+    //             >
+    //               Delete
+    //               <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
+    //             </DropdownMenuItem>
+    //           </DropdownMenuContent>
+    //         </DropdownMenu>
+    //       </>
+    //     );
+    //   },
+    //   size: 40,
+    // },
   ];
 }

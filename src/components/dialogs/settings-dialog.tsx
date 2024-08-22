@@ -16,9 +16,9 @@ import { useRouter } from "next/navigation";
 import { Cog } from "lucide-react";
 
 const settingLinks = [
-  { name: "Profile", href: "/settings/profile", cmd: "1" },
-  { name: "Password", href: "/settings/password", cmd: "2" },
-  { name: "Preference", href: "/settings/preferences", cmd: "3" },
+  { name: "Profile", href: "/settings/profile" },
+  { name: "Password", href: "/settings/password" },
+  { name: "Preference", href: "/settings/preferences" },
 ];
 
 export default function SettingsDialog() {
@@ -50,7 +50,6 @@ export default function SettingsDialog() {
             >
               <Cog className="mr-2 h-4 w-4" />
               <span>{item.name}</span>
-              <CommandShortcut>{item.cmd}</CommandShortcut>
             </CommandItem>
           ))}
         </CommandGroup>

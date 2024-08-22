@@ -16,10 +16,10 @@ import { useTheme } from "next-themes";
 import { useHotkeys } from "react-hotkeys-hook";
 
 const themes = [
-  { name: "Light", value: "light", icon: Sun, cmd: "1" },
-  { name: "Dark", value: "dark", icon: Moon, cmd: "2" },
-  { name: "Blue", value: "blue", icon: SunMoon, cmd: "3" },
-  { name: "System", value: "system", icon: SunMoon, cmd: "4" },
+  { name: "Light", value: "light", icon: Sun },
+  { name: "Dark", value: "dark", icon: Moon },
+  { name: "Blue", value: "blue", icon: SunMoon },
+  { name: "System", value: "system", icon: SunMoon },
 ];
 
 export default function ThemeDialog() {
@@ -31,19 +31,6 @@ export default function ThemeDialog() {
       dialogManager.setActiveDialog(null);
     }
   };
-
-  themes.forEach((item) => {
-    useHotkeys(
-      item.cmd,
-      () => {
-        if (dialogManager.activeDialog === "themeCommand") {
-          setTheme(item.value);
-          dialogManager.setActiveDialog(null);
-        }
-      },
-      { enableOnFormTags: true }
-    );
-  });
 
   return (
     <CommandDialog
@@ -64,10 +51,7 @@ export default function ThemeDialog() {
             >
               <item.icon className="mr-2 h-4 w-4" />
               <span>{item.name}</span>
-              <div className="ml-auto flex space-x-2">
-                {item.value === theme && <Check />}
-                <CommandShortcut>{item.cmd}</CommandShortcut>
-              </div>
+              {item.value === theme && <Check className="ml-auto" />}
             </CommandItem>
           ))}
         </CommandGroup>

@@ -11,13 +11,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
@@ -55,14 +49,30 @@ export function getDepartmentsColumns(): ColumnDef<Department>[] {
       enableSorting: false,
       enableHiding: false,
     },
+    // {
+    //   accessorKey: "id",
+    //   header: ({ column }) => (
+    //     <DataTableColumnHeader column={column} title="id" />
+    //   ),
+    //   cell: ({ row }) => <P>{row.getValue("id")}</P>,
+    //   enableSorting: false,
+    //   enableHiding: false,
+    // },
     {
-      accessorKey: "id",
+      accessorKey: "name",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="user" />
+        <DataTableColumnHeader column={column} title="Name" />
       ),
-      cell: ({ row }) => <P>{row.getValue("id")}</P>,
-      enableSorting: false,
-      enableHiding: false,
+      cell: ({ row }) => {
+        return (
+          <div className="flex items-center">
+            <P>{row.original.name}</P>
+          </div>
+        );
+      },
+      filterFn: (row, id, value) => {
+        return Array.isArray(value) && value.includes(row.getValue(id));
+      },
     },
     {
       accessorKey: "label",
@@ -73,22 +83,6 @@ export function getDepartmentsColumns(): ColumnDef<Department>[] {
         return (
           <div className="flex items-center">
             <P>{row.original.label}</P>
-          </div>
-        );
-      },
-      filterFn: (row, id, value) => {
-        return Array.isArray(value) && value.includes(row.getValue(id));
-      },
-    },
-    {
-      accessorKey: "name",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Name" />
-      ),
-      cell: ({ row }) => {
-        return (
-          <div className="flex items-center">
-            <P>{row.original.name}</P>
           </div>
         );
       },

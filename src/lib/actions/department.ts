@@ -57,24 +57,6 @@ export async function getDepartments(input: GetDepartmentsSchema) {
   }
 }
 
-export const loadDepartments = authedProcedure
-  .createServerAction()
-  .input(
-    z.object({
-      message: z.string().optional(),
-    })
-  )
-  .handler(async ({}) => {
-    try {
-      const departments = await db.department.findMany({});
-
-      return departments;
-    } catch (error) {
-      console.log(error);
-      getErrorMessage(error);
-    }
-  });
-
 export const createDepartment = authedProcedure
   .createServerAction()
   .input(extendedCreateDepartmentSchema)

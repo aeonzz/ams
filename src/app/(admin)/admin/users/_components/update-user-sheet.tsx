@@ -32,19 +32,18 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 
-import { RoleTypeSchema, User } from "prisma/generated/zod";
+import { Department, RoleTypeSchema, User } from "prisma/generated/zod";
 import { updateUserSchema, UpdateUserSchema } from "@/lib/schema/user";
 import { Input } from "@/components/ui/input";
 import {
   useServerActionMutation,
-  useServerActionQuery,
 } from "@/lib/hooks/server-action-hooks";
 import { usePathname } from "next/navigation";
-import { SubmitButton } from "@/components/ui/submit-button";
 import { updateUser } from "@/lib/actions/users";
 import { Separator } from "@/components/ui/separator";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
-import { loadDepartments } from "@/lib/actions/department";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 
 interface UpdateUserSheetProps
   extends React.ComponentPropsWithRef<typeof Sheet> {
@@ -64,10 +63,12 @@ export function UpdateUserSheet({ user, ...props }: UpdateUserSheetProps) {
   });
 
   const { dirtyFields } = useFormState({ control: form.control });
-  const { isLoading, data } = useServerActionQuery(loadDepartments, {
-    input: {},
-    queryKey: ["asd"],
-    refetchOnWindowFocus: false,
+  const { data, isLoading } = useQuery<Department[]>({
+    queryFn: async () => {
+      const res = await axios.get("/api/department");
+      return res.data.data;
+    },
+    queryKey: ["update-user-sheet-department-input"],
   });
 
   const { isPending, mutateAsync } = useServerActionMutation(updateUser);

@@ -18,6 +18,7 @@ import { RequestTableToolbarActions } from "./request-table-toolbar-actions";
 import { getRequests } from "@/lib/actions/requests";
 import { getPriorityIcon, getStatusIcon } from "@/lib/utils";
 import { RequestTableFloatingBar } from "./request-table-floating-bar";
+import { ModifiedDataTable } from "@/components/data-table/modified-data-table";
 
 interface RequestTableProps {
   requestPromise: ReturnType<typeof getRequests>;
@@ -88,13 +89,14 @@ export function RequestTable({ requestPromise }: RequestTableProps) {
   });
 
   return (
-    <DataTable
+    <ModifiedDataTable
+      showSelectedRows={false}
       table={table}
       floatingBar={<RequestTableFloatingBar table={table} />}
     >
       <DataTableToolbar table={table} filterFields={filterFields}>
         <RequestTableToolbarActions table={table} />
       </DataTableToolbar>
-    </DataTable>
+    </ModifiedDataTable>
   );
 }

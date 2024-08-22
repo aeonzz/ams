@@ -27,7 +27,7 @@ export function getAdminMenuList(pathname: string): Group[] {
         {
           href: "/admin",
           label: "Dashboard",
-          active: pathname.includes("/admin"),
+          active: pathname === "/admin",
           icon: LayoutGrid,
           submenus: [],
         },

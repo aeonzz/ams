@@ -17,31 +17,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { PlusIcon } from "lucide-react";
 import { toast } from "sonner";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { CreateUserSchema } from "../../lib/schema/user";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import {
-  useServerActionMutation,
-  useServerActionQuery,
-} from "@/lib/hooks/server-action-hooks";
 import { createUser } from "@/lib/actions/users";
 import { Separator } from "../ui/separator";
 import { DialogFooter } from "../ui/dialog";
-import { RoleTypeSchema } from "prisma/generated/zod";
+import { Department, RoleTypeSchema } from "prisma/generated/zod";
 import { SubmitButton } from "../ui/submit-button";
 import { PasswordInput } from "../ui/password-input";
 import {
-  UseMutateFunction,
   UseMutateAsyncFunction,
+  useQuery,
 } from "@tanstack/react-query";
 import { UseFormReturn } from "react-hook-form";
 import { usePathname } from "next/navigation";
-import { loadDepartments } from "@/lib/actions/department";
 import LoadingSpinner from "../loaders/loading-spinner";
+import axios from "axios";
 
 interface CreateUserFormProps {
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -67,10 +60,12 @@ export default function CreateUserForm({
 }: CreateUserFormProps) {
   const pathname = usePathname();
 
-  const { isLoading, data } = useServerActionQuery(loadDepartments, {
-    input: {},
-    queryKey: ["departments"],
-    refetchOnWindowFocus: false,
+  const { data, isLoading } = useQuery<Department[]>({
+    queryFn: async () => {
+      const res = await axios .get("/api/department");
+      return res.data.data;
+    },
+    queryKey: ["create-user-department-selection"],
   });
 
   async function onSubmit(values: CreateUserSchema) {

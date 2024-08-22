@@ -17,7 +17,7 @@ export default function MyRequestsScreen({ search }: MyRequestScreenProps) {
   return (
     <div className="flex h-full w-full">
       <div className="flex-1">
-        <div className="flex h-[50px] items-center border-b px-3">
+        <div className="flex h-[50px] items-center justify-between border-b px-3">
           <P className="font-medium">Requests</P>
           {/**
            * The `DateRangePicker` component is used to render the date range picker UI.

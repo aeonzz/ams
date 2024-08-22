@@ -12,8 +12,12 @@ import {
 } from "@/components/ui/table";
 import { DataTablePagination } from "@/components/data-table/data-table-pagination";
 import { getCommonPinningStyles } from "@/lib/data-table";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Request } from "prisma/generated/zod";
 
-interface DataTableProps<TData> extends React.HTMLAttributes<HTMLDivElement> {
+interface ModifiedDataTableProps<TData>
+  extends React.HTMLAttributes<HTMLDivElement> {
   /**
    * The table instance returned from useDataTable hook with pagination, sorting, filtering, etc.
    * @type TanstackTable<TData>
@@ -31,13 +35,14 @@ interface DataTableProps<TData> extends React.HTMLAttributes<HTMLDivElement> {
   showSelectedRows?: boolean;
 }
 
-export function DataTable<TData>({
+export function ModifiedDataTable<TData>({
   table,
   floatingBar = null,
   children,
   className,
   ...props
-}: DataTableProps<TData>) {
+}: ModifiedDataTableProps<TData>) {
+  const router = useRouter();
   return (
     <div
       className={cn("w-full space-y-2.5 overflow-auto", className)}
@@ -54,9 +59,6 @@ export function DataTable<TData>({
                     <TableHead
                       key={header.id}
                       colSpan={header.colSpan}
-                      style={{
-                        ...getCommonPinningStyles({ column: header.column }),
-                      }}
                       // className={header.index === 0 ? "" : "border-l"}
                     >
                       {header.isPlaceholder
@@ -77,13 +79,12 @@ export function DataTable<TData>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  onClick={() => router.push(`/request/${(row.original as Request).id}`)}
+                  className="cursor-pointer"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}
-                      style={{
-                        ...getCommonPinningStyles({ column: cell.column }),
-                      }}
                       // className="border-r"
                     >
                       {flexRender(

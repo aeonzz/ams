@@ -32,13 +32,17 @@ import { DataTableColumnHeader } from "@/components/data-table/data-table-column
 import { P } from "@/components/typography/text";
 import { User } from "prisma/generated/zod";
 import { UpdateUserSheet } from "./update-user-sheet";
-import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
+import {
+  useServerActionMutation,
+  useServerActionQuery,
+} from "@/lib/hooks/server-action-hooks";
 import { updateUser } from "@/lib/actions/users";
 import RoleTypeSchema, {
   RoleTypeType,
 } from "prisma/generated/zod/inputTypeSchemas/RoleTypeSchema";
 import { usePathname } from "next/navigation";
 import { DeleteUsersDialog } from "./delete-users-dialog";
+import { loadDepartments } from "@/lib/actions/department";
 
 export function getUsersColumns(): ColumnDef<User>[] {
   return [
