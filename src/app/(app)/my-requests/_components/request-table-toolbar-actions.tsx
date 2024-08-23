@@ -1,21 +1,21 @@
-"use client"
+"use client";
 
-import { DownloadIcon } from "@radix-ui/react-icons"
-import { type Table } from "@tanstack/react-table"
+import { type Table } from "@tanstack/react-table";
 
-import { exportTableToCSV } from "@/lib/export"
-import { Button } from "@/components/ui/button"
-
-import { Request } from "prisma/generated/zod"
-import { DeleteRequestDialog } from "./delete-request-dialog"
+import { Request } from "prisma/generated/zod";
+import { DeleteRequestDialog } from "./delete-request-dialog";
+import { Button } from "@/components/ui/button";
+import { CirclePlus } from "lucide-react";
+import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 
 interface RequestTableToolbarActionsProps {
-  table: Table<Request>
+  table: Table<Request>;
 }
 
 export function RequestTableToolbarActions({
   table,
 }: RequestTableToolbarActionsProps) {
+  const dialogManager = useDialogManager();
   return (
     <div className="flex items-center gap-2">
       {table.getFilteredSelectedRowModel().rows.length > 0 ? (
@@ -26,24 +26,18 @@ export function RequestTableToolbarActions({
           onSuccess={() => table.toggleAllRowsSelected(false)}
         />
       ) : null}
-      {/* <CreateTaskDialog /> */}
       <Button
-        variant="secondary"
+        variant="shine"
         size="sm"
-        onClick={() =>
-          exportTableToCSV(table, {
-            filename: "tasks",
-            excludeColumns: ["select", "actions"],
-          })
-        }
+        onClick={() => dialogManager.setActiveDialog("requestDialog")}
       >
-        <DownloadIcon className="mr-2 size-4" aria-hidden="true" />
-        Export
+        <CirclePlus className="mr-2 size-5" />
+        Create request
       </Button>
       {/**
        * Other actions can be added here.
        * For example, import, view, etc.
        */}
     </div>
-  )
+  );
 }

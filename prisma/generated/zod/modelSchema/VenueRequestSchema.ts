@@ -1,4 +1,6 @@
 import { z } from 'zod';
+import type { RequestWithRelations } from './RequestSchema'
+import { RequestWithRelationsSchema } from './RequestSchema'
 
 /////////////////////////////////////////
 // VENUE REQUEST SCHEMA
@@ -13,5 +15,19 @@ export const VenueRequestSchema = z.object({
 })
 
 export type VenueRequest = z.infer<typeof VenueRequestSchema>
+
+/////////////////////////////////////////
+// VENUE REQUEST RELATION SCHEMA
+/////////////////////////////////////////
+
+export type VenueRequestRelations = {
+  request: RequestWithRelations;
+};
+
+export type VenueRequestWithRelations = z.infer<typeof VenueRequestSchema> & VenueRequestRelations
+
+export const VenueRequestWithRelationsSchema: z.ZodType<VenueRequestWithRelations> = VenueRequestSchema.merge(z.object({
+  request: z.lazy(() => RequestWithRelationsSchema),
+}))
 
 export default VenueRequestSchema;

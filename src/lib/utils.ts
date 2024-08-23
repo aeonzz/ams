@@ -129,6 +129,17 @@ export function getRequestTypeIcon(requestType: RequestTypeType) {
   return requestTypeIcons[requestType] || CircleIcon;
 }
 
+export const isDateInPast = (date: Date) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return date < today;
+};
+
+export const textTransform = (text: string) => {
+  const transform = `${text.charAt(0).toUpperCase()}${text.slice(1).toLowerCase()}`;
+  return transform;
+};
+
 // export function calculatePriority(request) {
 //   let score = 0;
 //   const weights = {

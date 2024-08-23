@@ -1,4 +1,6 @@
 import { z } from 'zod';
+import type { JobRequestWithRelations } from './JobRequestSchema'
+import { JobRequestWithRelationsSchema } from './JobRequestSchema'
 
 /////////////////////////////////////////
 // FILE SCHEMA
@@ -12,5 +14,19 @@ export const FileSchema = z.object({
 })
 
 export type File = z.infer<typeof FileSchema>
+
+/////////////////////////////////////////
+// FILE RELATION SCHEMA
+/////////////////////////////////////////
+
+export type FileRelations = {
+  JobRequest?: JobRequestWithRelations | null;
+};
+
+export type FileWithRelations = z.infer<typeof FileSchema> & FileRelations
+
+export const FileWithRelationsSchema: z.ZodType<FileWithRelations> = FileSchema.merge(z.object({
+  JobRequest: z.lazy(() => JobRequestWithRelationsSchema).nullable(),
+}))
 
 export default FileSchema;

@@ -6,15 +6,16 @@ generator client {
 }
 
 generator zod {
-  provider              = "zod-prisma-types"
-  output                = "./generated/zod"
-  useMultipleFiles      = true
-  createInputTypes      = false
-  relationModel         = true
-  modelCase             = "camelCase"
-  modelSuffix           = "Schema"
-  useDecimalJs          = true
-  prismaJsonNullability = true
+  provider                  = "zod-prisma-types"
+  output                    = "./generated/zod"
+  useMultipleFiles          = true
+  createInputTypes          = false
+  relationModel             = true
+  createRelationValuesTypes = true
+  modelCase                 = "camelCase"
+  modelSuffix               = "Schema"
+  useDecimalJs              = true
+  prismaJsonNullability     = true
 }
 
 datasource db {
@@ -103,6 +104,7 @@ model JobRequest {
   jobType   String
   category  String
   name      String
+  assignTo  String
   files     File[]
   requestId String  @unique
   request   Request @relation(fields: [requestId], references: [id], onDelete: Cascade)

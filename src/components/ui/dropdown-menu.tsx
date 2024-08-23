@@ -81,7 +81,7 @@ const DropdownMenuItem = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Item> & {
     inset?: boolean;
   }
->(({ className, inset, ...props }, ref) => (
+>(({ className, inset, children, ...props }, ref) => (
   <DropdownMenuPrimitive.Item
     ref={ref}
     className={cn(
@@ -89,9 +89,10 @@ const DropdownMenuItem = React.forwardRef<
       inset && "pl-8",
       className
     )}
+    asChild
     {...props}
   >
-    <P>{props.children}</P>
+    <P>{children}</P>
   </DropdownMenuPrimitive.Item>
 ));
 DropdownMenuItem.displayName = DropdownMenuPrimitive.Item.displayName;

@@ -11,8 +11,13 @@ import { generateText } from "ai";
 import { z } from "zod";
 import { GetRequestsSchema } from "../schema";
 import { unstable_noStore as noStore } from "next/cache";
-import { Request } from "prisma/generated/zod";
-import { RequestSchema } from "../schema/request";
+import { Request, RequestWithRelations } from "prisma/generated/zod";
+import path from "path";
+import { readFile } from "fs/promises";
+import {
+  extendedJobRequestSchema,
+  extendedUpdateJobRequestSchema,
+} from "../schema/request";
 
 const cohere = createCohere({
   apiKey: process.env.COHERE_API_KEY,
@@ -20,7 +25,7 @@ const cohere = createCohere({
 
 export const createRequest = authedProcedure
   .createServerAction()
-  .input(RequestSchema)
+  .input(extendedJobRequestSchema)
   .handler(async ({ ctx, input }) => {
     const { user } = ctx;
 
@@ -31,12 +36,14 @@ export const createRequest = authedProcedure
     }
 
     try {
+      const departments = await db.department.findMany();
+
       const { text } = await generateText({
         model: cohere("command-r-plus"),
         system: `You are an expert at creating concise, informative titles for work requests. 
                  Your task is to generate clear, action-oriented titles that quickly convey 
                  the nature of the request. Always consider the job type, category, and specific 
-                 name of the task when crafting the title. Aim for brevity and clarity. Remove the quotes`,
+                 name of the task when crafting the title. Aim for brevity and clarity. And make it unique for every request. Dont add quotes`,
         prompt: `Create a clear and concise title for a request based on these details:
                  Notes: ${input.notes}
 
@@ -63,6 +70,27 @@ export const createRequest = authedProcedure
                  Now, create a title for the request using the provided details above.`,
       });
 
+      const departmentNames = departments.map((d) => d.name).join(", ");
+      const { text: assignedDepartment } = await generateText({
+        model: cohere("command-r-plus"),
+        system: `You are an AI assistant that assigns departments to job requests based on their description.`,
+        prompt: `Given the following job request description, choose the most appropriate department from this list: ${departmentNames}. 
+                 Job description: ${input.notes}
+                 Job Type: ${jobType}
+                 Category: ${rest.category}
+                 Name: ${rest.name}
+                 
+                 Respond with only the name of the chosen department.`,
+      });
+
+      const matchedDepartment = departments.find(
+        (d) => d.name.toLowerCase() === assignedDepartment.toLowerCase().trim()
+      );
+
+      if (!matchedDepartment) {
+        throw "couldn't assign a valid department";
+      }
+
       const requestId = `REQ-${generateId(15)}`;
 
       const request = await db.request.create({
@@ -88,8 +116,9 @@ export const createRequest = authedProcedure
             jobType: jobType,
             category: rest.category,
             name: rest.name,
+            assignTo: matchedDepartment.name,
             files: {
-              create: rest.files.map((fileName) => ({
+              create: rest.files?.map((fileName) => ({
                 id: `JRQ-${generateId(15)}`,
                 url: fileName,
               })),
@@ -156,74 +185,6 @@ export const getUserReqcount = authedProcedure
     }
   });
 
-// export const getRequests = authedProcedure
-//   .createServerAction()
-//   .input(getRequestsSchema)
-//   .handler(async ({ ctx, input }) => {
-//     noStore();
-//     const { user } = ctx;
-
-//     const {
-//       page,
-//       per_page,
-//       sort,
-//       title,
-//       status,
-//       priority,
-//       operator,
-//       from,
-//       to,
-//     } = input;
-//     try {
-//       const skip = (page - 1) * per_page;
-
-//       const [column, order] = (sort?.split(".") ?? ["createdAt", "desc"]) as [
-//         keyof Request | undefined,
-//         "asc" | "desc" | undefined,
-//       ];
-
-//       const where: any = {
-//         userId: user.id,
-//       };
-
-//       if (title) {
-//         where.title = { contains: title, mode: "insensitive" };
-//       }
-
-//       if (status) {
-//         where.status = status;
-//       }
-
-//       if (priority) {
-//         where.priority = priority;
-//       }
-
-//       if (from && to) {
-//         where.createdAt = {
-//           gte: new Date(from),
-//           lte: new Date(to),
-//         };
-//       }
-
-//       const [data, total] = await db.$transaction([
-//         db.request.findMany({
-//           where,
-//           take: per_page,
-//           skip,
-//           orderBy: {
-//             [column || "createdAt"]: order || "desc",
-//           },
-//         }),
-//         db.request.count({ where }),
-//       ]);
-//       const pageCount = Math.ceil(total / per_page);
-//       return { data, pageCount };
-//     } catch (err) {
-//       console.error(err);
-//       return { data: [], pageCount: 0 };
-//     }
-//   });
-
 export async function getRequests(input: GetRequestsSchema) {
   const { page, per_page, sort, title, status, priority, from, to } = input;
 
@@ -285,18 +246,61 @@ export const getRequestById = authedProcedure
   .handler(async ({ input }) => {
     const { id } = input;
     try {
-      const request = await db.request.findFirst({
+      const data = await db.request.findFirst({
         where: {
           id: id,
         },
         include: {
-          jobRequest: true,
+          jobRequest: {
+            include: {
+              files: true,
+            },
+          },
           resourceRequest: true,
           venueRequest: true,
         },
       });
 
-      return request;
+      if (!data) {
+        throw "Request not found";
+      }
+
+      if (data.jobRequest?.files) {
+        data.jobRequest.files = await Promise.all(
+          data.jobRequest.files.map(async (file) => {
+            const filePath = path.join(file.url);
+            const fileBuffer = await readFile(filePath);
+            const base64String = fileBuffer.toString("base64");
+            return {
+              ...file,
+              url: `data:image/png;base64,${base64String}`,
+            };
+          })
+        );
+      }
+
+      return data as RequestWithRelations;
+    } catch (error) {
+      getErrorMessage(error);
+    }
+  });
+
+export const updateRequest = authedProcedure
+  .createServerAction()
+  .input(extendedUpdateJobRequestSchema)
+  .handler(async ({ input }) => {
+    const { path, id, ...rest } = input;
+    try {
+      const result = await db.request.update({
+        where: {
+          id: id,
+        },
+        data: {
+          ...rest,
+        },
+      });
+
+      return revalidatePath(path);
     } catch (error) {
       getErrorMessage(error);
     }

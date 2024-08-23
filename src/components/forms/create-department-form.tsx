@@ -55,7 +55,7 @@ export default function CreateDepartmentForm({
       loading: "Creating...",
       success: () => {
         setIsOpen(false);
-        return "User created successfully";
+        return "Department created successfully";
       },
       error: (err) => {
         console.log(err);

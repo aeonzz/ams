@@ -202,6 +202,11 @@ export const currentUser = authedProcedure
     const { user } = ctx;
 
     try {
+      const uploadPath = process.env.UPLOAD_PATH;
+
+      if (!uploadPath) {
+        throw "Upload file path variable is missing";
+      }
       const data = await db.user.findUnique({
         where: {
           id: user.id,
@@ -218,7 +223,7 @@ export const currentUser = authedProcedure
       let profileImageData = null;
       if (data.profileUrl) {
         const filename = path.basename(data.profileUrl);
-        const filePath = path.join("/app/uploads", filename);
+        const filePath = path.join(uploadPath, filename);
         const fileBuffer = await readFile(filePath);
         const fileExtension = path.extname(filename).toLowerCase() as
           | ".svg"
@@ -380,7 +385,7 @@ export const createUser = authedProcedure
       });
 
       if (existingUser) {
-        throw ('Email already exists');
+        throw "Email already exists";
       }
 
       const userId = generateId(15);
@@ -423,4 +428,3 @@ export const deleteUsers = authedProcedure
       getErrorMessage(error);
     }
   });
-

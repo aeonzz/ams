@@ -41,7 +41,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/text-area";
 import { Separator } from "@/components/ui/separator";
-import { RequestSchemaType } from "@/lib/schema/request";
+import { type ExtendedJobRequestSchema } from "@/lib/schema/request";
 import { type RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTypeSchema";
 import { DialogState } from "@/lib/hooks/use-dialog-manager";
 import {
@@ -51,7 +51,8 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { addDays, format } from "date-fns";
-import { cn } from "@/lib/utils";
+import { cn, isDateInPast } from "@/lib/utils";
+import { useSession } from "@/lib/hooks/use-session";
 
 interface JobRequestInputProps {
   isLoading: boolean;
@@ -76,7 +77,8 @@ export default function JobRequestInput({
 }: JobRequestInputProps) {
   const queryClient = useQueryClient();
   const pathname = usePathname();
-  const department = "IT";
+  const currentUser = useSession();
+  const { department } = currentUser;
 
   const [selection, setSelection] = React.useState<Selection>({
     jobType: jobs[0],
@@ -92,7 +94,7 @@ export default function JobRequestInput({
     onSuccess: () => {
       setIsLoading(false);
       dialogManager.setActiveDialog(null);
-      toast.success("Request Successful!", {
+      toast.success("Request successfuly created!", {
         description:
           "Your request has been submitted and is awaiting approval.",
       });
@@ -112,21 +114,38 @@ export default function JobRequestInput({
 
   async function onSubmit(values: Request) {
     setIsLoading(true);
-    await uploadFiles(values.images ?? []);
+    try {
+      let uploadedFilesResult: { filePath: string }[] = [];
 
-    const data: RequestSchemaType = {
-      notes: values.notes,
-      priority: prio.value,
-      dueDate: values.dueDate,
-      type: type,
-      department: department,
-      jobType: selection.jobType.value,
-      category: selection.category.value,
-      name: selection.item,
-      path: pathname,
-      files: uploadedFiles,
-    };
-    mutate(data);
+      // Check if there are files to upload
+      if (values.images && values.images.length > 0) {
+        uploadedFilesResult = await uploadFiles(values.images);
+      }
+
+      const data: ExtendedJobRequestSchema = {
+        notes: values.notes,
+        priority: prio.value,
+        dueDate: values.dueDate,
+        type: type,
+        department: department,
+        jobType: selection.jobType.value,
+        category: selection.category.value,
+        name: selection.item,
+        path: pathname,
+        // Only include files if there are any
+        ...(uploadedFilesResult.length > 0 && {
+          files: uploadedFilesResult.map(
+            (result: { filePath: string }) => result.filePath
+          ),
+        }),
+      };
+
+      mutate(data);
+    } catch (error) {
+      setIsLoading(false);
+      console.error("Error during submission:", error);
+      toast.error("An error occurred during submission. Please try again.");
+    }
   }
 
   return (
@@ -176,7 +195,7 @@ export default function JobRequestInput({
                 </FormItem>
               )}
             />
-            <MotionLayout className="flex space-x-2">
+            <MotionLayout className="flex flex-wrap gap-2 py-1">
               <JobTypeOption
                 selection={selection}
                 setSelection={setSelection}
@@ -227,6 +246,7 @@ export default function JobRequestInput({
                             <SelectItem value="1">Tomorrow</SelectItem>
                             <SelectItem value="3">In 3 days</SelectItem>
                             <SelectItem value="7">In a week</SelectItem>
+                            <SelectItem value="30">In a month</SelectItem>
                           </SelectContent>
                         </Select>
                         <div className="rounded-md border">
@@ -234,9 +254,7 @@ export default function JobRequestInput({
                             mode="single"
                             selected={field.value}
                             onSelect={field.onChange}
-                            disabled={(date) =>
-                              date > new Date() || date < new Date("1900-01-01")
-                            }
+                            disabled={isDateInPast}
                           />
                         </div>
                       </PopoverContent>

@@ -1,12 +1,17 @@
 import {
+  Calendar,
+  Camera,
   CheckIcon,
   CircleArrowUp,
   Cog,
   Construction,
   FileQuestion,
   Hammer,
+  Laptop,
+  Leaf,
   LucideIcon,
   Paintbrush,
+  PenTool,
   PocketKnife,
   Wrench,
 } from "lucide-react";
@@ -283,6 +288,197 @@ export const jobs: Job[] = [
         items: [
           { value: "server", label: "Server" },
           { value: "database", label: "Database" },
+          { value: "other", label: "Other" },
+        ],
+      },
+    ],
+  },
+  {
+    value: "media_production",
+    label: "Media Production",
+    icon: Camera,
+    categories: [
+      {
+        value: "photography",
+        label: "Photography",
+        items: [
+          { value: "event_photoshoot", label: "Event Photoshoot" },
+          { value: "portrait", label: "Portrait Session" },
+          { value: "product", label: "Product Photography" },
+          { value: "other", label: "Other" },
+        ],
+      },
+      {
+        value: "videography",
+        label: "Videography",
+        items: [
+          { value: "event_coverage", label: "Event Coverage" },
+          { value: "promotional_video", label: "Promotional Video" },
+          { value: "tutorial", label: "Tutorial Video" },
+          { value: "other", label: "Other" },
+        ],
+      },
+      {
+        value: "audio",
+        label: "Audio Production",
+        items: [
+          { value: "podcast", label: "Podcast Recording" },
+          { value: "voice_over", label: "Voice Over" },
+          { value: "sound_editing", label: "Sound Editing" },
+          { value: "other", label: "Other" },
+        ],
+      },
+    ],
+  },
+  {
+    value: "it_support",
+    label: "IT Support",
+    icon: Laptop,
+    categories: [
+      {
+        value: "software",
+        label: "Software",
+        items: [
+          { value: "application_support", label: "Application Support" },
+          { value: "system_update", label: "System Update" },
+          { value: "data_recovery", label: "Data Recovery" },
+          { value: "other", label: "Other" },
+        ],
+      },
+      {
+        value: "hardware",
+        label: "Hardware",
+        items: [
+          { value: "computer_repair", label: "Computer Repair" },
+          { value: "network_setup", label: "Network Setup" },
+          { value: "peripheral_setup", label: "Peripheral Setup" },
+          { value: "other", label: "Other" },
+        ],
+      },
+      {
+        value: "user_support",
+        label: "User Support",
+        items: [
+          { value: "account_management", label: "Account Management" },
+          { value: "software_training", label: "Software Training" },
+          { value: "troubleshooting", label: "General Troubleshooting" },
+          { value: "other", label: "Other" },
+        ],
+      },
+    ],
+  },
+  {
+    value: "engineering_support",
+    label: "Engineering Support",
+    icon: PenTool,
+    categories: [
+      {
+        value: "mechanical",
+        label: "Mechanical",
+        items: [
+          { value: "equipment_calibration", label: "Equipment Calibration" },
+          { value: "prototype_fabrication", label: "Prototype Fabrication" },
+          { value: "machine_maintenance", label: "Machine Maintenance" },
+          { value: "other", label: "Other" },
+        ],
+      },
+      {
+        value: "electrical",
+        label: "Electrical",
+        items: [
+          { value: "circuit_design", label: "Circuit Design" },
+          {
+            value: "power_system_maintenance",
+            label: "Power System Maintenance",
+          },
+          { value: "electronic_repair", label: "Electronic Repair" },
+          { value: "other", label: "Other" },
+        ],
+      },
+      {
+        value: "materials",
+        label: "Materials",
+        items: [
+          { value: "material_testing", label: "Material Testing" },
+          { value: "sample_preparation", label: "Sample Preparation" },
+          { value: "analysis_support", label: "Analysis Support" },
+          { value: "other", label: "Other" },
+        ],
+      },
+    ],
+  },
+  {
+    value: "environmental_services",
+    label: "Environmental Services",
+    icon: Leaf,
+    categories: [
+      {
+        value: "waste_management",
+        label: "Waste Management",
+        items: [
+          { value: "recycling_setup", label: "Recycling Setup" },
+          { value: "waste_collection", label: "Waste Collection" },
+          { value: "hazardous_material", label: "Hazardous Material Handling" },
+          { value: "other", label: "Other" },
+        ],
+      },
+      {
+        value: "energy_efficiency",
+        label: "Energy Efficiency",
+        items: [
+          { value: "energy_audit", label: "Energy Audit" },
+          { value: "lighting_upgrade", label: "Lighting Upgrade" },
+          { value: "hvac_optimization", label: "HVAC Optimization" },
+          { value: "other", label: "Other" },
+        ],
+      },
+      {
+        value: "green_initiatives",
+        label: "Green Initiatives",
+        items: [
+          { value: "tree_planting", label: "Tree Planting" },
+          { value: "garden_maintenance", label: "Garden Maintenance" },
+          {
+            value: "sustainability_workshop",
+            label: "Sustainability Workshop",
+          },
+          { value: "other", label: "Other" },
+        ],
+      },
+    ],
+  },
+  {
+    value: "event_support",
+    label: "Event Support",
+    icon: Calendar,
+    categories: [
+      {
+        value: "setup",
+        label: "Setup",
+        items: [
+          { value: "stage_assembly", label: "Stage Assembly" },
+          { value: "av_equipment", label: "AV Equipment Setup" },
+          { value: "seating_arrangement", label: "Seating Arrangement" },
+          { value: "other", label: "Other" },
+        ],
+      },
+      {
+        value: "logistics",
+        label: "Logistics",
+        items: [
+          { value: "transportation", label: "Transportation" },
+          { value: "catering_coordination", label: "Catering Coordination" },
+          { value: "guest_management", label: "Guest Management" },
+          { value: "other", label: "Other" },
+        ],
+      },
+      {
+        value: "technical_support",
+        label: "Technical Support",
+        items: [
+          { value: "sound_system", label: "Sound System Operation" },
+          { value: "lighting_control", label: "Lighting Control" },
+          { value: "live_streaming", label: "Live Streaming" },
           { value: "other", label: "Other" },
         ],
       },
