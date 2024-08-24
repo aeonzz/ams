@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const RequestSchema = z.object({
+export const requestSchema = z.object({
   notes: z
     .string()
     .min(10, { message: "Must be at least 10 characters long" })
@@ -11,4 +11,4 @@ export const RequestSchema = z.object({
   }),
 });
 
-export type Request = z.infer<typeof RequestSchema>;
+export type RequestSchema = z.infer<typeof requestSchema>;

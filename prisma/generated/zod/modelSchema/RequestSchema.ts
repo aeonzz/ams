@@ -23,9 +23,7 @@ export const RequestSchema = z.object({
   approvedAt: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
-  dueDate: z.coerce.date(),
   title: z.string(),
-  notes: z.string(),
   userId: z.string(),
   department: z.string(),
 })

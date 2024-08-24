@@ -10,6 +10,8 @@ import { RequestWithRelationsSchema } from './RequestSchema'
 
 export const JobRequestSchema = z.object({
   id: z.string(),
+  notes: z.string(),
+  dueDate: z.coerce.date(),
   jobType: z.string(),
   category: z.string(),
   name: z.string(),

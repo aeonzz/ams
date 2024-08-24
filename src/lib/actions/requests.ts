@@ -100,9 +100,7 @@ export const createRequest = authedProcedure
           priority: rest.priority,
           type: rest.type,
           title: text,
-          notes: rest.notes,
           department: rest.department,
-          dueDate: rest.dueDate,
         },
       });
 
@@ -113,6 +111,8 @@ export const createRequest = authedProcedure
           data: {
             id: jobRequestId,
             requestId: request.id,
+            notes: rest.notes,
+            dueDate: rest.dueDate,
             jobType: jobType,
             category: rest.category,
             name: rest.name,
@@ -196,7 +196,9 @@ export async function getRequests(input: GetRequestsSchema) {
       "asc" | "desc" | undefined,
     ];
 
-    const where: any = {};
+    const where: any = {
+      status: { not: "CANCELLED" } 
+    };
 
     if (title) {
       where.title = { contains: title, mode: "insensitive" };
@@ -208,6 +210,59 @@ export async function getRequests(input: GetRequestsSchema) {
 
     if (priority) {
       where.priority = priority;
+    }
+
+    if (from && to) {
+      where.createdAt = {
+        gte: new Date(from),
+        lte: new Date(to),
+      };
+    }
+
+    const [data, total] = await db.$transaction([
+      db.request.findMany({
+        where,
+        take: per_page,
+        skip,
+        orderBy: {
+          [column || "createdAt"]: order || "desc",
+        },
+      }),
+      db.request.count({ where }),
+    ]);
+    const pageCount = Math.ceil(total / per_page);
+    return { data, pageCount };
+  } catch (err) {
+    console.error(err);
+    return { data: [], pageCount: 0 };
+  }
+}
+
+export async function getCancelledRequests(input: GetRequestsSchema) {
+  const { page, per_page, sort, title, status, type, priority, from, to } = input;
+
+  try {
+    const skip = (page - 1) * per_page;
+
+    const [column, order] = (sort?.split(".") ?? ["createdAt", "desc"]) as [
+      keyof Request | undefined,
+      "asc" | "desc" | undefined,
+    ];
+
+    const where: any = {
+      status: "CANCELLED" 
+    };
+
+    if (title) {
+      where.title = { contains: title, mode: "insensitive" };
+    }
+
+    if (priority) {
+      where.priority = priority;
+    }
+    
+    if (type) {
+      where.type = type;
     }
 
     if (from && to) {

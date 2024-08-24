@@ -1,17 +1,21 @@
 import { z } from "zod";
-import { PriorityTypeSchema, RequestStatusTypeSchema, RequestTypeSchema } from "prisma/generated/zod";
+import {
+  PriorityTypeSchema,
+  RequestStatusTypeSchema,
+  RequestTypeSchema,
+} from "prisma/generated/zod";
 
 export const requestSchemaBase = z.object({
-  notes: z.string(),
   priority: PriorityTypeSchema,
-  dueDate: z.date(),
   type: RequestTypeSchema,
   department: z.string(),
 });
 
 export const jobRequestSchema = requestSchemaBase.extend({
+  notes: z.string(),
   jobType: z.string().optional(),
   name: z.string(),
+  dueDate: z.date(),
   category: z.string(),
   files: z.array(z.string()).optional(),
 });
@@ -23,6 +27,28 @@ export const extendedJobRequestSchema = jobRequestSchema.extend({
 });
 
 export type ExtendedJobRequestSchema = z.infer<typeof extendedJobRequestSchema>;
+
+export const venueRequestSchema = requestSchemaBase.extend({
+  venueName: z.string({
+    required_error: "Please select a venue",
+  }),
+  purpose: z.array(z.string()).refine((value) => value.some((item) => item), {
+    message: "You have to select at least one item.",
+  }),
+  startTime: z.date({
+    required_error: "Start time is required",
+  }),
+  endTime: z.date({
+    required_error: "Start time is required",
+  }),
+  setupRequirements: z
+    .array(z.string())
+    .refine((value) => value.some((item) => item), {
+      message: "You have to select at least one item.",
+    }),
+});
+
+export type VenueRequestSchema = z.infer<typeof venueRequestSchema>;
 
 // export const RequestSchema = z.object({
 //   notes: z.string(),
@@ -62,4 +88,6 @@ export const extendedUpdateJobRequestSchema = updateJobRequestSchema.extend({
   id: z.string(),
 });
 
-export type ExtendedUpdateJobRequestSchema = z.infer<typeof extendedUpdateJobRequestSchema>
+export type ExtendedUpdateJobRequestSchema = z.infer<
+  typeof extendedUpdateJobRequestSchema
+>;

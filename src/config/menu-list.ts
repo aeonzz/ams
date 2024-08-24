@@ -38,20 +38,20 @@ export function getMenuList(pathname: string): Group[] {
       groupLabel: "My Requests & Reservations",
       menus: [
         {
-          href: "/my-requests",
+          href: "/requests",
           label: "Requests",
-          active: pathname.includes("/my-requests"),
+          active: pathname.includes("/requests"),
           icon: Mails,
           submenus: [
             {
-              href: "/my-requests",
-              label: "All Requests",
-              active: pathname === "/my-requests",
+              href: "/requests/my-requests",
+              label: "My Requests",
+              active: pathname === "/requests/my-requests",
             },
             {
-              href: "/my-requests/new",
-              label: "New Request",
-              active: pathname === "/my-requests/new",
+              href: "/requests/cancelled",
+              label: "Cancelled Requests",
+              active: pathname === "/requests/cancelled",
             },
           ],
         },

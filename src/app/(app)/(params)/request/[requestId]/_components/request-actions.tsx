@@ -24,9 +24,14 @@ import { type RequestWithRelations } from "prisma/generated/zod";
 interface RequestActionsProps {
   data: RequestWithRelations;
   refetch: () => void;
+  isRefetching: boolean;
 }
 
-export default function RequestActions({ data, refetch }: RequestActionsProps) {
+export default function RequestActions({
+  data,
+  refetch,
+  isRefetching,
+}: RequestActionsProps) {
   const pathname = usePathname();
   const { mutateAsync, isPending } = useServerActionMutation(updateRequest);
 
@@ -55,7 +60,7 @@ export default function RequestActions({ data, refetch }: RequestActionsProps) {
       {data.status !== "CANCELLED" && (
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <Button variant="secondary" disabled={isPending}>
+            <Button variant="secondary" disabled={isPending || isRefetching}>
               Cancel Request
             </Button>
           </AlertDialogTrigger>

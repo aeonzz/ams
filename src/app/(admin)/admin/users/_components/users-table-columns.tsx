@@ -42,7 +42,6 @@ import RoleTypeSchema, {
 } from "prisma/generated/zod/inputTypeSchemas/RoleTypeSchema";
 import { usePathname } from "next/navigation";
 import { DeleteUsersDialog } from "./delete-users-dialog";
-import { loadDepartments } from "@/lib/actions/department";
 
 export function getUsersColumns(): ColumnDef<User>[] {
   return [

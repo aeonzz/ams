@@ -20,6 +20,7 @@ import { format } from "date-fns";
 import { Calendar, User } from "lucide-react";
 import { SelectSeparator } from "@/components/ui/select";
 import RequestActions from "./request-actions";
+import { Badge } from "@/components/ui/badge";
 
 interface MyRequestScreenParamsProps {
   params: string;
@@ -28,15 +29,13 @@ interface MyRequestScreenParamsProps {
 export default function MyRequestScreenParams({
   params,
 }: MyRequestScreenParamsProps) {
-  const { data, isLoading, isError, refetch } = useServerActionQuery(
-    getRequestById,
-    {
+  const { data, isLoading, isError, refetch, isRefetching } =
+    useServerActionQuery(getRequestById, {
       input: {
         id: params,
       },
       queryKey: [params],
-    }
-  );
+    });
 
   if (isLoading) {
     return <LoadingSpinner />;
@@ -52,7 +51,7 @@ export default function MyRequestScreenParams({
 
   const PrioIcon = getPriorityIcon(data.priority);
   const StatusIcon = getStatusIcon(data.status);
-  const RequestTypeIcon = getRequestTypeIcon(data.type);
+  const { icon: Icon, variant } = getRequestTypeIcon(data.type);
 
   return (
     <div className="flex h-full w-full">
@@ -72,10 +71,10 @@ export default function MyRequestScreenParams({
         <div className="flex flex-col space-y-6 px-6">
           <div className="space-y-1">
             <P className="text-muted-foreground">Request type</P>
-            <span className="flex items-center gap-3">
-              <RequestTypeIcon className="size-5" />
+            <Badge className="gap-2" variant={variant}>
+              <Icon className="size-5" />
               <H5 className="font-semibold">{textTransform(data.type)}</H5>
-            </span>
+            </Badge>
           </div>
           <div className="space-y-1">
             <P className="text-muted-foreground">Request Status</P>
@@ -108,7 +107,11 @@ export default function MyRequestScreenParams({
             </span>
           </div>
           <Separator />
-          <RequestActions data={data} refetch={refetch} />
+          <RequestActions
+            data={data}
+            refetch={refetch}
+            isRefetching={isRefetching}
+          />
         </div>
       </div>
     </div>

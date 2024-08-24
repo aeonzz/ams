@@ -78,11 +78,9 @@ model Request {
   approvedAt      DateTime?
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
-  dueDate         DateTime
   priority        PriorityType
   type            RequestType
   title           String
-  notes           String
   status          RequestStatusType @default(PENDING)
   userId          String
   user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -100,23 +98,27 @@ model ItemCategory {
 }
 
 model JobRequest {
-  id        String  @id
+  id        String   @id
+  notes     String
+  dueDate   DateTime
   jobType   String
   category  String
   name      String
   assignTo  String
   files     File[]
-  requestId String  @unique
-  request   Request @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  requestId String   @unique
+  request   Request  @relation(fields: [requestId], references: [id], onDelete: Cascade)
 }
 
 model VenueRequest {
-  id        String   @id
-  venueName String
-  startTime DateTime
-  endTime   DateTime
-  requestId String   @unique
-  request   Request  @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  id                String   @id
+  purpose           String
+  venueName         String
+  setupRequirements String
+  startTime         DateTime
+  endTime           DateTime
+  requestId         String   @unique
+  request           Request  @relation(fields: [requestId], references: [id], onDelete: Cascade)
 }
 
 model ResourceRequest {
@@ -136,8 +138,8 @@ enum RequestType {
 
 enum RoleType {
   USER
+  REQUEST_MANAGER
   ADMIN
-  SYSTEMADMIN
 }
 
 enum PriorityType {

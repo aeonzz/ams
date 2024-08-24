@@ -25,7 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Request } from "@/lib/db/schema/request";
+import { RequestSchema } from "@/lib/db/schema/request";
 import { MotionLayout } from "@/components/layouts/motion-layout";
 import { usePathname } from "next/navigation";
 import { SubmitButton } from "@/components/ui/submit-button";
@@ -58,7 +58,7 @@ interface JobRequestInputProps {
   isLoading: boolean;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
   type: RequestTypeType;
-  form: UseFormReturn<Request>;
+  form: UseFormReturn<RequestSchema>;
   dialogManager: DialogState;
 }
 
@@ -112,7 +112,7 @@ export default function JobRequestInput({
     },
   });
 
-  async function onSubmit(values: Request) {
+  async function onSubmit(values: RequestSchema) {
     setIsLoading(true);
     try {
       let uploadedFilesResult: { filePath: string }[] = [];
@@ -165,7 +165,7 @@ export default function JobRequestInput({
                     <Textarea
                       rows={1}
                       maxRows={5}
-                      placeholder="Add description..."
+                      placeholder="Describe your request..."
                       className="min-h-20 border-none px-0 py-2 focus-visible:ring-0"
                       disabled={isLoading}
                       {...field}

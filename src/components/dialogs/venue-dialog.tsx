@@ -25,21 +25,31 @@ import {
 import JobRequestInput from "@/app/(app)/dashboard/_components/job-request-input";
 import { useForm, useFormState } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { requestSchema, RequestSchema } from "@/lib/db/schema/request";
 import { X } from "lucide-react";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
+import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
+import { createRequest } from "@/lib/actions/requests";
+import VenueRequestInput from "@/app/(app)/dashboard/_components/venue-request-input";
+import {
+  venueRequestSchema,
+  type VenueRequestSchema,
+} from "@/lib/schema/request";
 
-export default function JobDialog() {
+export default function VenueDialog() {
   const dialogManager = useDialogManager();
-  const [isLoading, setIsLoading] = React.useState(false);
   const [alertOpen, setAlertOpen] = React.useState(false);
 
-  const form = useForm<RequestSchema>({
-    resolver: zodResolver(requestSchema),
+  const form = useForm<VenueRequestSchema>({
+    resolver: zodResolver(venueRequestSchema),
+    defaultValues: {
+      purpose: [],
+    },
   });
 
   const { dirtyFields } = useFormState({ control: form.control });
   const isFieldsDirty = Object.keys(dirtyFields).length > 0;
+
+  const { mutateAsync, isPending } = useServerActionMutation(createRequest);
 
   const handleOpenChange = (open: boolean) => {
     if (!open) {
@@ -53,27 +63,27 @@ export default function JobDialog() {
 
   return (
     <Dialog
-      open={dialogManager.activeDialog === "jobDialog"}
+      open={dialogManager.activeDialog === "venueDialog"}
       onOpenChange={handleOpenChange}
     >
       <DialogContent
         onInteractOutside={(e) => {
-          if (isLoading) {
+          if (isPending) {
             e.preventDefault();
           }
-          if (isFieldsDirty && !isLoading) {
+          if (isFieldsDirty && !isPending) {
             e.preventDefault();
             setAlertOpen(true);
           }
         }}
         className="max-w-3xl"
-        isLoading={isLoading}
+        isLoading={isPending}
       >
         <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
-          {isFieldsDirty && isLoading && (
-            <AlertDialogTrigger disabled={isLoading} asChild>
+          {isFieldsDirty && isPending && (
+            <AlertDialogTrigger disabled={isPending} asChild>
               <button
-                disabled={isLoading}
+                disabled={isPending}
                 className="absolute right-4 top-4 z-50 cursor-pointer rounded-sm opacity-70 ring-offset-background transition-opacity data-[state=open]:bg-accent data-[state=open]:text-muted-foreground hover:opacity-100 focus:outline-none focus:ring-0 focus:ring-ring focus:ring-offset-0 active:scale-95 disabled:pointer-events-none"
               >
                 <X className="h-5 w-5" />
@@ -99,12 +109,10 @@ export default function JobDialog() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-        <JobRequestInput
+        <VenueRequestInput
+          mutateAsync={mutateAsync}
+          isPending={isPending}
           form={form}
-          isLoading={isLoading}
-          setIsLoading={setIsLoading}
-          type="JOB"
-          dialogManager={dialogManager}
         />
       </DialogContent>
     </Dialog>

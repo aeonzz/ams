@@ -20,6 +20,7 @@ import {
 } from "@/lib/hooks/use-dialog-manager";
 import { useHotkeys } from "react-hotkeys-hook";
 import JobDialog from "@/components/dialogs/job-dialog";
+import VenueDialog from "@/components/dialogs/venue-dialog";
 
 export type ReqType = {
   value: RequestTypeType;
@@ -94,6 +95,7 @@ export default function RequestOption() {
         </DialogContent>
       </Dialog>
       <JobDialog />
+      <VenueDialog />
     </>
   );
 }

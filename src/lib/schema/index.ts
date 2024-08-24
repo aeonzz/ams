@@ -7,6 +7,7 @@ export const requestSearchParamsSchema = z.object({
   title: z.string().optional(),
   status: z.string().optional(),
   priority: z.string().optional(),
+  type: z.string().optional(),
   from: z.string().optional(),
   to: z.string().optional(),
 });

@@ -8,7 +8,9 @@ import { RequestWithRelationsSchema } from './RequestSchema'
 
 export const VenueRequestSchema = z.object({
   id: z.string(),
+  purpose: z.string(),
   venueName: z.string(),
+  setupRequirements: z.string(),
   startTime: z.coerce.date(),
   endTime: z.coerce.date(),
   requestId: z.string(),
