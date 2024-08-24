@@ -28,27 +28,46 @@ export const extendedJobRequestSchema = jobRequestSchema.extend({
 
 export type ExtendedJobRequestSchema = z.infer<typeof extendedJobRequestSchema>;
 
-export const venueRequestSchema = requestSchemaBase.extend({
+export const venueRequestSchema = z.object({
   venueName: z.string({
     required_error: "Please select a venue",
   }),
   purpose: z.array(z.string()).refine((value) => value.some((item) => item), {
     message: "You have to select at least one item.",
   }),
+  otherPurpose: z.string().optional(),
   startTime: z.date({
     required_error: "Start time is required",
   }),
   endTime: z.date({
-    required_error: "Start time is required",
+    required_error: "End time is required",
   }),
   setupRequirements: z
     .array(z.string())
     .refine((value) => value.some((item) => item), {
       message: "You have to select at least one item.",
     }),
+  otherSetupRequirement: z.string().optional(),
+  notes: z.string().optional(),
 });
 
 export type VenueRequestSchema = z.infer<typeof venueRequestSchema>;
+
+export const venueRequestSchemaWithPath = venueRequestSchema.extend({
+  path: z.string(),
+});
+
+export type VenueRequestSchemaWithPath = z.infer<
+  typeof venueRequestSchemaWithPath
+>;
+
+export const extendedVenueRequestSchema = requestSchemaBase.merge(
+  venueRequestSchemaWithPath
+);
+
+export type ExtendedVenueRequestSchema = z.infer<
+  typeof extendedVenueRequestSchema
+>;
 
 // export const RequestSchema = z.object({
 //   notes: z.string(),

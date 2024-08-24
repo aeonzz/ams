@@ -112,6 +112,7 @@ model JobRequest {
 
 model VenueRequest {
   id                String   @id
+  notes             String?
   purpose           String
   venueName         String
   setupRequirements String

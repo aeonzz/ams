@@ -17,6 +17,7 @@ import { readFile } from "fs/promises";
 import {
   extendedJobRequestSchema,
   extendedUpdateJobRequestSchema,
+  extendedVenueRequestSchema,
 } from "../schema/request";
 
 const cohere = createCohere({
@@ -133,6 +134,91 @@ export const createRequest = authedProcedure
     }
   });
 
+export const createVenueRequest = authedProcedure
+  .createServerAction()
+  .input(extendedVenueRequestSchema)
+  .handler(async ({ ctx, input }) => {
+    const { user } = ctx;
+
+    const { path, ...rest } = input;
+
+    try {
+      const { text } = await generateText({
+        model: cohere("command-r-plus"),
+        system: `You are an expert at creating concise, informative titles for work requests. 
+                 Your task is to generate clear, action-oriented titles that quickly convey 
+                 the nature of the request. Always consider the job type, category, and specific 
+                 name of the task when crafting the title. Aim for brevity and clarity. And make it unique for every request. Dont add quotes`,
+        prompt: `Create a clear and concise title for a request based on these details:
+                 Notes: 
+                 ${input.notes}
+                 ${input.venueName}
+                 ${rest.purpose.join(", ")}
+
+                 
+                 Guidelines:
+                 1. Keep it under 50 characters
+                 2. Include the job type, category, and name in the title
+                 3. Capture the main purpose of the request
+                 4. Use action-oriented language
+                 5. Be specific to the request's context
+                 6. Make it easy to understand at a glance
+                 7. Use title case
+                 
+                 Example: 
+                 If given:
+                 Notes: Fix leaking faucet in the main office bathroom
+                 Job Type: Maintenance
+                 Category: Building
+                 Name: Plumbing
+                 
+                 A good title might be:
+                 "Urgent Plumbing Maintenance: Office Bathroom Faucet Repair"
+                 
+                 Now, create a title for the request using the provided details above.`,
+      });
+
+      const requestId = `REQ-${generateId(15)}`;
+      const venuRequestId = `VRQ-${generateId(15)}`;
+
+      await db.request.create({
+        data: {
+          id: requestId,
+          userId: user.id,
+          priority: rest.priority,
+          type: rest.type,
+          title: text,
+          department: rest.department,
+          venueRequest: {
+            create: {
+              id: venuRequestId,
+              venueName: rest.venueName,
+              startTime: rest.startTime,
+              endTime: rest.endTime,
+              purpose: rest.purpose.includes("other")
+                ? [
+                    ...rest.purpose.filter((p) => p !== "other"),
+                    rest.otherPurpose,
+                  ].join(", ")
+                : rest.purpose.join(", "),
+              setupRequirements: rest.setupRequirements.includes("other")
+                ? [
+                    ...rest.setupRequirements.filter((s) => s !== "other"),
+                    rest.otherSetupRequirement,
+                  ].join(", ")
+                : rest.setupRequirements.join(", "),
+              notes: rest.notes,
+            },
+          },
+        },
+      });
+
+      return revalidatePath(path);
+    } catch (error) {
+      getErrorMessage(error);
+    }
+  });
+
 export const getPendingReq = authedProcedure
   .createServerAction()
   .input(
@@ -197,7 +283,7 @@ export async function getRequests(input: GetRequestsSchema) {
     ];
 
     const where: any = {
-      status: { not: "CANCELLED" } 
+      status: { not: "CANCELLED" },
     };
 
     if (title) {
@@ -239,7 +325,8 @@ export async function getRequests(input: GetRequestsSchema) {
 }
 
 export async function getCancelledRequests(input: GetRequestsSchema) {
-  const { page, per_page, sort, title, status, type, priority, from, to } = input;
+  const { page, per_page, sort, title, status, type, priority, from, to } =
+    input;
 
   try {
     const skip = (page - 1) * per_page;
@@ -250,7 +337,7 @@ export async function getCancelledRequests(input: GetRequestsSchema) {
     ];
 
     const where: any = {
-      status: "CANCELLED" 
+      status: "CANCELLED",
     };
 
     if (title) {
@@ -260,7 +347,7 @@ export async function getCancelledRequests(input: GetRequestsSchema) {
     if (priority) {
       where.priority = priority;
     }
-    
+
     if (type) {
       where.type = type;
     }

@@ -21,7 +21,7 @@ export default function PendingReqCard({ data }: PendingReqCardProps) {
           <Badge variant="secondary">{`${data.status.charAt(0)}${data.status.slice(1).toLowerCase()}`}</Badge>
         </div>
         <div className="grid gap-2">
-          <P className="text-muted-foreground">{`${data.notes.slice(0, 70)}...`}</P>
+          {/* <P className="text-muted-foreground">{`${data.jo.slice(0, 70)}...`}</P> */}
         </div>
         <div className="mr-2 flex w-fit items-center space-x-2">
           <Briefcase className="size-4 text-primary" />

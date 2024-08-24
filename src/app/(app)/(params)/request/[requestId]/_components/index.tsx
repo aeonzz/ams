@@ -29,7 +29,7 @@ interface MyRequestScreenParamsProps {
 export default function MyRequestScreenParams({
   params,
 }: MyRequestScreenParamsProps) {
-  const { data, isLoading, isError, refetch, isRefetching } =
+  const { data, isLoading, isError, refetch } =
     useServerActionQuery(getRequestById, {
       input: {
         id: params,
@@ -103,14 +103,13 @@ export default function MyRequestScreenParams({
             <P className="text-muted-foreground">Due date</P>
             <span className="flex items-center gap-3">
               <Calendar className="size-5" />
-              <H5 className="font-semibold">{format(data.dueDate, "PPP")}</H5>
+              {/* <H5 className="font-semibold">{format(data.jobRequest?.dueDate, "PPP")}</H5> */}
             </span>
           </div>
           <Separator />
           <RequestActions
             data={data}
-            refetch={refetch}
-            isRefetching={isRefetching}
+            params={params}
           />
         </div>
       </div>

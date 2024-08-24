@@ -22,13 +22,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import JobRequestInput from "@/app/(app)/dashboard/_components/job-request-input";
 import { useForm, useFormState } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { X } from "lucide-react";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
-import { createRequest } from "@/lib/actions/requests";
+import { createVenueRequest } from "@/lib/actions/requests";
 import VenueRequestInput from "@/app/(app)/dashboard/_components/venue-request-input";
 import {
   venueRequestSchema,
@@ -42,14 +41,16 @@ export default function VenueDialog() {
   const form = useForm<VenueRequestSchema>({
     resolver: zodResolver(venueRequestSchema),
     defaultValues: {
-      purpose: [],
+      purpose: ["lecture"],
+      setupRequirements: ["slide viewing"],
     },
   });
 
   const { dirtyFields } = useFormState({ control: form.control });
   const isFieldsDirty = Object.keys(dirtyFields).length > 0;
 
-  const { mutateAsync, isPending } = useServerActionMutation(createRequest);
+  const { mutateAsync, isPending } =
+    useServerActionMutation(createVenueRequest);
 
   const handleOpenChange = (open: boolean) => {
     if (!open) {
@@ -80,7 +81,7 @@ export default function VenueDialog() {
         isLoading={isPending}
       >
         <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
-          {isFieldsDirty && isPending && (
+          {isFieldsDirty && !isPending && (
             <AlertDialogTrigger disabled={isPending} asChild>
               <button
                 disabled={isPending}
@@ -113,6 +114,8 @@ export default function VenueDialog() {
           mutateAsync={mutateAsync}
           isPending={isPending}
           form={form}
+          type="VENUE"
+          handleOpenChange={handleOpenChange}
         />
       </DialogContent>
     </Dialog>

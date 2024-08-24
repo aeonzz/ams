@@ -18,7 +18,7 @@ export default function JobRequest({ data }: JobRequestProps) {
         <H1 className="font-semibold">{data.title}</H1>
         <div>
           <P className="text-muted-foreground">Description:</P>
-          <H5>{data.notes}</H5>
+          <H5>{data.jobRequest?.notes}</H5>
         </div>
         <div className="mx-auto w-full max-w-7xl space-y-8">
           {data.jobRequest?.files.map((file, index) => (

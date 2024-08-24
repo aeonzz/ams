@@ -20,19 +20,16 @@ import { usePathname } from "next/navigation";
 import { type ExtendedUpdateJobRequestSchema } from "@/lib/schema/request";
 import { toast } from "sonner";
 import { type RequestWithRelations } from "prisma/generated/zod";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface RequestActionsProps {
   data: RequestWithRelations;
-  refetch: () => void;
-  isRefetching: boolean;
+  params: string;
 }
 
-export default function RequestActions({
-  data,
-  refetch,
-  isRefetching,
-}: RequestActionsProps) {
+export default function RequestActions({ data, params }: RequestActionsProps) {
   const pathname = usePathname();
+  const queryClient = useQueryClient();
   const { mutateAsync, isPending } = useServerActionMutation(updateRequest);
 
   function handleCancellation() {
@@ -45,7 +42,7 @@ export default function RequestActions({
     toast.promise(mutateAsync(values), {
       loading: "Cancelling...",
       success: () => {
-        refetch();
+        queryClient.invalidateQueries({ queryKey: [params] });
         return "Request cancelled succesfuly";
       },
       error: (err) => {
@@ -60,7 +57,7 @@ export default function RequestActions({
       {data.status !== "CANCELLED" && (
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <Button variant="secondary" disabled={isPending || isRefetching}>
+            <Button variant="secondary" disabled={isPending}>
               Cancel Request
             </Button>
           </AlertDialogTrigger>
