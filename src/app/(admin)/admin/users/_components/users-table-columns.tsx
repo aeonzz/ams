@@ -6,7 +6,7 @@ import { type ColumnDef } from "@tanstack/react-table";
 import { toast } from "sonner";
 
 // import { getErrorMessage } from "@/lib/handle-error"
-import { formatDate, getPriorityIcon, getStatusIcon } from "@/lib/utils";
+import { formatDate, getPriorityIcon } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";

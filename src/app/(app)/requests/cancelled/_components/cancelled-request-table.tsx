@@ -20,7 +20,6 @@ import { getRequests } from "@/lib/actions/requests";
 import {
   getPriorityIcon,
   getRequestTypeIcon,
-  getStatusIcon,
 } from "@/lib/utils";
 import { CancelledRequestTableFloatingBar } from "./cancelled-request-table-floating-bar";
 import { ModifiedDataTable } from "@/components/data-table/modified-data-table";

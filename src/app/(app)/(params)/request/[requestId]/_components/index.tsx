@@ -50,8 +50,8 @@ export default function MyRequestScreenParams({
   }
 
   const PrioIcon = getPriorityIcon(data.priority);
-  const StatusIcon = getStatusIcon(data.status);
-  const { icon: Icon, variant } = getRequestTypeIcon(data.type);
+  const statusIcon = getStatusIcon(data.status);
+  const requestTypeIcon = getRequestTypeIcon(data.type);
 
   return (
     <div className="flex h-full w-full">
@@ -71,15 +71,15 @@ export default function MyRequestScreenParams({
         <div className="flex flex-col space-y-6 px-6">
           <div className="space-y-1">
             <P className="text-muted-foreground">Request type</P>
-            <Badge className="gap-2" variant={variant}>
-              <Icon className="size-5" />
+            <Badge className="gap-2" variant={requestTypeIcon.variant}>
+              <requestTypeIcon.icon className="size-5" />
               <H5 className="font-semibold">{textTransform(data.type)}</H5>
             </Badge>
           </div>
           <div className="space-y-1">
             <P className="text-muted-foreground">Request Status</P>
             <span className="flex items-center gap-3">
-              <StatusIcon className="size-5" />
+              <statusIcon.icon className="size-5" />
               <H5 className="font-semibold">{textTransform(data.status)}</H5>
             </span>
           </div>

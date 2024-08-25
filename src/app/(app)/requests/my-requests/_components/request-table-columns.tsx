@@ -18,7 +18,7 @@ export function getRequestColumns(): ColumnDef<Request>[] {
         <DataTableColumnHeader column={column} title="Status" />
       ),
       cell: ({ row }) => {
-        const Icon = getStatusIcon(row.original.status);
+        const { icon: Icon } = getStatusIcon(row.original.status);
         const status = `${row.original.status.charAt(0)}${row.original.status.slice(1).toLowerCase()}`;
         return (
           <div className="flex items-center">
@@ -43,18 +43,14 @@ export function getRequestColumns(): ColumnDef<Request>[] {
         return (
           <div className="flex space-x-2">
             <Badge variant="outline">{row.original.type}</Badge>
-            <P className="truncate font-medium">
-              {row.getValue("title")}
-            </P>
+            <P className="truncate font-medium">{row.getValue("title")}</P>
           </div>
         );
       },
     },
     {
       accessorKey: "priority",
-      header: ({ column }) => (
-        <></>
-      ),
+      header: ({ column }) => <></>,
       cell: ({ row }) => {
         const Icon = getPriorityIcon(row.original.priority);
         const priority = row.original.priority
@@ -85,6 +81,5 @@ export function getRequestColumns(): ColumnDef<Request>[] {
       ),
       cell: ({ cell }) => formatDate(cell.getValue() as Date),
     },
-    
   ];
 }

@@ -7,7 +7,6 @@ import {
   formatDate,
   getPriorityIcon,
   getRequestTypeIcon,
-  getStatusIcon,
 } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";

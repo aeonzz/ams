@@ -90,6 +90,7 @@ interface JobRequestInputProps {
   type: RequestTypeType;
   form: UseFormReturn<JobRequestSchema>;
   handleOpenChange: (open: boolean) => void;
+  isFieldsDirty: boolean;
 }
 
 const jobs = [
@@ -189,6 +190,7 @@ export default function JobRequestInput({
   type,
   form,
   handleOpenChange,
+  isFieldsDirty,
 }: JobRequestInputProps) {
   const queryClient = useQueryClient();
   const pathname = usePathname();
@@ -477,7 +479,19 @@ export default function JobRequestInput({
           <MotionLayout>
             <Separator className="my-4" />
             <DialogFooter>
-              <div></div>
+              {isFieldsDirty ? (
+                <Button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    form.reset();
+                  }}
+                  variant="destructive"
+                >
+                  Reset form
+                </Button>
+              ) : (
+                <div></div>
+              )}
               <SubmitButton
                 disabled={isUploading || isPending}
                 className="w-28"

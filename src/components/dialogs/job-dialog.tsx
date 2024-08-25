@@ -2,10 +2,7 @@
 
 import React from "react";
 
-import {
-  Dialog,
-  DialogContent,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -35,6 +32,13 @@ export default function JobDialog() {
 
   const form = useForm<JobRequestSchema>({
     resolver: zodResolver(jobRequestSchema),
+    defaultValues: {
+      notes: "",
+      jobtype: undefined,
+      priority: undefined,
+      dueDate: undefined,
+      images: undefined,
+    },
   });
 
   const { dirtyFields } = useFormState({ control: form.control });
@@ -106,6 +110,7 @@ export default function JobDialog() {
           mutateAsync={mutateAsync}
           type="JOB"
           handleOpenChange={handleOpenChange}
+          isFieldsDirty={isFieldsDirty}
         />
       </DialogContent>
     </Dialog>

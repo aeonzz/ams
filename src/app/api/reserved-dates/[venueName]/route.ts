@@ -31,12 +31,19 @@ export async function GET(req: Request, params: Context) {
           gt: today,
         },
         request: {
-          status: "PENDING",
+          OR: [
+            {
+              status: "PENDING",
+            },
+            {
+              status: "APPROVED",
+            },
+          ],
         },
       },
       orderBy: {
-        id: "desc"
-      }
+        id: "desc",
+      },
     });
 
     return NextResponse.json({ data: reservedDatesAndTimes }, { status: 200 });

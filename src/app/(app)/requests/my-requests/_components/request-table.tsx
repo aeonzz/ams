@@ -55,7 +55,7 @@ export function RequestTable({ requestPromise }: RequestTableProps) {
           status.charAt(0).toUpperCase() +
           status.slice(1).toLowerCase().replace(/_/g, " "),
         value: status,
-        icon: getStatusIcon(status),
+        icon: getStatusIcon(status).icon,
         withCount: true,
       })),
     },
