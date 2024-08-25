@@ -5,7 +5,11 @@ import {
   type ExtendedVenueRequestSchema,
   VenueRequestSchema,
 } from "@/lib/schema/request";
-import { UseMutateAsyncFunction, useQueryClient } from "@tanstack/react-query";
+import {
+  UseMutateAsyncFunction,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import React from "react";
 import { UseFormReturn } from "react-hook-form";
 import {
@@ -42,7 +46,7 @@ import { CalendarIcon, Check, ChevronsUpDown } from "lucide-react";
 import { cn, isDateInPast } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import { SubmitButton } from "@/components/ui/submit-button";
-import { format } from "date-fns";
+import { format, isSameDay } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { TimePicker } from "@/components/ui/time-picker";
 import { Input } from "@/components/ui/input";
@@ -50,26 +54,32 @@ import { usePathname } from "next/navigation";
 import { toast } from "sonner";
 import { useSession } from "@/lib/hooks/use-session";
 import { type RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTypeSchema";
+import axios from "axios";
+import { type ReservedDatesAndTimes } from "@/lib/schema/utils";
+import LoadingSpinner from "@/components/loaders/loading-spinner";
+import DateTimePicker from "@/components/ui/date-time-picker";
+import { H3, P } from "@/components/typography/text";
+import ScheduledEventCard from "./scheduled-event-card";
 
 const purpose = [
   {
-    id: "lecture",
+    id: "Lecture/Forum/Symposium",
     label: "Lecture/Forum/Symposium",
   },
   {
-    id: "film showing",
+    id: "Film Showing",
     label: "Film Showing",
   },
   {
-    id: "seminar",
+    id: "Seminar/Workshop",
     label: "Seminar/Workshop",
   },
   {
-    id: "video coverage",
+    id: "Video Coverage",
     label: "Video Coverage",
   },
   {
-    id: "college meeting",
+    id: "College Meeting/Conference",
     label: "College Meeting/Conference",
   },
   {
@@ -80,23 +90,23 @@ const purpose = [
 
 const setup = [
   {
-    id: "slide viewing",
+    id: "Slide Viewing",
     label: "Slide Viewing",
   },
   {
-    id: "overhead projector",
+    id: "Overhead Projector",
     label: "Overhead Projector",
   },
   {
-    id: "tv",
+    id: "TV",
     label: "TV",
   },
   {
-    id: "video player",
+    id: "Video Player",
     label: "Video Player",
   },
   {
-    id: "projector",
+    id: "Data Projector (LCD Projector)",
     label: "Data Projector (LCD Projector)",
   },
   {
@@ -105,7 +115,10 @@ const setup = [
   },
 ] as const;
 
-const venues = [{ label: "Audio Visual Room", value: "avr" }] as const;
+const venues = [
+  { label: "Audio Visual Room", value: "Audio Visual Room" },
+  { label: "yawa", value: "yawa" },
+] as const;
 
 interface VenueRequestInputProps {
   mutateAsync: UseMutateAsyncFunction<
@@ -118,6 +131,7 @@ interface VenueRequestInputProps {
   form: UseFormReturn<VenueRequestSchema>;
   type: RequestTypeType;
   handleOpenChange: (open: boolean) => void;
+  isFieldsDirty: boolean;
 }
 
 export default function VenueRequestInput({
@@ -126,11 +140,54 @@ export default function VenueRequestInput({
   isPending,
   type,
   handleOpenChange,
+  isFieldsDirty,
 }: VenueRequestInputProps) {
   const pathname = usePathname();
   const currentUser = useSession();
   const { department } = currentUser;
   const queryClient = useQueryClient();
+  const venueName = form.watch("venueName");
+
+  const [open, setOpen] = React.useState(false);
+
+  const { data, isLoading, refetch, isRefetching } = useQuery<
+    ReservedDatesAndTimes[]
+  >({
+    queryFn: async () => {
+      if (!venueName) return [];
+      const res = await axios.get(`/api/reserved-dates/${venueName}`);
+      return res.data.data;
+    },
+    queryKey: ["get-reserved-dates", venueName],
+    enabled: !!venueName,
+    refetchOnWindowFocus: false,
+  });
+
+  React.useEffect(() => {
+    if (venueName) {
+      refetch();
+    }
+  }, [venueName, refetch]);
+
+  const disabledDates = React.useMemo(() => {
+    if (!data) return [];
+
+    return data.flatMap((item) => {
+      const startDate = new Date(item.startTime);
+      const endDate = new Date(item.endTime);
+      const dates = [];
+
+      for (
+        let date = startDate;
+        date <= endDate;
+        date.setDate(date.getDate() + 1)
+      ) {
+        dates.push(new Date(date));
+      }
+
+      return dates;
+    });
+  }, [data]);
 
   async function onSubmit(values: VenueRequestSchema) {
     const data: ExtendedVenueRequestSchema = {
@@ -174,7 +231,7 @@ export default function VenueRequestInput({
                     <FormLabel className="text-muted-foreground">
                       Venue
                     </FormLabel>
-                    <Popover>
+                    <Popover open={open} onOpenChange={setOpen}>
                       <PopoverTrigger asChild>
                         <FormControl>
                           <Button
@@ -207,6 +264,7 @@ export default function VenueRequestInput({
                                   key={venue.value}
                                   onSelect={() => {
                                     form.setValue("venueName", venue.value);
+                                    setOpen(false);
                                   }}
                                 >
                                   <Check
@@ -229,101 +287,21 @@ export default function VenueRequestInput({
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
+              <DateTimePicker
+                form={form}
                 name="startTime"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col">
-                    <FormLabel className="text-left text-muted-foreground">
-                      Start time
-                    </FormLabel>
-                    <Popover>
-                      <FormControl>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant="secondary"
-                            disabled={isPending}
-                            className={cn(
-                              "justify-start text-left font-normal",
-                              !field.value && "text-muted-foreground"
-                            )}
-                          >
-                            <CalendarIcon className="mr-2 h-4 w-4" />
-                            {field.value ? (
-                              format(field.value, "PPP HH:mm:ss")
-                            ) : (
-                              <span>Pick a date</span>
-                            )}
-                          </Button>
-                        </PopoverTrigger>
-                      </FormControl>
-                      <PopoverContent className="w-auto p-0">
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
-                          disabled={isDateInPast}
-                          initialFocus
-                        />
-                        <div className="border-t border-border p-3">
-                          <TimePicker
-                            setDate={field.onChange}
-                            date={field.value}
-                          />
-                        </div>
-                      </PopoverContent>
-                    </Popover>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label="Start Time"
+                isLoading={isLoading}
+                disabled={isPending || !venueName}
+                disabledDates={disabledDates}
               />
-              <FormField
-                control={form.control}
+              <DateTimePicker
+                form={form}
                 name="endTime"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col">
-                    <FormLabel className="text-left text-muted-foreground">
-                      End time
-                    </FormLabel>
-                    <Popover>
-                      <FormControl>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant="secondary"
-                            disabled={isPending}
-                            className={cn(
-                              "justify-start text-left font-normal",
-                              !field.value && "text-muted-foreground"
-                            )}
-                          >
-                            <CalendarIcon className="mr-2 h-4 w-4" />
-                            {field.value ? (
-                              format(field.value, "PPP HH:mm:ss")
-                            ) : (
-                              <span>Pick a date</span>
-                            )}
-                          </Button>
-                        </PopoverTrigger>
-                      </FormControl>
-                      <PopoverContent className="w-auto p-0">
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
-                          disabled={isDateInPast}
-                          initialFocus
-                        />
-                        <div className="border-t border-border p-3">
-                          <TimePicker
-                            setDate={field.onChange}
-                            date={field.value}
-                          />
-                        </div>
-                      </PopoverContent>
-                    </Popover>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label="End Time"
+                isLoading={isLoading}
+                disabled={isPending || !venueName}
+                disabledDates={disabledDates}
               />
               <FormField
                 control={form.control}
@@ -490,10 +468,47 @@ export default function VenueRequestInput({
                 />
               )}
             </div>
+            {venueName && (
+              <div
+                className={cn("scroll-bar max-h-[55vh] flex-1 overflow-y-auto")}
+              >
+                <P className="mb-2 font-semibold">
+                  {venues.find((venue) => venue.value === venueName)?.label}{" "}
+                  schedules
+                </P>
+                {isLoading || isRefetching ? (
+                  <div className="grid h-32 w-full place-items-center">
+                    <LoadingSpinner />
+                  </div>
+                ) : !data || data.length === 0 ? (
+                  <div className="grid h-32 w-full place-items-center">
+                    <P>No reserved schedules</P>
+                  </div>
+                ) : (
+                  <>
+                    {data.map((item, index) => (
+                      <ScheduledEventCard key={index} data={item} />
+                    ))}
+                  </>
+                )}
+              </div>
+            )}
           </div>
           <Separator className="my-4" />
           <DialogFooter>
-            <div></div>
+            {isFieldsDirty ? (
+              <Button
+                onClick={(e) => {
+                  e.preventDefault();
+                  form.reset();
+                }}
+                variant="destructive"
+              >
+                Reset form
+              </Button>
+            ) : (
+              <div></div>
+            )}
             <SubmitButton disabled={isPending} type="submit" className="w-28">
               Submit
             </SubmitButton>

@@ -33,6 +33,7 @@ import {
   venueRequestSchema,
   type VenueRequestSchema,
 } from "@/lib/schema/request";
+import { cn } from "@/lib/utils";
 
 export default function VenueDialog() {
   const dialogManager = useDialogManager();
@@ -41,11 +42,18 @@ export default function VenueDialog() {
   const form = useForm<VenueRequestSchema>({
     resolver: zodResolver(venueRequestSchema),
     defaultValues: {
-      purpose: ["lecture"],
-      setupRequirements: ["slide viewing"],
+      venueName: undefined,
+      notes: "",
+      startTime: undefined,
+      endTime: undefined,
+      otherPurpose: "",
+      otherSetupRequirement: "",
+      purpose: ["Lecture/Forum/Symposium"],
+      setupRequirements: ["Slide Viewing"],
     },
   });
 
+  const venueName = form.watch("venueName");
   const { dirtyFields } = useFormState({ control: form.control });
   const isFieldsDirty = Object.keys(dirtyFields).length > 0;
 
@@ -77,7 +85,7 @@ export default function VenueDialog() {
             setAlertOpen(true);
           }
         }}
-        className="max-w-3xl"
+        className={cn(venueName ? "max-w-6xl" : "max-w-3xl")}
         isLoading={isPending}
       >
         <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
@@ -116,6 +124,7 @@ export default function VenueDialog() {
           form={form}
           type="VENUE"
           handleOpenChange={handleOpenChange}
+          isFieldsDirty={isFieldsDirty}
         />
       </DialogContent>
     </Dialog>

@@ -48,7 +48,7 @@ export function TimePicker({ date, setDate }: TimePickerProps) {
           onRightFocus={() => secondRef.current?.focus()}
         />
       </div>
-      <div className="grid gap-1 text-center">
+      {/* <div className="grid gap-1 text-center">
         <Label htmlFor="seconds" className="text-xs">
           Seconds
         </Label>
@@ -61,7 +61,7 @@ export function TimePicker({ date, setDate }: TimePickerProps) {
           onLeftFocus={() => minuteRef.current?.focus()}
           onRightFocus={() => periodRef.current?.focus()}
         />
-      </div>
+      </div> */}
       <div className="grid gap-1 text-center">
         <Label htmlFor="period" className="text-xs">
           Period
