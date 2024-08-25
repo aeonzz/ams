@@ -12,7 +12,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTypeSchema";
-import { Lightbulb, LucideIcon, Theater, Wrench } from "lucide-react";
+import { CarFront, Lightbulb, LucideIcon, Theater, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   type DialogType,
@@ -47,6 +47,12 @@ const RequestTypes: ReqType[] = [
     label: "Resource",
     icon: Lightbulb,
     dialog: "resourceDialog",
+  },
+  {
+    value: "TRANSPORT",
+    label: "Transport",
+    icon: CarFront,
+    dialog: "transportDialog",
   },
 ];
 

@@ -41,7 +41,7 @@ export type Priority = {
   icon: LucideIcon;
 };
 
-export const priorities: Priority[] = [
+const priorities = [
   {
     value: "NO_PRIORITY",
     label: "No priority",
@@ -67,7 +67,7 @@ export const priorities: Priority[] = [
     label: "Low",
     icon: SignalLow,
   },
-];
+] as const;
 
 export default function PriorityOption({
   prio,

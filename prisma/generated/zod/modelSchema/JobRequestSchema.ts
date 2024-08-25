@@ -13,8 +13,6 @@ export const JobRequestSchema = z.object({
   notes: z.string(),
   dueDate: z.coerce.date(),
   jobType: z.string(),
-  category: z.string(),
-  name: z.string(),
   assignTo: z.string(),
   requestId: z.string(),
 })

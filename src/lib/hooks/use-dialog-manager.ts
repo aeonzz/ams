@@ -7,6 +7,7 @@ export type DialogType =
   | "jobDialog"
   | "venueDialog"
   | "resourceDialog"
+  | "transportDialog"
   | "settingsDialog"
   | null;
 

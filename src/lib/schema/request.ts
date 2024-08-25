@@ -11,20 +11,25 @@ export const requestSchemaBase = z.object({
   department: z.string(),
 });
 
-export const jobRequestSchema = requestSchemaBase.extend({
-  notes: z.string(),
-  jobType: z.string().optional(),
-  name: z.string(),
+export const jobRequestSchemaServer = z.object({
+  notes: z
+    .string()
+    .min(10, { message: "Must be at least 10 characters long" })
+    .max(600, { message: "Cannot be more than 600 characters long" }),
+  images: z.array(z.string()).optional(),
+  jobType: z.string(),
   dueDate: z.date(),
-  category: z.string(),
-  files: z.array(z.string()).optional(),
 });
 
-export type JobRequestSchema = z.infer<typeof jobRequestSchema>;
-
-export const extendedJobRequestSchema = jobRequestSchema.extend({
+export const jobRequestSchemaWithPath = jobRequestSchemaServer.extend({
   path: z.string(),
 });
+
+export type JobRequestSchemaWithPath = z.infer<typeof jobRequestSchemaWithPath>;
+
+export const extendedJobRequestSchema = requestSchemaBase.merge(
+  jobRequestSchemaWithPath
+);
 
 export type ExtendedJobRequestSchema = z.infer<typeof extendedJobRequestSchema>;
 

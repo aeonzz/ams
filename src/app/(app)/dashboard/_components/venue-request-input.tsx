@@ -5,7 +5,7 @@ import {
   type ExtendedVenueRequestSchema,
   VenueRequestSchema,
 } from "@/lib/schema/request";
-import { UseMutateAsyncFunction } from "@tanstack/react-query";
+import { UseMutateAsyncFunction, useQueryClient } from "@tanstack/react-query";
 import React from "react";
 import { UseFormReturn } from "react-hook-form";
 import {
@@ -130,6 +130,7 @@ export default function VenueRequestInput({
   const pathname = usePathname();
   const currentUser = useSession();
   const { department } = currentUser;
+  const queryClient = useQueryClient();
 
   async function onSubmit(values: VenueRequestSchema) {
     const data: ExtendedVenueRequestSchema = {
@@ -143,6 +144,9 @@ export default function VenueRequestInput({
     toast.promise(mutateAsync(data), {
       loading: "Submitting...",
       success: () => {
+        queryClient.invalidateQueries({ queryKey: ["pending-req-overview"] });
+        queryClient.invalidateQueries({ queryKey: ["pending-req"] });
+        queryClient.invalidateQueries({ queryKey: ["total-req-overview"] });
         handleOpenChange(false);
         return "Your request has been submitted and is awaiting approval.";
       },
@@ -160,7 +164,7 @@ export default function VenueRequestInput({
       </DialogHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <div className="flex gap-6 px-4">
+          <div className="scroll-bar flex max-h-[60vh] gap-6 overflow-y-auto px-4 py-1">
             <div className="flex flex-1 flex-col space-y-2">
               <FormField
                 control={form.control}
@@ -176,6 +180,7 @@ export default function VenueRequestInput({
                           <Button
                             variant="secondary"
                             role="combobox"
+                            disabled={isPending}
                             className={cn(
                               "justify-between",
                               !field.value && "text-muted-foreground"
@@ -237,6 +242,7 @@ export default function VenueRequestInput({
                         <PopoverTrigger asChild>
                           <Button
                             variant="secondary"
+                            disabled={isPending}
                             className={cn(
                               "justify-start text-left font-normal",
                               !field.value && "text-muted-foreground"
@@ -284,6 +290,7 @@ export default function VenueRequestInput({
                         <PopoverTrigger asChild>
                           <Button
                             variant="secondary"
+                            disabled={isPending}
                             className={cn(
                               "justify-start text-left font-normal",
                               !field.value && "text-muted-foreground"
@@ -364,6 +371,7 @@ export default function VenueRequestInput({
                               >
                                 <FormControl>
                                   <Checkbox
+                                    disabled={isPending}
                                     checked={field.value?.includes(item.id)}
                                     onCheckedChange={(checked) => {
                                       return checked
@@ -400,7 +408,11 @@ export default function VenueRequestInput({
                     <FormItem>
                       <FormLabel>Other Purpose</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="Specify other purpose" />
+                        <Input
+                          disabled={isPending}
+                          {...field}
+                          placeholder="Specify other purpose"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -429,6 +441,7 @@ export default function VenueRequestInput({
                               >
                                 <FormControl>
                                   <Checkbox
+                                    disabled={isPending}
                                     checked={field.value?.includes(item.id)}
                                     onCheckedChange={(checked) => {
                                       return checked
@@ -466,6 +479,7 @@ export default function VenueRequestInput({
                       <FormLabel>Other Equipment</FormLabel>
                       <FormControl>
                         <Input
+                          disabled={isPending}
                           {...field}
                           placeholder="Specify other equipment"
                         />

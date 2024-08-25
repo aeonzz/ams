@@ -78,8 +78,6 @@ export const createRequest = authedProcedure
         prompt: `Given the following job request description, choose the most appropriate department from this list: ${departmentNames}. 
                  Job description: ${input.notes}
                  Job Type: ${jobType}
-                 Category: ${rest.category}
-                 Name: ${rest.name}
                  
                  Respond with only the name of the chosen department.`,
       });
@@ -93,6 +91,7 @@ export const createRequest = authedProcedure
       }
 
       const requestId = `REQ-${generateId(15)}`;
+      const jobRequestId = `JRQ-${generateId(15)}`;
 
       const request = await db.request.create({
         data: {
@@ -102,31 +101,23 @@ export const createRequest = authedProcedure
           type: rest.type,
           title: text,
           department: rest.department,
-        },
-      });
-
-      if (rest.type === ("JOB" satisfies RequestTypeType)) {
-        const jobRequestId = `JRQ-${generateId(15)}`;
-
-        const a = await db.jobRequest.create({
-          data: {
-            id: jobRequestId,
-            requestId: request.id,
-            notes: rest.notes,
-            dueDate: rest.dueDate,
-            jobType: jobType,
-            category: rest.category,
-            name: rest.name,
-            assignTo: matchedDepartment.name,
-            files: {
-              create: rest.files?.map((fileName) => ({
-                id: `JRQ-${generateId(15)}`,
-                url: fileName,
-              })),
+          jobRequest: {
+            create: {
+              id: jobRequestId,
+              notes: rest.notes,
+              dueDate: rest.dueDate,
+              jobType: jobType,
+              assignTo: matchedDepartment.name,
+              files: {
+                create: rest.images?.map((fileName) => ({
+                  id: `JRQ-${generateId(15)}`,
+                  url: fileName,
+                })),
+              },
             },
           },
-        });
-      }
+        },
+      });
 
       return revalidatePath(path);
     } catch (error) {

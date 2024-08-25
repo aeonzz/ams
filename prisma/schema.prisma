@@ -102,8 +102,6 @@ model JobRequest {
   notes     String
   dueDate   DateTime
   jobType   String
-  category  String
-  name      String
   assignTo  String
   files     File[]
   requestId String   @unique
@@ -135,6 +133,7 @@ enum RequestType {
   JOB
   RESOURCE
   VENUE
+  TRANSPORT
 }
 
 enum RoleType {

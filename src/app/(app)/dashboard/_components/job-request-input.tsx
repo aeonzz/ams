@@ -7,7 +7,28 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { CalendarIcon, ChevronLeft } from "lucide-react";
+import {
+  CalendarIcon,
+  Camera,
+  Check,
+  ChevronLeft,
+  ChevronsUpDown,
+  CircleArrowUp,
+  Cog,
+  Construction,
+  FileQuestion,
+  Laptop,
+  Leaf,
+  Minus,
+  Paintbrush,
+  PenTool,
+  PocketKnife,
+  SignalHigh,
+  SignalLow,
+  SignalMedium,
+  TriangleAlert,
+  Wrench,
+} from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
 import {
   Form,
@@ -25,25 +46,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { RequestSchema } from "@/lib/db/schema/request";
 import { MotionLayout } from "@/components/layouts/motion-layout";
 import { usePathname } from "next/navigation";
 import { SubmitButton } from "@/components/ui/submit-button";
-import JobTypeOption from "./job-type-option";
-import { Category, Item, Job, jobs } from "@/config/job-list";
-import PriorityOption, { priorities, Priority } from "./priority-option";
 import { useUploadFile } from "@/lib/hooks/use-upload-file";
 import { FileUploader } from "@/components/file-uploader";
-import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
 import { toast } from "sonner";
 import { createRequest } from "@/lib/actions/requests";
-import { useQueryClient } from "@tanstack/react-query";
+import { UseMutateAsyncFunction, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/text-area";
 import { Separator } from "@/components/ui/separator";
 import { type ExtendedJobRequestSchema } from "@/lib/schema/request";
 import { type RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTypeSchema";
-import { DialogState } from "@/lib/hooks/use-dialog-manager";
 import {
   Popover,
   PopoverContent,
@@ -53,67 +68,137 @@ import { Calendar } from "@/components/ui/calendar";
 import { addDays, format } from "date-fns";
 import { cn, isDateInPast } from "@/lib/utils";
 import { useSession } from "@/lib/hooks/use-session";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import { PriorityTypeType } from "prisma/generated/zod/inputTypeSchemas/PriorityTypeSchema";
+import { JobRequestSchema } from "@/lib/db/schema/request";
 
 interface JobRequestInputProps {
-  isLoading: boolean;
-  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  mutateAsync: UseMutateAsyncFunction<
+    any,
+    Error,
+    Parameters<typeof createRequest>[0],
+    unknown
+  >;
+  isPending: boolean;
   type: RequestTypeType;
-  form: UseFormReturn<RequestSchema>;
-  dialogManager: DialogState;
+  form: UseFormReturn<JobRequestSchema>;
+  handleOpenChange: (open: boolean) => void;
 }
 
-export type Selection = {
-  jobType: Job;
-  category: Category;
-  item: string;
-};
+const jobs = [
+  {
+    value: "repair",
+    label: "Repair",
+    icon: Wrench,
+  },
+  {
+    value: "maintenance",
+    label: "Maintenance",
+    icon: Construction,
+  },
+  {
+    value: "installation",
+    label: "Installation",
+    icon: PocketKnife,
+  },
+  {
+    value: "troubleshooting",
+    label: "Troubleshooting",
+    icon: FileQuestion,
+  },
+  {
+    value: "cleaning",
+    label: "Cleaning",
+    icon: Paintbrush,
+  },
+  {
+    value: "replacement",
+    label: "Replacement",
+    icon: CircleArrowUp,
+  },
+  {
+    value: "configuration",
+    label: "Configuration",
+    icon: Cog,
+  },
+  {
+    value: "media_production",
+    label: "Media Production",
+    icon: Camera,
+  },
+  {
+    value: "it_support",
+    label: "IT Support",
+    icon: Laptop,
+  },
+  {
+    value: "engineering_support",
+    label: "Engineering Support",
+    icon: PenTool,
+  },
+  {
+    value: "environmental_services",
+    label: "Environmental Services",
+    icon: Leaf,
+  },
+  {
+    value: "event_support",
+    label: "Event Support",
+    icon: CalendarIcon,
+  },
+] as const;
+
+const priorities = [
+  {
+    value: "NO_PRIORITY",
+    label: "No priority",
+    icon: Minus,
+  },
+  {
+    value: "URGENT",
+    label: "Urgent",
+    icon: TriangleAlert,
+  },
+  {
+    value: "HIGH",
+    label: "High",
+    icon: SignalHigh,
+  },
+  {
+    value: "MEDIUM",
+    label: "Medium",
+    icon: SignalMedium,
+  },
+  {
+    value: "LOW",
+    label: "Low",
+    icon: SignalLow,
+  },
+] as const;
 
 export default function JobRequestInput({
-  isLoading,
-  setIsLoading,
+  mutateAsync,
+  isPending,
   type,
   form,
-  dialogManager,
+  handleOpenChange,
 }: JobRequestInputProps) {
   const queryClient = useQueryClient();
   const pathname = usePathname();
   const currentUser = useSession();
   const { department } = currentUser;
 
-  const [selection, setSelection] = React.useState<Selection>({
-    jobType: jobs[0],
-    category: jobs[0].categories[0],
-    item: jobs[0].categories[0].items[0].value,
-  });
-  const [prio, setPrio] = React.useState<Priority>(priorities[0]);
-
   const { uploadFiles, progresses, isUploading, uploadedFiles } =
     useUploadFile();
 
-  const { mutate } = useServerActionMutation(createRequest, {
-    onSuccess: () => {
-      setIsLoading(false);
-      dialogManager.setActiveDialog(null);
-      toast.success("Request successfuly created!", {
-        description:
-          "Your request has been submitted and is awaiting approval.",
-      });
-
-      queryClient.invalidateQueries({ queryKey: ["pending-req-overview"] });
-      queryClient.invalidateQueries({ queryKey: ["pending-req"] });
-      queryClient.invalidateQueries({ queryKey: ["total-req-overview"] });
-    },
-    onError: (err) => {
-      console.log(err);
-      setIsLoading(false);
-      toast.error("Uh oh! Something went wrong.", {
-        description: "Something went wrong, please try again later.",
-      });
-    },
-  });
-
-  async function onSubmit(values: RequestSchema) {
-    setIsLoading(true);
+  async function onSubmit(values: JobRequestSchema) {
     try {
       let uploadedFilesResult: { filePath: string }[] = [];
 
@@ -124,13 +209,11 @@ export default function JobRequestInput({
 
       const data: ExtendedJobRequestSchema = {
         notes: values.notes,
-        priority: prio.value,
+        priority: values.priority as PriorityTypeType,
         dueDate: values.dueDate,
         type: type,
         department: department,
-        jobType: selection.jobType.value,
-        category: selection.category.value,
-        name: selection.item,
+        jobType: values.jobtype,
         path: pathname,
         // Only include files if there are any
         ...(uploadedFilesResult.length > 0 && {
@@ -140,9 +223,21 @@ export default function JobRequestInput({
         }),
       };
 
-      mutate(data);
+      toast.promise(mutateAsync(data), {
+        loading: "Submitting...",
+        success: () => {
+          queryClient.invalidateQueries({ queryKey: ["pending-req-overview"] });
+          queryClient.invalidateQueries({ queryKey: ["pending-req"] });
+          queryClient.invalidateQueries({ queryKey: ["total-req-overview"] });
+          handleOpenChange(false);
+          return "Your request has been submitted and is awaiting approval.";
+        },
+        error: (err) => {
+          console.log(err);
+          return err.message;
+        },
+      });
     } catch (error) {
-      setIsLoading(false);
       console.error("Error during submission:", error);
       toast.error("An error occurred during submission. Please try again.");
     }
@@ -156,72 +251,185 @@ export default function JobRequestInput({
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="relative space-y-2 px-4">
-            <FormField
-              control={form.control}
-              name="notes"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Textarea
-                      rows={1}
-                      maxRows={5}
-                      placeholder="Describe your request..."
-                      className="min-h-20 border-none px-0 py-2 focus-visible:ring-0"
-                      disabled={isLoading}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="images"
-              render={({ field }) => (
-                <FormItem className="w-full">
-                  <FormControl>
-                    <FileUploader
-                      value={field.value}
-                      onValueChange={field.onChange}
-                      maxFiles={4}
-                      maxSize={4 * 1024 * 1024}
-                      progresses={progresses}
-                      disabled={isUploading || isLoading}
-                      drop={false}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <MotionLayout className="flex flex-wrap gap-2 py-1">
-              <JobTypeOption
-                selection={selection}
-                setSelection={setSelection}
-                isLoading={isLoading}
+            <div className="rounded-md border p-3">
+              <FormField
+                control={form.control}
+                name="notes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Textarea
+                        rows={1}
+                        maxRows={10}
+                        minRows={3}
+                        placeholder="Describe your request..."
+                        className="border-none p-0 focus-visible:ring-0"
+                        disabled={isUploading || isPending}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              <PriorityOption
-                prio={prio}
-                setPrio={setPrio}
-                isLoading={isLoading}
+              <FormField
+                control={form.control}
+                name="images"
+                render={({ field }) => (
+                  <FormItem className="w-full">
+                    <FormControl>
+                      <FileUploader
+                        value={field.value}
+                        onValueChange={field.onChange}
+                        maxFiles={4}
+                        maxSize={4 * 1024 * 1024}
+                        progresses={progresses}
+                        disabled={isUploading || isPending}
+                        drop={false}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="flex flex-wrap gap-2 py-1">
+              <FormField
+                control={form.control}
+                name="jobtype"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <Popover modal>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="secondary"
+                            role="combobox"
+                            className={cn(
+                              "w-[230px] justify-between",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value
+                              ? jobs.find((job) => job.value === field.value)
+                                  ?.label
+                              : "Select job"}
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[230px] p-0" align="start">
+                        <Command className="max-h-72">
+                          <CommandInput placeholder="Search job..." />
+                          <CommandList>
+                            <CommandEmpty>No job found.</CommandEmpty>
+                            <CommandGroup>
+                              {jobs.map((job) => (
+                                <CommandItem
+                                  value={job.label}
+                                  key={job.value}
+                                  onSelect={() => {
+                                    form.setValue("jobtype", job.value);
+                                  }}
+                                >
+                                  <job.icon className="mr-2 size-4" />
+                                  {job.label}
+                                  <Check
+                                    className={cn(
+                                      "ml-auto h-4 w-4",
+                                      job.value === field.value
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+                    <FormLabel>Job type</FormLabel>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="priority"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <Popover modal>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="secondary"
+                            role="combobox"
+                            className={cn(
+                              "w-[230px] justify-between",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value
+                              ? priorities.find(
+                                  (priority) => priority.value === field.value
+                                )?.label
+                              : "Select priority"}
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[230px] p-0" align="start">
+                        <Command className="max-h-72">
+                          <CommandInput placeholder="Search priority..." />
+                          <CommandList>
+                            <CommandEmpty>No job found.</CommandEmpty>
+                            <CommandGroup>
+                              {priorities.map((priority) => (
+                                <CommandItem
+                                  value={priority.label}
+                                  key={priority.value}
+                                  onSelect={() => {
+                                    form.setValue("priority", priority.value);
+                                  }}
+                                >
+                                  <priority.icon className="mr-2 size-4" />
+                                  {priority.label}
+                                  <Check
+                                    className={cn(
+                                      "ml-auto h-4 w-4",
+                                      priority.value === field.value
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+                    <FormLabel>Priority type</FormLabel>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
               <FormField
                 control={form.control}
                 name="dueDate"
                 render={({ field }) => (
-                  <FormItem className="flex flex-col">
+                  <FormItem className="flex flex-1 flex-col">
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
                           <Button
                             variant={"secondary"}
-                            size="sm"
                             className={cn(
-                              "w-[200px] justify-start px-2 text-left font-normal",
+                              "justify-start px-2 text-left font-normal",
                               !field.value && "text-muted-foreground"
                             )}
-                            disabled={isLoading}
+                            disabled={isUploading || isPending}
                           >
                             <CalendarIcon className="mr-2 h-4 w-4" />
                             {field.value ? (
@@ -259,17 +467,21 @@ export default function JobRequestInput({
                         </div>
                       </PopoverContent>
                     </Popover>
+                    <FormLabel>Due date</FormLabel>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-            </MotionLayout>
+            </div>
           </div>
           <MotionLayout>
             <Separator className="my-4" />
             <DialogFooter>
               <div></div>
-              <SubmitButton disabled={isLoading} className="w-28">
+              <SubmitButton
+                disabled={isUploading || isPending}
+                className="w-28"
+              >
                 Submit
               </SubmitButton>
             </DialogFooter>
