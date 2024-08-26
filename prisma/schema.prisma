@@ -123,13 +123,15 @@ model VenueRequest {
 }
 
 model Venue {
-  id       String         @id
-  name     String
-  location String
-  capacity Int
-  imageUrl String
-  status   VenueStatus
-  requests VenueRequest[]
+  id        String         @id
+  name      String
+  location  String
+  capacity  Int
+  imageUrl  String
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  status    VenueStatus    @default(AVAILABLE)
+  requests  VenueRequest[]
 }
 
 model ResourceRequest {
@@ -161,6 +163,8 @@ model Vehicle {
   image             String
   capacity          Int
   licensePlate      String
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
   status            VehicleStatus       @default(AVAILABLE)
   TransportRequest  TransportRequest[]
   MaintenanceRecord MaintenanceRecord[]

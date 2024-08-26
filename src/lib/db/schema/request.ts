@@ -18,3 +18,5 @@ export const jobRequestSchema = z.object({
 });
 
 export type JobRequestSchema = z.infer<typeof jobRequestSchema>;
+
+

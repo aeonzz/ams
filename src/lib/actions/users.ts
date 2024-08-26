@@ -33,6 +33,7 @@ import {
   extendedUserInputSchema,
   updateUsersSchema,
 } from "../schema/user";
+import { User } from "prisma/generated/zod";
 
 interface ActionResult {
   error: string;
@@ -260,7 +261,7 @@ export async function getUsers(input: GetUsersSchema) {
     const skip = (page - 1) * per_page;
 
     const [column, order] = (sort?.split(".") ?? ["createdAt", "desc"]) as [
-      keyof Request | undefined,
+      keyof User | undefined,
       "asc" | "desc" | undefined,
     ];
 

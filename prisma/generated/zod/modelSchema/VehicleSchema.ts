@@ -17,6 +17,8 @@ export const VehicleSchema = z.object({
   image: z.string(),
   capacity: z.number().int(),
   licensePlate: z.string(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
 })
 
 export type Vehicle = z.infer<typeof VehicleSchema>

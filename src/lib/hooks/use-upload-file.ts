@@ -9,6 +9,7 @@ export function useUploadFile() {
   const [isUploading, setIsUploading] = useState(false);
   async function handleImageUpload(files: File[]) {
     try {
+      setIsUploading(true)
       const serializedFiles = await Promise.all(
         files.map(async (file) => ({
           name: file.name,

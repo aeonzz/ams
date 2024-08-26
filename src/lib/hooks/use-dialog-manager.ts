@@ -9,6 +9,7 @@ export type DialogType =
   | "resourceDialog"
   | "transportDialog"
   | "settingsDialog"
+  | "adminCreateVenueDialog"
   | null;
 
 export interface DialogState {

@@ -14,6 +14,8 @@ export const VenueSchema = z.object({
   location: z.string(),
   capacity: z.number().int(),
   imageUrl: z.string(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
 })
 
 export type Venue = z.infer<typeof VenueSchema>

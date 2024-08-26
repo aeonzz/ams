@@ -1,12 +1,10 @@
 import {
   LayoutGrid,
   Bell,
-  Mails,
   Calendar,
   Settings,
   HelpCircle,
   Users,
-  FileText,
   Building,
   Briefcase,
   BookOpen,
@@ -14,10 +12,12 @@ import {
   BarChart,
   ShieldAlert,
   Wrench,
-  BriefcaseBusiness,
-} from "lucide-react";
+  GraduationCap,
+  ClipboardList,
+  FileText,
+} from "lucide-react"
 
-import { Group } from "@/lib/types/menu";
+import { Group } from "@/lib/types/menu"
 
 export function getAdminMenuList(pathname: string): Group[] {
   return [
@@ -47,7 +47,7 @@ export function getAdminMenuList(pathname: string): Group[] {
           href: "/requests",
           label: "Request Management",
           active: pathname.includes("/requests"),
-          icon: Mails,
+          icon: ClipboardList,
           submenus: [
             {
               href: "/requests/pending",
@@ -105,7 +105,7 @@ export function getAdminMenuList(pathname: string): Group[] {
           href: "/admin/departments",
           label: "Departments",
           active: pathname.includes("/admin/departments"),
-          icon: BriefcaseBusiness,
+          icon: GraduationCap,
           submenus: [],
         },
         {
@@ -121,9 +121,9 @@ export function getAdminMenuList(pathname: string): Group[] {
       groupLabel: "Asset Management",
       menus: [
         {
-          href: "/facilities",
+          href: "/admin/venues",
           label: "Facilities",
-          active: pathname.includes("/facilities"),
+          active: pathname.includes("/admin/venues"),
           icon: Building,
           submenus: [],
         },
@@ -170,9 +170,9 @@ export function getAdminMenuList(pathname: string): Group[] {
               active: pathname === "/reports/trends",
             },
             {
-              href: "/reports/financial",
-              label: "Financial Reports",
-              active: pathname === "/reports/financial",
+              href: "/reports/inventory",
+              label: "Inventory Reports",
+              active: pathname === "/reports/inventory",
             },
           ],
         },
@@ -198,9 +198,9 @@ export function getAdminMenuList(pathname: string): Group[] {
               active: pathname === "/settings/security",
             },
             {
-              href: "/settings/integrations",
-              label: "Integrations",
-              active: pathname === "/settings/integrations",
+              href: "/settings/notifications",
+              label: "Notification Settings",
+              active: pathname === "/settings/notifications",
             },
           ],
         },
@@ -233,13 +233,20 @@ export function getAdminMenuList(pathname: string): Group[] {
               active: pathname === "/help/contact",
             },
             {
-              href: "/help/documentation",
-              label: "System Documentation",
-              active: pathname === "/help/documentation",
+              href: "/help/user-manual",
+              label: "User Manual",
+              active: pathname === "/help/user-manual",
             },
           ],
         },
+        {
+          href: "/policies",
+          label: "Policies & Procedures",
+          active: pathname.includes("/policies"),
+          icon: FileText,
+          submenus: [],
+        },
       ],
     },
-  ];
+  ]
 }

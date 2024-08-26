@@ -25,9 +25,7 @@ export default async function AppLayout({
 
   return (
     <SessionProvider user={data}>
-      <AdminDashboardLayout>
-        <AdminCommandLayout>{children}</AdminCommandLayout>
-      </AdminDashboardLayout>
+      <AdminDashboardLayout>{children}</AdminDashboardLayout>
     </SessionProvider>
   );
 }
