@@ -46,7 +46,7 @@ export default function CommandSearchDialog({
         dialogManager.setActiveDialog("commandDialog");
       }
     },
-    { enableOnFormTags: true }
+    { enableOnFormTags: false }
   );
 
   const handleOpenChange = (open: boolean) => {

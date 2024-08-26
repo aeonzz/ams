@@ -24,12 +24,16 @@ import {
   MapPin,
   type LucideIcon,
   CarFront,
+  Truck,
+  PenTool,
+  BookMarked,
 } from "lucide-react";
 import { RequestStatusTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestStatusTypeSchema";
 import { PriorityTypeType } from "prisma/generated/zod/inputTypeSchemas/PriorityTypeSchema";
 import { RoleTypeType } from "prisma/generated/zod/inputTypeSchemas/RoleTypeSchema";
 import { RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTypeSchema";
 import { BadgeVariant } from "@/components/ui/badge";
+import { VehicleStatusType } from "prisma/generated/zod/inputTypeSchemas/VehicleStatusSchema";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -179,6 +183,39 @@ export function getRequestTypeIcon(
   return (
     requestTypeIcons[requestType] || { icon: CircleIcon, variant: "default" }
   );
+}
+
+type VehicleStatusIconConfig = {
+  icon: LucideIcon;
+  variant: BadgeVariant;
+};
+
+type VehicleStatusIconMap = {
+  [key in VehicleStatusType]: VehicleStatusIconConfig;
+};
+
+export function getVehicleStatusIcon(
+  status: VehicleStatusType
+): VehicleStatusIconConfig {
+  const VehicleStatusIcons: VehicleStatusIconMap = {
+    AVAILABLE: {
+      icon: CheckCircle,
+      variant: "green",
+    },
+    IN_USE: {
+      icon: Truck,
+      variant: "blue",
+    },
+    UNDER_MAINTENANCE: {
+      icon: PenTool,
+      variant: "orange",
+    },
+    RESERVED: {
+      icon: BookMarked,
+      variant: "yellow",
+    },
+  };
+  return VehicleStatusIcons[status] || { icon: CircleIcon, variant: "default" };
 }
 
 export const isDateInPast = (date: Date) => {

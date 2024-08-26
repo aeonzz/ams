@@ -155,10 +155,10 @@ export default function VenueRequestInput({
   >({
     queryFn: async () => {
       if (!venueName) return [];
-      const res = await axios.get(`/api/reserved-dates/${venueName}`);
+      const res = await axios.get(`/api/reserved-dates/venue/${venueName}`);
       return res.data.data;
     },
-    queryKey: ["get-reserved-dates", venueName],
+    queryKey: [venueName],
     enabled: !!venueName,
     refetchOnWindowFocus: false,
   });
@@ -503,6 +503,7 @@ export default function VenueRequestInput({
                   form.reset();
                 }}
                 variant="destructive"
+                disabled={isPending}
               >
                 Reset form
               </Button>

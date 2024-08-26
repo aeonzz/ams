@@ -21,6 +21,7 @@ import {
 import { useHotkeys } from "react-hotkeys-hook";
 import JobDialog from "@/components/dialogs/job-dialog";
 import VenueDialog from "@/components/dialogs/venue-dialog";
+import TransportDialog from "@/components/dialogs/transport-dialog";
 
 export type ReqType = {
   value: RequestTypeType;
@@ -66,7 +67,7 @@ export default function RequestOption() {
         dialogManager.setActiveDialog("requestDialog");
       }
     },
-    { enableOnFormTags: true }
+    { enableOnFormTags: false }
   );
 
   const handleOpenChange = (open: boolean) => {
@@ -102,6 +103,7 @@ export default function RequestOption() {
       </Dialog>
       <JobDialog />
       <VenueDialog />
+      <TransportDialog />
     </>
   );
 }

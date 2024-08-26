@@ -6,10 +6,12 @@ import type { UserWithRelations } from './UserSchema'
 import type { JobRequestWithRelations } from './JobRequestSchema'
 import type { VenueRequestWithRelations } from './VenueRequestSchema'
 import type { ResourceRequestWithRelations } from './ResourceRequestSchema'
+import type { TransportRequestWithRelations } from './TransportRequestSchema'
 import { UserWithRelationsSchema } from './UserSchema'
 import { JobRequestWithRelationsSchema } from './JobRequestSchema'
 import { VenueRequestWithRelationsSchema } from './VenueRequestSchema'
 import { ResourceRequestWithRelationsSchema } from './ResourceRequestSchema'
+import { TransportRequestWithRelationsSchema } from './TransportRequestSchema'
 
 /////////////////////////////////////////
 // REQUEST SCHEMA
@@ -39,6 +41,7 @@ export type RequestRelations = {
   jobRequest?: JobRequestWithRelations | null;
   venueRequest?: VenueRequestWithRelations | null;
   resourceRequest?: ResourceRequestWithRelations | null;
+  transportRequest?: TransportRequestWithRelations | null;
 };
 
 export type RequestWithRelations = z.infer<typeof RequestSchema> & RequestRelations
@@ -48,6 +51,7 @@ export const RequestWithRelationsSchema: z.ZodType<RequestWithRelations> = Reque
   jobRequest: z.lazy(() => JobRequestWithRelationsSchema).nullable(),
   venueRequest: z.lazy(() => VenueRequestWithRelationsSchema).nullable(),
   resourceRequest: z.lazy(() => ResourceRequestWithRelationsSchema).nullable(),
+  transportRequest: z.lazy(() => TransportRequestWithRelationsSchema).nullable(),
 }))
 
 export default RequestSchema;

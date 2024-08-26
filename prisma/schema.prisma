@@ -74,20 +74,21 @@ model Setting {
 }
 
 model Request {
-  id              String            @id
-  approvedAt      DateTime?
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  priority        PriorityType
-  type            RequestType
-  title           String
-  status          RequestStatusType @default(PENDING)
-  userId          String
-  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  department      String
-  jobRequest      JobRequest?
-  venueRequest    VenueRequest?
-  resourceRequest ResourceRequest?
+  id               String            @id
+  approvedAt       DateTime?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  priority         PriorityType
+  type             RequestType
+  title            String
+  status           RequestStatusType @default(PENDING)
+  userId           String
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  department       String
+  jobRequest       JobRequest?
+  venueRequest     VenueRequest?
+  resourceRequest  ResourceRequest?
+  transportRequest TransportRequest?
 }
 
 model ItemCategory {
@@ -127,6 +128,46 @@ model ResourceRequest {
   returnDate DateTime
   requestId  String   @unique
   request    Request  @relation(fields: [requestId], references: [id], onDelete: Cascade)
+}
+
+model TransportRequest {
+  id                String   @id
+  description       String
+  destination       String
+  dateAndTimeNeeded DateTime
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  requestId         String   @unique
+  request           Request  @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  vehicleId         String
+  vehicle           Vehicle  @relation(fields: [vehicleId], references: [id])
+}
+
+model Vehicle {
+  id                String              @id
+  name              String
+  type              String
+  image             String
+  capacity          Int
+  licensePlate      String
+  status            VehicleStatus       @default(AVAILABLE)
+  TransportRequest  TransportRequest[]
+  MaintenanceRecord MaintenanceRecord[]
+}
+
+model MaintenanceRecord {
+  id        String   @id
+  date      DateTime
+  details   String
+  vehicleId String
+  vehicle   Vehicle  @relation(fields: [vehicleId], references: [id])
+}
+
+enum VehicleStatus {
+  AVAILABLE
+  IN_USE
+  UNDER_MAINTENANCE
+  RESERVED
 }
 
 enum RequestType {

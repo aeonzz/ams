@@ -74,20 +74,34 @@ export type ExtendedVenueRequestSchema = z.infer<
   typeof extendedVenueRequestSchema
 >;
 
-// export const RequestSchema = z.object({
-//   notes: z.string(),
-//   priority: PriorityTypeSchema,
-//   dueDate: z.date(),
-//   type: RequestTypeSchema,
-//   department: z.string(),
-//   jobType: z.string().optional(),
-//   name: z.string(),
-//   category: z.string(),
-//   files: z.array(z.string()).optional(),
-//   path: z.string(),
-// });
+export const transportRequestSchema = z.object({
+  vehicleId: z.string({
+    required_error: "Please select a vehicle",
+  }),
+  description: z.string().min(1, "Description is required"),
+  destination: z.string().min(1, "Please add a destination"),
+  dateAndTimeNeeded: z.date({
+    required_error: "Start time is required",
+  }),
+});
 
-// export type RequestSchemaType = z.infer<typeof RequestSchema>;
+export type TransportRequestSchema = z.infer<typeof transportRequestSchema>;
+
+export const transportRequestSchemaWithPath = transportRequestSchema.extend({
+  path: z.string(),
+});
+
+export type TransportRequestSchemaWithPath = z.infer<
+  typeof transportRequestSchemaWithPath
+>;
+
+export const extendedTransportRequestSchema = requestSchemaBase.merge(
+  transportRequestSchemaWithPath
+);
+
+export type ExtendedTransportRequestSchema = z.infer<
+  typeof extendedTransportRequestSchema
+>;
 
 export const updateRequestSchemaBase = z.object({
   notes: z.string().optional(),

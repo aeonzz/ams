@@ -9,9 +9,13 @@ export { ItemCategoryScalarFieldEnumSchema } from './ItemCategoryScalarFieldEnum
 export { JobRequestScalarFieldEnumSchema } from './JobRequestScalarFieldEnumSchema';
 export { VenueRequestScalarFieldEnumSchema } from './VenueRequestScalarFieldEnumSchema';
 export { ResourceRequestScalarFieldEnumSchema } from './ResourceRequestScalarFieldEnumSchema';
+export { TransportRequestScalarFieldEnumSchema } from './TransportRequestScalarFieldEnumSchema';
+export { VehicleScalarFieldEnumSchema } from './VehicleScalarFieldEnumSchema';
+export { MaintenanceRecordScalarFieldEnumSchema } from './MaintenanceRecordScalarFieldEnumSchema';
 export { SortOrderSchema } from './SortOrderSchema';
 export { QueryModeSchema } from './QueryModeSchema';
 export { NullsOrderSchema } from './NullsOrderSchema';
+export { VehicleStatusSchema } from './VehicleStatusSchema';
 export { RequestTypeSchema } from './RequestTypeSchema';
 export { RoleTypeSchema } from './RoleTypeSchema';
 export { PriorityTypeSchema } from './PriorityTypeSchema';

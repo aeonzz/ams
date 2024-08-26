@@ -8,3 +8,6 @@ export * from './ItemCategorySchema';
 export * from './JobRequestSchema';
 export * from './VenueRequestSchema';
 export * from './ResourceRequestSchema';
+export * from './TransportRequestSchema';
+export * from './VehicleSchema';
+export * from './MaintenanceRecordSchema';
