@@ -7,6 +7,7 @@ export * from './RequestSchema';
 export * from './ItemCategorySchema';
 export * from './JobRequestSchema';
 export * from './VenueRequestSchema';
+export * from './VenueSchema';
 export * from './ResourceRequestSchema';
 export * from './TransportRequestSchema';
 export * from './VehicleSchema';

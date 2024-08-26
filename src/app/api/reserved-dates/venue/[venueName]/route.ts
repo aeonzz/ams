@@ -4,17 +4,16 @@ import { errorMonitor } from "stream";
 
 interface Context {
   params: {
-    venueName: string;
+    venueId: string;
   };
 }
 
 export async function GET(req: Request, params: Context) {
-  const { venueName } = params.params;
+  const { venueId } = params.params;
   const today = new Date();
   try {
     const reservedDatesAndTimes = await db.venueRequest.findMany({
       select: {
-        venueName: true,
         startTime: true,
         endTime: true,
         request: {
@@ -26,7 +25,7 @@ export async function GET(req: Request, params: Context) {
         },
       },
       where: {
-        venueName: venueName,
+        venueId: venueId,
         startTime: {
           gt: today,
         },

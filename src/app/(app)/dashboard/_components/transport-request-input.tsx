@@ -42,6 +42,10 @@ import {
 } from "@/lib/schema/utils";
 import DateTimePicker from "@/components/ui/date-time-picker";
 import VehicleField from "./vehicle-field";
+import LoadingSpinner from "@/components/loaders/loading-spinner";
+import { P } from "@/components/typography/text";
+import { cn } from "@/lib/utils";
+import VehicleScheduleCard from "./vehicle-schedule-card";
 
 interface VenueRequestInputProps {
   mutateAsync: UseMutateAsyncFunction<
@@ -125,7 +129,7 @@ export default function TransportRequestInput({
   return (
     <>
       <DialogHeader>
-        <DialogTitle>Venue Request</DialogTitle>
+        <DialogTitle>Transport Request</DialogTitle>
       </DialogHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -186,31 +190,28 @@ export default function TransportRequestInput({
                 )}
               />
             </div>
-            {/* {vehicleId && (
+            {vehicleId && (
               <div
-                className={cn("scroll-bar max-h-[55vh] flex-1 overflow-y-auto")}
+                className={cn("scroll-bar max-h-[55vh] w-72 overflow-y-auto")}
               >
-                <P className="mb-2 font-semibold">
-                  {venues.find((venue) => venue.value === venueName)?.label}{" "}
-                  schedules
-                </P>
+                <P className="mb-2 font-semibold">Schedules</P>
                 {isLoading || isRefetching ? (
                   <div className="grid h-32 w-full place-items-center">
                     <LoadingSpinner />
                   </div>
                 ) : !data || data.length === 0 ? (
                   <div className="grid h-32 w-full place-items-center">
-                    <P>No reserved schedules</P>
+                    <P>No schedules</P>
                   </div>
                 ) : (
                   <>
                     {data.map((item, index) => (
-                      <ScheduledEventCard key={index} data={item} />
+                      <VehicleScheduleCard key={index} data={item} />
                     ))}
                   </>
                 )}
               </div>
-            )} */}
+            )}
           </div>
           <Separator className="my-4" />
           <DialogFooter>

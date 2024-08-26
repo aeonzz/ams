@@ -76,7 +76,7 @@ export default function TransportDialog() {
             setAlertOpen(true);
           }
         }}
-        className={cn(vehicleId ? "max-w-6xl" : "max-w-xl")}
+        className={cn(vehicleId ? "max-w-3xl" : "max-w-xl")}
         isLoading={isPending}
       >
         <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>

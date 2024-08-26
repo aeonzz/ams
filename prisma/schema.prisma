@@ -113,12 +113,23 @@ model VenueRequest {
   id                String   @id
   notes             String?
   purpose           String
-  venueName         String
   setupRequirements String
   startTime         DateTime
   endTime           DateTime
   requestId         String   @unique
   request           Request  @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  venueId           String
+  venue             Venue    @relation(fields: [venueId], references: [id])
+}
+
+model Venue {
+  id       String         @id
+  name     String
+  location String
+  capacity Int
+  imageUrl String
+  status   VenueStatus
+  requests VenueRequest[]
 }
 
 model ResourceRequest {
@@ -161,6 +172,14 @@ model MaintenanceRecord {
   details   String
   vehicleId String
   vehicle   Vehicle  @relation(fields: [vehicleId], references: [id])
+}
+
+enum VenueStatus {
+  AVAILABLE
+  IN_USE
+  UNDER_MAINTENANCE
+  RESERVED
+  CLOSED
 }
 
 enum VehicleStatus {

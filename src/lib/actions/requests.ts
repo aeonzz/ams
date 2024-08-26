@@ -47,7 +47,9 @@ export const createRequest = authedProcedure
                  the nature of the request. Always consider the job type, category, and specific 
                  name of the task when crafting the title. Aim for brevity and clarity. And make it unique for every request. Dont add quotes`,
         prompt: `Create a clear and concise title for a request based on these details:
-                 Notes: ${input.notes}
+                 Notes: 
+                 ${input.type} request
+                 ${input.notes}
 
                  
                  Guidelines:
@@ -143,8 +145,8 @@ export const createVenueRequest = authedProcedure
                  name of the task when crafting the title. Aim for brevity and clarity. And make it unique for every request. Dont add quotes`,
         prompt: `Create a clear and concise title for a request based on these details:
                  Notes: 
+                 ${input.type} request
                  ${input.notes}
-                 ${input.venueName}
                  ${rest.purpose.join(", ")}
 
                  
@@ -184,7 +186,6 @@ export const createVenueRequest = authedProcedure
           venueRequest: {
             create: {
               id: venuRequestId,
-              venueName: rest.venueName,
               startTime: rest.startTime,
               endTime: rest.endTime,
               purpose: rest.purpose.includes("other")
@@ -200,6 +201,7 @@ export const createVenueRequest = authedProcedure
                   ].join(", ")
                 : rest.setupRequirements.join(", "),
               notes: rest.notes,
+              venueId: rest.venueId,
             },
           },
         },
@@ -216,7 +218,7 @@ export const createTransportRequest = authedProcedure
   .input(extendedTransportRequestSchema)
   .handler(async ({ ctx, input }) => {
     const { user } = ctx;
-
+    console.log(input);
     const { path, ...rest } = input;
 
     try {
@@ -228,6 +230,7 @@ export const createTransportRequest = authedProcedure
                  name of the task when crafting the title. Aim for brevity and clarity. And make it unique for every request. Dont add quotes`,
         prompt: `Create a clear and concise title for a request based on these details:
                  Notes: 
+                 ${input.type} request
                  ${input.description}
                  ${input.destination}
 
@@ -271,7 +274,7 @@ export const createTransportRequest = authedProcedure
               description: rest.description,
               destination: rest.destination,
               dateAndTimeNeeded: rest.dateAndTimeNeeded,
-              vehicleId: "asd"
+              vehicleId: input.vehicleId,
             },
           },
         },

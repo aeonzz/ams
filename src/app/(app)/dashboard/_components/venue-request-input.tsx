@@ -60,6 +60,7 @@ import LoadingSpinner from "@/components/loaders/loading-spinner";
 import DateTimePicker from "@/components/ui/date-time-picker";
 import { H3, P } from "@/components/typography/text";
 import ScheduledEventCard from "./scheduled-event-card";
+import VenueField from "./venue-field";
 
 const purpose = [
   {
@@ -146,7 +147,7 @@ export default function VenueRequestInput({
   const currentUser = useSession();
   const { department } = currentUser;
   const queryClient = useQueryClient();
-  const venueName = form.watch("venueName");
+  const venueId = form.watch("venueId");
 
   const [open, setOpen] = React.useState(false);
 
@@ -154,20 +155,20 @@ export default function VenueRequestInput({
     ReservedDatesAndTimes[]
   >({
     queryFn: async () => {
-      if (!venueName) return [];
-      const res = await axios.get(`/api/reserved-dates/venue/${venueName}`);
+      if (!venueId) return [];
+      const res = await axios.get(`/api/reserved-dates/venue/${venueId}`);
       return res.data.data;
     },
-    queryKey: [venueName],
-    enabled: !!venueName,
+    queryKey: [venueId],
+    enabled: !!venueId,
     refetchOnWindowFocus: false,
   });
 
   React.useEffect(() => {
-    if (venueName) {
+    if (venueId) {
       refetch();
     }
-  }, [venueName, refetch]);
+  }, [venueId, refetch]);
 
   const disabledDates = React.useMemo(() => {
     if (!data) return [];
@@ -222,77 +223,14 @@ export default function VenueRequestInput({
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="scroll-bar flex max-h-[60vh] gap-6 overflow-y-auto px-4 py-1">
-            <div className="flex flex-1 flex-col space-y-2">
-              <FormField
-                control={form.control}
-                name="venueName"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col">
-                    <FormLabel className="text-muted-foreground">
-                      Venue
-                    </FormLabel>
-                    <Popover open={open} onOpenChange={setOpen}>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant="secondary"
-                            role="combobox"
-                            disabled={isPending}
-                            className={cn(
-                              "justify-between",
-                              !field.value && "text-muted-foreground"
-                            )}
-                          >
-                            {field.value
-                              ? venues.find(
-                                  (venue) => venue.value === field.value
-                                )?.label
-                              : "Select venue"}
-                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="p-0">
-                        <Command>
-                          <CommandInput placeholder="Search venues..." />
-                          <CommandList>
-                            <CommandEmpty>No venues found.</CommandEmpty>
-                            <CommandGroup>
-                              {venues.map((venue) => (
-                                <CommandItem
-                                  value={venue.label}
-                                  key={venue.value}
-                                  onSelect={() => {
-                                    form.setValue("venueName", venue.value);
-                                    setOpen(false);
-                                  }}
-                                >
-                                  <Check
-                                    className={cn(
-                                      "mr-2 h-4 w-4",
-                                      venue.value === field.value
-                                        ? "opacity-100"
-                                        : "opacity-0"
-                                    )}
-                                  />
-                                  {venue.label}
-                                </CommandItem>
-                              ))}
-                            </CommandGroup>
-                          </CommandList>
-                        </Command>
-                      </PopoverContent>
-                    </Popover>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <div className="flex w-[307px] flex-col space-y-2">
+              <VenueField form={form} name="venueId" isPending={isPending} />
               <DateTimePicker
                 form={form}
                 name="startTime"
                 label="Start Time"
                 isLoading={isLoading}
-                disabled={isPending || !venueName}
+                disabled={isPending || !venueId}
                 disabledDates={disabledDates}
               />
               <DateTimePicker
@@ -300,7 +238,7 @@ export default function VenueRequestInput({
                 name="endTime"
                 label="End Time"
                 isLoading={isLoading}
-                disabled={isPending || !venueName}
+                disabled={isPending || !venueId}
                 disabledDates={disabledDates}
               />
               <FormField
@@ -468,14 +406,11 @@ export default function VenueRequestInput({
                 />
               )}
             </div>
-            {venueName && (
+            {venueId && (
               <div
-                className={cn("scroll-bar max-h-[55vh] flex-1 overflow-y-auto")}
+                className={cn("scroll-bar max-h-[55vh] w-72 overflow-y-auto")}
               >
-                <P className="mb-2 font-semibold">
-                  {venues.find((venue) => venue.value === venueName)?.label}{" "}
-                  schedules
-                </P>
+                <P className="mb-2 font-semibold">Schedules</P>
                 {isLoading || isRefetching ? (
                   <div className="grid h-32 w-full place-items-center">
                     <LoadingSpinner />

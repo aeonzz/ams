@@ -142,7 +142,7 @@ export default function DateTimePicker<T extends FieldValues>({
                     if (date) {
                       const newDate = field.value
                         ? new Date(field.value)
-                        : new Date();
+                        : new Date(new Date().setHours(9, 0, 0, 0));
                       newDate.setFullYear(
                         date.getFullYear(),
                         date.getMonth(),

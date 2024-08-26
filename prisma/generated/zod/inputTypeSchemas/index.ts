@@ -8,6 +8,7 @@ export { RequestScalarFieldEnumSchema } from './RequestScalarFieldEnumSchema';
 export { ItemCategoryScalarFieldEnumSchema } from './ItemCategoryScalarFieldEnumSchema';
 export { JobRequestScalarFieldEnumSchema } from './JobRequestScalarFieldEnumSchema';
 export { VenueRequestScalarFieldEnumSchema } from './VenueRequestScalarFieldEnumSchema';
+export { VenueScalarFieldEnumSchema } from './VenueScalarFieldEnumSchema';
 export { ResourceRequestScalarFieldEnumSchema } from './ResourceRequestScalarFieldEnumSchema';
 export { TransportRequestScalarFieldEnumSchema } from './TransportRequestScalarFieldEnumSchema';
 export { VehicleScalarFieldEnumSchema } from './VehicleScalarFieldEnumSchema';
@@ -15,6 +16,7 @@ export { MaintenanceRecordScalarFieldEnumSchema } from './MaintenanceRecordScala
 export { SortOrderSchema } from './SortOrderSchema';
 export { QueryModeSchema } from './QueryModeSchema';
 export { NullsOrderSchema } from './NullsOrderSchema';
+export { VenueStatusSchema } from './VenueStatusSchema';
 export { VehicleStatusSchema } from './VehicleStatusSchema';
 export { RequestTypeSchema } from './RequestTypeSchema';
 export { RoleTypeSchema } from './RoleTypeSchema';

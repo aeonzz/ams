@@ -42,7 +42,7 @@ export default function VenueDialog() {
   const form = useForm<VenueRequestSchema>({
     resolver: zodResolver(venueRequestSchema),
     defaultValues: {
-      venueName: undefined,
+      venueId: undefined,
       notes: "",
       startTime: undefined,
       endTime: undefined,
@@ -53,7 +53,7 @@ export default function VenueDialog() {
     },
   });
 
-  const venueName = form.watch("venueName");
+  const venueId = form.watch("venueId");
   const { dirtyFields } = useFormState({ control: form.control });
   const isFieldsDirty = Object.keys(dirtyFields).length > 0;
 
@@ -85,7 +85,7 @@ export default function VenueDialog() {
             setAlertOpen(true);
           }
         }}
-        className={cn(venueName ? "max-w-6xl" : "max-w-3xl")}
+        className={cn(venueId ? "max-w-4xl" : "max-w-2xl")}
         isLoading={isPending}
       >
         <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>

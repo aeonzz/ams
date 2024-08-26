@@ -34,7 +34,7 @@ export const extendedJobRequestSchema = requestSchemaBase.merge(
 export type ExtendedJobRequestSchema = z.infer<typeof extendedJobRequestSchema>;
 
 export const venueRequestSchema = z.object({
-  venueName: z.string({
+  venueId: z.string({
     required_error: "Please select a venue",
   }),
   purpose: z.array(z.string()).refine((value) => value.some((item) => item), {
