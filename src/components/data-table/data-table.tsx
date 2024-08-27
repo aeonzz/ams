@@ -84,7 +84,6 @@ export function DataTable<TData>({
                       style={{
                         ...getCommonPinningStyles({ column: cell.column }),
                       }}
-                      // className="border-r"
                     >
                       {flexRender(
                         cell.column.columnDef.cell,

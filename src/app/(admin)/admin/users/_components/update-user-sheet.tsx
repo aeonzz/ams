@@ -112,9 +112,9 @@ export function UpdateUserSheet({ user, ...props }: UpdateUserSheetProps) {
         }}
       >
         <SheetHeader className="text-left">
-          <SheetTitle>Update task</SheetTitle>
+          <SheetTitle>Update user</SheetTitle>
           <SheetDescription>
-            Update the task details and save the changes
+            Update the user details and save the changes
           </SheetDescription>
         </SheetHeader>
         <Form {...form}>

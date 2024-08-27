@@ -28,15 +28,19 @@ export function getDepartmentsColumns(): ColumnDef<Department>[] {
     {
       id: "select",
       header: ({ table }) => (
-        <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
-          }
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
-          className="translate-y-0.5"
-        />
+        <div className="px-3">
+          <Checkbox
+            checked={
+              table.getIsAllPageRowsSelected() ||
+              (table.getIsSomePageRowsSelected() && "indeterminate")
+            }
+            onCheckedChange={(value) =>
+              table.toggleAllPageRowsSelected(!!value)
+            }
+            aria-label="Select all"
+            className="translate-y-0.5"
+          />
+        </div>
       ),
       cell: ({ row }) => (
         <Checkbox
@@ -105,7 +109,6 @@ export function getDepartmentsColumns(): ColumnDef<Department>[] {
           React.useState(false);
         const [showDeleteTaskDialog, setShowDeleteTaskDialog] =
           React.useState(false);
-
 
         return (
           <div className="grid place-items-center">

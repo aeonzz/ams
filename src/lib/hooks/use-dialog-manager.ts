@@ -10,6 +10,8 @@ export type DialogType =
   | "transportDialog"
   | "settingsDialog"
   | "adminCreateVenueDialog"
+  | "adminCreateVehicleDialog"
+  | "adminUpdateVenueSheet"
   | null;
 
 export interface DialogState {

@@ -18,60 +18,62 @@ import { SubmitButton } from "../ui/submit-button";
 import { type UseMutateAsyncFunction } from "@tanstack/react-query";
 import { type UseFormReturn } from "react-hook-form";
 import { usePathname } from "next/navigation";
-import { createVenue } from "@/lib/actions/venue";
-import { type CreateVenueSchema } from "@/lib/db/schema/venue";
 import { FileUploader } from "../file-uploader";
 import { DialogState } from "@/lib/hooks/use-dialog-manager";
 import { useUploadFile } from "@/lib/hooks/use-upload-file";
 import { CreateVenueSchemaWithPath } from "@/lib/schema/venue";
+import { type CreateVehicleSchema } from "@/lib/db/schema/vehicle";
+import { createVehicle } from "@/lib/actions/vehicle";
+import { type CreateVehicleSchemaWithPath } from "@/lib/schema/vehicle";
 
-interface CreateVenueFormProps {
+interface CreateVenueFehiclerops {
   setAlertOpen: React.Dispatch<React.SetStateAction<boolean>>;
   mutateAsync: UseMutateAsyncFunction<
     any,
     Error,
-    Parameters<typeof createVenue>[0],
+    Parameters<typeof createVehicle>[0],
     unknown
   >;
-  form: UseFormReturn<CreateVenueSchema>;
+  form: UseFormReturn<CreateVehicleSchema>;
   isPending: boolean;
   isFieldsDirty: boolean;
   dialogManager: DialogState;
 }
 
-export default function CreateVenueForm({
+export default function CreateVehicleForm({
   mutateAsync,
   isPending,
   form,
   isFieldsDirty,
   setAlertOpen,
   dialogManager,
-}: CreateVenueFormProps) {
+}: CreateVenueFehiclerops) {
   const pathname = usePathname();
 
   const { uploadFiles, progresses, isUploading } = useUploadFile();
 
-  async function onSubmit(values: CreateVenueSchema) {
+  async function onSubmit(values: CreateVehicleSchema) {
     try {
       let uploadedFilesResult: { filePath: string }[] = [];
 
       uploadedFilesResult = await uploadFiles(values.imageUrl);
 
-      const data: CreateVenueSchemaWithPath = {
+      const data: CreateVehicleSchemaWithPath = {
         name: values.name,
-        capacity: values.capacity,
-        location: values.location,
-        path: pathname,
+        type: values.type,
         imageUrl: uploadedFilesResult.map(
           (result: { filePath: string }) => result.filePath
         ),
+        capacity: values.capacity,
+        licensePlate: values.licensePlate,
+        path: pathname,
       };
 
       toast.promise(mutateAsync(data), {
         loading: "Submitting...",
         success: () => {
           dialogManager.setActiveDialog(null);
-          return "Venue created successfuly";
+          return "Your request has been submitted and is awaiting approval.";
         },
         error: (err) => {
           console.log(err);
@@ -87,7 +89,7 @@ export default function CreateVenueForm({
   return (
     <Form {...form}>
       <form autoComplete="off" onSubmit={form.handleSubmit(onSubmit)}>
-      <div className="scroll-bar flex flex-col max-h-[55vh] gap-6 overflow-y-auto px-4 py-1">
+        <div className="scroll-bar flex max-h-[55vh] flex-col gap-6 overflow-y-auto px-4 py-1">
           <FormField
             control={form.control}
             name="name"
@@ -97,7 +99,7 @@ export default function CreateVenueForm({
                 <FormControl>
                   <Input
                     autoComplete="off"
-                    placeholder="Audio Visual Room"
+                    placeholder="Campus Shuttle"
                     disabled={isPending || isUploading}
                     {...field}
                   />
@@ -108,14 +110,32 @@ export default function CreateVenueForm({
           />
           <FormField
             control={form.control}
-            name="location"
+            name="type"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Location</FormLabel>
+                <FormLabel>Type</FormLabel>
                 <FormControl>
                   <Input
                     autoComplete="off"
-                    placeholder="Jasaan USTP"
+                    placeholder="e.g., Bus, Van, Car"
+                    disabled={isPending || isUploading}
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="licensePlate"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>License plate</FormLabel>
+                <FormControl>
+                  <Input
+                    autoComplete="off"
+                    placeholder="ABC 1234"
                     disabled={isPending || isUploading}
                     {...field}
                   />
@@ -129,12 +149,12 @@ export default function CreateVenueForm({
             name="capacity"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Capacity</FormLabel>
+                <FormLabel>Location</FormLabel>
                 <FormControl>
                   <Input
                     autoComplete="off"
                     type="number"
-                    placeholder="24"
+                    placeholder="24 seats"
                     disabled={isPending || isUploading}
                     {...field}
                   />
@@ -148,7 +168,7 @@ export default function CreateVenueForm({
             name="imageUrl"
             render={({ field }) => (
               <FormItem className="w-full">
-                <FormLabel>Venue image</FormLabel>
+                <FormLabel>Vehicle image</FormLabel>
                 <FormControl>
                   <FileUploader
                     value={field.value}

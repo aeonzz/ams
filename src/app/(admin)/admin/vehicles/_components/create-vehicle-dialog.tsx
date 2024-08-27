@@ -25,26 +25,23 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { X } from "lucide-react";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
-import {
-  type CreateVenueSchema,
-  createVenueSchema,
-} from "@/lib/db/schema/venue";
-import CreateVenueForm from "@/components/forms/create-venue-form";
-import { createVenue } from "@/lib/actions/venue";
+import { createVehicleSchema, type CreateVehicleSchema } from "@/lib/db/schema/vehicle";
+import { createVehicle } from "@/lib/actions/vehicle";
+import CreateVehicleForm from "@/components/forms/create-vehicle-form";
 
-export default function CreateVenueDialog() {
+export default function CreateVehicleDialog() {
   const dialogManager = useDialogManager();
   const [alertOpen, setAlertOpen] = React.useState(false);
 
-  const form = useForm<CreateVenueSchema>({
-    resolver: zodResolver(createVenueSchema),
+  const form = useForm<CreateVehicleSchema>({
+    resolver: zodResolver(createVehicleSchema),
   });
 
   const { dirtyFields } = useFormState({ control: form.control });
   const isFieldsDirty = Object.keys(dirtyFields).length > 0;
 
   const { mutateAsync, isPending } =
-    useServerActionMutation(createVenue);
+    useServerActionMutation(createVehicle);
 
   const handleOpenChange = (open: boolean) => {
     if (!open) {
@@ -58,7 +55,7 @@ export default function CreateVenueDialog() {
 
   return (
     <Dialog
-      open={dialogManager.activeDialog === "adminCreateVenueDialog"}
+      open={dialogManager.activeDialog === "adminCreateVehicleDialog"}
       onOpenChange={handleOpenChange}
     >
       <DialogContent
@@ -104,12 +101,12 @@ export default function CreateVenueDialog() {
           </AlertDialogContent>
         </AlertDialog>
         <DialogHeader>
-          <DialogTitle>Add venue</DialogTitle>
+          <DialogTitle>Add vehicle</DialogTitle>
           <DialogDescription>
-            Fill in the details below to add a new venue.
+            Fill in the details below to add a new vehicle.
           </DialogDescription>
         </DialogHeader>
-        <CreateVenueForm
+        <CreateVehicleForm
           mutateAsync={mutateAsync}
           isPending={isPending}
           setAlertOpen={setAlertOpen}

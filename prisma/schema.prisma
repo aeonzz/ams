@@ -160,7 +160,7 @@ model Vehicle {
   id                String              @id
   name              String
   type              String
-  image             String
+  imageUrl          String
   capacity          Int
   licensePlate      String
   createdAt         DateTime            @default(now())

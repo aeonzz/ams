@@ -25,16 +25,16 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { type Venue } from "prisma/generated/zod";
+import { type Vehicle } from "prisma/generated/zod";
 import RoleTypeSchema, {
   RoleTypeType,
 } from "prisma/generated/zod/inputTypeSchemas/RoleTypeSchema";
 import CommandTooltip from "@/components/ui/command-tooltip";
 import { CommandShortcut } from "@/components/ui/command";
 import { P } from "@/components/typography/text";
-import { Activity, User2 } from "lucide-react";
+import { User2 } from "lucide-react";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
-import { deleteUsers } from "@/lib/actions/users";
+import { deleteUsers, updateUsers } from "@/lib/actions/users";
 import { usePathname } from "next/navigation";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
 import {
@@ -48,30 +48,23 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import VenueStatusSchema, {
-  type VenueStatusType,
-} from "prisma/generated/zod/inputTypeSchemas/VenueStatusSchema";
-import { deleteVenues, updateVenueStatuses } from "@/lib/actions/venue";
-import { getVenueStatusIcon, textTransform } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
 
-interface VenuesTableFloatingBarProps {
-  table: Table<Venue>;
+interface VehiclesTableFloatingBarProps {
+  table: Table<Vehicle>;
 }
 
-export function VenuesTableFloatingBar({ table }: VenuesTableFloatingBarProps) {
+export function VehiclesTableFloatingBar({ table }: VehiclesTableFloatingBarProps) {
   const rows = table.getFilteredSelectedRowModel().rows;
   const pathname = usePathname();
 
   const [isLoading, startTransition] = React.useTransition();
   const [method, setMethod] = React.useState<
-    "update-status" | "export" | "delete"
+    "update-role" | "export" | "delete"
   >();
 
-  const { isPending, mutateAsync } =
-    useServerActionMutation(updateVenueStatuses);
-  const { isPending: isPendingDeletion, mutateAsync: deleteVenuesMutateAsync } =
-    useServerActionMutation(deleteVenues);
+  const { isPending, mutateAsync } = useServerActionMutation(updateUsers);
+  const { isPending: isPendingDeletion, mutateAsync: deleteUsersMutateAsync } =
+    useServerActionMutation(deleteUsers);
 
   // Clear selection on Escape key press
   React.useEffect(() => {
@@ -116,18 +109,18 @@ export function VenuesTableFloatingBar({ table }: VenuesTableFloatingBarProps) {
           <Separator orientation="vertical" className="hidden h-5 sm:block" />
           <div className="flex items-center gap-1.5">
             <Select
-              onValueChange={(value: VenueStatusType) => {
-                setMethod("update-status");
+              onValueChange={(value: RoleTypeType) => {
+                setMethod("update-role");
                 toast.promise(
                   mutateAsync({
                     ids: rows.map((row) => row.original.id),
-                    status: value as VenueStatusType,
+                    role: value as RoleTypeType,
                     path: pathname,
                   }),
                   {
-                    loading: "Updating...",
+                    loading: "Saving...",
                     success: () => {
-                      return "Status/es updated successfully";
+                      return "Role updated successfully";
                     },
                     error: (err) => {
                       console.log(err);
@@ -147,35 +140,25 @@ export function VenuesTableFloatingBar({ table }: VenuesTableFloatingBarProps) {
                       disabled={isPending || isPendingDeletion}
                     >
                       {isPending ||
-                      (isPendingDeletion && method === "update-status") ? (
+                      (isPendingDeletion && method === "update-role") ? (
                         <LoadingSpinner />
                       ) : (
-                        <Activity className="size-5" aria-hidden="true" />
+                        <User2 className="size-5" aria-hidden="true" />
                       )}
                     </Button>
                   </TooltipTrigger>
                 </SelectTrigger>
                 <TooltipContent className="border bg-accent font-semibold text-foreground dark:bg-zinc-900">
-                  <P>Update status</P>
+                  <P>Update role</P>
                 </TooltipContent>
               </Tooltip>
               <SelectContent align="center">
                 <SelectGroup>
-                  {VenueStatusSchema.options.map((status) => {
-                    const { icon: Icon, variant } = getVenueStatusIcon(status);
-                    return (
-                      <SelectItem
-                        key={status}
-                        value={status}
-                        className="capitalize"
-                      >
-                        <Badge variant={variant}>
-                          <Icon className="mr-1 size-4" />
-                          {textTransform(status)}
-                        </Badge>
-                      </SelectItem>
-                    );
-                  })}
+                  {RoleTypeSchema.options.map((role) => (
+                    <SelectItem key={role} value={role} className="capitalize">
+                      {role}
+                    </SelectItem>
+                  ))}
                 </SelectGroup>
               </SelectContent>
             </Select>
@@ -204,7 +187,7 @@ export function VenuesTableFloatingBar({ table }: VenuesTableFloatingBarProps) {
                 </Button>
               </TooltipTrigger>
               <TooltipContent className="border bg-accent font-semibold text-foreground dark:bg-zinc-900">
-                <P>Export venues</P>
+                <P>Export users</P>
               </TooltipContent>
             </Tooltip>
             <Tooltip delayDuration={250}>
@@ -233,7 +216,7 @@ export function VenuesTableFloatingBar({ table }: VenuesTableFloatingBarProps) {
                     </AlertDialogTitle>
                     <AlertDialogDescription>
                       This action cannot be undone. This will permanently delete
-                      the selected venue/s and all related records from our
+                      the selected user/s and all related records from our
                       servers.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
@@ -243,7 +226,7 @@ export function VenuesTableFloatingBar({ table }: VenuesTableFloatingBarProps) {
                       onClick={() => {
                         setMethod("delete");
                         toast.promise(
-                          deleteVenuesMutateAsync({
+                          deleteUsersMutateAsync({
                             ids: rows.map((row) => row.original.id),
                             path: pathname,
                           }),
@@ -251,7 +234,7 @@ export function VenuesTableFloatingBar({ table }: VenuesTableFloatingBarProps) {
                             loading: "Deleting...",
                             success: () => {
                               table.toggleAllRowsSelected(false);
-                              return "Venue/s deleted successfully";
+                              return "user/s deleted successfully";
                             },
                             error: (err) => {
                               console.log(err);
@@ -269,7 +252,7 @@ export function VenuesTableFloatingBar({ table }: VenuesTableFloatingBarProps) {
                 </AlertDialogContent>
               </AlertDialog>
               <TooltipContent className="border bg-accent font-semibold text-foreground dark:bg-zinc-900">
-                <P>Delete venues</P>
+                <P>Delete users</P>
               </TooltipContent>
             </Tooltip>
           </div>

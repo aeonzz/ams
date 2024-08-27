@@ -142,9 +142,9 @@ export function getAdminMenuList(pathname: string): Group[] {
           submenus: [],
         },
         {
-          href: "/vehicles",
+          href: "/admin/vehicles",
           label: "Vehicles",
-          active: pathname.includes("/vehicles"),
+          active: pathname.includes("/admin/vehicles"),
           icon: Truck,
           submenus: [],
         },

@@ -7,36 +7,35 @@ import { exportTableToCSV } from "@/lib/export";
 import { Button } from "@/components/ui/button";
 
 // import { DeleteUsersDialog } from "./delete-users-dialog"
-import { type Venue } from "prisma/generated/zod";
+import { type Vehicle } from "prisma/generated/zod";
 import { PlusIcon } from "lucide-react";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
-import { DeleteVenuesDialog } from "./delete-venues-dialog";
 
-interface VenuesTableToolbarActionsProps {
-  table: Table<Venue>;
+interface VehiclesTableToolbarActionsProps {
+  table: Table<Vehicle>;
 }
 
-export function VenuesTableToolbarActions({
+export function VehiclesTableToolbarActions({
   table,
-}: VenuesTableToolbarActionsProps) {
+}: VehiclesTableToolbarActionsProps) {
   const dialogManager = useDialogManager();
   return (
     <div className="flex items-center gap-2">
-      {table.getFilteredSelectedRowModel().rows.length > 0 ? (
-        <DeleteVenuesDialog
-          venues={table
+      {/* {table.getFilteredSelectedRowModel().rows.length > 0 ? (
+        <DeleteUsersDialog
+          users={table
             .getFilteredSelectedRowModel()
             .rows.map((row) => row.original)}
           onSuccess={() => table.toggleAllRowsSelected(false)}
         />
-      ) : null}
+      ) : null}*/}
       <Button
         variant="secondary"
         size="sm"
-        onClick={() => dialogManager.setActiveDialog("adminCreateVenueDialog")}
+        onClick={() => dialogManager.setActiveDialog("adminCreateVehicleDialog")}
       >
         <PlusIcon className="mr-2 size-4" aria-hidden="true" />
-        New venue
+        Add vehicle
       </Button>
       <Button
         variant="secondary"

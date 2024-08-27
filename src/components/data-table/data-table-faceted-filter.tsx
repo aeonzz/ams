@@ -1,10 +1,10 @@
-import type { Option } from "@/lib/types"
-import { CheckIcon, PlusCircledIcon } from "@radix-ui/react-icons"
-import type { Column } from "@tanstack/react-table"
+import type { Option } from "@/lib/types";
+import { CheckIcon, PlusCircledIcon } from "@radix-ui/react-icons";
+import type { Column } from "@tanstack/react-table";
 
-import { cn } from "@/lib/utils"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { cn, getVenueStatusIcon, textTransform } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Command,
   CommandEmpty,
@@ -13,18 +13,19 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-} from "@/components/ui/command"
+} from "@/components/ui/command";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
-import { Separator } from "@/components/ui/separator"
+} from "@/components/ui/popover";
+import { Separator } from "@/components/ui/separator";
+import { type VenueStatusType } from "prisma/generated/zod/inputTypeSchemas/VenueStatusSchema";
 
 interface DataTableFacetedFilterProps<TData, TValue> {
-  column?: Column<TData, TValue>
-  title?: string
-  options: Option[]
+  column?: Column<TData, TValue>;
+  title?: string;
+  options: Option[];
 }
 
 export function DataTableFacetedFilter<TData, TValue>({
@@ -32,7 +33,7 @@ export function DataTableFacetedFilter<TData, TValue>({
   title,
   options,
 }: DataTableFacetedFilterProps<TData, TValue>) {
-  const selectedValues = new Set(column?.getFilterValue() as string[])
+  const selectedValues = new Set(column?.getFilterValue() as string[]);
 
   return (
     <Popover>
@@ -60,15 +61,21 @@ export function DataTableFacetedFilter<TData, TValue>({
                 ) : (
                   options
                     .filter((option) => selectedValues.has(option.value))
-                    .map((option) => (
-                      <Badge
-                        variant="secondary"
-                        key={option.value}
-                        className="rounded-sm px-1 font-normal"
-                      >
-                        {option.label}
-                      </Badge>
-                    ))
+                    .map((option) => {
+                      const { icon: Icon, variant } = getVenueStatusIcon(
+                        option.value as VenueStatusType
+                      );
+                      return (
+                        <Badge
+                          variant={variant}
+                          key={option.value}
+                          className="rounded-sm px-1"
+                        >
+                          <Icon className="mr-1 size-4" />
+                          {textTransform(option.value)}
+                        </Badge>
+                      );
+                    })
                 )}
               </div>
             </>
@@ -82,21 +89,20 @@ export function DataTableFacetedFilter<TData, TValue>({
             <CommandEmpty>No results found.</CommandEmpty>
             <CommandGroup>
               {options.map((option) => {
-                const isSelected = selectedValues.has(option.value)
-
+                const isSelected = selectedValues.has(option.value);
                 return (
                   <CommandItem
                     key={option.value}
                     onSelect={() => {
                       if (isSelected) {
-                        selectedValues.delete(option.value)
+                        selectedValues.delete(option.value);
                       } else {
-                        selectedValues.add(option.value)
+                        selectedValues.add(option.value);
                       }
-                      const filterValues = Array.from(selectedValues)
+                      const filterValues = Array.from(selectedValues);
                       column?.setFilterValue(
                         filterValues.length ? filterValues : undefined
-                      )
+                      );
                     }}
                   >
                     <div
@@ -123,7 +129,7 @@ export function DataTableFacetedFilter<TData, TValue>({
                         </span>
                       )}
                   </CommandItem>
-                )
+                );
               })}
             </CommandGroup>
             {selectedValues.size > 0 && (
@@ -143,5 +149,5 @@ export function DataTableFacetedFilter<TData, TValue>({
         </Command>
       </PopoverContent>
     </Popover>
-  )
+  );
 }
