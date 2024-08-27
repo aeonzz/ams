@@ -9,7 +9,7 @@ import { DataTableToolbar } from "@/components/data-table/data-table-toolbar";
 import { useDataTable } from "@/lib/hooks/use-data-table";
 import { type DataTableFilterField } from "@/lib/types";
 import { VenuesTableToolbarActions } from "./venues-table-toolbar-actions";
-import { getRoleIcon, getVenueStatusIcon } from "@/lib/utils";
+import { getVenueStatusIcon } from "@/lib/utils";
 import { VenuesTableFloatingBar } from "./venues-table-floating-bar";
 import { VenueStatusSchema, type Venue } from "prisma/generated/zod";
 import { getVenues } from "@/lib/actions/venue";
@@ -41,11 +41,6 @@ export function VenuesTable({ venuesPromise }: VenuesTableProps) {
       label: "Name",
       value: "name",
       placeholder: "Filter names...",
-    },
-    {
-      label: "Location",
-      value: "location",
-      placeholder: "Filter locations...",
     },
     {
       label: "Status",

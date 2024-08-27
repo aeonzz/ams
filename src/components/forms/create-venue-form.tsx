@@ -87,7 +87,7 @@ export default function CreateVenueForm({
   return (
     <Form {...form}>
       <form autoComplete="off" onSubmit={form.handleSubmit(onSubmit)}>
-      <div className="scroll-bar flex flex-col max-h-[55vh] gap-6 overflow-y-auto px-4 py-1">
+      <div className="scroll-bar flex flex-col max-h-[55vh] gap-2 overflow-y-auto px-4 py-1">
           <FormField
             control={form.control}
             name="name"

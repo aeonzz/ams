@@ -26,15 +26,11 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { type Vehicle } from "prisma/generated/zod";
-import RoleTypeSchema, {
-  RoleTypeType,
-} from "prisma/generated/zod/inputTypeSchemas/RoleTypeSchema";
 import CommandTooltip from "@/components/ui/command-tooltip";
 import { CommandShortcut } from "@/components/ui/command";
 import { P } from "@/components/typography/text";
-import { User2 } from "lucide-react";
+import { Activity } from "lucide-react";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
-import { deleteUsers, updateUsers } from "@/lib/actions/users";
 import { usePathname } from "next/navigation";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
 import {
@@ -48,23 +44,35 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { deleteVehicles, updateVehicleStatuses } from "@/lib/actions/vehicle";
+import VehicleStatusSchema, {
+  type VehicleStatusType,
+} from "prisma/generated/zod/inputTypeSchemas/VehicleStatusSchema";
+import { getVehicleStatusIcon, textTransform } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 
 interface VehiclesTableFloatingBarProps {
   table: Table<Vehicle>;
 }
 
-export function VehiclesTableFloatingBar({ table }: VehiclesTableFloatingBarProps) {
+export function VehiclesTableFloatingBar({
+  table,
+}: VehiclesTableFloatingBarProps) {
   const rows = table.getFilteredSelectedRowModel().rows;
   const pathname = usePathname();
 
   const [isLoading, startTransition] = React.useTransition();
   const [method, setMethod] = React.useState<
-    "update-role" | "export" | "delete"
+    "update-status" | "export" | "delete"
   >();
 
-  const { isPending, mutateAsync } = useServerActionMutation(updateUsers);
-  const { isPending: isPendingDeletion, mutateAsync: deleteUsersMutateAsync } =
-    useServerActionMutation(deleteUsers);
+  const { isPending, mutateAsync } = useServerActionMutation(
+    updateVehicleStatuses
+  );
+  const {
+    isPending: isPendingDeletion,
+    mutateAsync: deleteVehiclesMutateAsync,
+  } = useServerActionMutation(deleteVehicles);
 
   // Clear selection on Escape key press
   React.useEffect(() => {
@@ -109,18 +117,18 @@ export function VehiclesTableFloatingBar({ table }: VehiclesTableFloatingBarProp
           <Separator orientation="vertical" className="hidden h-5 sm:block" />
           <div className="flex items-center gap-1.5">
             <Select
-              onValueChange={(value: RoleTypeType) => {
-                setMethod("update-role");
+              onValueChange={(value: VehicleStatusType) => {
+                setMethod("update-status");
                 toast.promise(
                   mutateAsync({
                     ids: rows.map((row) => row.original.id),
-                    role: value as RoleTypeType,
+                    status: value as VehicleStatusType,
                     path: pathname,
                   }),
                   {
-                    loading: "Saving...",
+                    loading: "Updating...",
                     success: () => {
-                      return "Role updated successfully";
+                      return "Status/es updated successfully";
                     },
                     error: (err) => {
                       console.log(err);
@@ -140,25 +148,36 @@ export function VehiclesTableFloatingBar({ table }: VehiclesTableFloatingBarProp
                       disabled={isPending || isPendingDeletion}
                     >
                       {isPending ||
-                      (isPendingDeletion && method === "update-role") ? (
+                      (isPendingDeletion && method === "update-status") ? (
                         <LoadingSpinner />
                       ) : (
-                        <User2 className="size-5" aria-hidden="true" />
+                        <Activity className="size-5" aria-hidden="true" />
                       )}
                     </Button>
                   </TooltipTrigger>
                 </SelectTrigger>
                 <TooltipContent className="border bg-accent font-semibold text-foreground dark:bg-zinc-900">
-                  <P>Update role</P>
+                  <P>Update status</P>
                 </TooltipContent>
               </Tooltip>
               <SelectContent align="center">
                 <SelectGroup>
-                  {RoleTypeSchema.options.map((role) => (
-                    <SelectItem key={role} value={role} className="capitalize">
-                      {role}
-                    </SelectItem>
-                  ))}
+                  {VehicleStatusSchema.options.map((status) => {
+                    const { icon: Icon, variant } =
+                      getVehicleStatusIcon(status);
+                    return (
+                      <SelectItem
+                        key={status}
+                        value={status}
+                        className="capitalize"
+                      >
+                        <Badge variant={variant}>
+                          <Icon className="mr-1 size-4" />
+                          {textTransform(status)}
+                        </Badge>
+                      </SelectItem>
+                    );
+                  })}
                 </SelectGroup>
               </SelectContent>
             </Select>
@@ -187,7 +206,7 @@ export function VehiclesTableFloatingBar({ table }: VehiclesTableFloatingBarProp
                 </Button>
               </TooltipTrigger>
               <TooltipContent className="border bg-accent font-semibold text-foreground dark:bg-zinc-900">
-                <P>Export users</P>
+                <P>Export vehicles</P>
               </TooltipContent>
             </Tooltip>
             <Tooltip delayDuration={250}>
@@ -216,7 +235,7 @@ export function VehiclesTableFloatingBar({ table }: VehiclesTableFloatingBarProp
                     </AlertDialogTitle>
                     <AlertDialogDescription>
                       This action cannot be undone. This will permanently delete
-                      the selected user/s and all related records from our
+                      the selected vehicle/s and all related records from our
                       servers.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
@@ -226,7 +245,7 @@ export function VehiclesTableFloatingBar({ table }: VehiclesTableFloatingBarProp
                       onClick={() => {
                         setMethod("delete");
                         toast.promise(
-                          deleteUsersMutateAsync({
+                          deleteVehiclesMutateAsync({
                             ids: rows.map((row) => row.original.id),
                             path: pathname,
                           }),
@@ -234,7 +253,7 @@ export function VehiclesTableFloatingBar({ table }: VehiclesTableFloatingBarProp
                             loading: "Deleting...",
                             success: () => {
                               table.toggleAllRowsSelected(false);
-                              return "user/s deleted successfully";
+                              return "vehicle/s deleted successfully";
                             },
                             error: (err) => {
                               console.log(err);
@@ -252,7 +271,7 @@ export function VehiclesTableFloatingBar({ table }: VehiclesTableFloatingBarProp
                 </AlertDialogContent>
               </AlertDialog>
               <TooltipContent className="border bg-accent font-semibold text-foreground dark:bg-zinc-900">
-                <P>Delete users</P>
+                <P>Delete vehicles</P>
               </TooltipContent>
             </Tooltip>
           </div>

@@ -43,11 +43,6 @@ export function VehiclesTable({ vehiclesPromise }: VehiclesTableProps) {
       placeholder: "Filter names...",
     },
     {
-      label: "LicensePlate",
-      value: "licensePlate",
-      placeholder: "Filter licensePlates...",
-    },
-    {
       label: "Status",
       value: "status",
       options: VehicleStatusSchema.options.map((vehicle) => ({

@@ -6,7 +6,12 @@ import { type ColumnDef } from "@tanstack/react-table";
 import { toast } from "sonner";
 
 // import { getErrorMessage } from "@/lib/handle-error"
-import { formatDate, getPriorityIcon } from "@/lib/utils";
+import {
+  formatDate,
+  getPriorityIcon,
+  getRoleIcon,
+  textTransform,
+} from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -72,15 +77,7 @@ export function getUsersColumns(): ColumnDef<User>[] {
       ),
       enableSorting: false,
       enableHiding: false,
-    },
-    {
-      accessorKey: "id",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="user" />
-      ),
-      cell: ({ row }) => <P>{row.getValue("id")}</P>,
-      enableSorting: false,
-      enableHiding: false,
+      size: 20,
     },
     {
       accessorKey: "email",
@@ -89,9 +86,21 @@ export function getUsersColumns(): ColumnDef<User>[] {
       ),
       cell: ({ row }) => {
         return (
+          <div className="flex w-[25vw] space-x-2">
+            <P className="truncate font-medium">{row.getValue("email")}</P>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "department",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Department" />
+      ),
+      cell: ({ row }) => {
+        return (
           <div className="flex space-x-2">
             <Badge variant="outline">{row.original.department}</Badge>
-            <P className="truncate font-medium">{row.getValue("email")}</P>
           </div>
         );
       },
@@ -118,9 +127,13 @@ export function getUsersColumns(): ColumnDef<User>[] {
         <DataTableColumnHeader column={column} title="Role" />
       ),
       cell: ({ row }) => {
+        const { icon: Icon, variant } = getRoleIcon(row.original.role);
         return (
           <div className="flex items-center">
-            <P>{row.original.role}</P>
+            <Badge variant={variant}>
+              <Icon className="mr-1 size-4" />
+              {textTransform(row.original.role)}
+            </Badge>
           </div>
         );
       },
@@ -199,16 +212,22 @@ export function getUsersColumns(): ColumnDef<User>[] {
                         );
                       }}
                     >
-                      {RoleTypeSchema.options.map((role) => (
-                        <DropdownMenuRadioItem
-                          key={role}
-                          value={role}
-                          className="capitalize"
-                          disabled={isPending}
-                        >
-                          {role}
-                        </DropdownMenuRadioItem>
-                      ))}
+                      {RoleTypeSchema.options.map((role) => {
+                        const { icon: Icon, variant } = getRoleIcon(role);
+                        return (
+                          <DropdownMenuRadioItem
+                            key={role}
+                            value={role}
+                            className="capitalize"
+                            disabled={isPending}
+                          >
+                            <Badge variant={variant}>
+                              <Icon className="mr-1 size-4" />
+                              {textTransform(role)}
+                            </Badge>
+                          </DropdownMenuRadioItem>
+                        );
+                      })}
                     </DropdownMenuRadioGroup>
                   </DropdownMenuSubContent>
                 </DropdownMenuSub>

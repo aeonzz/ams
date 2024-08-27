@@ -56,7 +56,7 @@ export function UsersTable({ usersPromise }: UsersTableProps) {
           role.charAt(0).toUpperCase() +
           role.slice(1).toLowerCase().replace(/_/g, " "),
         value: role,
-        icon: getRoleIcon(role),
+        icon: getRoleIcon(role).icon,
         withCount: true,
       })),
     },

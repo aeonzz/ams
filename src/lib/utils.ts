@@ -89,15 +89,35 @@ export function formatDate(
   }).format(new Date(date));
 }
 
-export function getRoleIcon(role: RoleTypeType) {
-  const roleIcons = {
-    USER: UserIcon,
-    REQUEST_MANAGER: Shield,
-    ADMIN: ShieldCheck,
-  };
+type RoleIconConfig = {
+  icon: LucideIcon;
+  variant: BadgeVariant;
+};
 
-  return roleIcons[role] || UserIcon;
+type RoleIconMap = {
+  [key in RoleTypeType]: RoleIconConfig;
+};
+
+export function getRoleIcon(
+  role: RoleTypeType
+): RoleIconConfig {
+  const RoleIcons: RoleIconMap = {
+    USER: {
+      icon: UserIcon,
+      variant: "blue",
+    },
+    REQUEST_MANAGER: {
+      icon: Shield,
+      variant: "green",
+    },
+    ADMIN: {
+      icon: ShieldCheck,
+      variant: "destructive",
+    },
+  };
+  return RoleIcons[role] || { icon: CircleIcon, variant: "default" };
 }
+
 
 export function getPriorityIcon(priority: PriorityTypeType) {
   const priorityIcons = {

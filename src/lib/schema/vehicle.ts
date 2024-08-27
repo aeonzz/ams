@@ -1,3 +1,4 @@
+import { VehicleStatusSchema } from "prisma/generated/zod";
 import { z } from "zod";
 
 export const createVehicleSchemaServer = z.object({
@@ -19,3 +20,39 @@ export const createVehicleSchemaWithPath = createVehicleSchemaServer.extend({
 export type CreateVehicleSchemaWithPath = z.infer<
   typeof createVehicleSchemaWithPath
 >;
+
+export const updateVehicleSchemaServer = z.object({
+  name: z.string().optional(),
+  type: z.string().optional(),
+  imageUrl: z.array(z.string()).optional(),
+  capacity: z.number().optional(),
+  licensePlate: z.string().optional(),
+  status: VehicleStatusSchema.optional(),
+});
+
+export const extendedUpdateVehicleServerSchema =
+  updateVehicleSchemaServer.extend({
+    path: z.string(),
+    id: z.string().optional(),
+  });
+
+export type ExtendedUpdateVehicleServerSchema = z.infer<
+  typeof extendedUpdateVehicleServerSchema
+>;
+
+export const updateVehicleStatusesSchema = z.object({
+  ids: z.string().array(),
+  status: VehicleStatusSchema.optional(),
+  path: z.string(),
+});
+
+export type UpdateVehicleStatusesSchema = z.infer<
+  typeof updateVehicleStatusesSchema
+>;
+
+export const deleteVehiclesSchema = z.object({
+  ids: z.string().array(),
+  path: z.string(),
+});
+
+export type DeleteVehiclesSchema = z.infer<typeof deleteVehiclesSchema>;

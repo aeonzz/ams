@@ -6,10 +6,10 @@ import { type Table } from "@tanstack/react-table";
 import { exportTableToCSV } from "@/lib/export";
 import { Button } from "@/components/ui/button";
 
-// import { DeleteUsersDialog } from "./delete-users-dialog"
 import { type Vehicle } from "prisma/generated/zod";
 import { PlusIcon } from "lucide-react";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
+import { DeleteVehiclesDialog } from "./delete-vehicles-dialog";
 
 interface VehiclesTableToolbarActionsProps {
   table: Table<Vehicle>;
@@ -21,18 +21,20 @@ export function VehiclesTableToolbarActions({
   const dialogManager = useDialogManager();
   return (
     <div className="flex items-center gap-2">
-      {/* {table.getFilteredSelectedRowModel().rows.length > 0 ? (
-        <DeleteUsersDialog
-          users={table
+      {table.getFilteredSelectedRowModel().rows.length > 0 ? (
+        <DeleteVehiclesDialog
+          vehicles={table
             .getFilteredSelectedRowModel()
             .rows.map((row) => row.original)}
           onSuccess={() => table.toggleAllRowsSelected(false)}
         />
-      ) : null}*/}
+      ) : null}
       <Button
         variant="secondary"
         size="sm"
-        onClick={() => dialogManager.setActiveDialog("adminCreateVehicleDialog")}
+        onClick={() =>
+          dialogManager.setActiveDialog("adminCreateVehicleDialog")
+        }
       >
         <PlusIcon className="mr-2 size-4" aria-hidden="true" />
         Add vehicle

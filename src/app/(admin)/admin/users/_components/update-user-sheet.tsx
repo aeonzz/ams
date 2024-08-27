@@ -35,15 +35,15 @@ import {
 import { Department, RoleTypeSchema, User } from "prisma/generated/zod";
 import { updateUserSchema, UpdateUserSchema } from "@/lib/schema/user";
 import { Input } from "@/components/ui/input";
-import {
-  useServerActionMutation,
-} from "@/lib/hooks/server-action-hooks";
+import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
 import { usePathname } from "next/navigation";
 import { updateUser } from "@/lib/actions/users";
 import { Separator } from "@/components/ui/separator";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import { getRoleIcon, textTransform } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 
 interface UpdateUserSheetProps
   extends React.ComponentPropsWithRef<typeof Sheet> {
@@ -122,7 +122,7 @@ export function UpdateUserSheet({ user, ...props }: UpdateUserSheetProps) {
             onSubmit={form.handleSubmit(onSubmit)}
             className="flex h-screen flex-col justify-between"
           >
-            <div className="relative space-y-2 px-4">
+            <div className="scroll-bar relative max-h-[75vh] space-y-2 overflow-y-auto px-4 pb-1">
               <FormField
                 control={form.control}
                 name="email"
@@ -142,78 +142,76 @@ export function UpdateUserSheet({ user, ...props }: UpdateUserSheetProps) {
                   </FormItem>
                 )}
               />
-              <div className="flex justify-between space-x-3">
-                <FormField
-                  control={form.control}
-                  name="username"
-                  render={({ field }) => (
-                    <FormItem className="flex-1">
-                      <FormLabel>Username</FormLabel>
+              <FormField
+                control={form.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormLabel>Username</FormLabel>
+                    <FormControl>
+                      <Input
+                        autoComplete="off"
+                        placeholder="Aeonz"
+                        disabled={isPending}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="department"
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormLabel>Department</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
-                        <Input
-                          autoComplete="off"
-                          placeholder="Aeonz"
+                        <SelectTrigger
+                          className="bg-secondary capitalize"
                           disabled={isPending}
-                          {...field}
-                        />
+                        >
+                          <SelectValue
+                            placeholder={
+                              isLoading ? (
+                                <LoadingSpinner />
+                              ) : (
+                                "Select a department"
+                              )
+                            }
+                          />
+                        </SelectTrigger>
                       </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="department"
-                  render={({ field }) => (
-                    <FormItem className="flex-1">
-                      <FormLabel>Department</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger
-                            className="bg-secondary capitalize"
-                            disabled={isPending}
-                          >
-                            <SelectValue
-                              placeholder={
-                                isLoading ? (
-                                  <LoadingSpinner />
-                                ) : (
-                                  "Select a department"
-                                )
-                              }
-                            />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className="bg-secondary">
-                          <SelectGroup>
-                            {data?.length === 0 ? (
-                              <p className="p-4 text-center text-sm">
-                                No departments yet
-                              </p>
-                            ) : (
-                              <>
-                                {data?.map((item) => (
-                                  <SelectItem
-                                    key={item.id}
-                                    value={item.name}
-                                    className="capitalize"
-                                  >
-                                    {item.name}
-                                  </SelectItem>
-                                ))}
-                              </>
-                            )}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+                      <SelectContent className="bg-secondary">
+                        <SelectGroup>
+                          {data?.length === 0 ? (
+                            <p className="p-4 text-center text-sm">
+                              No departments yet
+                            </p>
+                          ) : (
+                            <>
+                              {data?.map((item) => (
+                                <SelectItem
+                                  key={item.id}
+                                  value={item.name}
+                                  className="capitalize"
+                                >
+                                  {item.name}
+                                </SelectItem>
+                              ))}
+                            </>
+                          )}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="role"
@@ -234,15 +232,21 @@ export function UpdateUserSheet({ user, ...props }: UpdateUserSheetProps) {
                       </FormControl>
                       <SelectContent className="bg-secondary">
                         <SelectGroup>
-                          {RoleTypeSchema.options.map((item) => (
-                            <SelectItem
-                              key={item}
-                              value={item}
-                              className="capitalize"
-                            >
-                              {item}
-                            </SelectItem>
-                          ))}
+                          {RoleTypeSchema.options.map((role) => {
+                            const { icon: Icon, variant } = getRoleIcon(role);
+                            return (
+                              <SelectItem
+                                key={role}
+                                value={role}
+                                className="capitalize"
+                              >
+                                <Badge variant={variant}>
+                                  <Icon className="mr-1 size-4" />
+                                  {textTransform(role)}
+                                </Badge>
+                              </SelectItem>
+                            );
+                          })}
                         </SelectGroup>
                       </SelectContent>
                     </Select>

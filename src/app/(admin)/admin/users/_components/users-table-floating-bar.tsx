@@ -48,6 +48,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { getRoleIcon, textTransform } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 
 interface UsersTableFloatingBarProps {
   table: Table<User>;
@@ -154,11 +156,21 @@ export function UsersTableFloatingBar({ table }: UsersTableFloatingBarProps) {
               </Tooltip>
               <SelectContent align="center">
                 <SelectGroup>
-                  {RoleTypeSchema.options.map((role) => (
-                    <SelectItem key={role} value={role} className="capitalize">
-                      {role}
-                    </SelectItem>
-                  ))}
+                  {RoleTypeSchema.options.map((role) => {
+                    const { icon: Icon, variant } = getRoleIcon(role);
+                    return (
+                      <SelectItem
+                        key={role}
+                        value={role}
+                        className="capitalize"
+                      >
+                        <Badge variant={variant}>
+                          <Icon className="mr-1 size-4" />
+                          {textTransform(role)}
+                        </Badge>
+                      </SelectItem>
+                    );
+                  })}
                 </SelectGroup>
               </SelectContent>
             </Select>

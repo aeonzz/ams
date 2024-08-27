@@ -18,7 +18,7 @@ import placeholder from "public/placeholder.svg";
 
 export async function getVenues(input: GetVenuesSchema) {
   await checkAuth();
-  const { page, per_page, sort, name, status, location, from, to } = input;
+  const { page, per_page, sort, name, status, from, to } = input;
 
   try {
     const skip = (page - 1) * per_page;
@@ -32,10 +32,6 @@ export async function getVenues(input: GetVenuesSchema) {
 
     if (name) {
       where.name = { contains: name, mode: "insensitive" };
-    }
-
-    if (location) {
-      where.location = { contains: location, mode: "insensitive" };
     }
 
     if (status) {

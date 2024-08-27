@@ -89,7 +89,7 @@ export default function CreateVehicleForm({
   return (
     <Form {...form}>
       <form autoComplete="off" onSubmit={form.handleSubmit(onSubmit)}>
-        <div className="scroll-bar flex max-h-[55vh] flex-col gap-6 overflow-y-auto px-4 py-1">
+        <div className="scroll-bar flex max-h-[55vh] flex-col gap-2 overflow-y-auto px-4 py-1">
           <FormField
             control={form.control}
             name="name"

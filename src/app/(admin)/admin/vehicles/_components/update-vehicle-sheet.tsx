@@ -23,19 +23,14 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { VenueStatusSchema, type Venue } from "prisma/generated/zod";
+import { VehicleStatusSchema, type Vehicle } from "prisma/generated/zod";
 import { Input } from "@/components/ui/input";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
 import { usePathname } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
-import {
-  updateVenueSchema,
-  type UpdateVenueSchema,
-} from "@/lib/db/schema/venue";
 import { FileUploader } from "@/components/file-uploader";
 import { useUploadFile } from "@/lib/hooks/use-upload-file";
-import { type ExtendedUpdateVenueServerSchema } from "@/lib/schema/venue";
-import { updateVenue } from "@/lib/actions/venue";
+import { updateVehicle } from "@/lib/actions/vehicle";
 import {
   Select,
   SelectContent,
@@ -44,42 +39,49 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { getVenueStatusIcon, textTransform } from "@/lib/utils";
+import { getVehicleStatusIcon, textTransform } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import {
+  updateVehicleSchema,
+  type UpdateVehicleSchema,
+} from "@/lib/db/schema/vehicle";
+import { ExtendedUpdateVehicleServerSchema } from "@/lib/schema/vehicle";
 
-interface UpdateDeparVenueProps
-  extends React.ComponentPropsWithRef<typeof Sheet> {
-  venue: Venue;
+interface UpdateVehicleProps extends React.ComponentPropsWithRef<typeof Sheet> {
+  vehicle: Vehicle;
 }
 
-export function UpdateVenueSheet({ venue, ...props }: UpdateDeparVenueProps) {
+export function UpdateVehicleSheet({ vehicle, ...props }: UpdateVehicleProps) {
   const pathname = usePathname();
-  const form = useForm<UpdateVenueSchema>({
-    resolver: zodResolver(updateVenueSchema),
+  const form = useForm<UpdateVehicleSchema>({
+    resolver: zodResolver(updateVehicleSchema),
     defaultValues: {
-      name: venue.name,
-      location: venue.location,
-      capacity: venue.capacity,
-      status: venue.status,
+      name: vehicle.name,
+      type: vehicle.type,
+      capacity: vehicle.capacity,
+      licensePlate: vehicle.licensePlate,
+      status: vehicle.status,
+      imageUrl: undefined,
     },
   });
 
   const { dirtyFields } = useFormState({ control: form.control });
 
-  const { isPending, mutateAsync } = useServerActionMutation(updateVenue);
+  const { isPending, mutateAsync } = useServerActionMutation(updateVehicle);
   const { uploadFiles, progresses, isUploading } = useUploadFile();
 
   React.useEffect(() => {
     form.reset({
-      name: venue.name,
-      location: venue.location,
-      capacity: venue.capacity,
-      status: venue.status,
+      name: vehicle.name,
+      type: vehicle.type,
+      capacity: vehicle.capacity,
+      licensePlate: vehicle.licensePlate,
+      status: vehicle.status,
       imageUrl: undefined,
     });
-  }, [venue, form, props.open]);
+  }, [vehicle, form, props.open]);
 
-  async function onSubmit(values: UpdateVenueSchema) {
+  async function onSubmit(values: UpdateVehicleSchema) {
     try {
       let uploadedFilesResult: { filePath: string }[] = [];
 
@@ -87,12 +89,13 @@ export function UpdateVenueSheet({ venue, ...props }: UpdateDeparVenueProps) {
         uploadedFilesResult = await uploadFiles(values.imageUrl);
       }
 
-      const data: ExtendedUpdateVenueServerSchema = {
-        id: venue.id,
+      const data: ExtendedUpdateVehicleServerSchema = {
+        id: vehicle.id,
         path: pathname,
         name: values.name,
-        location: values.location,
+        type: values.type,
         capacity: values.capacity,
+        licensePlate: values.licensePlate,
         status: values.status,
         imageUrl: uploadedFilesResult.map(
           (result: { filePath: string }) => result.filePath
@@ -103,7 +106,7 @@ export function UpdateVenueSheet({ venue, ...props }: UpdateDeparVenueProps) {
         loading: "Updating...",
         success: () => {
           props.onOpenChange?.(false);
-          return "Venue updated succesfully.";
+          return "Vehicle updated succesfully.";
         },
         error: (err) => {
           console.log(err);
@@ -126,9 +129,9 @@ export function UpdateVenueSheet({ venue, ...props }: UpdateDeparVenueProps) {
         }}
       >
         <SheetHeader className="text-left">
-          <SheetTitle>Update venue</SheetTitle>
+          <SheetTitle>Update vehicle</SheetTitle>
           <SheetDescription>
-            Update the venue details and save the changes
+            Update the vehicle details and save the changes
           </SheetDescription>
         </SheetHeader>
         <Form {...form}>
@@ -146,7 +149,7 @@ export function UpdateVenueSheet({ venue, ...props }: UpdateDeparVenueProps) {
                     <FormControl>
                       <Input
                         autoComplete="off"
-                        placeholder="Audio Visual Room"
+                        placeholder="Campus Shuttle"
                         disabled={isPending || isUploading}
                         {...field}
                       />
@@ -157,14 +160,32 @@ export function UpdateVenueSheet({ venue, ...props }: UpdateDeparVenueProps) {
               />
               <FormField
                 control={form.control}
-                name="location"
+                name="type"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Location</FormLabel>
+                    <FormLabel>Type</FormLabel>
                     <FormControl>
                       <Input
                         autoComplete="off"
-                        placeholder="Jasaan USTP"
+                        placeholder="e.g., Bus, Van, Car"
+                        disabled={isPending || isUploading}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="licensePlate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>License plate</FormLabel>
+                    <FormControl>
+                      <Input
+                        autoComplete="off"
+                        placeholder="ABC 1234"
                         disabled={isPending || isUploading}
                         {...field}
                       />
@@ -183,7 +204,7 @@ export function UpdateVenueSheet({ venue, ...props }: UpdateDeparVenueProps) {
                       <Input
                         autoComplete="off"
                         type="number"
-                        placeholder="24"
+                        placeholder="24 seats"
                         disabled={isPending || isUploading}
                         {...field}
                       />
@@ -212,9 +233,9 @@ export function UpdateVenueSheet({ venue, ...props }: UpdateDeparVenueProps) {
                       </FormControl>
                       <SelectContent className="bg-secondary">
                         <SelectGroup>
-                          {VenueStatusSchema.options.map((status) => {
+                          {VehicleStatusSchema.options.map((status) => {
                             const { icon: Icon, variant } =
-                              getVenueStatusIcon(status);
+                              getVehicleStatusIcon(status);
                             return (
                               <SelectItem
                                 key={status}
@@ -240,7 +261,7 @@ export function UpdateVenueSheet({ venue, ...props }: UpdateDeparVenueProps) {
                 name="imageUrl"
                 render={({ field }) => (
                   <FormItem className="w-full">
-                    <FormLabel>Venue image</FormLabel>
+                    <FormLabel>Vehicle image</FormLabel>
                     <FormControl>
                       <FileUploader
                         value={field.value}
