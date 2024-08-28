@@ -61,21 +61,15 @@ export function DataTableFacetedFilter<TData, TValue>({
                 ) : (
                   options
                     .filter((option) => selectedValues.has(option.value))
-                    .map((option) => {
-                      const { icon: Icon, variant } = getVenueStatusIcon(
-                        option.value as VenueStatusType
-                      );
-                      return (
-                        <Badge
-                          variant={variant}
-                          key={option.value}
-                          className="rounded-sm px-1"
-                        >
-                          <Icon className="mr-1 size-4" />
-                          {textTransform(option.value)}
-                        </Badge>
-                      );
-                    })
+                    .map((option) => (
+                      <Badge
+                        variant="secondary"
+                        key={option.value}
+                        className="rounded-sm px-1"
+                      >
+                        {textTransform(option.value)}
+                      </Badge>
+                    ))
                 )}
               </div>
             </>

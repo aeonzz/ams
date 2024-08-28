@@ -9,6 +9,7 @@ export * from './JobRequestSchema';
 export * from './VenueRequestSchema';
 export * from './VenueSchema';
 export * from './ResourceRequestSchema';
+export * from './ResourceItemSchema';
 export * from './TransportRequestSchema';
 export * from './VehicleSchema';
 export * from './MaintenanceRecordSchema';

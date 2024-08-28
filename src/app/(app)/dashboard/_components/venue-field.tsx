@@ -78,7 +78,7 @@ export default function VenueField({ form, name, isPending }: VenueProps) {
                       {data?.find((venue) => venue.id === field.value)?.name}
                     </p>
                   ) : (
-                    "Select vehicle"
+                    "Select venue"
                   )}
                   {isLoading ? (
                     <LoadingSpinner className="ml-auto" />
@@ -90,9 +90,9 @@ export default function VenueField({ form, name, isPending }: VenueProps) {
             </PopoverTrigger>
             <PopoverContent className="p-0" align="start">
               <Command>
-                <CommandInput placeholder="Search vehicles..." />
+                <CommandInput placeholder="Search venues..." />
                 <CommandList>
-                  <CommandEmpty>No vehicles found.</CommandEmpty>
+                  <CommandEmpty>No venues found.</CommandEmpty>
                   <CommandGroup>
                     {data?.map((venue) => {
                       const { icon: Icon, variant } = getVenueStatusIcon(

@@ -1,17 +1,13 @@
 "use client";
 
-import { createVenueRequest } from "@/lib/actions/requests";
+import { ExtendedResourceRequestSchema, type ResourceRequestSchema } from "@/lib/schema/resource";
 import {
-  type ExtendedVenueRequestSchema,
-  VenueRequestSchema,
-} from "@/lib/schema/request";
-import {
-  UseMutateAsyncFunction,
+  type UseMutateAsyncFunction,
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
 import React from "react";
-import { UseFormReturn } from "react-hook-form";
+import {type  UseFormReturn } from "react-hook-form";
 import {
   Form,
   FormControl,
@@ -28,10 +24,27 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/text-area";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { CalendarIcon, Check, ChevronsUpDown } from "lucide-react";
+import { cn, isDateInPast } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import { SubmitButton } from "@/components/ui/submit-button";
+import { format, isSameDay } from "date-fns";
+import { Calendar } from "@/components/ui/calendar";
+import { TimePicker } from "@/components/ui/time-picker";
 import { Input } from "@/components/ui/input";
 import { usePathname } from "next/navigation";
 import { toast } from "sonner";
@@ -44,88 +57,37 @@ import DateTimePicker from "@/components/ui/date-time-picker";
 import { H3, P } from "@/components/typography/text";
 import ScheduledEventCard from "./scheduled-event-card";
 import VenueField from "./venue-field";
+import { createResourceRequest } from "@/lib/actions/resource";
+import ResourceField from "./resource-field";
 
-const purpose = [
-  {
-    id: "Lecture/Forum/Symposium",
-    label: "Lecture/Forum/Symposium",
-  },
-  {
-    id: "Film Showing",
-    label: "Film Showing",
-  },
-  {
-    id: "Seminar/Workshop",
-    label: "Seminar/Workshop",
-  },
-  {
-    id: "Video Coverage",
-    label: "Video Coverage",
-  },
-  {
-    id: "College Meeting/Conference",
-    label: "College Meeting/Conference",
-  },
-  {
-    id: "other",
-    label: "Others",
-  },
-] as const;
-
-const setup = [
-  {
-    id: "Slide Viewing",
-    label: "Slide Viewing",
-  },
-  {
-    id: "Overhead Projector",
-    label: "Overhead Projector",
-  },
-  {
-    id: "TV",
-    label: "TV",
-  },
-  {
-    id: "Video Player",
-    label: "Video Player",
-  },
-  {
-    id: "Data Projector (LCD Projector)",
-    label: "Data Projector (LCD Projector)",
-  },
-  {
-    id: "other",
-    label: "Others",
-  },
-] as const;
-
-interface VenueRequestInputProps {
+interface ResourceRequestInputProps {
   mutateAsync: UseMutateAsyncFunction<
     any,
     Error,
-    Parameters<typeof createVenueRequest>[0],
+    Parameters<typeof createResourceRequest>[0],
     unknown
   >;
   isPending: boolean;
-  form: UseFormReturn<VenueRequestSchema>;
+  form: UseFormReturn<ResourceRequestSchema>;
   type: RequestTypeType;
   handleOpenChange: (open: boolean) => void;
   isFieldsDirty: boolean;
 }
 
-export default function VenueRequestInput({
+export default function ResourceRequestInput({
   form,
   mutateAsync,
   isPending,
   type,
   handleOpenChange,
   isFieldsDirty,
-}: VenueRequestInputProps) {
+}: ResourceRequestInputProps) {
   const pathname = usePathname();
   const currentUser = useSession();
   const { department } = currentUser;
   const queryClient = useQueryClient();
-  const venueId = form.watch("venueId");
+
+  const [open, setOpen] = React.useState(false);
 
   const { data, isLoading, refetch, isRefetching } = useQuery<
     ReservedDatesAndTimes[]
@@ -166,8 +128,8 @@ export default function VenueRequestInput({
     });
   }, [data]);
 
-  async function onSubmit(values: VenueRequestSchema) {
-    const data: ExtendedVenueRequestSchema = {
+  async function onSubmit(values: ResourceRequestSchema) {
+    const data: ExtendedResourceRequestSchema = {
       ...values,
       priority: "LOW",
       type: type,
@@ -194,17 +156,17 @@ export default function VenueRequestInput({
   return (
     <>
       <DialogHeader>
-        <DialogTitle>Venue Request</DialogTitle>
+        <DialogTitle>Resource Request</DialogTitle>
       </DialogHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="scroll-bar flex max-h-[60vh] gap-6 overflow-y-auto px-4 py-1">
             <div className="flex w-[307px] flex-col space-y-2">
-              <VenueField form={form} name="venueId" isPending={isPending} />
+              <ResourceField form={form} name="resourceItems" isPending={isPending} />
               <DateTimePicker
                 form={form}
-                name="startTime"
-                label="Start Time"
+                name="dateNeeded"
+                label="Date needed"
                 isLoading={isLoading}
                 disabled={isPending || !venueId}
                 disabledDates={disabledDates}

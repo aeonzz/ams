@@ -33,8 +33,6 @@ export default function PendingReqCard({ data }: PendingReqCardProps) {
         </div>
         <div className="flex space-x-1">
           <Badge variant="secondary">{data.jobRequest?.jobType}</Badge>
-          <Badge variant="secondary">{data.jobRequest?.category}</Badge>
-          <Badge variant="secondary">{data.jobRequest?.name}</Badge>
         </div>
       </CardHeader>
     </Card>

@@ -3,6 +3,7 @@ import {
   PriorityTypeSchema,
   RequestStatusTypeSchema,
   RequestTypeSchema,
+  ResourceItemSchema,
 } from "prisma/generated/zod";
 
 export const requestSchemaBase = z.object({
@@ -41,12 +42,20 @@ export const venueRequestSchema = z.object({
     message: "You have to select at least one item.",
   }),
   otherPurpose: z.string().optional(),
-  startTime: z.date({
-    required_error: "Start time is required",
-  }),
-  endTime: z.date({
-    required_error: "End time is required",
-  }),
+  startTime: z
+    .date({
+      required_error: "Start time is required",
+    })
+    .min(new Date(), {
+      message: "Date needed must be in the future",
+    }),
+  endTime: z
+    .date({
+      required_error: "End time is required",
+    })
+    .min(new Date(), {
+      message: "Date needed must be in the future",
+    }),
   setupRequirements: z
     .array(z.string())
     .refine((value) => value.some((item) => item), {
@@ -80,9 +89,13 @@ export const transportRequestSchema = z.object({
   }),
   description: z.string().min(1, "Description is required"),
   destination: z.string().min(1, "Please add a destination"),
-  dateAndTimeNeeded: z.date({
-    required_error: "Start time is required",
-  }),
+  dateAndTimeNeeded: z
+    .date({
+      required_error: "Start time is required",
+    })
+    .min(new Date(), {
+      message: "Date needed must be in the future",
+    }),
 });
 
 export type TransportRequestSchema = z.infer<typeof transportRequestSchema>;
@@ -129,3 +142,4 @@ export const extendedUpdateJobRequestSchema = updateJobRequestSchema.extend({
 export type ExtendedUpdateJobRequestSchema = z.infer<
   typeof extendedUpdateJobRequestSchema
 >;
+

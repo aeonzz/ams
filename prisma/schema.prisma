@@ -135,12 +135,29 @@ model Venue {
 }
 
 model ResourceRequest {
-  id         String   @id
-  itemType   String
-  quantity   Int
-  returnDate DateTime
-  requestId  String   @unique
-  request    Request  @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  id            String         @id
+  resourceItems ResourceItem[]
+  quantity      Int
+  dateNeeded    DateTime
+  returnDate    DateTime?
+  purpose       String?
+  requestId     String         @unique
+  request       Request        @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model ResourceItem {
+  id          String            @id
+  name        String
+  description String?
+  itemType    ItemType
+  quantity    Int
+  status      ItemStatus        @default(AVAILABLE)
+  imageUrl    String
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  requests    ResourceRequest[]
 }
 
 model TransportRequest {
@@ -176,6 +193,26 @@ model MaintenanceRecord {
   details   String
   vehicleId String
   vehicle   Vehicle  @relation(fields: [vehicleId], references: [id])
+}
+
+enum ItemType {
+  ELECTRONICS
+  FURNITURE
+  STATIONERY
+  VEHICLE
+  EQUIPMENT
+  BOOK
+  SOFTWARE
+  OTHER
+}
+
+enum ItemStatus {
+  AVAILABLE
+  IN_USE
+  MAINTENANCE
+  LOST
+  RETURNED
+  PENDING_RETURN
 }
 
 enum VenueStatus {
