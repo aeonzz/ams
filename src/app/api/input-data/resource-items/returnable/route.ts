@@ -6,9 +6,9 @@ import { checkAuth } from "@/lib/auth/utils";
 export async function GET(req: Request) {
   await checkAuth();
   try {
-    const resourceItems = await db.resourceItem.findMany({});
+    const returnableItems = await db.returnableItem.findMany({});
 
-    return NextResponse.json({ data: resourceItems }, { status: 200 });
+    return NextResponse.json({ data: returnableItems }, { status: 200 });
   } catch (error) {
     console.log(errorMonitor);
     return NextResponse.json(

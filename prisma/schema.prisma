@@ -74,21 +74,22 @@ model Setting {
 }
 
 model Request {
-  id               String            @id
-  approvedAt       DateTime?
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
-  priority         PriorityType
-  type             RequestType
-  title            String
-  status           RequestStatusType @default(PENDING)
-  userId           String
-  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  department       String
-  jobRequest       JobRequest?
-  venueRequest     VenueRequest?
-  resourceRequest  ResourceRequest?
-  transportRequest TransportRequest?
+  id                String             @id
+  approvedAt        DateTime?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  priority          PriorityType
+  type              RequestType
+  title             String
+  status            RequestStatusType  @default(PENDING)
+  userId            String
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  department        String
+  jobRequest        JobRequest?
+  venueRequest      VenueRequest?
+  ReturnableRequest ReturnableRequest?
+  ConsumableRequest ConsumableRequest?
+  transportRequest  TransportRequest?
 }
 
 model ItemCategory {
@@ -134,30 +135,61 @@ model Venue {
   requests  VenueRequest[]
 }
 
-model ResourceRequest {
-  id            String         @id
-  resourceItems ResourceItem[]
-  quantity      Int
-  dateNeeded    DateTime
-  returnDate    DateTime?
-  purpose       String?
-  requestId     String         @unique
-  request       Request        @relation(fields: [requestId], references: [id], onDelete: Cascade)
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+model ReturnableRequest {
+  id         String           @id
+  items      ReturnableItem[]
+  quantity   Int
+  dateNeeded DateTime
+  returnDate DateTime
+  purpose    String?
+  status     RequestStatus    @default(PENDING)
+  requestId  String           @unique
+  request    Request          @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
 }
 
-model ResourceItem {
-  id          String            @id
-  name        String
-  description String?
-  itemType    ItemType
-  quantity    Int
-  status      ItemStatus        @default(AVAILABLE)
-  imageUrl    String
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
-  requests    ResourceRequest[]
+model ConsumableRequest {
+  id         String           @id
+  items      ConsumableItem[]
+  quantity   Int
+  dateNeeded DateTime
+  purpose    String?
+  status     RequestStatus    @default(PENDING)
+  requestId  String           @unique
+  request    Request          @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+}
+
+model ReturnableItem {
+  id                  String               @id
+  name                String
+  description         String?
+  status              ReturnableItemStatus @default(AVAILABLE)
+  imageUrl            String?
+  serialNumber        String?              @unique
+  lastMaintenance     DateTime?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  returnableRequest   ReturnableRequest?   @relation(fields: [returnableRequestId], references: [id])
+  returnableRequestId String?
+}
+
+model ConsumableItem {
+  id                  String               @id
+  name                String
+  description         String?
+  status              ConsumableItemStatus @default(IN_STOCK)
+  imageUrl            String?
+  quantity            Int
+  unit                String
+  lowStockThreshold   Int
+  expirationDate      DateTime?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  consumableRequest   ConsumableRequest?   @relation(fields: [consumableRequestId], references: [id])
+  consumableRequestId String?
 }
 
 model TransportRequest {
@@ -195,24 +227,30 @@ model MaintenanceRecord {
   vehicle   Vehicle  @relation(fields: [vehicleId], references: [id])
 }
 
-enum ItemType {
-  ELECTRONICS
-  FURNITURE
-  STATIONERY
-  VEHICLE
-  EQUIPMENT
-  BOOK
-  SOFTWARE
-  OTHER
-}
-
-enum ItemStatus {
+enum ReturnableItemStatus {
   AVAILABLE
   IN_USE
   MAINTENANCE
   LOST
   RETURNED
   PENDING_RETURN
+}
+
+enum ConsumableItemStatus {
+  IN_STOCK
+  LOW_STOCK
+  OUT_OF_STOCK
+  ORDERED
+  EXPIRED
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  FULFILLED
+  RETURNED
+  PARTIALLY_FULFILLED
 }
 
 enum VenueStatus {

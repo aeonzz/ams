@@ -3,7 +3,6 @@ import {
   PriorityTypeSchema,
   RequestStatusTypeSchema,
   RequestTypeSchema,
-  ResourceItemSchema,
 } from "prisma/generated/zod";
 
 export const requestSchemaBase = z.object({

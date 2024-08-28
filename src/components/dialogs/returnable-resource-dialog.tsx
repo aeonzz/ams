@@ -5,11 +5,6 @@ import React from "react";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   AlertDialog,
@@ -27,23 +22,21 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { X } from "lucide-react";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
-import { createResourceRequest } from "@/lib/actions/resource";
-import ResourceRequestInput from "@/app/(app)/dashboard/_components/resource-request-input";
 import {
-  resourceRequestSchema,
-  type ResourceRequestSchema,
-} from "@/lib/schema/resource";
-import { cn } from "@/lib/utils";
+  returnableResourceRequestSchema,
+  type ReturnableResourceRequestSchema,
+} from "@/lib/schema/resource/returnable-resource";
+import ReturnableResourceRequestInput from "@/app/(app)/dashboard/_components/returnable-resource-request-input";
+import { createReturnableResourceRequest } from "@/lib/actions/resource";
 
-export default function ResourceDialog() {
+export default function ReturnableResourceDialog() {
   const dialogManager = useDialogManager();
   const [alertOpen, setAlertOpen] = React.useState(false);
 
-  const form = useForm<ResourceRequestSchema>({
-    resolver: zodResolver(resourceRequestSchema),
+  const form = useForm<ReturnableResourceRequestSchema>({
+    resolver: zodResolver(returnableResourceRequestSchema),
     defaultValues: {
-      consumableItems: [],
-      returnableItems: [],
+      items: [],
       quantity: 0,
       dateNeeded: undefined,
       returnDate: undefined,
@@ -55,7 +48,7 @@ export default function ResourceDialog() {
   const isFieldsDirty = Object.keys(dirtyFields).length > 0;
 
   const { mutateAsync, isPending } = useServerActionMutation(
-    createResourceRequest
+    createReturnableResourceRequest
   );
 
   const handleOpenChange = (open: boolean) => {
@@ -70,7 +63,7 @@ export default function ResourceDialog() {
 
   return (
     <Dialog
-      open={dialogManager.activeDialog === "resourceDialog"}
+      open={dialogManager.activeDialog === "returnableResourceDialog"}
       onOpenChange={handleOpenChange}
     >
       <DialogContent
@@ -115,7 +108,7 @@ export default function ResourceDialog() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-        <ResourceRequestInput
+        <ReturnableResourceRequestInput
           mutateAsync={mutateAsync}
           isPending={isPending}
           form={form}

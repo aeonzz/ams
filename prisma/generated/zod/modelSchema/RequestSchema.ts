@@ -5,12 +5,14 @@ import { RequestStatusTypeSchema } from '../inputTypeSchemas/RequestStatusTypeSc
 import type { UserWithRelations } from './UserSchema'
 import type { JobRequestWithRelations } from './JobRequestSchema'
 import type { VenueRequestWithRelations } from './VenueRequestSchema'
-import type { ResourceRequestWithRelations } from './ResourceRequestSchema'
+import type { ReturnableRequestWithRelations } from './ReturnableRequestSchema'
+import type { ConsumableRequestWithRelations } from './ConsumableRequestSchema'
 import type { TransportRequestWithRelations } from './TransportRequestSchema'
 import { UserWithRelationsSchema } from './UserSchema'
 import { JobRequestWithRelationsSchema } from './JobRequestSchema'
 import { VenueRequestWithRelationsSchema } from './VenueRequestSchema'
-import { ResourceRequestWithRelationsSchema } from './ResourceRequestSchema'
+import { ReturnableRequestWithRelationsSchema } from './ReturnableRequestSchema'
+import { ConsumableRequestWithRelationsSchema } from './ConsumableRequestSchema'
 import { TransportRequestWithRelationsSchema } from './TransportRequestSchema'
 
 /////////////////////////////////////////
@@ -40,7 +42,8 @@ export type RequestRelations = {
   user: UserWithRelations;
   jobRequest?: JobRequestWithRelations | null;
   venueRequest?: VenueRequestWithRelations | null;
-  resourceRequest?: ResourceRequestWithRelations | null;
+  ReturnableRequest?: ReturnableRequestWithRelations | null;
+  ConsumableRequest?: ConsumableRequestWithRelations | null;
   transportRequest?: TransportRequestWithRelations | null;
 };
 
@@ -50,7 +53,8 @@ export const RequestWithRelationsSchema: z.ZodType<RequestWithRelations> = Reque
   user: z.lazy(() => UserWithRelationsSchema),
   jobRequest: z.lazy(() => JobRequestWithRelationsSchema).nullable(),
   venueRequest: z.lazy(() => VenueRequestWithRelationsSchema).nullable(),
-  resourceRequest: z.lazy(() => ResourceRequestWithRelationsSchema).nullable(),
+  ReturnableRequest: z.lazy(() => ReturnableRequestWithRelationsSchema).nullable(),
+  ConsumableRequest: z.lazy(() => ConsumableRequestWithRelationsSchema).nullable(),
   transportRequest: z.lazy(() => TransportRequestWithRelationsSchema).nullable(),
 }))
 

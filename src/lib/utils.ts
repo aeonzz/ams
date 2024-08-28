@@ -38,7 +38,6 @@ import { RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTy
 import { BadgeVariant } from "@/components/ui/badge";
 import { VehicleStatusType } from "prisma/generated/zod/inputTypeSchemas/VehicleStatusSchema";
 import { VenueStatusType } from "prisma/generated/zod/inputTypeSchemas/VenueStatusSchema";
-import { ItemStatusType } from "prisma/generated/zod/inputTypeSchemas/ItemStatusSchema";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -277,47 +276,47 @@ export function getVenueStatusIcon(
   return VenueStatusIcons[status] || { icon: CircleIcon, variant: "default" };
 }
 
-type ItemStatusIconConfig = {
-  icon: LucideIcon;
-  variant: BadgeVariant;
-};
+// type ItemStatusIconConfig = {
+//   icon: LucideIcon;
+//   variant: BadgeVariant;
+// };
 
-type ItemStatusIconMap = {
-  [key in ItemStatusType]: ItemStatusIconConfig;
-};
+// type ItemStatusIconMap = {
+//   [key in ItemStatusType]: ItemStatusIconConfig;
+// };
 
-export function getItemStatusIcon(
-  status: ItemStatusType
-): ItemStatusIconConfig {
-  const ItemStatusIcons: ItemStatusIconMap = {
-    AVAILABLE: {
-      icon: CheckCircle,
-      variant: "green",
-    },
-    IN_USE: {
-      icon: Truck,
-      variant: "blue",
-    },
-    MAINTENANCE: {
-      icon: PenTool,
-      variant: "orange",
-    },
-    LOST: {
-      icon: Search,
-      variant: "destructive",
-    },
-    RETURNED: {
-      icon: RotateCcw,
-      variant: "secondary",
-    },
-    PENDING_RETURN: {
-      icon: Clock,
-      variant: "yellow",
-    },
-  };
+// export function getItemStatusIcon(
+//   status: ItemStatusType
+// ): ItemStatusIconConfig {
+//   const ItemStatusIcons: ItemStatusIconMap = {
+//     AVAILABLE: {
+//       icon: CheckCircle,
+//       variant: "green",
+//     },
+//     IN_USE: {
+//       icon: Truck,
+//       variant: "blue",
+//     },
+//     MAINTENANCE: {
+//       icon: PenTool,
+//       variant: "orange",
+//     },
+//     LOST: {
+//       icon: Search,
+//       variant: "destructive",
+//     },
+//     RETURNED: {
+//       icon: RotateCcw,
+//       variant: "secondary",
+//     },
+//     PENDING_RETURN: {
+//       icon: Clock,
+//       variant: "yellow",
+//     },
+//   };
 
-  return ItemStatusIcons[status] || { icon: CircleIcon, variant: "default" };
-}
+//   return ItemStatusIcons[status] || { icon: CircleIcon, variant: "default" };
+// }
 
 export const isDateInPast = (date: Date) => {
   const today = new Date();

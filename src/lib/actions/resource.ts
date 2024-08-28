@@ -8,7 +8,7 @@ import { generateId } from "lucia";
 import { revalidatePath } from "next/cache";
 
 
-export const createResourceRequest = authedProcedure
+export const createReturnableResourceRequest = authedProcedure
   .createServerAction()
   .input(extendedResourceRequestSchema)
   .handler(async ({ ctx, input }) => {

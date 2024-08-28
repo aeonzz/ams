@@ -58,7 +58,7 @@ import { H3, P } from "@/components/typography/text";
 import ScheduledEventCard from "./scheduled-event-card";
 import VenueField from "./venue-field";
 import { createResourceRequest } from "@/lib/actions/resource";
-import ResourceField from "./resource-field";
+import ResourceField from "./items-field";
 
 interface ResourceRequestInputProps {
   mutateAsync: UseMutateAsyncFunction<
@@ -87,46 +87,45 @@ export default function ResourceRequestInput({
   const { department } = currentUser;
   const queryClient = useQueryClient();
 
-  const [open, setOpen] = React.useState(false);
 
-  const { data, isLoading, refetch, isRefetching } = useQuery<
-    ReservedDatesAndTimes[]
-  >({
-    queryFn: async () => {
-      if (!venueId) return [];
-      const res = await axios.get(`/api/reserved-dates/venue/${venueId}`);
-      return res.data.data;
-    },
-    queryKey: [venueId],
-    enabled: !!venueId,
-    refetchOnWindowFocus: false,
-  });
+  // const { data, isLoading, refetch, isRefetching } = useQuery<
+  //   ReservedDatesAndTimes[]
+  // >({
+  //   queryFn: async () => {
+  //     if (!venueId) return [];
+  //     const res = await axios.get(`/api/reserved-dates/venue/${venueId}`);
+  //     return res.data.data;
+  //   },
+  //   queryKey: [venueId],
+  //   enabled: !!venueId,
+  //   refetchOnWindowFocus: false,
+  // });
 
-  React.useEffect(() => {
-    if (venueId) {
-      refetch();
-    }
-  }, [venueId, refetch]);
+  // React.useEffect(() => {
+  //   if (venueId) {
+  //     refetch();
+  //   }
+  // }, [venueId, refetch]);
 
-  const disabledDates = React.useMemo(() => {
-    if (!data) return [];
+  // const disabledDates = React.useMemo(() => {
+  //   if (!data) return [];
 
-    return data.flatMap((item) => {
-      const startDate = new Date(item.startTime);
-      const endDate = new Date(item.endTime);
-      const dates = [];
+  //   return data.flatMap((item) => {
+  //     const startDate = new Date(item.startTime);
+  //     const endDate = new Date(item.endTime);
+  //     const dates = [];
 
-      for (
-        let date = startDate;
-        date <= endDate;
-        date.setDate(date.getDate() + 1)
-      ) {
-        dates.push(new Date(date));
-      }
+  //     for (
+  //       let date = startDate;
+  //       date <= endDate;
+  //       date.setDate(date.getDate() + 1)
+  //     ) {
+  //       dates.push(new Date(date));
+  //     }
 
-      return dates;
-    });
-  }, [data]);
+  //     return dates;
+  //   });
+  // }, [data]);
 
   async function onSubmit(values: ResourceRequestSchema) {
     const data: ExtendedResourceRequestSchema = {
@@ -163,7 +162,7 @@ export default function ResourceRequestInput({
           <div className="scroll-bar flex max-h-[60vh] gap-6 overflow-y-auto px-4 py-1">
             <div className="flex w-[307px] flex-col space-y-2">
               <ResourceField form={form} name="resourceItems" isPending={isPending} />
-              <DateTimePicker
+              {/* <DateTimePicker
                 form={form}
                 name="dateNeeded"
                 label="Date needed"
@@ -200,10 +199,10 @@ export default function ResourceRequestInput({
                     <FormMessage />
                   </FormItem>
                 )}
-              />
+              /> */}
             </div>
             <div className="flex flex-1 flex-col space-y-6">
-              <FormField
+              {/* <FormField
                 control={form.control}
                 name="purpose"
                 render={({ field }) => (
@@ -342,9 +341,9 @@ export default function ResourceRequestInput({
                     </FormItem>
                   )}
                 />
-              )}
+              )} */}
             </div>
-            {venueId && (
+            {/* {venueId && (
               <div
                 className={cn("scroll-bar max-h-[55vh] w-72 overflow-y-auto")}
               >
@@ -365,7 +364,7 @@ export default function ResourceRequestInput({
                   </>
                 )}
               </div>
-            )}
+            )} */}
           </div>
           <Separator className="my-4" />
           <DialogFooter>

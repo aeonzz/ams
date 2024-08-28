@@ -22,6 +22,7 @@ import { useHotkeys } from "react-hotkeys-hook";
 import JobDialog from "@/components/dialogs/job-dialog";
 import VenueDialog from "@/components/dialogs/venue-dialog";
 import TransportDialog from "@/components/dialogs/transport-dialog";
+import ReturnableResourceDialog from "@/components/dialogs/returnable-resource-dialog";
 
 export type ReqType = {
   value: RequestTypeType;
@@ -47,7 +48,7 @@ const RequestTypes: ReqType[] = [
     value: "RESOURCE",
     label: "Resource",
     icon: Lightbulb,
-    dialog: "resourceDialog",
+    dialog: "returnableResourceDialog",
   },
   {
     value: "TRANSPORT",
@@ -104,6 +105,7 @@ export default function RequestOption() {
       <JobDialog />
       <VenueDialog />
       <TransportDialog />
+      <ReturnableResourceDialog />
     </>
   );
 }
