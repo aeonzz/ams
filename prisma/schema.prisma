@@ -87,8 +87,8 @@ model Request {
   department        String
   jobRequest        JobRequest?
   venueRequest      VenueRequest?
-  ReturnableRequest ReturnableRequest?
-  ConsumableRequest ConsumableRequest?
+  returnableRequest ReturnableRequest?
+  consumableRequest ConsumableRequest?
   transportRequest  TransportRequest?
 }
 
@@ -136,17 +136,16 @@ model Venue {
 }
 
 model ReturnableRequest {
-  id         String           @id
-  items      ReturnableItem[]
-  quantity   Int
+  id         String            @id
+  items      ItemReservation[]
   dateNeeded DateTime
   returnDate DateTime
   purpose    String?
-  status     RequestStatus    @default(PENDING)
-  requestId  String           @unique
-  request    Request          @relation(fields: [requestId], references: [id], onDelete: Cascade)
-  createdAt  DateTime         @default(now())
-  updatedAt  DateTime         @updatedAt
+  status     RequestStatus     @default(PENDING)
+  requestId  String            @unique
+  request    Request           @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
 }
 
 model ConsumableRequest {
@@ -163,17 +162,26 @@ model ConsumableRequest {
 }
 
 model ReturnableItem {
-  id                  String               @id
-  name                String
-  description         String?
-  status              ReturnableItemStatus @default(AVAILABLE)
-  imageUrl            String?
-  serialNumber        String?              @unique
-  lastMaintenance     DateTime?
-  createdAt           DateTime             @default(now())
-  updatedAt           DateTime             @updatedAt
-  returnableRequest   ReturnableRequest?   @relation(fields: [returnableRequestId], references: [id])
-  returnableRequestId String?
+  id              String               @id
+  name            String
+  description     String?
+  status          ReturnableItemStatus @default(AVAILABLE)
+  imageUrl        String?
+  serialNumber    String?              @unique
+  lastMaintenance DateTime?
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+  itemReservation ItemReservation[]
+}
+
+model ItemReservation {
+  id        String            @id 
+  itemId    String
+  item      ReturnableItem    @relation(fields: [itemId], references: [id])
+  startDate DateTime
+  endDate   DateTime
+  requestId String
+  request   ReturnableRequest @relation(fields: [requestId], references: [id])
 }
 
 model ConsumableItem {

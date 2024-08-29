@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { ReturnableItemStatusSchema } from '../inputTypeSchemas/ReturnableItemStatusSchema'
-import type { ReturnableRequestWithRelations } from './ReturnableRequestSchema'
-import { ReturnableRequestWithRelationsSchema } from './ReturnableRequestSchema'
+import type { ItemReservationWithRelations } from './ItemReservationSchema'
+import { ItemReservationWithRelationsSchema } from './ItemReservationSchema'
 
 /////////////////////////////////////////
 // RETURNABLE ITEM SCHEMA
@@ -17,7 +17,6 @@ export const ReturnableItemSchema = z.object({
   lastMaintenance: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
-  returnableRequestId: z.string().nullable(),
 })
 
 export type ReturnableItem = z.infer<typeof ReturnableItemSchema>
@@ -27,13 +26,13 @@ export type ReturnableItem = z.infer<typeof ReturnableItemSchema>
 /////////////////////////////////////////
 
 export type ReturnableItemRelations = {
-  returnableRequest?: ReturnableRequestWithRelations | null;
+  itemReservation: ItemReservationWithRelations[];
 };
 
 export type ReturnableItemWithRelations = z.infer<typeof ReturnableItemSchema> & ReturnableItemRelations
 
 export const ReturnableItemWithRelationsSchema: z.ZodType<ReturnableItemWithRelations> = ReturnableItemSchema.merge(z.object({
-  returnableRequest: z.lazy(() => ReturnableRequestWithRelationsSchema).nullable(),
+  itemReservation: z.lazy(() => ItemReservationWithRelationsSchema).array(),
 }))
 
 export default ReturnableItemSchema;

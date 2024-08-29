@@ -1,4 +1,4 @@
-'use server'
+"use server";
 
 import { generateText } from "ai";
 import { authedProcedure, getErrorMessage } from "./utils";
@@ -6,11 +6,11 @@ import { db } from "@/lib/db/index";
 import { cohere } from "@ai-sdk/cohere";
 import { generateId } from "lucia";
 import { revalidatePath } from "next/cache";
-
+import { extendedReturnableResourceRequestSchema } from "../schema/resource/returnable-resource";
 
 export const createReturnableResourceRequest = authedProcedure
   .createServerAction()
-  .input(extendedResourceRequestSchema)
+  .input(extendedReturnableResourceRequestSchema)
   .handler(async ({ ctx, input }) => {
     const { user } = ctx;
 
@@ -26,8 +26,8 @@ export const createReturnableResourceRequest = authedProcedure
         prompt: `Create a clear and concise title for a request based on these details:
                  Notes: 
                  ${input.type} request
-                 ${input.notes}
-                 ${rest.purpose.join(", ")}
+                 ${input.items}
+                 ${rest.items.map((item) => item.name).join(", ")}
 
                  
                  Guidelines:
@@ -63,25 +63,24 @@ export const createReturnableResourceRequest = authedProcedure
           type: rest.type,
           title: text,
           department: rest.department,
-          resourceRequest: {
+          returnableRequest: {
             create: {
               id: resourceRequestId,
-              startTime: rest.startTime,
-              endTime: rest.endTime,
-              purpose: rest.purpose.includes("other")
-                ? [
-                    ...rest.purpose.filter((p) => p !== "other"),
-                    rest.otherPurpose,
-                  ].join(", ")
-                : rest.purpose.join(", "),
-              setupRequirements: rest.setupRequirements.includes("other")
-                ? [
-                    ...rest.setupRequirements.filter((s) => s !== "other"),
-                    rest.otherSetupRequirement,
-                  ].join(", ")
-                : rest.setupRequirements.join(", "),
-              notes: rest.notes,
-              resourceId: rest.resourceId,
+              dateNeeded: rest.dateNeeded,
+              returnDate: rest.returnDate,
+              purpose: rest.purpose,
+              items: {
+                create: rest.items.map((item) => ({
+                  id: `IR-${generateId(15)}`,
+                  item: {
+                    connect: {
+                      id: item.id,
+                    },
+                  },
+                  startDate: rest.dateNeeded,
+                  endDate: rest.returnDate,
+                })),
+              },
             },
           },
         },

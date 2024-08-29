@@ -42,6 +42,8 @@ import type {
   ReturnableResourceRequestSchema,
 } from "@/lib/schema/resource/returnable-resource";
 import ItemsField from "./items-field";
+import { Textarea } from "@/components/ui/text-area";
+import { Input } from "@/components/ui/input";
 
 interface ReturnableResourceRequestInputProps {
   mutateAsync: UseMutateAsyncFunction<
@@ -71,45 +73,6 @@ export default function ReturnableResourceRequestInput({
   const queryClient = useQueryClient();
   const items = form.watch("items");
 
-  const { data, isLoading, refetch, isRefetching } = useQuery<
-    ReservedDatesAndTimes[]
-  >({
-    queryFn: async () => {
-      if (!items) return [];
-      const res = await axios.get(`/api/reserved-dates/items/${items}`);
-      return res.data.data;
-    },
-    queryKey: [items],
-    enabled: !!items,
-    refetchOnWindowFocus: false,
-  });
-
-  React.useEffect(() => {
-    if (items) {
-      refetch();
-    }
-  }, [items, refetch]);
-
-  const disabledDates = React.useMemo(() => {
-    if (!data) return [];
-
-    return data.flatMap((item) => {
-      const startDate = new Date(item.startTime);
-      const endDate = new Date(item.endTime);
-      const dates = [];
-
-      for (
-        let date = startDate;
-        date <= endDate;
-        date.setDate(date.getDate() + 1)
-      ) {
-        dates.push(new Date(date));
-      }
-
-      return dates;
-    });
-  }, [data]);
-
   async function onSubmit(values: ReturnableResourceRequestSchema) {
     const data: ExtendedReturnableResourceRequestSchema = {
       ...values,
@@ -138,24 +101,38 @@ export default function ReturnableResourceRequestInput({
   return (
     <>
       <DialogHeader>
-        <DialogTitle>Venue Request</DialogTitle>
+        <DialogTitle>Returnable Resource Request</DialogTitle>
       </DialogHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="scroll-bar flex max-h-[60vh] gap-6 overflow-y-auto px-4 py-1">
             <div className="flex w-[307px] flex-col space-y-2">
               <ItemsField form={form} name="items" isPending={isPending} />
-              {items && items.map((item) => (
-                <DateTimePicker
-                  key={item.id}
-                  form={form}
-                  name={`itemDates.${item.id}`}
-                  label={`Date needed for ${item.name}`}
-                  isLoading={isLoading}
-                  disabled={isPending}
-                  disabledDates={disabledDates}
-                />
-              ))}
+              <DateTimePicker
+                form={form}
+                name="dateNeeded"
+                label="Date Needed"
+                disabled={isPending}
+              />
+              <DateTimePicker
+                form={form}
+                name="returnDate"
+                label="Return Date"
+                disabled={isPending}
+              />
+              <FormField
+                control={form.control}
+                name="purpose"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Purpose</FormLabel>
+                    <FormControl>
+                      <Textarea {...field} disabled={isPending} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
           </div>
           <Separator className="my-4" />

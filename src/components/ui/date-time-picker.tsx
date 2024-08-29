@@ -41,9 +41,9 @@ import { cn, isDateInPast } from "@/lib/utils";
 interface DateTimePickerProps<T extends FieldValues> {
   form: UseFormReturn<T>;
   name: Path<T>;
-  isLoading: boolean;
+  isLoading?: boolean;
   disabled: boolean;
-  disabledDates: Date[];
+  disabledDates?: Date[];
   label: string;
 }
 

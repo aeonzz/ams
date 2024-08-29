@@ -42,8 +42,8 @@ export type RequestRelations = {
   user: UserWithRelations;
   jobRequest?: JobRequestWithRelations | null;
   venueRequest?: VenueRequestWithRelations | null;
-  ReturnableRequest?: ReturnableRequestWithRelations | null;
-  ConsumableRequest?: ConsumableRequestWithRelations | null;
+  returnableRequest?: ReturnableRequestWithRelations | null;
+  consumableRequest?: ConsumableRequestWithRelations | null;
   transportRequest?: TransportRequestWithRelations | null;
 };
 
@@ -53,8 +53,8 @@ export const RequestWithRelationsSchema: z.ZodType<RequestWithRelations> = Reque
   user: z.lazy(() => UserWithRelationsSchema),
   jobRequest: z.lazy(() => JobRequestWithRelationsSchema).nullable(),
   venueRequest: z.lazy(() => VenueRequestWithRelationsSchema).nullable(),
-  ReturnableRequest: z.lazy(() => ReturnableRequestWithRelationsSchema).nullable(),
-  ConsumableRequest: z.lazy(() => ConsumableRequestWithRelationsSchema).nullable(),
+  returnableRequest: z.lazy(() => ReturnableRequestWithRelationsSchema).nullable(),
+  consumableRequest: z.lazy(() => ConsumableRequestWithRelationsSchema).nullable(),
   transportRequest: z.lazy(() => TransportRequestWithRelationsSchema).nullable(),
 }))
 

@@ -6,10 +6,6 @@ export const returnableResourceRequestSchema = z.object({
   items: z
     .array(ReturnableItemSchema)
     .min(1, "At least one item must be selected"),
-  itemDates: z.record(z.string(), z.date().nullable()),
-  quantity: z.number().int().positive().min(1, {
-    message: "Quantity must be at least 1",
-  }),
   dateNeeded: z
     .date({
       required_error: "Date needed is required",

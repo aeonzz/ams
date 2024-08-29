@@ -12,6 +12,7 @@ export { VenueScalarFieldEnumSchema } from './VenueScalarFieldEnumSchema';
 export { ReturnableRequestScalarFieldEnumSchema } from './ReturnableRequestScalarFieldEnumSchema';
 export { ConsumableRequestScalarFieldEnumSchema } from './ConsumableRequestScalarFieldEnumSchema';
 export { ReturnableItemScalarFieldEnumSchema } from './ReturnableItemScalarFieldEnumSchema';
+export { ItemReservationScalarFieldEnumSchema } from './ItemReservationScalarFieldEnumSchema';
 export { ConsumableItemScalarFieldEnumSchema } from './ConsumableItemScalarFieldEnumSchema';
 export { TransportRequestScalarFieldEnumSchema } from './TransportRequestScalarFieldEnumSchema';
 export { VehicleScalarFieldEnumSchema } from './VehicleScalarFieldEnumSchema';

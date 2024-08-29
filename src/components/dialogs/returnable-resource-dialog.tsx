@@ -37,7 +37,6 @@ export default function ReturnableResourceDialog() {
     resolver: zodResolver(returnableResourceRequestSchema),
     defaultValues: {
       items: [],
-      quantity: 0,
       dateNeeded: undefined,
       returnDate: undefined,
       purpose: "",
