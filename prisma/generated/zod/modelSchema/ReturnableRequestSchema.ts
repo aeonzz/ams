@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import { RequestStatusSchema } from '../inputTypeSchemas/RequestStatusSchema'
-import type { ItemReservationWithRelations } from './ItemReservationSchema'
+import type { ReturnableItemWithRelations } from './ReturnableItemSchema'
 import type { RequestWithRelations } from './RequestSchema'
-import { ItemReservationWithRelationsSchema } from './ItemReservationSchema'
+import { ReturnableItemWithRelationsSchema } from './ReturnableItemSchema'
 import { RequestWithRelationsSchema } from './RequestSchema'
 
 /////////////////////////////////////////
@@ -12,9 +12,10 @@ import { RequestWithRelationsSchema } from './RequestSchema'
 export const ReturnableRequestSchema = z.object({
   status: RequestStatusSchema,
   id: z.string(),
-  dateNeeded: z.coerce.date(),
-  returnDate: z.coerce.date(),
-  purpose: z.string().nullable(),
+  itemId: z.string(),
+  dateAndTimeNeeded: z.coerce.date(),
+  returnDateAndTime: z.coerce.date(),
+  purpose: z.string(),
   requestId: z.string(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
@@ -27,14 +28,14 @@ export type ReturnableRequest = z.infer<typeof ReturnableRequestSchema>
 /////////////////////////////////////////
 
 export type ReturnableRequestRelations = {
-  items: ItemReservationWithRelations[];
+  item: ReturnableItemWithRelations;
   request: RequestWithRelations;
 };
 
 export type ReturnableRequestWithRelations = z.infer<typeof ReturnableRequestSchema> & ReturnableRequestRelations
 
 export const ReturnableRequestWithRelationsSchema: z.ZodType<ReturnableRequestWithRelations> = ReturnableRequestSchema.merge(z.object({
-  items: z.lazy(() => ItemReservationWithRelationsSchema).array(),
+  item: z.lazy(() => ReturnableItemWithRelationsSchema),
   request: z.lazy(() => RequestWithRelationsSchema),
 }))
 

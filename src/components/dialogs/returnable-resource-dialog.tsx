@@ -2,10 +2,7 @@
 
 import React from "react";
 
-import {
-  Dialog,
-  DialogContent,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -36,10 +33,11 @@ export default function ReturnableResourceDialog() {
   const form = useForm<ReturnableResourceRequestSchema>({
     resolver: zodResolver(returnableResourceRequestSchema),
     defaultValues: {
-      items: [],
-      dateNeeded: undefined,
-      returnDate: undefined,
-      purpose: "",
+      itemId: undefined,
+      dateAndTimeNeeded: undefined,
+      returnDateAndTime: undefined,
+      otherPurpose: "other",
+      purpose: ["Lecture/Forum/Symposium"],
     },
   });
 

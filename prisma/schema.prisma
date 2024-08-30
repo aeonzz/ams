@@ -136,16 +136,17 @@ model Venue {
 }
 
 model ReturnableRequest {
-  id         String            @id
-  items      ItemReservation[]
-  dateNeeded DateTime
-  returnDate DateTime
-  purpose    String?
-  status     RequestStatus     @default(PENDING)
-  requestId  String            @unique
-  request    Request           @relation(fields: [requestId], references: [id], onDelete: Cascade)
-  createdAt  DateTime          @default(now())
-  updatedAt  DateTime          @updatedAt
+  id                String         @id
+  itemId            String
+  item              ReturnableItem @relation(fields: [itemId], references: [id])
+  dateAndTimeNeeded DateTime
+  returnDateAndTime DateTime
+  purpose           String
+  status            RequestStatus  @default(PENDING)
+  requestId         String         @unique
+  request           Request        @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
 }
 
 model ConsumableRequest {
@@ -162,26 +163,16 @@ model ConsumableRequest {
 }
 
 model ReturnableItem {
-  id              String               @id
-  name            String
-  description     String?
-  status          ReturnableItemStatus @default(AVAILABLE)
-  imageUrl        String?
-  serialNumber    String?              @unique
-  lastMaintenance DateTime?
-  createdAt       DateTime             @default(now())
-  updatedAt       DateTime             @updatedAt
-  itemReservation ItemReservation[]
-}
-
-model ItemReservation {
-  id        String            @id 
-  itemId    String
-  item      ReturnableItem    @relation(fields: [itemId], references: [id])
-  startDate DateTime
-  endDate   DateTime
-  requestId String
-  request   ReturnableRequest @relation(fields: [requestId], references: [id])
+  id                String               @id
+  name              String
+  description       String
+  status            ReturnableItemStatus @default(AVAILABLE)
+  imageUrl          String
+  serialNumber      String?              @unique
+  lastMaintenance   DateTime?
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+  returnableRequest ReturnableRequest[]
 }
 
 model ConsumableItem {

@@ -26,8 +26,7 @@ export const createReturnableResourceRequest = authedProcedure
         prompt: `Create a clear and concise title for a request based on these details:
                  Notes: 
                  ${input.type} request
-                 ${input.items}
-                 ${rest.items.map((item) => item.name).join(", ")}
+                 ${rest.purpose.join(", ")}
 
                  
                  Guidelines:
@@ -66,21 +65,15 @@ export const createReturnableResourceRequest = authedProcedure
           returnableRequest: {
             create: {
               id: resourceRequestId,
-              dateNeeded: rest.dateNeeded,
-              returnDate: rest.returnDate,
-              purpose: rest.purpose,
-              items: {
-                create: rest.items.map((item) => ({
-                  id: `IR-${generateId(15)}`,
-                  item: {
-                    connect: {
-                      id: item.id,
-                    },
-                  },
-                  startDate: rest.dateNeeded,
-                  endDate: rest.returnDate,
-                })),
-              },
+              dateAndTimeNeeded: rest.dateAndTimeNeeded,
+              returnDateAndTime: rest.returnDateAndTime,
+              purpose: rest.purpose.includes("other")
+                ? [
+                    ...rest.purpose.filter((p) => p !== "other"),
+                    rest.otherPurpose,
+                  ].join(", ")
+                : rest.purpose.join(", "),
+              itemId: rest.itemId,
             },
           },
         },

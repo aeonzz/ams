@@ -44,6 +44,7 @@ import DateTimePicker from "@/components/ui/date-time-picker";
 import { H3, P } from "@/components/typography/text";
 import ScheduledEventCard from "./scheduled-event-card";
 import VenueField from "./venue-field";
+import VenueDateTimePicker from "./venue-date-time-picker";
 
 const purpose = [
   {
@@ -166,6 +167,15 @@ export default function VenueRequestInput({
     });
   }, [data]);
 
+  const disabledTimeRanges = React.useMemo(() => {
+    return (
+      data?.map(({ startTime, endTime }) => ({
+        start: new Date(startTime),
+        end: new Date(endTime),
+      })) ?? []
+    );
+  }, [data]);
+
   async function onSubmit(values: VenueRequestSchema) {
     const data: ExtendedVenueRequestSchema = {
       ...values,
@@ -201,21 +211,23 @@ export default function VenueRequestInput({
           <div className="scroll-bar flex max-h-[60vh] gap-6 overflow-y-auto px-4 py-1">
             <div className="flex w-[307px] flex-col space-y-2">
               <VenueField form={form} name="venueId" isPending={isPending} />
-              <DateTimePicker
+              <VenueDateTimePicker
                 form={form}
                 name="startTime"
                 label="Start Time"
                 isLoading={isLoading}
                 disabled={isPending || !venueId}
-                disabledDates={disabledDates}
+                disabledTimeRanges={disabledTimeRanges}
+                reservations={data}
               />
-              <DateTimePicker
+              <VenueDateTimePicker
                 form={form}
                 name="endTime"
                 label="End Time"
                 isLoading={isLoading}
                 disabled={isPending || !venueId}
-                disabledDates={disabledDates}
+                disabledTimeRanges={disabledTimeRanges}
+                reservations={data}
               />
               <FormField
                 control={form.control}

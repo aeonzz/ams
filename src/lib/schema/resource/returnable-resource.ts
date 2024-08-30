@@ -2,33 +2,52 @@ import { z } from "zod";
 import { ReturnableItemSchema } from "prisma/generated/zod";
 import { requestSchemaBase } from "../request";
 
-export const returnableResourceRequestSchema = z.object({
-  items: z
-    .array(ReturnableItemSchema)
-    .min(1, "At least one item must be selected"),
-  dateNeeded: z
+export const returnableResourceRequestSchemaBase = z.object({
+  itemId: z.string({
+    required_error: "Name is required",
+  }),
+  dateAndTimeNeeded: z
     .date({
       required_error: "Date needed is required",
     })
     .min(new Date(), {
       message: "Date needed must be in the future",
+    })
+    .refine((date) => date.getHours() !== 0 || date.getMinutes() !== 0, {
+      message: "Time cannot be exactly midnight (00:00)",
     }),
-  returnDate: z
+  returnDateAndTime: z
     .date({
-      required_error: "Date needed is required",
+      required_error: "Return date is required",
     })
     .min(new Date(), {
-      message: "Date needed must be in the future",
+      message: "Return date must be in the future",
+    })
+    .refine((date) => date.getHours() !== 0 || date.getMinutes() !== 0, {
+      message: "Time cannot be exactly midnight (00:00)",
     }),
-  purpose: z.string().optional(),
+  purpose: z.array(z.string()).refine((value) => value.some((item) => item), {
+    message: "You have to select at least one item.",
+  }),
+  otherPurpose: z.string().optional(),
 });
+
+export const returnableResourceRequestSchema =
+  returnableResourceRequestSchemaBase.refine(
+    (data) => data.dateAndTimeNeeded <= data.returnDateAndTime,
+    {
+      message:
+        "Date and time needed must not be later than the return date and time",
+      path: ["dateAndTimeNeeded"],
+    }
+  );
 
 export type ReturnableResourceRequestSchema = z.infer<
   typeof returnableResourceRequestSchema
 >;
 
 export const returnableResourceRequestSchemaWithPath =
-  returnableResourceRequestSchema.extend({
+  returnableResourceRequestSchemaBase.extend({
     path: z.string(),
   });
 

@@ -38,7 +38,6 @@ import { type RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/Requ
 import axios from "axios";
 import {
   ReservedTransportDateAndTime,
-  type ReservedDatesAndTimes,
 } from "@/lib/schema/utils";
 import DateTimePicker from "@/components/ui/date-time-picker";
 import VehicleField from "./vehicle-field";

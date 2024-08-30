@@ -23,9 +23,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Button } from "./button";
-import { Calendar } from "./calendar";
-import { TimePicker } from "./time-picker";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { TimePicker } from "@/components/ui/time-picker";
 import {
   addMonths,
   format,
@@ -35,9 +35,11 @@ import {
   setMinutes,
   setMonth,
 } from "date-fns";
-import LoadingSpinner from "../loaders/loading-spinner";
+import LoadingSpinner from "@/components/loaders/loading-spinner";
 import { CalendarIcon } from "lucide-react";
 import { cn, isDateInPast } from "@/lib/utils";
+import { type ReservedDatesAndTimes } from "@/lib/schema/utils";
+import { P } from "@/components/typography/text";
 
 interface DateTimePickerProps<T extends FieldValues> {
   form: UseFormReturn<T>;
@@ -47,6 +49,7 @@ interface DateTimePickerProps<T extends FieldValues> {
   disabledDates?: Date[];
   disabledTimeRanges?: { start: Date; end: Date }[];
   label: string;
+  reservations?: ReservedDatesAndTimes[];
 }
 
 const timePresets = [
@@ -105,7 +108,7 @@ const monthNames = [
   "December",
 ] as const;
 
-export default function DateTimePicker<T extends FieldValues>({
+export default function VenueDateTimePicker<T extends FieldValues>({
   form,
   isLoading = false,
   disabled = false,
@@ -113,6 +116,7 @@ export default function DateTimePicker<T extends FieldValues>({
   label = "Select Date and Time",
   disabledDates = [],
   disabledTimeRanges = [],
+  reservations = [],
 }: DateTimePickerProps<T>) {
   const [selectedMonth, setSelectedMonth] = React.useState(
     new Date().getMonth()
@@ -131,6 +135,17 @@ export default function DateTimePicker<T extends FieldValues>({
       })
     );
   };
+
+  const reservationsForSelectedDate = React.useMemo(() => {
+    if (!selectedDate) return [];
+    return reservations.filter(
+      (reservation) =>
+        isSameDay(new Date(reservation.startTime), selectedDate) ||
+        isSameDay(new Date(reservation.endTime), selectedDate) ||
+        (selectedDate >= new Date(reservation.startTime) &&
+          selectedDate <= new Date(reservation.endTime))
+    );
+  }, [selectedDate, reservations]);
 
   return (
     <>
@@ -159,7 +174,7 @@ export default function DateTimePicker<T extends FieldValues>({
                       <CalendarIcon className="mr-2 h-4 w-4" />
                     )}
                     {field.value ? (
-                      format(field.value, "PPP HH:mm")
+                      format(field.value, "PPP hh:mm a")
                     ) : (
                       <span>Pick a date</span>
                     )}
@@ -182,7 +197,7 @@ export default function DateTimePicker<T extends FieldValues>({
                       if (date) {
                         const newDate = field.value
                           ? new Date(field.value)
-                          : new Date(new Date().setHours(9, 0, 0, 0));
+                          : new Date(new Date().setHours(0, 0, 0, 0));
                         newDate.setFullYear(
                           date.getFullYear(),
                           date.getMonth(),
@@ -195,57 +210,95 @@ export default function DateTimePicker<T extends FieldValues>({
                     }}
                     initialFocus
                   />
-                  <div className="space-y-3 overflow-y-auto p-3">
-                    <Select
-                      value={selectedMonth.toString()}
-                      onValueChange={(value) => {
-                        const newMonth = parseInt(value);
-                        setSelectedMonth(newMonth);
-                        if (field.value) {
-                          field.onChange(setMonth(field.value, newMonth));
-                        }
-                      }}
-                    >
-                      <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Select month" />
-                      </SelectTrigger>
-                      <SelectContent className="max-h-60">
-                        {monthNames.map((month, index) => (
-                          <SelectItem key={index} value={index.toString()}>
-                            {month}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <div className="scroll-bar flex h-[250px] flex-col gap-2 overflow-y-auto">
-                      {timePresets.map((preset, index) => (
-                        <Button
-                          key={index}
-                          variant={
-                            selectedTime === preset.label
-                              ? "default"
-                              : "secondary"
+                  <div className="flex">
+                    <div className="space-y-3 p-3">
+                      <Select
+                        value={selectedMonth.toString()}
+                        onValueChange={(value) => {
+                          const newMonth = parseInt(value);
+                          setSelectedMonth(newMonth);
+                          if (field.value) {
+                            field.onChange(setMonth(field.value, newMonth));
                           }
-                          onClick={() => {
-                            const newDate = field.value
-                              ? new Date(field.value)
-                              : new Date();
-                            const updatedDate = setMinutes(
-                              setHours(newDate, preset.hours),
+                        }}
+                      >
+                        <SelectTrigger className="w-[180px]">
+                          <SelectValue placeholder="Select month" />
+                        </SelectTrigger>
+                        <SelectContent className="max-h-60">
+                          {monthNames.map((month, index) => (
+                            <SelectItem key={index} value={index.toString()}>
+                              {month}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <div className="scroll-bar flex h-[250px] flex-col gap-2 overflow-y-auto">
+                        {timePresets.map((preset, index) => (
+                          <Button
+                            key={index}
+                            variant={
+                              selectedTime === preset.label
+                                ? "default"
+                                : "secondary"
+                            }
+                            onClick={() => {
+                              const newDate = field.value
+                                ? new Date(field.value)
+                                : new Date();
+                              const updatedDate = setMinutes(
+                                setHours(newDate, preset.hours),
+                                preset.minutes
+                              );
+                              field.onChange(updatedDate);
+                              setSelectedTime(preset.label);
+                            }}
+                            disabled={isTimeDisabled(
+                              preset.hours,
                               preset.minutes
-                            );
-                            field.onChange(updatedDate);
-                            setSelectedTime(preset.label);
-                          }}
-                          disabled={isTimeDisabled(
-                            preset.hours,
-                            preset.minutes
-                          )}
-                        >
-                          {preset.label}
-                        </Button>
-                      ))}
+                            )}
+                          >
+                            {preset.label}
+                          </Button>
+                        ))}
+                      </div>
                     </div>
+                    {reservationsForSelectedDate.length > 0 && (
+                      <div className="w-48 p-3">
+                        <P className="mb-2 font-semibold">
+                          Reservations for{" "}
+                          {selectedDate
+                            ? format(selectedDate, "MMM d, yyyy")
+                            : "Selected Date"}
+                        </P>
+                        <div className="scroll-bar h-[250px] overflow-y-auto">
+                          {reservationsForSelectedDate.map(
+                            (reservation, index) => (
+                              <div
+                                key={index}
+                                className="border-b py-2 text-sm"
+                              >
+                                <p>
+                                  <strong>{reservation.venueName}</strong>
+                                </p>
+                                <p>
+                                  {format(
+                                    new Date(reservation.startTime),
+                                    "MMM d, h:mm a"
+                                  )}{" "}
+                                  -{" "}
+                                  {format(
+                                    new Date(reservation.endTime),
+                                    "MMM d, h:mm a"
+                                  )}
+                                </p>
+                                <p>Dept: {reservation.request.department}</p>
+                              </div>
+                            )
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </PopoverContent>
