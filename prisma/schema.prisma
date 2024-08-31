@@ -142,6 +142,7 @@ model ReturnableRequest {
   dateAndTimeNeeded DateTime
   returnDateAndTime DateTime
   purpose           String
+  quantity          Int            @default(1)
   status            RequestStatus  @default(PENDING)
   requestId         String         @unique
   request           Request        @relation(fields: [requestId], references: [id], onDelete: Cascade)
@@ -163,16 +164,23 @@ model ConsumableRequest {
 }
 
 model ReturnableItem {
-  id                String               @id
-  name              String
-  description       String
-  status            ReturnableItemStatus @default(AVAILABLE)
-  imageUrl          String
-  serialNumber      String?              @unique
-  lastMaintenance   DateTime?
-  createdAt         DateTime             @default(now())
-  updatedAt         DateTime             @updatedAt
-  returnableRequest ReturnableRequest[]
+  id                 String              @id
+  name               String
+  description        String
+  imageUrl           String
+  inventoryItems     InventoryItem[]
+  returnableRequests ReturnableRequest[]
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+}
+
+model InventoryItem {
+  id               String               @id
+  returnableItemId String
+  returnableItem   ReturnableItem       @relation(fields: [returnableItemId], references: [id])
+  status           ReturnableItemStatus @default(AVAILABLE)
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
 }
 
 model ConsumableItem {

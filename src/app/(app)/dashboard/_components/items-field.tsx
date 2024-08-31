@@ -3,10 +3,7 @@
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import {
-  ChevronsUpDown,
-  Check,
-} from "lucide-react";
+import { ChevronsUpDown, Check } from "lucide-react";
 import type { Path, UseFormReturn } from "react-hook-form";
 
 import { cn, getReturnableItemStatusIcon, textTransform } from "@/lib/utils";
@@ -36,6 +33,7 @@ import LoadingSpinner from "@/components/loaders/loading-spinner";
 import { type ReturnableResourceRequestSchema } from "@/lib/schema/resource/returnable-resource";
 import { type ReturnableItem } from "prisma/generated/zod";
 import { P } from "@/components/typography/text";
+import Image from "next/image";
 
 interface ItemsFieldProps {
   form: UseFormReturn<ReturnableResourceRequestSchema>;
@@ -87,16 +85,15 @@ export default function ItemsField({ form, name, isPending }: ItemsFieldProps) {
                   )}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-full p-0">
+              <PopoverContent className="w-[450px] p-0">
                 <Command>
                   <CommandInput placeholder="Search items..." />
                   <CommandList>
                     <CommandEmpty>No items found.</CommandEmpty>
                     <CommandGroup>
                       {data?.map((item) => {
-                        const { icon: Icon, variant } = getReturnableItemStatusIcon(
-                          item.status
-                        );
+                        const { icon: Icon, variant } =
+                          getReturnableItemStatusIcon(item.status);
                         return (
                           <CommandItem
                             value={item.id}
@@ -106,22 +103,32 @@ export default function ItemsField({ form, name, isPending }: ItemsFieldProps) {
                               setOpen(false);
                             }}
                           >
-                            <div className="w-10 self-start pt-1">
+                            <div className="flex w-full justify-between">
+                              <div className="flex space-x-2 truncate">
+                                <div className="relative aspect-square h-14 cursor-pointer transition-colors hover:brightness-75">
+                                  <Image
+                                    src={item.imageUrl}
+                                    alt={`Image of ${item.name}`}
+                                    fill
+                                    className="rounded-md border object-cover"
+                                  />
+                                </div>
+                                <div className="flex flex-col justify-between">
+                                  <P className="truncate">{item.name}</P>
+                                  <Badge variant={variant} className="ml-auto">
+                                    <Icon className="mr-1 size-4" />
+                                    {textTransform(item.status)}
+                                  </Badge>
+                                </div>
+                              </div>
                               <Check
                                 className={cn(
-                                  "mr-2 h-4 w-4",
+                                  "h-4 w-4",
                                   item.id === field.value
                                     ? "opacity-100"
                                     : "opacity-0"
                                 )}
                               />
-                            </div>
-                            <div className="space-y-1 truncate">
-                              <P className="truncate">{item.name}</P>
-                              <Badge variant={variant} className="ml-auto">
-                                <Icon className="mr-1 size-4" />
-                                {textTransform(item.status)}
-                              </Badge>
                             </div>
                           </CommandItem>
                         );

@@ -16,6 +16,7 @@ export const ReturnableRequestSchema = z.object({
   dateAndTimeNeeded: z.coerce.date(),
   returnDateAndTime: z.coerce.date(),
   purpose: z.string(),
+  quantity: z.number().int(),
   requestId: z.string(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),

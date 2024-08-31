@@ -5,9 +5,7 @@ import { type ColumnDef } from "@tanstack/react-table";
 
 import {
   formatDate,
-  getPriorityIcon,
   getReturnableItemStatusIcon,
-  getVehicleStatusIcon,
   textTransform,
 } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -35,14 +33,16 @@ import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
 import { Button } from "@/components/ui/button";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { toast } from "sonner";
-import VehicleStatusSchema, {
-  type VehicleStatusType,
-} from "prisma/generated/zod/inputTypeSchemas/VehicleStatusSchema";
-import { updateVehicle } from "@/lib/actions/vehicle";
 import { UpdateEquipmentSheet } from "./update-equipment-sheet";
 import { DeleteEquipmentsDialog } from "./delete-equipments-dialog";
+import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
+import { updateEquipment } from "@/lib/actions/item";
+import ReturnableItemStatusSchema, {
+  ReturnableItemStatusType,
+} from "prisma/generated/zod/inputTypeSchemas/ReturnableItemStatusSchema";
+import { type ReturnableItemType } from "@/lib/types/item";
 
-export function getEquipmentsColumns(): ColumnDef<ReturnableItem>[] {
+export function getEquipmentsColumns(): ColumnDef<ReturnableItemType>[] {
   return [
     {
       id: "select",
@@ -121,27 +121,53 @@ export function getEquipmentsColumns(): ColumnDef<ReturnableItem>[] {
       },
     },
     {
-      accessorKey: "status",
+      accessorKey: "inventory",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="status" />
+        <DataTableColumnHeader column={column} title="Inventory" />
       ),
       cell: ({ row }) => {
-        const { icon: Icon, variant } = getReturnableItemStatusIcon(
-          row.original.status
-        );
         return (
-          <div className="flex items-center">
-            <Badge variant={variant}>
-              <Icon className="mr-1 size-4" />
-              {textTransform(row.original.status)}
-            </Badge>
+          <div className="flex w-[15vw] space-x-2">
+            <P className="truncate font-medium">{row.original.inventoryCount}</P>
           </div>
         );
       },
-      filterFn: (row, id, value) => {
-        return Array.isArray(value) && value.includes(row.getValue(id));
+    },
+    {
+      accessorKey: "description",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Description" />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="flex w-[15vw] space-x-2">
+            <P className="truncate font-medium">{row.original.description}</P>
+          </div>
+        );
       },
     },
+    // {
+    //   accessorKey: "status",
+    //   header: ({ column }) => (
+    //     <DataTableColumnHeader column={column} title="status" />
+    //   ),
+    //   cell: ({ row }) => {
+    //     const { icon: Icon, variant } = getReturnableItemStatusIcon(
+    //       row.original.status
+    //     );
+    //     return (
+    //       <div className="flex items-center">
+    //         <Badge variant={variant}>
+    //           <Icon className="mr-1 size-4" />
+    //           {textTransform(row.original.status)}
+    //         </Badge>
+    //       </div>
+    //     );
+    //   },
+    //   filterFn: (row, id, value) => {
+    //     return Array.isArray(value) && value.includes(row.getValue(id));
+    //   },
+    // },
     {
       accessorKey: "createdAt",
       header: ({ column }) => (
@@ -152,6 +178,7 @@ export function getEquipmentsColumns(): ColumnDef<ReturnableItem>[] {
     {
       id: "actions",
       cell: function Cell({ row }) {
+        const dialogManager = useDialogManager();
         const pathname = usePathname();
         const [showUpdateTaskSheet, setShowUpdateTaskSheet] =
           React.useState(false);
@@ -159,16 +186,24 @@ export function getEquipmentsColumns(): ColumnDef<ReturnableItem>[] {
           React.useState(false);
 
         const { isPending, mutateAsync } =
-          useServerActionMutation(updateVehicle);
+          useServerActionMutation(updateEquipment);
+
+        React.useEffect(() => {
+          if (showUpdateTaskSheet) {
+            dialogManager.setActiveDialog("adminUpdateEquipmentSheet");
+          } else {
+            dialogManager.setActiveDialog(null);
+          }
+        }, [showUpdateTaskSheet]);
 
         return (
           <div className="grid place-items-center">
-            {/* <UpdateEquipmentSheet
+            <UpdateEquipmentSheet
               open={showUpdateTaskSheet}
               onOpenChange={setShowUpdateTaskSheet}
               equipment={row.original}
             />
-            <DeleteEquipmentsDialog
+            {/* <DeleteEquipmentsDialog
               open={showDeleteTaskDialog}
               onOpenChange={setShowDeleteTaskDialog}
               equipments={[row.original]}
@@ -198,7 +233,7 @@ export function getEquipmentsColumns(): ColumnDef<ReturnableItem>[] {
                         toast.promise(
                           mutateAsync({
                             id: row.original.id,
-                            status: value as VehicleStatusType,
+                            status: value as ReturnableItemStatusType,
                             path: pathname,
                           }),
                           {
@@ -214,9 +249,9 @@ export function getEquipmentsColumns(): ColumnDef<ReturnableItem>[] {
                         );
                       }}
                     >
-                      {VehicleStatusSchema.options.map((status) => {
+                      {ReturnableItemStatusSchema.options.map((status) => {
                         const { icon: Icon, variant } =
-                          getVehicleStatusIcon(status);
+                          getReturnableItemStatusIcon(status);
                         return (
                           <DropdownMenuRadioItem
                             key={status}

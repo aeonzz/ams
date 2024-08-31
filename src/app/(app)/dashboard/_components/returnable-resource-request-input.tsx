@@ -126,6 +126,8 @@ export default function ReturnableResourceRequestInput({
 
   React.useEffect(() => {
     if (itemId) {
+      form.resetField("dateAndTimeNeeded");
+      form.resetField("returnDateAndTime");
       refetch();
     }
   }, [itemId, refetch]);

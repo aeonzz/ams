@@ -8,12 +8,14 @@ export type DialogType =
   | "venueDialog"
   | "resourceDialog"
   | "returnableResourceDialog"
+  | "consumableResourceDialog"
   | "transportDialog"
   | "settingsDialog"
   | "adminCreateVenueDialog"
   | "adminCreateVehicleDialog"
   | "adminUpdateVenueSheet"
   | "adminCreateEquipmentDialog"
+  | "adminUpdateEquipmentSheet"
   | null;
 
 export interface DialogState {

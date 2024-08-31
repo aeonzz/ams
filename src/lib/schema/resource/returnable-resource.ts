@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { ReturnableItemSchema } from "prisma/generated/zod";
 import { requestSchemaBase } from "../request";
+import { ReturnableItemStatusSchema } from "prisma/generated/zod";
 
 export const returnableResourceRequestSchemaBase = z.object({
   itemId: z.string({
@@ -67,7 +67,7 @@ export const createEquipmentSchemaServer = z.object({
       required_error: "Image is required",
     })
   ),
-  serialNumber: z.string().optional(),
+  inventoryCount: z.number(),
 });
 
 export const createEquipmentSchemaWithPath = createEquipmentSchemaServer.extend(
@@ -79,3 +79,36 @@ export const createEquipmentSchemaWithPath = createEquipmentSchemaServer.extend(
 export type CreateEquipmentSchemaWithPath = z.infer<
   typeof createEquipmentSchemaWithPath
 >;
+
+export const updateEquipmentSchemaServer = z.object({
+  name: z.string().optional(),
+  description: z.string().optional(),
+  imageUrl: z.array(z.string()).optional(),
+});
+
+export const extendedUpdateEquipmentServerSchema =
+  updateEquipmentSchemaServer.extend({
+    path: z.string(),
+    id: z.string().optional(),
+  });
+
+export type ExtendedUpdateEquipmentServerSchema = z.infer<
+  typeof extendedUpdateEquipmentServerSchema
+>;
+
+export const updateEquipmentStatusesSchema = z.object({
+  ids: z.string().array(),
+  status: ReturnableItemStatusSchema.optional(),
+  path: z.string(),
+});
+
+export type UpdateEquipmentStatusesSchema = z.infer<
+  typeof updateEquipmentStatusesSchema
+>;
+
+export const deleteEquipmentsSchema = z.object({
+  ids: z.string().array(),
+  path: z.string(),
+});
+
+export type DeleteEquipmentsSchema = z.infer<typeof deleteEquipmentsSchema>;

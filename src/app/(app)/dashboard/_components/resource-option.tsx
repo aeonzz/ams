@@ -5,71 +5,41 @@ import React from "react";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
-import { RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTypeSchema";
-import { CarFront, Lightbulb, LucideIcon, Theater, Wrench } from "lucide-react";
+import { Box, type LucideIcon, RotateCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   type DialogType,
   useDialogManager,
 } from "@/lib/hooks/use-dialog-manager";
-import { useHotkeys } from "react-hotkeys-hook";
-import JobDialog from "@/components/dialogs/job-dialog";
-import VenueDialog from "@/components/dialogs/venue-dialog";
-import TransportDialog from "@/components/dialogs/transport-dialog";
-import ResourceOption from "./resource-option";
+import ReturnableResourceDialog from "@/components/dialogs/returnable-resource-dialog";
 
-type ReqType = {
-  value: RequestTypeType;
+type ResourceType = {
+  value: "Returnable" | "Consumable";
   label: string;
   icon: LucideIcon;
   dialog: DialogType;
 };
 
-const RequestTypes: ReqType[] = [
+const RequestTypes: ResourceType[] = [
   {
-    value: "JOB",
-    label: "Job",
-    icon: Wrench,
-    dialog: "jobDialog",
+    value: "Returnable",
+    label: "Equipments",
+    icon: RotateCw,
+    dialog: "returnableResourceDialog",
   },
   {
-    value: "VENUE",
-    label: "Venue",
-    icon: Theater,
-    dialog: "venueDialog",
-  },
-  {
-    value: "RESOURCE",
-    label: "Resource",
-    icon: Lightbulb,
-    dialog: "resourceDialog",
-  },
-  {
-    value: "TRANSPORT",
-    label: "Transport",
-    icon: CarFront,
-    dialog: "transportDialog",
+    value: "Consumable",
+    label: "Materials",
+    icon: Box,
+    dialog: "consumableResourceDialog",
   },
 ];
 
-export default function RequestOption() {
+export default function ResourceOption() {
   const dialogManager = useDialogManager();
-
-  useHotkeys(
-    "c",
-    () => {
-      if (!dialogManager.isAnyDialogOpen()) {
-        dialogManager.setActiveDialog("requestDialog");
-      }
-    },
-    { enableOnFormTags: false }
-  );
 
   const handleOpenChange = (open: boolean) => {
     if (!open) {
@@ -80,7 +50,7 @@ export default function RequestOption() {
   return (
     <>
       <Dialog
-        open={dialogManager.activeDialog === "requestDialog"}
+        open={dialogManager.activeDialog === "resourceDialog"}
         onOpenChange={handleOpenChange}
       >
         <DialogContent className="max-w-3xl">
@@ -102,10 +72,7 @@ export default function RequestOption() {
           </DialogHeader>
         </DialogContent>
       </Dialog>
-      <JobDialog />
-      <VenueDialog />
-      <TransportDialog />
-      <ResourceOption />
+      <ReturnableResourceDialog />
     </>
   );
 }

@@ -11,6 +11,7 @@ export * from './VenueSchema';
 export * from './ReturnableRequestSchema';
 export * from './ConsumableRequestSchema';
 export * from './ReturnableItemSchema';
+export * from './InventoryItemSchema';
 export * from './ConsumableItemSchema';
 export * from './TransportRequestSchema';
 export * from './VehicleSchema';

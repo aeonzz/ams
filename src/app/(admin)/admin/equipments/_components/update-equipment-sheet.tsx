@@ -24,9 +24,8 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import {
-  ReturnableItem,
-  VehicleStatusSchema,
-  type Vehicle,
+  ReturnableItemStatusSchema,
+  type ReturnableItem,
 } from "prisma/generated/zod";
 import { Input } from "@/components/ui/input";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
@@ -34,7 +33,6 @@ import { usePathname } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
 import { FileUploader } from "@/components/file-uploader";
 import { useUploadFile } from "@/lib/hooks/use-upload-file";
-import { updateVehicle } from "@/lib/actions/vehicle";
 import {
   Select,
   SelectContent,
@@ -43,17 +41,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { getVehicleStatusIcon, textTransform } from "@/lib/utils";
+import { getReturnableItemStatusIcon, textTransform } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import {
-  updateVehicleSchema,
-  type UpdateVehicleSchema,
-} from "@/lib/db/schema/vehicle";
-import { ExtendedUpdateVehicleServerSchema } from "@/lib/schema/vehicle";
+  updateEquipmentSchema,
+  type UpdateEquipmentSchema,
+} from "@/lib/db/schema/equipment";
+import { type ExtendedUpdateEquipmentServerSchema } from "@/lib/schema/resource/returnable-resource";
+import { updateEquipment } from "@/lib/actions/item";
+import { Textarea } from "@/components/ui/text-area";
+import { type ReturnableItemType } from "@/lib/types/item";
 
 interface UpdateEquipmentProps
   extends React.ComponentPropsWithRef<typeof Sheet> {
-  equipment: ReturnableItem;
+  equipment: ReturnableItemType;
 }
 
 export function UpdateEquipmentSheet({
@@ -61,35 +62,29 @@ export function UpdateEquipmentSheet({
   ...props
 }: UpdateEquipmentProps) {
   const pathname = usePathname();
-  const form = useForm<UpdateVehicleSchema>({
-    resolver: zodResolver(updateVehicleSchema),
+  const form = useForm<UpdateEquipmentSchema>({
+    resolver: zodResolver(updateEquipmentSchema),
     defaultValues: {
-      name: vehicle.name,
-      type: vehicle.type,
-      capacity: vehicle.capacity,
-      licensePlate: vehicle.licensePlate,
-      status: vehicle.status,
+      name: equipment.name,
+      description: equipment.description,
       imageUrl: undefined,
     },
   });
 
   const { dirtyFields } = useFormState({ control: form.control });
 
-  const { isPending, mutateAsync } = useServerActionMutation(updateVehicle);
+  const { isPending, mutateAsync } = useServerActionMutation(updateEquipment);
   const { uploadFiles, progresses, isUploading } = useUploadFile();
 
   React.useEffect(() => {
     form.reset({
-      name: vehicle.name,
-      type: vehicle.type,
-      capacity: vehicle.capacity,
-      licensePlate: vehicle.licensePlate,
-      status: vehicle.status,
+      name: equipment.name,
+      description: equipment.description,
       imageUrl: undefined,
     });
-  }, [vehicle, form, props.open]);
+  }, [equipment, form, props.open]);
 
-  async function onSubmit(values: UpdateVehicleSchema) {
+  async function onSubmit(values: UpdateEquipmentSchema) {
     try {
       let uploadedFilesResult: { filePath: string }[] = [];
 
@@ -97,14 +92,11 @@ export function UpdateEquipmentSheet({
         uploadedFilesResult = await uploadFiles(values.imageUrl);
       }
 
-      const data: ExtendedUpdateVehicleServerSchema = {
-        id: vehicle.id,
+      const data: ExtendedUpdateEquipmentServerSchema = {
+        id: equipment.id,
         path: pathname,
         name: values.name,
-        type: values.type,
-        capacity: values.capacity,
-        licensePlate: values.licensePlate,
-        status: values.status,
+        description: values.description,
         imageUrl: uploadedFilesResult.map(
           (result: { filePath: string }) => result.filePath
         ),
@@ -114,7 +106,7 @@ export function UpdateEquipmentSheet({
         loading: "Updating...",
         success: () => {
           props.onOpenChange?.(false);
-          return "Vehicle updated succesfully.";
+          return "Equipment updated succesfully.";
         },
         error: (err) => {
           console.log(err);
@@ -137,9 +129,9 @@ export function UpdateEquipmentSheet({
         }}
       >
         <SheetHeader className="text-left">
-          <SheetTitle>Update vehicle</SheetTitle>
+          <SheetTitle>Update equipment</SheetTitle>
           <SheetDescription>
-            Update the vehicle details and save the changes
+            Update the equipment details and save the changes
           </SheetDescription>
         </SheetHeader>
         <Form {...form}>
@@ -168,98 +160,20 @@ export function UpdateEquipmentSheet({
               />
               <FormField
                 control={form.control}
-                name="type"
+                name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Type</FormLabel>
+                    <FormLabel>Description</FormLabel>
                     <FormControl>
-                      <Input
-                        autoComplete="off"
-                        placeholder="e.g., Bus, Van, Car"
-                        disabled={isPending || isUploading}
+                      <Textarea
+                        rows={1}
+                        maxRows={5}
+                        placeholder="Description"
+                        className="min-h-[100px] flex-grow resize-none"
+                        disabled={isPending}
                         {...field}
                       />
                     </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="licensePlate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>License plate</FormLabel>
-                    <FormControl>
-                      <Input
-                        autoComplete="off"
-                        placeholder="ABC 1234"
-                        disabled={isPending || isUploading}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="capacity"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Capacity</FormLabel>
-                    <FormControl>
-                      <Input
-                        autoComplete="off"
-                        type="number"
-                        placeholder="24 seats"
-                        disabled={isPending || isUploading}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Status</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger
-                          className="bg-secondary capitalize"
-                          disabled={isPending || isUploading}
-                        >
-                          <SelectValue placeholder="Select a role" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent className="bg-secondary">
-                        <SelectGroup>
-                          {VehicleStatusSchema.options.map((status) => {
-                            const { icon: Icon, variant } =
-                              getVehicleStatusIcon(status);
-                            return (
-                              <SelectItem
-                                key={status}
-                                value={status}
-                                className="capitalize"
-                              >
-                                <Badge variant={variant}>
-                                  <Icon className="mr-1 size-4" />
-                                  {textTransform(status)}
-                                </Badge>
-                              </SelectItem>
-                            );
-                          })}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -269,7 +183,7 @@ export function UpdateEquipmentSheet({
                 name="imageUrl"
                 render={({ field }) => (
                   <FormItem className="w-full">
-                    <FormLabel>Vehicle image</FormLabel>
+                    <FormLabel>Equipment image</FormLabel>
                     <FormControl>
                       <FileUploader
                         value={field.value}

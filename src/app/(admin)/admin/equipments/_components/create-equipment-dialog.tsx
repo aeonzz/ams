@@ -38,6 +38,12 @@ export default function CreateEquipmentDialog() {
 
   const form = useForm<CreateEquipmentSchema>({
     resolver: zodResolver(createEquipmentSchema),
+    defaultValues: {
+      name: "",
+      description: "",
+      imageUrl: undefined,
+      inventoryCount: 1,
+    },
   });
 
   const { dirtyFields } = useFormState({ control: form.control });

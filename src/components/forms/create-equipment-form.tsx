@@ -61,7 +61,7 @@ export default function CreateEquipmentForm({
       const data: CreateEquipmentSchemaWithPath = {
         name: values.name,
         description: values.description,
-        serialNumber: values.serialNumber,
+        inventoryCount: values.inventoryCount,
         path: pathname,
         imageUrl: uploadedFilesResult.map(
           (result: { filePath: string }) => result.filePath
@@ -98,7 +98,7 @@ export default function CreateEquipmentForm({
                 <FormControl>
                   <Input
                     autoComplete="off"
-                    placeholder="Audio Visual Room"
+                    placeholder="Projector"
                     disabled={isPending || isUploading}
                     {...field}
                   />
@@ -109,14 +109,15 @@ export default function CreateEquipmentForm({
           />
           <FormField
             control={form.control}
-            name="serialNumber"
+            name="inventoryCount"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Serial number</FormLabel>
+                <FormLabel>Inventory Count</FormLabel>
                 <FormControl>
                   <Input
                     autoComplete="off"
-                    placeholder="87asdf7987a"
+                    type="number"
+                    placeholder="24"
                     disabled={isPending || isUploading}
                     {...field}
                   />
@@ -135,7 +136,7 @@ export default function CreateEquipmentForm({
                   <Textarea
                     rows={1}
                     maxRows={5}
-                    placeholder="Notes..."
+                    placeholder="description..."
                     className="min-h-[100px] flex-grow resize-none"
                     disabled={isPending}
                     {...field}

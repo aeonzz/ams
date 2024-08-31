@@ -308,7 +308,7 @@ export function getReturnableItemStatusIcon(
     },
     RETURNED: {
       icon: RotateCcw,
-      variant: "secondary",
+      variant: "gray",
     },
     PENDING_RETURN: {
       icon: Clock,

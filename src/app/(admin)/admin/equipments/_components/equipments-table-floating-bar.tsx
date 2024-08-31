@@ -7,20 +7,29 @@ import {
   ReloadIcon,
   TrashIcon,
 } from "@radix-ui/react-icons";
+import { SelectTrigger } from "@radix-ui/react-select";
 import { type Table } from "@tanstack/react-table";
 import { toast } from "sonner";
 
 import { exportTableToCSV } from "@/lib/export";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { ReturnableItem, type Vehicle } from "prisma/generated/zod";
 import CommandTooltip from "@/components/ui/command-tooltip";
 import { CommandShortcut } from "@/components/ui/command";
 import { P } from "@/components/typography/text";
+import { Activity } from "lucide-react";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
 import { usePathname } from "next/navigation";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
@@ -35,8 +44,20 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { deleteDepartments } from "@/lib/actions/department";
-import { type ReturnableItem } from "prisma/generated/zod";
+import { deleteVehicles, updateVehicleStatuses } from "@/lib/actions/vehicle";
+import VehicleStatusSchema, {
+  type VehicleStatusType,
+} from "prisma/generated/zod/inputTypeSchemas/VehicleStatusSchema";
+import {
+  getReturnableItemStatusIcon,
+  getVehicleStatusIcon,
+  textTransform,
+} from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import { deleteEquipments, updateEquipmentsStatuses } from "@/lib/actions/item";
+import ReturnableItemStatusSchema, {
+  ReturnableItemStatusType,
+} from "prisma/generated/zod/inputTypeSchemas/ReturnableItemStatusSchema";
 
 interface EquipmentsTableFloatingBarProps {
   table: Table<ReturnableItem>;
@@ -49,9 +70,17 @@ export function EquipmentsTableFloatingBar({
   const pathname = usePathname();
 
   const [isLoading, startTransition] = React.useTransition();
-  const [method, setMethod] = React.useState<"export" | "delete">();
+  const [method, setMethod] = React.useState<
+    "update-status" | "export" | "delete"
+  >();
 
-  const { isPending, mutateAsync } = useServerActionMutation(deleteDepartments);
+  const { isPending, mutateAsync } = useServerActionMutation(
+    updateEquipmentsStatuses
+  );
+  const {
+    isPending: isPendingDeletion,
+    mutateAsync: deleteEquipmentsMutateAsync,
+  } = useServerActionMutation(deleteEquipments);
 
   // Clear selection on Escape key press
   React.useEffect(() => {
@@ -95,6 +124,71 @@ export function EquipmentsTableFloatingBar({
           </div>
           <Separator orientation="vertical" className="hidden h-5 sm:block" />
           <div className="flex items-center gap-1.5">
+            <Select
+              onValueChange={(value: ReturnableItemStatusType) => {
+                setMethod("update-status");
+                toast.promise(
+                  mutateAsync({
+                    ids: rows.map((row) => row.original.id),
+                    status: value as ReturnableItemStatusType,
+                    path: pathname,
+                  }),
+                  {
+                    loading: "Updating...",
+                    success: () => {
+                      return "Status/es updated successfully";
+                    },
+                    error: (err) => {
+                      console.log(err);
+                      return err.message;
+                    },
+                  }
+                );
+              }}
+            >
+              <Tooltip delayDuration={250}>
+                <SelectTrigger asChild>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="secondary"
+                      size="icon"
+                      className="size-10 border data-[state=open]:bg-accent data-[state=open]:text-accent-foreground"
+                      disabled={isPending || isPendingDeletion}
+                    >
+                      {isPending ||
+                      (isPendingDeletion && method === "update-status") ? (
+                        <LoadingSpinner />
+                      ) : (
+                        <Activity className="size-5" aria-hidden="true" />
+                      )}
+                    </Button>
+                  </TooltipTrigger>
+                </SelectTrigger>
+                <TooltipContent className="border bg-accent font-semibold text-foreground dark:bg-zinc-900">
+                  <P>Update status</P>
+                </TooltipContent>
+              </Tooltip>
+              <SelectContent align="center">
+                <SelectGroup>
+                  {ReturnableItemStatusSchema.options.map((status) => {
+                    const { icon: Icon, variant } =
+                      getReturnableItemStatusIcon(status);
+                    return (
+                      <SelectItem
+                        key={status}
+                        value={status}
+                        className="capitalize"
+                      >
+                        <Badge variant={variant}>
+                          <Icon className="mr-1 size-4" />
+                          {textTransform(status)}
+                        </Badge>
+                      </SelectItem>
+                    );
+                  })}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
             <Tooltip delayDuration={250}>
               <TooltipTrigger asChild>
                 <Button
@@ -110,7 +204,7 @@ export function EquipmentsTableFloatingBar({
                       });
                     });
                   }}
-                  disabled={isPending || isLoading}
+                  disabled={isPending || isLoading || isPendingDeletion}
                 >
                   {isLoading && method === "export" ? (
                     <LoadingSpinner />
@@ -120,7 +214,7 @@ export function EquipmentsTableFloatingBar({
                 </Button>
               </TooltipTrigger>
               <TooltipContent className="border bg-accent font-semibold text-foreground dark:bg-zinc-900">
-                <P>Export departments</P>
+                <P>Export equipments</P>
               </TooltipContent>
             </Tooltip>
             <Tooltip delayDuration={250}>
@@ -131,9 +225,10 @@ export function EquipmentsTableFloatingBar({
                       variant="secondary"
                       size="icon"
                       className="size-10 border"
-                      disabled={isPending}
+                      disabled={isPending || isPendingDeletion}
                     >
-                      {isPending && method === "delete" ? (
+                      {isPending ||
+                      (isPendingDeletion && method === "delete") ? (
                         <LoadingSpinner />
                       ) : (
                         <TrashIcon className="size-5" aria-hidden="true" />
@@ -148,7 +243,7 @@ export function EquipmentsTableFloatingBar({
                     </AlertDialogTitle>
                     <AlertDialogDescription>
                       This action cannot be undone. This will permanently delete
-                      the selected department/s and all related records from our
+                      the selected equipment/s and all related records from our
                       servers.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
@@ -158,7 +253,7 @@ export function EquipmentsTableFloatingBar({
                       onClick={() => {
                         setMethod("delete");
                         toast.promise(
-                          mutateAsync({
+                          deleteEquipmentsMutateAsync({
                             ids: rows.map((row) => row.original.id),
                             path: pathname,
                           }),
@@ -166,7 +261,7 @@ export function EquipmentsTableFloatingBar({
                             loading: "Deleting...",
                             success: () => {
                               table.toggleAllRowsSelected(false);
-                              return "user/s deleted successfully";
+                              return "equipment/s deleted successfully";
                             },
                             error: (err) => {
                               console.log(err);
@@ -176,7 +271,7 @@ export function EquipmentsTableFloatingBar({
                         );
                       }}
                       className="bg-destructive hover:bg-destructive/90"
-                      disabled={isPending}
+                      disabled={isPending || isPendingDeletion}
                     >
                       Delete
                     </AlertDialogAction>
@@ -184,7 +279,7 @@ export function EquipmentsTableFloatingBar({
                 </AlertDialogContent>
               </AlertDialog>
               <TooltipContent className="border bg-accent font-semibold text-foreground dark:bg-zinc-900">
-                <P>Delete departments</P>
+                <P>Delete equipments</P>
               </TooltipContent>
             </Tooltip>
           </div>

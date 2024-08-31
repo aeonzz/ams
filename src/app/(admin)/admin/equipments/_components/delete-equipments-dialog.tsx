@@ -20,7 +20,7 @@ import {
 import { type ReturnableItem } from "prisma/generated/zod";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
 import { usePathname } from "next/navigation";
-import { deleteVehicles } from "@/lib/actions/vehicle";
+import { deleteEquipments } from "@/lib/actions/item";
 
 interface DeleteEquipmentsDialogProps
   extends React.ComponentPropsWithoutRef<typeof AlertDialog> {
@@ -36,18 +36,18 @@ export function DeleteEquipmentsDialog({
   ...props
 }: DeleteEquipmentsDialogProps) {
   const pathname = usePathname();
-  const { isPending, mutateAsync } = useServerActionMutation(deleteVehicles);
+  const { isPending, mutateAsync } = useServerActionMutation(deleteEquipments);
   function onDelete() {
     toast.promise(
       mutateAsync({
-        ids: vehicles.map((user) => user.id),
+        ids: equipments.map((equipment) => equipment.id),
         path: pathname,
       }),
       {
         loading: "Deleting...",
         success: () => {
           onSuccess?.();
-          return "Vehicle/s deleted successfully";
+          return "Equipment/s deleted successfully";
         },
         error: (err) => {
           console.log(err);
@@ -64,7 +64,7 @@ export function DeleteEquipmentsDialog({
           <AlertDialogTrigger asChild>
             <Button variant="secondary" size="sm">
               <TrashIcon className="mr-2 size-4" aria-hidden="true" />
-              Delete ({vehicles.length})
+              Delete ({equipments.length})
             </Button>
           </AlertDialogTrigger>
         ) : null}
@@ -73,9 +73,9 @@ export function DeleteEquipmentsDialog({
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
               This action cannot be undone. This will permanently delete{" "}
-              <span className="font-medium">{vehicles.length}</span>
-              {vehicles.length === 1 ? " vehicle" : " vehicles"} and all related
-              records from our servers.
+              <span className="font-medium">{equipments.length}</span>
+              {equipments.length === 1 ? " equipment" : " equipments"} and all
+              related records from our servers.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
