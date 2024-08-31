@@ -113,7 +113,7 @@ export function getRoleIcon(role: RoleTypeType): RoleIconConfig {
     },
     ADMIN: {
       icon: ShieldCheck,
-      variant: "destructive",
+      variant: "red",
     },
   };
   return RoleIcons[role] || { icon: CircleIcon, variant: "default" };
@@ -271,7 +271,7 @@ export function getVenueStatusIcon(
     },
     CLOSED: {
       icon: CircleX,
-      variant: "destructive",
+      variant: "red",
     },
   };
   return VenueStatusIcons[status] || { icon: CircleIcon, variant: "default" };
@@ -304,7 +304,7 @@ export function getReturnableItemStatusIcon(
     },
     LOST: {
       icon: Search,
-      variant: "destructive",
+      variant: "red",
     },
     RETURNED: {
       icon: RotateCcw,
@@ -316,7 +316,21 @@ export function getReturnableItemStatusIcon(
     },
   };
 
-  return ReturnableItemStatusIcons[status] || { icon: CircleIcon, variant: "default" };
+  return (
+    ReturnableItemStatusIcons[status] || {
+      icon: CircleIcon,
+      variant: "default",
+    }
+  );
+}
+
+export function isOverlapping(
+  start1: Date,
+  end1: Date,
+  start2: Date,
+  end2: Date
+): boolean {
+  return start1 < end2 && start2 < end1;
 }
 
 export const isDateInPast = (date: Date) => {

@@ -4,8 +4,11 @@ import { ReturnableItem } from "prisma/generated/zod";
 import { checkAuth } from "../auth/utils";
 import { type GetEquipmentSchema } from "../schema";
 import { db } from "@/lib/db/index";
-import { convertToBase64 } from "./utils";
+import { authedProcedure, convertToBase64, getErrorMessage } from "./utils";
 import placeholder from "public/placeholder.svg";
+import { createEquipmentSchemaWithPath } from "../schema/resource/returnable-resource";
+import { generateId } from "lucia";
+import { revalidatePath } from "next/cache";
 
 export async function getEquipments(input: GetEquipmentSchema) {
   await checkAuth();
@@ -79,3 +82,24 @@ export async function getEquipments(input: GetEquipmentSchema) {
     return { data: [], pageCount: 0 };
   }
 }
+
+export const createEquipment = authedProcedure
+  .createServerAction()
+  .input(createEquipmentSchemaWithPath)
+  .handler(async ({ input, ctx }) => {
+    const { path, imageUrl, ...rest } = input;
+    try {
+      const itemId = generateId(15);
+      await db.returnableItem.create({
+        data: {
+          id: itemId,
+          imageUrl: imageUrl[0],
+          ...rest,
+        },
+      });
+
+      return revalidatePath(path);
+    } catch (error) {
+      getErrorMessage(error);
+    }
+  });

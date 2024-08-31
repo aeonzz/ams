@@ -58,3 +58,24 @@ export const extendedReturnableResourceRequestSchema = requestSchemaBase.merge(
 export type ExtendedReturnableResourceRequestSchema = z.infer<
   typeof extendedReturnableResourceRequestSchema
 >;
+
+export const createEquipmentSchemaServer = z.object({
+  name: z.string(),
+  description: z.string(),
+  imageUrl: z.array(
+    z.string({
+      required_error: "Image is required",
+    })
+  ),
+  serialNumber: z.string().optional(),
+});
+
+export const createEquipmentSchemaWithPath = createEquipmentSchemaServer.extend(
+  {
+    path: z.string(),
+  }
+);
+
+export type CreateEquipmentSchemaWithPath = z.infer<
+  typeof createEquipmentSchemaWithPath
+>;

@@ -29,7 +29,7 @@ import {
 import { Textarea } from "@/components/ui/text-area";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn, isOverlapping } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { Input } from "@/components/ui/input";
@@ -177,6 +177,25 @@ export default function VenueRequestInput({
   }, [data]);
 
   async function onSubmit(values: VenueRequestSchema) {
+    const { startTime, endTime } = values;
+
+    // Check for conflicts
+    const hasConflict = disabledTimeRanges.some((range) =>
+      isOverlapping(
+        new Date(startTime),
+        new Date(endTime),
+        range.start,
+        range.end
+      )
+    );
+
+    if (hasConflict) {
+      toast.error(
+        "The selected time range conflicts with existing reservations."
+      );
+      return;
+    }
+
     const data: ExtendedVenueRequestSchema = {
       ...values,
       priority: "LOW",

@@ -46,6 +46,7 @@ import { Textarea } from "@/components/ui/text-area";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import ResourceDateTimePicker from "./resource-date-time-picker";
+import { isOverlapping } from "@/lib/utils";
 
 const purpose = [
   {
@@ -90,15 +91,6 @@ interface ReturnableResourceRequestInputProps {
   type: RequestTypeType;
   handleOpenChange: (open: boolean) => void;
   isFieldsDirty: boolean;
-}
-
-export function isOverlapping(
-  start1: Date,
-  end1: Date,
-  start2: Date,
-  end2: Date
-): boolean {
-  return start1 < end2 && start2 < end1;
 }
 
 export default function ReturnableResourceRequestInput({
