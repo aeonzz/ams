@@ -92,6 +92,7 @@ export function RequestTable({ requestPromise }: RequestTableProps) {
     <ModifiedDataTable
       showSelectedRows={false}
       table={table}
+      route="requests"
       floatingBar={<RequestTableFloatingBar table={table} />}
     >
       <DataTableToolbar table={table} filterFields={filterFields}>

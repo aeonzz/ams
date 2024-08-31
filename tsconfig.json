@@ -20,6 +20,7 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
+      "@components/*": ["./src/components/*"],
       "@/zodAutoGenSchemas": ["./prisma/zod/index"]
     },
     "baseUrl": "./"

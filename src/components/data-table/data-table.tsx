@@ -44,7 +44,7 @@ export function DataTable<TData>({
       {...props}
     >
       {children}
-      <div className="min-h-[calc(100vh_-_190px)] overflow-hidden border-y">
+      <div className="scroll-bar h-[calc(100vh_-_190px)] overflow-y-auto border-y">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

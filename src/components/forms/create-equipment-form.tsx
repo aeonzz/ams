@@ -21,7 +21,7 @@ import { usePathname } from "next/navigation";
 import { FileUploader } from "../file-uploader";
 import { DialogState } from "@/lib/hooks/use-dialog-manager";
 import { useUploadFile } from "@/lib/hooks/use-upload-file";
-import { createEquipment } from "@/lib/actions/item";
+import { createEquipment } from "@/lib/actions/equipment";
 import { type CreateEquipmentSchema } from "@/lib/db/schema/equipment";
 import { type CreateEquipmentSchemaWithPath } from "@/lib/schema/resource/returnable-resource";
 import { Textarea } from "../ui/text-area";
@@ -120,6 +120,10 @@ export default function CreateEquipmentForm({
                     placeholder="24"
                     disabled={isPending || isUploading}
                     {...field}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      const value = e.target.value.slice(0, 3);
+                      field.onChange(value);
+                    }}
                   />
                 </FormControl>
                 <FormMessage />

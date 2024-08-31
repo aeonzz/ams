@@ -23,10 +23,6 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import {
-  ReturnableItemStatusSchema,
-  type ReturnableItem,
-} from "prisma/generated/zod";
 import { Input } from "@/components/ui/input";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
 import { usePathname } from "next/navigation";
@@ -34,21 +30,11 @@ import { Separator } from "@/components/ui/separator";
 import { FileUploader } from "@/components/file-uploader";
 import { useUploadFile } from "@/lib/hooks/use-upload-file";
 import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { getReturnableItemStatusIcon, textTransform } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
-import {
   updateEquipmentSchema,
   type UpdateEquipmentSchema,
 } from "@/lib/db/schema/equipment";
 import { type ExtendedUpdateEquipmentServerSchema } from "@/lib/schema/resource/returnable-resource";
-import { updateEquipment } from "@/lib/actions/item";
+import { updateEquipment } from "@/lib/actions/equipment";
 import { Textarea } from "@/components/ui/text-area";
 import { type ReturnableItemType } from "@/lib/types/item";
 

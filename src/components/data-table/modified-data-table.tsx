@@ -14,7 +14,6 @@ import { DataTablePagination } from "@/components/data-table/data-table-paginati
 import { getCommonPinningStyles } from "@/lib/data-table";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Request } from "prisma/generated/zod";
 
 interface ModifiedDataTableProps<TData>
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -33,6 +32,7 @@ interface ModifiedDataTableProps<TData>
   floatingBar?: React.ReactNode | null;
 
   showSelectedRows?: boolean;
+  route?: string;
 }
 
 export function ModifiedDataTable<TData>({
@@ -49,7 +49,7 @@ export function ModifiedDataTable<TData>({
       {...props}
     >
       {children}
-      <div className="min-h-[calc(100vh_-_190px)] overflow-hidden border-y">
+      <div className="scroll-bar h-[calc(100vh_-_190px)] overflow-y-auto border-y">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -79,7 +79,9 @@ export function ModifiedDataTable<TData>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  onClick={() => router.push(`/request/${(row.original as Request).id}`)}
+                  onClick={() =>
+                    router.push(`/${props.route}/${(row.original as any).id}`)
+                  }
                   className="cursor-pointer"
                 >
                   {row.getVisibleCells().map((cell) => (

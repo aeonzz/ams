@@ -20,7 +20,7 @@ import {
 import { type ReturnableItem } from "prisma/generated/zod";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
 import { usePathname } from "next/navigation";
-import { deleteEquipments } from "@/lib/actions/item";
+import { deleteEquipments } from "@/lib/actions/equipment";
 
 interface DeleteEquipmentsDialogProps
   extends React.ComponentPropsWithoutRef<typeof AlertDialog> {

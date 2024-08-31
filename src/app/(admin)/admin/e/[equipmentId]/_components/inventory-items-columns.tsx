@@ -27,22 +27,21 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
 import { Button } from "@/components/ui/button";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { toast } from "sonner";
-import { UpdateEquipmentSheet } from "./update-equipment-sheet";
-import { DeleteEquipmentsDialog } from "./delete-equipments-dialog";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import { updateEquipment } from "@/lib/actions/equipment";
 import ReturnableItemStatusSchema, {
   ReturnableItemStatusType,
 } from "prisma/generated/zod/inputTypeSchemas/ReturnableItemStatusSchema";
-import { type ReturnableItemType } from "@/lib/types/item";
+import type { InventoryItemType } from "@/lib/types/item";
+import { updateInventoryItem } from "@/lib/actions/inventoryItem";
 
-export function getEquipmentsColumns(): ColumnDef<ReturnableItemType>[] {
+export function getInventoryItemsColumns(): ColumnDef<InventoryItemType>[] {
   return [
     {
       id: "select",
@@ -121,42 +120,26 @@ export function getEquipmentsColumns(): ColumnDef<ReturnableItemType>[] {
       },
     },
     {
-      accessorKey: "inventory",
+      accessorKey: "status",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Inventory" />
+        <DataTableColumnHeader column={column} title="status" />
       ),
       cell: ({ row }) => {
-        const router = useRouter();
+        const { icon: Icon, variant } = getReturnableItemStatusIcon(
+          row.original.status
+        );
         return (
-          <div className="flex items-center space-x-2">
-            <P className="truncate font-medium">
-              {row.original.inventoryCount}
-            </P>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => router.push(`/admin/e/${row.original.id}`)}
-            >
-              View
-            </Button>
+          <div className="flex items-center">
+            <Badge variant={variant}>
+              <Icon className="mr-1 size-4" />
+              {textTransform(row.original.status)}
+            </Badge>
           </div>
         );
       },
-      size: 0,
-    },
-    {
-      accessorKey: "description",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Description" />
-      ),
-      cell: ({ row }) => {
-        return (
-          <div className="flex space-x-2">
-            <P className="truncate font-medium">{row.original.description}</P>
-          </div>
-        );
+      filterFn: (row, id, value) => {
+        return Array.isArray(value) && value.includes(row.getValue(id));
       },
-      size: 0,
     },
     {
       accessorKey: "createdAt",
@@ -164,7 +147,6 @@ export function getEquipmentsColumns(): ColumnDef<ReturnableItemType>[] {
         <DataTableColumnHeader column={column} title="Created At" />
       ),
       cell: ({ cell }) => formatDate(cell.getValue() as Date),
-      size: 0,
     },
     {
       id: "actions",
@@ -177,7 +159,7 @@ export function getEquipmentsColumns(): ColumnDef<ReturnableItemType>[] {
           React.useState(false);
 
         const { isPending, mutateAsync } =
-          useServerActionMutation(updateEquipment);
+          useServerActionMutation(updateInventoryItem);
 
         React.useEffect(() => {
           if (showUpdateTaskSheet) {
@@ -186,14 +168,14 @@ export function getEquipmentsColumns(): ColumnDef<ReturnableItemType>[] {
             dialogManager.setActiveDialog(null);
           }
         }, [showUpdateTaskSheet]);
-
+        console.log(row.original.id);
         return (
           <div className="grid place-items-center">
-            <UpdateEquipmentSheet
+            {/* <UpdateEquipmentSheet
               open={showUpdateTaskSheet}
               onOpenChange={setShowUpdateTaskSheet}
               equipment={row.original}
-            />
+            /> */}
             {/* <DeleteEquipmentsDialog
               open={showDeleteTaskDialog}
               onOpenChange={setShowDeleteTaskDialog}
@@ -215,6 +197,51 @@ export function getEquipmentsColumns(): ColumnDef<ReturnableItemType>[] {
                 <DropdownMenuItem onSelect={() => setShowUpdateTaskSheet(true)}>
                   Edit
                 </DropdownMenuItem>
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>Status</DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent>
+                    <DropdownMenuRadioGroup
+                      value={row.original.status}
+                      onValueChange={(value) => {
+                        toast.promise(
+                          mutateAsync({
+                            id: row.original.id,
+                            status: value as ReturnableItemStatusType,
+                            path: pathname,
+                          }),
+                          {
+                            loading: "Updating status...",
+                            success: () => {
+                              return "Status updated successfully";
+                            },
+                            error: (err) => {
+                              console.log(err);
+                              return err.message;
+                            },
+                          }
+                        );
+                      }}
+                    >
+                      {ReturnableItemStatusSchema.options.map((status) => {
+                        const { icon: Icon, variant } =
+                          getReturnableItemStatusIcon(status);
+                        return (
+                          <DropdownMenuRadioItem
+                            key={status}
+                            value={status}
+                            className="capitalize"
+                            disabled={isPending}
+                          >
+                            <Badge variant={variant}>
+                              <Icon className="mr-1 size-4" />
+                              {textTransform(status)}
+                            </Badge>
+                          </DropdownMenuRadioItem>
+                        );
+                      })}
+                    </DropdownMenuRadioGroup>
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onSelect={() => setShowDeleteTaskDialog(true)}

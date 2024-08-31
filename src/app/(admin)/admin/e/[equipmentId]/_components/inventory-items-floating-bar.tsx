@@ -54,18 +54,22 @@ import {
   textTransform,
 } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { deleteEquipments, updateEquipmentsStatuses } from "@/lib/actions/equipment";
+import {
+  deleteEquipments,
+  updateEquipmentsStatuses,
+} from "@/lib/actions/equipment";
 import ReturnableItemStatusSchema, {
   ReturnableItemStatusType,
 } from "prisma/generated/zod/inputTypeSchemas/ReturnableItemStatusSchema";
+import type { InventoryItemType } from "@/lib/types/item";
 
-interface EquipmentsTableFloatingBarProps {
-  table: Table<ReturnableItem>;
+interface InventoryItemsTableFloatingBarProps {
+  table: Table<InventoryItemType>;
 }
 
-export function EquipmentsTableFloatingBar({
+export function InventoryItemsTableFloatingBar({
   table,
-}: EquipmentsTableFloatingBarProps) {
+}: InventoryItemsTableFloatingBarProps) {
   const rows = table.getFilteredSelectedRowModel().rows;
   const pathname = usePathname();
 

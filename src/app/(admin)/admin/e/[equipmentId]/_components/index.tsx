@@ -1,30 +1,27 @@
 import React, { useState } from "react";
 
 import { H1, H2, H3, P } from "@/components/typography/text";
-import { type GetEquipmentSchema } from "@/lib/schema";
+import { type GetInventorySchema } from "@/lib/schema";
 import { DateRangePicker } from "@/components/date-range-picker";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DataTableSkeleton } from "@/components/data-table/data-table-skeleton";
-import { getEquipments } from "@/lib/actions/equipment";
-import { EquipmentsTable } from "./equipments-table";
+import { getInventoryItems } from "@/lib/actions/inventoryItem";
+import { InventoryItemsTable } from "./inventory-items-table";
 
-interface EquipmentsScreenProps {
-  params: GetEquipmentSchema;
+interface EquipmentDetailsScreenProps {
+  params: GetInventorySchema & { id: string };
 }
 
-export default function EquipmentsScreen({ params }: EquipmentsScreenProps) {
-  const equipmentsPromise = getEquipments(params);
+export default function EquipmentDetailsScreen({
+  params,
+}: EquipmentDetailsScreenProps) {
+  const inventoryItemsPromise = getInventoryItems(params);
 
   return (
     <div className="flex h-full w-full">
       <div className="flex-1">
         <div className="flex h-[50px] items-center justify-between border-b px-3">
-          <P className="font-medium">Equipments</P>
-          {/**
-           * The `DateRangePicker` component is used to render the date range picker UI.
-           * It is used to filter the tasks based on the selected date range it was created at.
-           * The business logic for filtering the tasks based on the selected date range is handled inside the component.
-           */}
+          <P className="font-medium">Equipment</P>
           <React.Suspense fallback={<Skeleton className="h-7 w-52" />}>
             <DateRangePicker
               triggerVariant="secondary"
@@ -46,11 +43,9 @@ export default function EquipmentsScreen({ params }: EquipmentsScreenProps) {
               />
             }
           >
-            {/**
-             * Passing promises and consuming them using React.use for triggering the suspense fallback.
-             * @see https://react.dev/reference/react/use
-             */}
-            <EquipmentsTable equipmentsPromise={equipmentsPromise} />
+            <InventoryItemsTable
+              inventoryItemsPromise={inventoryItemsPromise}
+            />
           </React.Suspense>
         </div>
       </div>

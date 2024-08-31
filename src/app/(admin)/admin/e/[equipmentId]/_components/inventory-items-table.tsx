@@ -1,34 +1,31 @@
-
 "use client";
 "use memo";
 
 import * as React from "react";
 
-import { DataTable } from "@/components/data-table/data-table";
 import { DataTableToolbar } from "@/components/data-table/data-table-toolbar";
 
 import { useDataTable } from "@/lib/hooks/use-data-table";
 import { type DataTableFilterField } from "@/lib/types";
-import { type ReturnableItem } from "prisma/generated/zod";
-import { EquipmentsTableFloatingBar } from "./equipments-table-floating-bar";
-import { EquipmentsTableToolbarActions } from "./equipments-table-toolbar-actions";
-import { getEquipments } from "@/lib/actions/equipment";
-import { getEquipmentsColumns } from "./equipments-table-columns";
-import { type ColumnDef } from "@tanstack/react-table";
 import { ModifiedDataTable } from "@/components/data-table/modified-data-table";
+import { getInventoryItems } from "@/lib/actions/inventoryItem";
+import { getInventoryItemsColumns } from "./inventory-items-columns";
+import { type InventoryItemType } from "@/lib/types/item";
+import { DataTable } from "@/components/data-table/data-table";
+import { InventoryItemsTableFloatingBar } from "./inventory-items-floating-bar";
+import { InventoryItemsTableToolbarActions } from "./inventory-items-table-toolbar-actions";
 
-interface EquipmentsTableProps {
-  equipmentsPromise: ReturnType<typeof getEquipments>;
+interface InventoryItemsTableProps {
+  inventoryItemsPromise: ReturnType<typeof getInventoryItems>;
 }
 
-export function EquipmentsTable({ equipmentsPromise }: EquipmentsTableProps) {
-  const { data, pageCount } = React.use(equipmentsPromise);
+export function InventoryItemsTable({
+  inventoryItemsPromise,
+}: InventoryItemsTableProps) {
+  const { data, pageCount } = React.use(inventoryItemsPromise);
 
   // Explicitly type the columns
-  const columns = React.useMemo<ColumnDef<ReturnableItem>[]>(
-    () => getEquipmentsColumns() as ColumnDef<ReturnableItem>[],
-    []
-  );
+  const columns = React.useMemo(() => getInventoryItemsColumns(), []);
 
   /**
    * This component can render either a faceted filter or a search filter based on the `options` prop.
@@ -41,7 +38,7 @@ export function EquipmentsTable({ equipmentsPromise }: EquipmentsTableProps) {
    * @prop {React.ReactNode} [icon] - An optional icon to display next to the label.
    * @prop {boolean} [withCount] - An optional boolean to display the count of the filter option.
    */
-  const filterFields: DataTableFilterField<ReturnableItem>[] = [
+  const filterFields: DataTableFilterField<InventoryItemType>[] = [
     {
       label: "Name",
       value: "name",
@@ -56,7 +53,7 @@ export function EquipmentsTable({ equipmentsPromise }: EquipmentsTableProps) {
     /* optional props */
     filterFields,
     initialState: {
-      sorting: [{ id: "createdAt", desc: true }],
+      sorting: [{ id: "createdAt", desc: true, }],
       columnPinning: { right: ["actions"] },
     },
     // For remembering the previous row selection on page change
@@ -67,11 +64,10 @@ export function EquipmentsTable({ equipmentsPromise }: EquipmentsTableProps) {
   return (
     <DataTable
       table={table}
-      // route="admin/e"
-      floatingBar={<EquipmentsTableFloatingBar table={table} />}
+      floatingBar={<InventoryItemsTableFloatingBar table={table} />}
     >
       <DataTableToolbar table={table} filterFields={filterFields}>
-        <EquipmentsTableToolbarActions table={table} />
+        <InventoryItemsTableToolbarActions table={table} />
       </DataTableToolbar>
     </DataTable>
   );

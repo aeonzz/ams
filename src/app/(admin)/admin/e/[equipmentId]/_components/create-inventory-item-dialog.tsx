@@ -31,25 +31,25 @@ import {
 } from "@/lib/db/schema/equipment";
 import { createEquipment } from "@/lib/actions/equipment";
 import CreateEquipmentForm from "@/components/forms/create-equipment-form";
+import {
+  createInventoryItemSchema,
+  type CreateInventoryItemSchema,
+} from "@/lib/db/schema/inventory-item";
+import CreateInventoryForm from "@/components/forms/create-inventory-item-form";
+import { createInventoryItem } from "@/lib/actions/inventoryItem";
 
-export default function CreateEquipmentDialog() {
+export default function CreateInventorytDialog() {
   const dialogManager = useDialogManager();
   const [alertOpen, setAlertOpen] = React.useState(false);
 
-  const form = useForm<CreateEquipmentSchema>({
-    resolver: zodResolver(createEquipmentSchema),
-    defaultValues: {
-      name: "",
-      description: "",
-      imageUrl: undefined,
-      inventoryCount: 1,
-    },
+  const form = useForm<CreateInventoryItemSchema>({
+    resolver: zodResolver(createInventoryItemSchema),
   });
 
   const { dirtyFields } = useFormState({ control: form.control });
   const isFieldsDirty = Object.keys(dirtyFields).length > 0;
 
-  const { mutateAsync, isPending } = useServerActionMutation(createEquipment);
+  const { mutateAsync, isPending } = useServerActionMutation(createInventoryItem);
 
   const handleOpenChange = (open: boolean) => {
     if (!open) {
@@ -63,7 +63,7 @@ export default function CreateEquipmentDialog() {
 
   return (
     <Dialog
-      open={dialogManager.activeDialog === "adminCreateEquipmentDialog"}
+      open={dialogManager.activeDialog === "adminCreateInventoryItemDialog"}
       onOpenChange={handleOpenChange}
     >
       <DialogContent
@@ -114,7 +114,7 @@ export default function CreateEquipmentDialog() {
             Fill in the details below to add a new equipment.
           </DialogDescription>
         </DialogHeader>
-        <CreateEquipmentForm
+        <CreateInventoryForm
           mutateAsync={mutateAsync}
           isPending={isPending}
           setAlertOpen={setAlertOpen}
