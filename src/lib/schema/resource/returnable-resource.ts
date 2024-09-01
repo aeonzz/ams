@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { requestSchemaBase } from "../request";
-import { ReturnableItemStatusSchema } from "prisma/generated/zod";
+import { ItemStatusSchema } from "prisma/generated/zod";
 
 export const returnableResourceRequestSchemaBase = z.object({
   itemId: z.string({
@@ -59,7 +59,7 @@ export type ExtendedReturnableResourceRequestSchema = z.infer<
   typeof extendedReturnableResourceRequestSchema
 >;
 
-export const createEquipmentSchemaServer = z.object({
+export const createInventoryItemSchemaServer = z.object({
   name: z.string(),
   description: z.string(),
   imageUrl: z.array(
@@ -70,45 +70,92 @@ export const createEquipmentSchemaServer = z.object({
   inventoryCount: z.number(),
 });
 
-export const createEquipmentSchemaWithPath = createEquipmentSchemaServer.extend(
-  {
+export const createInventoryItemSchemaWithPath =
+  createInventoryItemSchemaServer.extend({
     path: z.string(),
-  }
-);
+  });
 
-export type CreateEquipmentSchemaWithPath = z.infer<
-  typeof createEquipmentSchemaWithPath
+export type CreateInventoryItemSchemaWithPath = z.infer<
+  typeof createInventoryItemSchemaWithPath
 >;
 
-export const updateEquipmentSchemaServer = z.object({
+export const updateInventoryItemSchemaServer = z.object({
   name: z.string().optional(),
   description: z.string().optional(),
   imageUrl: z.array(z.string()).optional(),
 });
 
-export const extendedUpdateEquipmentServerSchema =
-  updateEquipmentSchemaServer.extend({
+export const extendedUpdateInventoryItemServerSchema =
+  updateInventoryItemSchemaServer.extend({
     path: z.string(),
     id: z.string().optional(),
   });
 
-export type ExtendedUpdateEquipmentServerSchema = z.infer<
-  typeof extendedUpdateEquipmentServerSchema
+export type ExtendedUpdateInventoryItemServerSchema = z.infer<
+  typeof extendedUpdateInventoryItemServerSchema
 >;
 
-export const updateEquipmentStatusesSchema = z.object({
+export const updateInventoryItemStatusesSchema = z.object({
   ids: z.string().array(),
-  status: ReturnableItemStatusSchema.optional(),
+  status: ItemStatusSchema.optional(),
   path: z.string(),
 });
 
-export type UpdateEquipmentStatusesSchema = z.infer<
-  typeof updateEquipmentStatusesSchema
+export type UpdateInventoryItemStatusesSchema = z.infer<
+  typeof updateInventoryItemStatusesSchema
 >;
 
-export const deleteEquipmentsSchema = z.object({
+export const deleteInventoryItemsSchema = z.object({
   ids: z.string().array(),
   path: z.string(),
 });
 
-export type DeleteEquipmentsSchema = z.infer<typeof deleteEquipmentsSchema>;
+export type DeleteInventoryItemsSchema = z.infer<
+  typeof deleteInventoryItemsSchema
+>;
+
+export const createInventorySubItemSchemaServer = z.object({
+  inventoryId: z.string(),
+});
+
+export const createInventorySubItemSchemaWithPath =
+  createInventorySubItemSchemaServer.extend({
+    path: z.string(),
+  });
+
+export type CreateInventorySubItemtSchemaWithPath = z.infer<
+  typeof createInventorySubItemSchemaWithPath
+>;
+
+export const updateInventorySubItemItemSchemaServer = z.object({
+  status: ItemStatusSchema.optional(),
+});
+
+export const extendedUpdateInventorySubItemItemServerSchema =
+  updateInventorySubItemItemSchemaServer.extend({
+    path: z.string(),
+    id: z.string().optional(),
+  });
+
+export type ExtendedUpdateInventorySubItemItemServerSchema = z.infer<
+  typeof extendedUpdateInventorySubItemItemServerSchema
+>;
+
+export const updateInventorySubItemStatusesSchema = z.object({
+  ids: z.string().array(),
+  status: ItemStatusSchema.optional(),
+  path: z.string(),
+});
+
+export type UpdateInventorySubItemStatusesSchema = z.infer<
+  typeof updateInventorySubItemStatusesSchema
+>;
+
+export const deleteInventorySubItemsSchema = z.object({
+  ids: z.string().array(),
+  path: z.string(),
+});
+
+export type DeleteInventorySubItemsSchema = z.infer<
+  typeof deleteInventorySubItemsSchema
+>;

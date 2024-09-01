@@ -1,7 +1,6 @@
-import { ReturnableItemStatusSchema } from "prisma/generated/zod";
 import { z } from "zod";
 
-export const createEquipmentSchema = z.object({
+export const createInventoryItemSchema = z.object({
   name: z
     .string()
     .min(1, "Name is required")
@@ -19,17 +18,17 @@ export const createEquipmentSchema = z.object({
     .pipe(z.number().min(1, "Inventory count is required")),
 });
 
-export type CreateEquipmentSchema = z.infer<typeof createEquipmentSchema>;
+export type CreateInventoryItemSchema = z.infer<typeof createInventoryItemSchema>;
 
-export const updateEquipmentSchema = z.object({
+export const updateInventoryItemSchema = z.object({
   name: z.string().optional(),
   description: z.string().optional(),
   imageUrl: z.array(z.instanceof(File)).optional(),
 });
 
-export type UpdateEquipmentSchema = z.infer<typeof updateEquipmentSchema>;
+export type UpdateInventoryItemSchema = z.infer<typeof updateInventoryItemSchema>;
 
-export const extendedUpdateEquipmentSchema = updateEquipmentSchema.extend({
+export const extendedUpdateInventoryItemSchema = updateInventoryItemSchema.extend({
   path: z.string(),
   id: z.string().optional(),
 });

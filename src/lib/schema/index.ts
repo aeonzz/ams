@@ -63,7 +63,7 @@ export const vehicleSearchParamsSchema = z.object({
 
 export type GetVehicleSchema = z.infer<typeof vehicleSearchParamsSchema>;
 
-export const equipmentSearchParamsSchema = z.object({
+export const inventoryItemSearchParamsSchema = z.object({
   page: z.coerce.number().default(1),
   per_page: z.coerce.number().default(10),
   sort: z.string().optional(),
@@ -72,9 +72,9 @@ export const equipmentSearchParamsSchema = z.object({
   to: z.string().optional(),
 });
 
-export type GetEquipmentSchema = z.infer<typeof equipmentSearchParamsSchema>;
+export type GetInventoryItemSchema = z.infer<typeof inventoryItemSearchParamsSchema>;
 
-export const inventorySearchParamsSchema = z.object({
+export const inventorySubItemSearchParamsSchema = z.object({
   page: z.coerce.number().default(1),
   per_page: z.coerce.number().default(10),
   sort: z.string().optional(),
@@ -83,4 +83,4 @@ export const inventorySearchParamsSchema = z.object({
   to: z.string().optional(),
 });
 
-export type GetInventorySchema = z.infer<typeof inventorySearchParamsSchema>;
+export type GetInventorySubItemSchema = z.infer<typeof inventorySubItemSearchParamsSchema>;

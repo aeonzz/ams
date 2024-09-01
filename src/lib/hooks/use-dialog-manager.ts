@@ -14,9 +14,10 @@ export type DialogType =
   | "adminCreateVenueDialog"
   | "adminCreateVehicleDialog"
   | "adminUpdateVenueSheet"
-  | "adminCreateEquipmentDialog"
-  | "adminUpdateEquipmentSheet"
   | "adminCreateInventoryItemDialog"
+  | "adminUpdateInventoryItemSheet"
+  | "adminCreateInventorySubItemDialog"
+  | "adminUpdateInventorySubItemDialog"
   | null;
 
 export interface DialogState {

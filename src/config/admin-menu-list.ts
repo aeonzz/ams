@@ -15,9 +15,9 @@ import {
   GraduationCap,
   ClipboardList,
   FileText,
-} from "lucide-react"
+} from "lucide-react";
 
-import { Group } from "@/lib/types/menu"
+import { Group } from "@/lib/types/menu";
 
 export function getAdminMenuList(pathname: string): Group[] {
   return [
@@ -128,9 +128,9 @@ export function getAdminMenuList(pathname: string): Group[] {
           submenus: [],
         },
         {
-          href: "/admin/equipments",
-          label: "Equipment",
-          active: pathname.includes("/admin/equipments"),
+          href: "/admin/inventory",
+          label: "Inventory",
+          active: pathname.includes("/admin/inventory"),
           icon: Briefcase,
           submenus: [],
         },
@@ -248,5 +248,5 @@ export function getAdminMenuList(pathname: string): Group[] {
         },
       ],
     },
-  ]
+  ];
 }

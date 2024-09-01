@@ -1,12 +1,13 @@
 import React from "react";
 
-import {  P } from "@/components/typography/text";
+import { P } from "@/components/typography/text";
 import { DateRangePicker } from "@/components/date-range-picker";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DataTableSkeleton } from "@/components/data-table/data-table-skeleton";
 import { type GetVenuesSchema } from "@/lib/schema";
 import { getVenues } from "@/lib/actions/venue";
 import { VenuesTable } from "./venues-table";
+import LoadingSpinner from "@/components/loaders/loading-spinner";
 
 interface VenuesScreenProps {
   params: GetVenuesSchema;
@@ -34,18 +35,8 @@ export default function VenuesScreen({ params }: VenuesScreenProps) {
             />
           </React.Suspense>
         </div>
-        <div className="grid items-center py-3">
-          <React.Suspense
-            fallback={
-              <DataTableSkeleton
-                columnCount={5}
-                searchableColumnCount={1}
-                filterableColumnCount={2}
-                cellWidths={["10rem", "40rem", "12rem", "12rem", "8rem"]}
-                shrinkZero
-              />
-            }
-          >
+        <div className="grid min-h-[calc(100vh_-_100px)] place-items-center items-center py-3">
+          <React.Suspense fallback={<LoadingSpinner />}>
             {/**
              * Passing promises and consuming them using React.use for triggering the suspense fallback.
              * @see https://react.dev/reference/react/use

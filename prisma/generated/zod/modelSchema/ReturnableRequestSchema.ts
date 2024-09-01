@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import { RequestStatusSchema } from '../inputTypeSchemas/RequestStatusSchema'
-import type { ReturnableItemWithRelations } from './ReturnableItemSchema'
+import type { InventoryItemWithRelations } from './InventoryItemSchema'
 import type { RequestWithRelations } from './RequestSchema'
-import { ReturnableItemWithRelationsSchema } from './ReturnableItemSchema'
+import { InventoryItemWithRelationsSchema } from './InventoryItemSchema'
 import { RequestWithRelationsSchema } from './RequestSchema'
 
 /////////////////////////////////////////
@@ -29,14 +29,14 @@ export type ReturnableRequest = z.infer<typeof ReturnableRequestSchema>
 /////////////////////////////////////////
 
 export type ReturnableRequestRelations = {
-  item: ReturnableItemWithRelations;
+  item: InventoryItemWithRelations;
   request: RequestWithRelations;
 };
 
 export type ReturnableRequestWithRelations = z.infer<typeof ReturnableRequestSchema> & ReturnableRequestRelations
 
 export const ReturnableRequestWithRelationsSchema: z.ZodType<ReturnableRequestWithRelations> = ReturnableRequestSchema.merge(z.object({
-  item: z.lazy(() => ReturnableItemWithRelationsSchema),
+  item: z.lazy(() => InventoryItemWithRelationsSchema),
   request: z.lazy(() => RequestWithRelationsSchema),
 }))
 

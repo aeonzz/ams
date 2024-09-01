@@ -25,7 +25,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { ReturnableItem, type Vehicle } from "prisma/generated/zod";
 import CommandTooltip from "@/components/ui/command-tooltip";
 import { CommandShortcut } from "@/components/ui/command";
 import { P } from "@/components/typography/text";
@@ -44,28 +43,22 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { deleteVehicles, updateVehicleStatuses } from "@/lib/actions/vehicle";
-import VehicleStatusSchema, {
-  type VehicleStatusType,
-} from "prisma/generated/zod/inputTypeSchemas/VehicleStatusSchema";
-import {
-  getReturnableItemStatusIcon,
-  getVehicleStatusIcon,
-  textTransform,
-} from "@/lib/utils";
+import { getReturnableItemStatusIcon, textTransform } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { deleteEquipments, updateEquipmentsStatuses } from "@/lib/actions/equipment";
-import ReturnableItemStatusSchema, {
-  ReturnableItemStatusType,
-} from "prisma/generated/zod/inputTypeSchemas/ReturnableItemStatusSchema";
+import type { InventorySubItemType } from "@/lib/types/item";
+import {
+  deleteInventorySubItems,
+  updateInventorySubItemStatuses,
+} from "@/lib/actions/inventoryItem";
+import ItemStatusSchema, { ItemStatusType } from "prisma/generated/zod/inputTypeSchemas/ItemStatusSchema";
 
-interface EquipmentsTableFloatingBarProps {
-  table: Table<ReturnableItem>;
+interface InventorySubItemsTableFloatingBarProps {
+  table: Table<InventorySubItemType>;
 }
 
-export function EquipmentsTableFloatingBar({
+export function InventorySubItemsTableFloatingBar({
   table,
-}: EquipmentsTableFloatingBarProps) {
+}: InventorySubItemsTableFloatingBarProps) {
   const rows = table.getFilteredSelectedRowModel().rows;
   const pathname = usePathname();
 
@@ -75,12 +68,12 @@ export function EquipmentsTableFloatingBar({
   >();
 
   const { isPending, mutateAsync } = useServerActionMutation(
-    updateEquipmentsStatuses
+    updateInventorySubItemStatuses
   );
   const {
     isPending: isPendingDeletion,
-    mutateAsync: deleteEquipmentsMutateAsync,
-  } = useServerActionMutation(deleteEquipments);
+    mutateAsync: deleteInventorysMutateAsync,
+  } = useServerActionMutation(deleteInventorySubItems);
 
   // Clear selection on Escape key press
   React.useEffect(() => {
@@ -125,12 +118,12 @@ export function EquipmentsTableFloatingBar({
           <Separator orientation="vertical" className="hidden h-5 sm:block" />
           <div className="flex items-center gap-1.5">
             <Select
-              onValueChange={(value: ReturnableItemStatusType) => {
+              onValueChange={(value: ItemStatusType) => {
                 setMethod("update-status");
                 toast.promise(
                   mutateAsync({
                     ids: rows.map((row) => row.original.id),
-                    status: value as ReturnableItemStatusType,
+                    status: value as ItemStatusType,
                     path: pathname,
                   }),
                   {
@@ -170,7 +163,7 @@ export function EquipmentsTableFloatingBar({
               </Tooltip>
               <SelectContent align="center">
                 <SelectGroup>
-                  {ReturnableItemStatusSchema.options.map((status) => {
+                  {ItemStatusSchema.options.map((status) => {
                     const { icon: Icon, variant } =
                       getReturnableItemStatusIcon(status);
                     return (
@@ -214,7 +207,7 @@ export function EquipmentsTableFloatingBar({
                 </Button>
               </TooltipTrigger>
               <TooltipContent className="border bg-accent font-semibold text-foreground dark:bg-zinc-900">
-                <P>Export equipments</P>
+                <P>Export inventorys</P>
               </TooltipContent>
             </Tooltip>
             <Tooltip delayDuration={250}>
@@ -243,7 +236,7 @@ export function EquipmentsTableFloatingBar({
                     </AlertDialogTitle>
                     <AlertDialogDescription>
                       This action cannot be undone. This will permanently delete
-                      the selected equipment/s and all related records from our
+                      the selected inventory/s and all related records from our
                       servers.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
@@ -253,7 +246,7 @@ export function EquipmentsTableFloatingBar({
                       onClick={() => {
                         setMethod("delete");
                         toast.promise(
-                          deleteEquipmentsMutateAsync({
+                          deleteInventorysMutateAsync({
                             ids: rows.map((row) => row.original.id),
                             path: pathname,
                           }),
@@ -261,7 +254,7 @@ export function EquipmentsTableFloatingBar({
                             loading: "Deleting...",
                             success: () => {
                               table.toggleAllRowsSelected(false);
-                              return "equipment/s deleted successfully";
+                              return "inventory/s deleted successfully";
                             },
                             error: (err) => {
                               console.log(err);
@@ -279,7 +272,7 @@ export function EquipmentsTableFloatingBar({
                 </AlertDialogContent>
               </AlertDialog>
               <TooltipContent className="border bg-accent font-semibold text-foreground dark:bg-zinc-900">
-                <P>Delete equipments</P>
+                <P>Delete inventorys</P>
               </TooltipContent>
             </Tooltip>
           </div>

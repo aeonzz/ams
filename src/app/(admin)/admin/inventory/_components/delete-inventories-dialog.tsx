@@ -17,37 +17,37 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { type ReturnableItem } from "prisma/generated/zod";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
 import { usePathname } from "next/navigation";
-import { deleteEquipments } from "@/lib/actions/equipment";
+import { deleteInventories } from "@/lib/actions/inventory";
+import { type InventoryItemType } from "@/lib/types/item";
 
-interface DeleteEquipmentsDialogProps
+interface DeleteInventoryDialogProps
   extends React.ComponentPropsWithoutRef<typeof AlertDialog> {
-  equipments: Row<ReturnableItem>["original"][];
+  inventories: Row<InventoryItemType>["original"][];
   showTrigger?: boolean;
   onSuccess?: () => void;
 }
 
-export function DeleteEquipmentsDialog({
-  equipments,
+export function DeleteInventoryDialog({
+  inventories,
   showTrigger = true,
   onSuccess,
   ...props
-}: DeleteEquipmentsDialogProps) {
+}: DeleteInventoryDialogProps) {
   const pathname = usePathname();
-  const { isPending, mutateAsync } = useServerActionMutation(deleteEquipments);
+  const { isPending, mutateAsync } = useServerActionMutation(deleteInventories);
   function onDelete() {
     toast.promise(
       mutateAsync({
-        ids: equipments.map((equipment) => equipment.id),
+        ids: inventories.map((inventory) => inventory.id),
         path: pathname,
       }),
       {
         loading: "Deleting...",
         success: () => {
           onSuccess?.();
-          return "Equipment/s deleted successfully";
+          return "Inventory/s deleted successfully";
         },
         error: (err) => {
           console.log(err);
@@ -64,7 +64,7 @@ export function DeleteEquipmentsDialog({
           <AlertDialogTrigger asChild>
             <Button variant="secondary" size="sm">
               <TrashIcon className="mr-2 size-4" aria-hidden="true" />
-              Delete ({equipments.length})
+              Delete ({inventories.length})
             </Button>
           </AlertDialogTrigger>
         ) : null}
@@ -73,8 +73,8 @@ export function DeleteEquipmentsDialog({
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
               This action cannot be undone. This will permanently delete{" "}
-              <span className="font-medium">{equipments.length}</span>
-              {equipments.length === 1 ? " equipment" : " equipments"} and all
+              <span className="font-medium">{inventories.length}</span>
+              {inventories.length === 1 ? " inventory" : " inventories"} and all
               related records from our servers.
             </AlertDialogDescription>
           </AlertDialogHeader>

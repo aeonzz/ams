@@ -1,7 +1,7 @@
 import ThemeDialog from "@/components/dialogs/theme-dialog";
 import SettingsDialog from "@/components/dialogs/settings-dialog";
-import AdminCommandSearchDialog from "../../_components/admin-command-search-dialog";
-import CreateInventorytDialog from "./_components/create-inventory-item-dialog";
+import AdminCommandSearchDialog from "../_components/admin-command-search-dialog";
+import CreateInventorySubItemDialog from "./_components/create-inventory-sub-item-dialog";
 
 export default async function Layout({
   children,
@@ -12,7 +12,7 @@ export default async function Layout({
     <AdminCommandSearchDialog>
       <ThemeDialog />
       <SettingsDialog />
-      <CreateInventorytDialog />
+      <CreateInventorySubItemDialog />
       {children}
     </AdminCommandSearchDialog>
   );

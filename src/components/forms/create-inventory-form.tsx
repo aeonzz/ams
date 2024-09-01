@@ -21,44 +21,44 @@ import { usePathname } from "next/navigation";
 import { FileUploader } from "../file-uploader";
 import { DialogState } from "@/lib/hooks/use-dialog-manager";
 import { useUploadFile } from "@/lib/hooks/use-upload-file";
-import { createEquipment } from "@/lib/actions/equipment";
-import { type CreateEquipmentSchema } from "@/lib/db/schema/equipment";
-import { type CreateEquipmentSchemaWithPath } from "@/lib/schema/resource/returnable-resource";
 import { Textarea } from "../ui/text-area";
+import { createInventory } from "@/lib/actions/inventory";
+import { type CreateInventoryItemSchema } from "@/lib/db/schema/inventory";
+import { type CreateInventoryItemSchemaWithPath } from "@/lib/schema/resource/returnable-resource";
 
-interface CreateEquipmentFormProps {
+interface CreateInventoryFormProps {
   setAlertOpen: React.Dispatch<React.SetStateAction<boolean>>;
   mutateAsync: UseMutateAsyncFunction<
     any,
     Error,
-    Parameters<typeof createEquipment>[0],
+    Parameters<typeof createInventory>[0],
     unknown
   >;
-  form: UseFormReturn<CreateEquipmentSchema>;
+  form: UseFormReturn<CreateInventoryItemSchema>;
   isPending: boolean;
   isFieldsDirty: boolean;
   dialogManager: DialogState;
 }
 
-export default function CreateEquipmentForm({
+export default function CreateInventoryForm({
   mutateAsync,
   isPending,
   form,
   isFieldsDirty,
   setAlertOpen,
   dialogManager,
-}: CreateEquipmentFormProps) {
+}: CreateInventoryFormProps) {
   const pathname = usePathname();
 
   const { uploadFiles, progresses, isUploading } = useUploadFile();
 
-  async function onSubmit(values: CreateEquipmentSchema) {
+  async function onSubmit(values: CreateInventoryItemSchema) {
     try {
       let uploadedFilesResult: { filePath: string }[] = [];
 
       uploadedFilesResult = await uploadFiles(values.imageUrl);
 
-      const data: CreateEquipmentSchemaWithPath = {
+      const data: CreateInventoryItemSchemaWithPath = {
         name: values.name,
         description: values.description,
         inventoryCount: values.inventoryCount,
@@ -72,7 +72,7 @@ export default function CreateEquipmentForm({
         loading: "Submitting...",
         success: () => {
           dialogManager.setActiveDialog(null);
-          return "Equipment created successfuly";
+          return "Inventory created successfuly";
         },
         error: (err) => {
           console.log(err);
@@ -155,7 +155,7 @@ export default function CreateEquipmentForm({
             name="imageUrl"
             render={({ field }) => (
               <FormItem className="w-full">
-                <FormLabel>Equipment image</FormLabel>
+                <FormLabel>Inventory image</FormLabel>
                 <FormControl>
                   <FileUploader
                     value={field.value}

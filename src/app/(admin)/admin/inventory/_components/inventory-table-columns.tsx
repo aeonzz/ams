@@ -4,14 +4,12 @@ import * as React from "react";
 import { type ColumnDef } from "@tanstack/react-table";
 
 import {
+  cn,
   formatDate,
-  getReturnableItemStatusIcon,
-  textTransform,
 } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
 
 import { P } from "@/components/typography/text";
-import { type ReturnableItem } from "prisma/generated/zod";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import Image from "next/image";
 import {
@@ -27,22 +25,18 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { usePathname, useRouter } from "next/navigation";
-import { Badge } from "@/components/ui/badge";
+import { usePathname } from "next/navigation";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
-import { toast } from "sonner";
-import { UpdateEquipmentSheet } from "./update-equipment-sheet";
-import { DeleteEquipmentsDialog } from "./delete-equipments-dialog";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
-import { updateEquipment } from "@/lib/actions/equipment";
-import ReturnableItemStatusSchema, {
-  ReturnableItemStatusType,
-} from "prisma/generated/zod/inputTypeSchemas/ReturnableItemStatusSchema";
-import { type ReturnableItemType } from "@/lib/types/item";
+import Link from "next/link";
+import { type InventoryItemType } from "@/lib/types/item";
+import { updateInventory } from "@/lib/actions/inventory";
+import { UpdateInventorySheet } from "./inventory-inventory-sheet";
+import { DeleteInventoryDialog } from "./delete-inventories-dialog";
 
-export function getEquipmentsColumns(): ColumnDef<ReturnableItemType>[] {
+export function getInventoryColumns(): ColumnDef<InventoryItemType>[] {
   return [
     {
       id: "select",
@@ -83,7 +77,7 @@ export function getEquipmentsColumns(): ColumnDef<ReturnableItemType>[] {
           <div className="flex items-center justify-start">
             <Dialog>
               <DialogTrigger asChild>
-                <div className="relative aspect-square h-20 cursor-pointer transition-colors hover:brightness-75">
+                <div className="relative aspect-square h-10 cursor-pointer transition-colors hover:brightness-75">
                   <Image
                     src={row.original.imageUrl}
                     alt={`Image of ${row.original.name}`}
@@ -126,19 +120,19 @@ export function getEquipmentsColumns(): ColumnDef<ReturnableItemType>[] {
         <DataTableColumnHeader column={column} title="Inventory" />
       ),
       cell: ({ row }) => {
-        const router = useRouter();
         return (
           <div className="flex items-center space-x-2">
             <P className="truncate font-medium">
               {row.original.inventoryCount}
             </P>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => router.push(`/admin/e/${row.original.id}`)}
+            <Link
+              href={`/admin/${row.original.id}`}
+              className={cn(
+                buttonVariants({ variant: "link", size: "sm" })
+              )}
             >
               View
-            </Button>
+            </Link>
           </div>
         );
       },
@@ -177,11 +171,11 @@ export function getEquipmentsColumns(): ColumnDef<ReturnableItemType>[] {
           React.useState(false);
 
         const { isPending, mutateAsync } =
-          useServerActionMutation(updateEquipment);
+          useServerActionMutation(updateInventory);
 
         React.useEffect(() => {
           if (showUpdateTaskSheet) {
-            dialogManager.setActiveDialog("adminUpdateEquipmentSheet");
+            dialogManager.setActiveDialog("adminUpdateInventoryItemSheet");
           } else {
             dialogManager.setActiveDialog(null);
           }
@@ -189,18 +183,18 @@ export function getEquipmentsColumns(): ColumnDef<ReturnableItemType>[] {
 
         return (
           <div className="grid place-items-center">
-            <UpdateEquipmentSheet
+            <UpdateInventorySheet
               open={showUpdateTaskSheet}
               onOpenChange={setShowUpdateTaskSheet}
-              equipment={row.original}
+              inventory={row.original}
             />
-            {/* <DeleteEquipmentsDialog
+            <DeleteInventoryDialog
               open={showDeleteTaskDialog}
               onOpenChange={setShowDeleteTaskDialog}
-              equipments={[row.original]}
+              inventories={[row.original]}
               showTrigger={false}
               onSuccess={() => row.toggleSelected(false)}
-            /> */}
+            />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button

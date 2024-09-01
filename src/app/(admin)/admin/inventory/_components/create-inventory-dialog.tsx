@@ -26,30 +26,30 @@ import { X } from "lucide-react";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
 import {
-  createEquipmentSchema,
-  type CreateEquipmentSchema,
-} from "@/lib/db/schema/equipment";
-import { createEquipment } from "@/lib/actions/equipment";
-import CreateEquipmentForm from "@/components/forms/create-equipment-form";
-import {
   createInventoryItemSchema,
   type CreateInventoryItemSchema,
-} from "@/lib/db/schema/inventory-item";
-import CreateInventoryForm from "@/components/forms/create-inventory-item-form";
-import { createInventoryItem } from "@/lib/actions/inventoryItem";
+} from "@/lib/db/schema/inventory";
+import { createInventory } from "@/lib/actions/inventory";
+import CreateInventoryForm from "@/components/forms/create-inventory-form";
 
-export default function CreateInventorytDialog() {
+export default function CreateInventoryDialog() {
   const dialogManager = useDialogManager();
   const [alertOpen, setAlertOpen] = React.useState(false);
 
   const form = useForm<CreateInventoryItemSchema>({
     resolver: zodResolver(createInventoryItemSchema),
+    defaultValues: {
+      name: "",
+      description: "",
+      imageUrl: undefined,
+      inventoryCount: 1,
+    },
   });
 
   const { dirtyFields } = useFormState({ control: form.control });
   const isFieldsDirty = Object.keys(dirtyFields).length > 0;
 
-  const { mutateAsync, isPending } = useServerActionMutation(createInventoryItem);
+  const { mutateAsync, isPending } = useServerActionMutation(createInventory);
 
   const handleOpenChange = (open: boolean) => {
     if (!open) {

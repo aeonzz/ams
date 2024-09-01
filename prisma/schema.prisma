@@ -136,18 +136,18 @@ model Venue {
 }
 
 model ReturnableRequest {
-  id                String         @id
+  id                String        @id
   itemId            String
-  item              ReturnableItem @relation(fields: [itemId], references: [id])
+  item              InventoryItem @relation(fields: [itemId], references: [id])
   dateAndTimeNeeded DateTime
   returnDateAndTime DateTime
   purpose           String
-  quantity          Int            @default(1)
-  status            RequestStatus  @default(PENDING)
-  requestId         String         @unique
-  request           Request        @relation(fields: [requestId], references: [id], onDelete: Cascade)
-  createdAt         DateTime       @default(now())
-  updatedAt         DateTime       @updatedAt
+  quantity          Int           @default(1)
+  status            RequestStatus @default(PENDING)
+  requestId         String        @unique
+  request           Request       @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
 }
 
 model ConsumableRequest {
@@ -163,24 +163,26 @@ model ConsumableRequest {
   updatedAt  DateTime         @updatedAt
 }
 
-model ReturnableItem {
+model InventoryItem {
   id                 String              @id
   name               String
   description        String
   imageUrl           String
-  inventoryItems     InventoryItem[]
+  inventorySubItems  InventorySubItem[]
   returnableRequests ReturnableRequest[]
+  isArchived         Boolean             @default(false)
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
 }
 
-model InventoryItem {
-  id               String               @id
-  returnableItemId String
-  returnableItem   ReturnableItem       @relation(fields: [returnableItemId], references: [id])
-  status           ReturnableItemStatus @default(AVAILABLE)
-  createdAt        DateTime             @default(now())
-  updatedAt        DateTime             @updatedAt
+model InventorySubItem {
+  id          String        @id
+  inventoryId String
+  inventory   InventoryItem @relation(fields: [inventoryId], references: [id])
+  status      ItemStatus    @default(AVAILABLE)
+  isArchived  Boolean       @default(false)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 }
 
 model ConsumableItem {
@@ -234,7 +236,7 @@ model MaintenanceRecord {
   vehicle   Vehicle  @relation(fields: [vehicleId], references: [id])
 }
 
-enum ReturnableItemStatus {
+enum ItemStatus {
   AVAILABLE
   IN_USE
   MAINTENANCE

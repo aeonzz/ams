@@ -11,7 +11,6 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 
 import { P } from "@/components/typography/text";
-import { type ReturnableItem } from "prisma/generated/zod";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import Image from "next/image";
 import {
@@ -34,14 +33,13 @@ import { Button } from "@/components/ui/button";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { toast } from "sonner";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
-import { updateEquipment } from "@/lib/actions/equipment";
-import ReturnableItemStatusSchema, {
-  ReturnableItemStatusType,
-} from "prisma/generated/zod/inputTypeSchemas/ReturnableItemStatusSchema";
-import type { InventoryItemType } from "@/lib/types/item";
-import { updateInventoryItem } from "@/lib/actions/inventoryItem";
+import type { InventorySubItemType } from "@/lib/types/item";
+import { updateInventorySubItem } from "@/lib/actions/inventoryItem";
+import ItemStatusSchema, {
+  type ItemStatusType,
+} from "prisma/generated/zod/inputTypeSchemas/ItemStatusSchema";
 
-export function getInventoryItemsColumns(): ColumnDef<InventoryItemType>[] {
+export function getInventorySubItemsColumns(): ColumnDef<InventorySubItemType>[] {
   return [
     {
       id: "select",
@@ -82,7 +80,7 @@ export function getInventoryItemsColumns(): ColumnDef<InventoryItemType>[] {
           <div className="flex items-center justify-start">
             <Dialog>
               <DialogTrigger asChild>
-                <div className="relative aspect-square h-20 cursor-pointer transition-colors hover:brightness-75">
+                <div className="relative aspect-square h-10 cursor-pointer transition-colors hover:brightness-75">
                   <Image
                     src={row.original.imageUrl}
                     alt={`Image of ${row.original.name}`}
@@ -158,12 +156,13 @@ export function getInventoryItemsColumns(): ColumnDef<InventoryItemType>[] {
         const [showDeleteTaskDialog, setShowDeleteTaskDialog] =
           React.useState(false);
 
-        const { isPending, mutateAsync } =
-          useServerActionMutation(updateInventoryItem);
+        const { isPending, mutateAsync } = useServerActionMutation(
+          updateInventorySubItem
+        );
 
         React.useEffect(() => {
           if (showUpdateTaskSheet) {
-            dialogManager.setActiveDialog("adminUpdateEquipmentSheet");
+            dialogManager.setActiveDialog("adminUpdateInventorySubItemDialog");
           } else {
             dialogManager.setActiveDialog(null);
           }
@@ -206,7 +205,7 @@ export function getInventoryItemsColumns(): ColumnDef<InventoryItemType>[] {
                         toast.promise(
                           mutateAsync({
                             id: row.original.id,
-                            status: value as ReturnableItemStatusType,
+                            status: value as ItemStatusType,
                             path: pathname,
                           }),
                           {
@@ -222,7 +221,7 @@ export function getInventoryItemsColumns(): ColumnDef<InventoryItemType>[] {
                         );
                       }}
                     >
-                      {ReturnableItemStatusSchema.options.map((status) => {
+                      {ItemStatusSchema.options.map((status) => {
                         const { icon: Icon, variant } =
                           getReturnableItemStatusIcon(status);
                         return (

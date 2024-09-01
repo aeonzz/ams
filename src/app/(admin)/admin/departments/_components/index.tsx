@@ -1,12 +1,13 @@
 import React from "react";
 
-import {  P } from "@/components/typography/text";
+import { P } from "@/components/typography/text";
 import { DateRangePicker } from "@/components/date-range-picker";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DataTableSkeleton } from "@/components/data-table/data-table-skeleton";
 import { GetDepartmentsSchema } from "@/lib/schema";
 import { getDepartments } from "@/lib/actions/department";
 import { DepartmentsTable } from "./departments-table";
+import LoadingSpinner from "@/components/loaders/loading-spinner";
 
 interface DepartmentScreenProps {
   params: GetDepartmentsSchema;
@@ -29,18 +30,8 @@ export default function DepartmentScreen({ params }: DepartmentScreenProps) {
             />
           </React.Suspense>
         </div>
-        <div className="grid items-center py-3">
-          <React.Suspense
-            fallback={
-              <DataTableSkeleton
-                columnCount={5}
-                searchableColumnCount={1}
-                filterableColumnCount={2}
-                cellWidths={["10rem", "40rem", "12rem", "12rem", "8rem"]}
-                shrinkZero
-              />
-            }
-          >
+        <div className="grid min-h-[calc(100vh_-_100px)] place-items-center items-center py-3">
+          <React.Suspense fallback={<LoadingSpinner />}>
             <DepartmentsTable departmentsPromise={departmentsPromise} />
           </React.Suspense>
         </div>

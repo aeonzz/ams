@@ -18,23 +18,17 @@ import { SubmitButton } from "../ui/submit-button";
 import { type UseMutateAsyncFunction } from "@tanstack/react-query";
 import { type UseFormReturn } from "react-hook-form";
 import { useParams, usePathname } from "next/navigation";
-import { FileUploader } from "../file-uploader";
 import { DialogState } from "@/lib/hooks/use-dialog-manager";
-import { useUploadFile } from "@/lib/hooks/use-upload-file";
-import { createEquipment } from "@/lib/actions/equipment";
-import { type CreateEquipmentSchema } from "@/lib/db/schema/equipment";
-import { type CreateEquipmentSchemaWithPath } from "@/lib/schema/resource/returnable-resource";
-import { Textarea } from "../ui/text-area";
 import { type CreateInventoryItemSchema } from "@/lib/db/schema/inventory-item";
-import { createInventoryItem } from "@/lib/actions/inventoryItem";
-import { CreateInventorytSchemaWithPath } from "@/lib/schema/inventoryItem";
+import { createInventorySubItem } from "@/lib/actions/inventoryItem";
+import { CreateInventorySubItemtSchemaWithPath } from "@/lib/schema/resource/returnable-resource";
 
 interface CreateInventoryFormProps {
   setAlertOpen: React.Dispatch<React.SetStateAction<boolean>>;
   mutateAsync: UseMutateAsyncFunction<
     any,
     Error,
-    Parameters<typeof createInventoryItem>[0],
+    Parameters<typeof createInventorySubItem>[0],
     unknown
   >;
   form: UseFormReturn<CreateInventoryItemSchema>;
@@ -43,7 +37,7 @@ interface CreateInventoryFormProps {
   dialogManager: DialogState;
 }
 
-export default function CreateInventoryForm({
+export default function CreateInventoryItemForm({
   mutateAsync,
   isPending,
   form,
@@ -53,19 +47,19 @@ export default function CreateInventoryForm({
 }: CreateInventoryFormProps) {
   const pathname = usePathname();
   const params = useParams();
-  const equipmentId = params.equipmentId;
+  const inventoryItemId = params.inventoryItemId;
 
   async function onSubmit(values: CreateInventoryItemSchema) {
-    const data: CreateInventorytSchemaWithPath = {
+    const data: CreateInventorySubItemtSchemaWithPath = {
       path: pathname,
-      returnableItemId: equipmentId as string,
+      inventoryId: inventoryItemId as string,
     };
 
     toast.promise(mutateAsync(data), {
       loading: "Submitting...",
       success: () => {
         dialogManager.setActiveDialog(null);
-        return "Equipment created successfuly";
+        return "InventoryItem created successfuly";
       },
       error: (err) => {
         console.log(err);

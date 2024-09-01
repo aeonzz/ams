@@ -1,22 +1,23 @@
-import { InventoryItem, ReturnableItem } from "prisma/generated/zod";
-import { type ReturnableItemStatusType } from "prisma/generated/zod/inputTypeSchemas/ReturnableItemStatusSchema";
+import { InventorySubItem } from "prisma/generated/zod";
+import { type ItemStatusType } from "prisma/generated/zod/inputTypeSchemas/ItemStatusSchema";
 
-export type ReturnableItemType = {
+export type InventoryItemType = {
   id: string;
   name: string;
   description: string;
   imageUrl: string;
   inventoryCount: number;
   availableCount: number;
-  inventoryItems: InventoryItem[];
+  createdAt: Date;
+  inventorySubItems: InventorySubItem[];
 };
 
-export type InventoryItemType = {
+export type InventorySubItemType = {
   id: string;
   name: string;
   description: string;
-  status: ReturnableItemStatusType;
-  imageUrl: any;
+  status: ItemStatusType;
+  imageUrl: string;
   createdAt: Date;
   updatedAt: Date;
 };

@@ -30,47 +30,47 @@ import { Separator } from "@/components/ui/separator";
 import { FileUploader } from "@/components/file-uploader";
 import { useUploadFile } from "@/lib/hooks/use-upload-file";
 import {
-  updateEquipmentSchema,
-  type UpdateEquipmentSchema,
-} from "@/lib/db/schema/equipment";
-import { type ExtendedUpdateEquipmentServerSchema } from "@/lib/schema/resource/returnable-resource";
-import { updateEquipment } from "@/lib/actions/equipment";
+  updateInventoryItemSchema,
+  type UpdateInventoryItemSchema,
+} from "@/lib/db/schema/inventory";
 import { Textarea } from "@/components/ui/text-area";
-import { type ReturnableItemType } from "@/lib/types/item";
+import { type InventoryItemType } from "@/lib/types/item";
+import { updateInventory } from "@/lib/actions/inventory";
+import { ExtendedUpdateInventoryItemServerSchema } from "@/lib/schema/resource/returnable-resource";
 
-interface UpdateEquipmentProps
+interface UpdateInventoryProps
   extends React.ComponentPropsWithRef<typeof Sheet> {
-  equipment: ReturnableItemType;
+  inventory: InventoryItemType;
 }
 
-export function UpdateEquipmentSheet({
-  equipment,
+export function UpdateInventorySheet({
+  inventory,
   ...props
-}: UpdateEquipmentProps) {
+}: UpdateInventoryProps) {
   const pathname = usePathname();
-  const form = useForm<UpdateEquipmentSchema>({
-    resolver: zodResolver(updateEquipmentSchema),
+  const form = useForm<UpdateInventoryItemSchema>({
+    resolver: zodResolver(updateInventoryItemSchema),
     defaultValues: {
-      name: equipment.name,
-      description: equipment.description,
+      name: inventory.name,
+      description: inventory.description,
       imageUrl: undefined,
     },
   });
 
   const { dirtyFields } = useFormState({ control: form.control });
 
-  const { isPending, mutateAsync } = useServerActionMutation(updateEquipment);
+  const { isPending, mutateAsync } = useServerActionMutation(updateInventory);
   const { uploadFiles, progresses, isUploading } = useUploadFile();
 
   React.useEffect(() => {
     form.reset({
-      name: equipment.name,
-      description: equipment.description,
+      name: inventory.name,
+      description: inventory.description,
       imageUrl: undefined,
     });
-  }, [equipment, form, props.open]);
+  }, [inventory, form, props.open]);
 
-  async function onSubmit(values: UpdateEquipmentSchema) {
+  async function onSubmit(values: UpdateInventoryItemSchema) {
     try {
       let uploadedFilesResult: { filePath: string }[] = [];
 
@@ -78,8 +78,8 @@ export function UpdateEquipmentSheet({
         uploadedFilesResult = await uploadFiles(values.imageUrl);
       }
 
-      const data: ExtendedUpdateEquipmentServerSchema = {
-        id: equipment.id,
+      const data: ExtendedUpdateInventoryItemServerSchema = {
+        id: inventory.id,
         path: pathname,
         name: values.name,
         description: values.description,

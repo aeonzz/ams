@@ -3,15 +3,20 @@
 import { checkAuth } from "../auth/utils";
 import { db } from "@/lib/db/index";
 import { authedProcedure, convertToBase64, getErrorMessage } from "./utils";
-import { type GetInventorySchema } from "../schema";
 import placeholder from "public/placeholder.svg";
-import { type InventoryItem } from "prisma/generated/zod";
-import { createInventorytSchemaWithPath, extendedUpdateInventoryItemServerSchema } from "../schema/inventoryItem";
+import { type InventorySubItem } from "prisma/generated/zod";
 import { generateId } from "lucia";
 import { revalidatePath } from "next/cache";
+import { GetInventorySubItemSchema } from "../schema";
+import {
+  createInventorySubItemSchemaWithPath,
+  deleteInventorySubItemsSchema,
+  extendedUpdateInventorySubItemItemServerSchema,
+  updateInventorySubItemStatusesSchema,
+} from "../schema/resource/returnable-resource";
 
-export async function getInventoryItems(
-  input: GetInventorySchema & { id: string }
+export async function getInventorySubItems(
+  input: GetInventorySubItemSchema & { id: string }
 ) {
   await checkAuth();
   const { page, per_page, sort, name, id, from, to } = input;
@@ -20,12 +25,12 @@ export async function getInventoryItems(
     const skip = (page - 1) * per_page;
 
     const [column, order] = (sort?.split(".") ?? ["createdAt", "desc"]) as [
-      keyof InventoryItem | undefined,
+      keyof InventorySubItem | undefined,
       "asc" | "desc" | undefined,
     ];
 
     const where: any = {
-      returnableItemId: id,
+      inventoryId: id,
     };
 
     if (name) {
@@ -40,7 +45,7 @@ export async function getInventoryItems(
     }
 
     const [data, total] = await db.$transaction([
-      db.inventoryItem.findMany({
+      db.inventorySubItem.findMany({
         where,
         take: per_page,
         skip,
@@ -48,28 +53,21 @@ export async function getInventoryItems(
           [column || "createdAt"]: order || "desc",
         },
         include: {
-          returnableItem: {
-            select: {
-              id: true,
-              name: true,
-              description: true,
-              imageUrl: true,
-            },
-          },
+          inventory: true,
         },
       }),
-      db.inventoryItem.count({ where }),
+      db.inventorySubItem.count({ where }),
     ]);
 
     const pageCount = Math.ceil(total / per_page);
 
-    const dataWithInventoryAndImages = await Promise.all(
+    const dataWithInventorySubAndImages = await Promise.all(
       data.map(async (item) => {
-        let imageUrl = item.returnableItem.imageUrl || placeholder;
+        let imageUrl = item.inventory.imageUrl || placeholder;
 
         try {
-          if (item.returnableItem.imageUrl) {
-            const result = await convertToBase64(item.returnableItem.imageUrl);
+          if (item.inventory.imageUrl) {
+            const result = await convertToBase64(item.inventory.imageUrl);
             if ("base64Url" in result) {
               imageUrl = result.base64Url;
             }
@@ -81,8 +79,8 @@ export async function getInventoryItems(
 
         return {
           id: item.id,
-          name: item.returnableItem.name,
-          description: item.returnableItem.description,
+          name: item.inventory.name,
+          description: item.inventory.description,
           status: item.status,
           imageUrl: imageUrl,
           createdAt: item.createdAt,
@@ -91,21 +89,21 @@ export async function getInventoryItems(
       })
     );
 
-    return { data: dataWithInventoryAndImages, pageCount };
+    return { data: dataWithInventorySubAndImages, pageCount };
   } catch (err) {
     console.error(err);
     return { data: [], pageCount: 0 };
   }
 }
 
-export const createInventoryItem = authedProcedure
+export const createInventorySubItem = authedProcedure
   .createServerAction()
-  .input(createInventorytSchemaWithPath)
+  .input(createInventorySubItemSchemaWithPath)
   .handler(async ({ input, ctx }) => {
     const { path, ...rest } = input;
     try {
       const itemId = generateId(15);
-      const item = await db.inventoryItem.create({
+      const item = await db.inventorySubItem.create({
         data: {
           id: itemId,
           ...rest,
@@ -118,13 +116,13 @@ export const createInventoryItem = authedProcedure
     }
   });
 
-export const updateInventoryItem = authedProcedure
+export const updateInventorySubItem = authedProcedure
   .createServerAction()
-  .input(extendedUpdateInventoryItemServerSchema)
+  .input(extendedUpdateInventorySubItemItemServerSchema)
   .handler(async ({ ctx, input }) => {
     const { path, id, ...rest } = input;
     try {
-      await db.inventoryItem.update({
+      await db.inventorySubItem.update({
         where: {
           id: id,
         },
@@ -135,6 +133,51 @@ export const updateInventoryItem = authedProcedure
 
       return revalidatePath(path);
     } catch (error) {
+      getErrorMessage(error);
+    }
+  });
+
+export const updateInventorySubItemStatuses = authedProcedure
+  .createServerAction()
+  .input(updateInventorySubItemStatusesSchema)
+  .handler(async ({ input }) => {
+    const { path, ...rest } = input;
+    try {
+      await db.inventorySubItem.updateMany({
+        where: {
+          id: {
+            in: rest.ids,
+          },
+        },
+        data: {
+          ...(rest.status !== undefined && { status: rest.status }),
+        },
+      });
+
+      return revalidatePath(path);
+    } catch (error) {
+      getErrorMessage(error);
+    }
+  });
+
+export const deleteInventorySubItems = authedProcedure
+  .createServerAction()
+  .input(deleteInventorySubItemsSchema)
+  .handler(async ({ input }) => {
+    const { path, ...rest } = input;
+
+    try {
+      await db.inventorySubItem.deleteMany({
+        where: {
+          id: {
+            in: rest.ids,
+          },
+        },
+      });
+
+      return revalidatePath(path);
+    } catch (error) {
+      console.log(error);
       getErrorMessage(error);
     }
   });

@@ -11,8 +11,8 @@ export { VenueRequestScalarFieldEnumSchema } from './VenueRequestScalarFieldEnum
 export { VenueScalarFieldEnumSchema } from './VenueScalarFieldEnumSchema';
 export { ReturnableRequestScalarFieldEnumSchema } from './ReturnableRequestScalarFieldEnumSchema';
 export { ConsumableRequestScalarFieldEnumSchema } from './ConsumableRequestScalarFieldEnumSchema';
-export { ReturnableItemScalarFieldEnumSchema } from './ReturnableItemScalarFieldEnumSchema';
 export { InventoryItemScalarFieldEnumSchema } from './InventoryItemScalarFieldEnumSchema';
+export { InventorySubItemScalarFieldEnumSchema } from './InventorySubItemScalarFieldEnumSchema';
 export { ConsumableItemScalarFieldEnumSchema } from './ConsumableItemScalarFieldEnumSchema';
 export { TransportRequestScalarFieldEnumSchema } from './TransportRequestScalarFieldEnumSchema';
 export { VehicleScalarFieldEnumSchema } from './VehicleScalarFieldEnumSchema';
@@ -20,7 +20,7 @@ export { MaintenanceRecordScalarFieldEnumSchema } from './MaintenanceRecordScala
 export { SortOrderSchema } from './SortOrderSchema';
 export { QueryModeSchema } from './QueryModeSchema';
 export { NullsOrderSchema } from './NullsOrderSchema';
-export { ReturnableItemStatusSchema } from './ReturnableItemStatusSchema';
+export { ItemStatusSchema } from './ItemStatusSchema';
 export { ConsumableItemStatusSchema } from './ConsumableItemStatusSchema';
 export { RequestStatusSchema } from './RequestStatusSchema';
 export { VenueStatusSchema } from './VenueStatusSchema';
