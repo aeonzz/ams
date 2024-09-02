@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { RequestStatusSchema } from '../inputTypeSchemas/RequestStatusSchema'
 import type { InventorySubItemWithRelations } from './InventorySubItemSchema'
 import type { RequestWithRelations } from './RequestSchema'
 import { InventorySubItemWithRelationsSchema } from './InventorySubItemSchema'
@@ -10,7 +9,6 @@ import { RequestWithRelationsSchema } from './RequestSchema'
 /////////////////////////////////////////
 
 export const ReturnableRequestSchema = z.object({
-  status: RequestStatusSchema,
   id: z.string(),
   itemId: z.string(),
   dateAndTimeNeeded: z.coerce.date(),

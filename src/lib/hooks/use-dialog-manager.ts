@@ -8,7 +8,7 @@ export type DialogType =
   | "venueDialog"
   | "resourceDialog"
   | "returnableResourceDialog"
-  | "consumableResourceDialog"
+  | "supplyResourceDialog"
   | "transportDialog"
   | "settingsDialog"
   | "adminCreateVenueDialog"

@@ -15,7 +15,7 @@ export async function GET(req: Request) {
       },
       include: {
         jobRequest: true,
-        consumableRequest: true,
+        supplyRequest: true,
         returnableRequest: true,
         transportRequest: true,
         venueRequest: true,

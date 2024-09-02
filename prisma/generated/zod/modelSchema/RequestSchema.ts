@@ -6,13 +6,13 @@ import type { UserWithRelations } from './UserSchema'
 import type { JobRequestWithRelations } from './JobRequestSchema'
 import type { VenueRequestWithRelations } from './VenueRequestSchema'
 import type { ReturnableRequestWithRelations } from './ReturnableRequestSchema'
-import type { ConsumableRequestWithRelations } from './ConsumableRequestSchema'
+import type { SupplyRequestWithRelations } from './SupplyRequestSchema'
 import type { TransportRequestWithRelations } from './TransportRequestSchema'
 import { UserWithRelationsSchema } from './UserSchema'
 import { JobRequestWithRelationsSchema } from './JobRequestSchema'
 import { VenueRequestWithRelationsSchema } from './VenueRequestSchema'
 import { ReturnableRequestWithRelationsSchema } from './ReturnableRequestSchema'
-import { ConsumableRequestWithRelationsSchema } from './ConsumableRequestSchema'
+import { SupplyRequestWithRelationsSchema } from './SupplyRequestSchema'
 import { TransportRequestWithRelationsSchema } from './TransportRequestSchema'
 
 /////////////////////////////////////////
@@ -43,7 +43,7 @@ export type RequestRelations = {
   jobRequest?: JobRequestWithRelations | null;
   venueRequest?: VenueRequestWithRelations | null;
   returnableRequest?: ReturnableRequestWithRelations | null;
-  consumableRequest?: ConsumableRequestWithRelations | null;
+  supplyRequest?: SupplyRequestWithRelations | null;
   transportRequest?: TransportRequestWithRelations | null;
 };
 
@@ -54,7 +54,7 @@ export const RequestWithRelationsSchema: z.ZodType<RequestWithRelations> = Reque
   jobRequest: z.lazy(() => JobRequestWithRelationsSchema).nullable(),
   venueRequest: z.lazy(() => VenueRequestWithRelationsSchema).nullable(),
   returnableRequest: z.lazy(() => ReturnableRequestWithRelationsSchema).nullable(),
-  consumableRequest: z.lazy(() => ConsumableRequestWithRelationsSchema).nullable(),
+  supplyRequest: z.lazy(() => SupplyRequestWithRelationsSchema).nullable(),
   transportRequest: z.lazy(() => TransportRequestWithRelationsSchema).nullable(),
 }))
 

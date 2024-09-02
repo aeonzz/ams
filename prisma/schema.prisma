@@ -88,7 +88,7 @@ model Request {
   jobRequest        JobRequest?
   venueRequest      VenueRequest?
   returnableRequest ReturnableRequest?
-  consumableRequest ConsumableRequest?
+  supplyRequest     SupplyRequest?
   transportRequest  TransportRequest?
 }
 
@@ -143,7 +143,6 @@ model ReturnableRequest {
   returnDateAndTime DateTime
   purpose           String
   quantity          Int              @default(1)
-  status            RequestStatus    @default(PENDING)
   requestId         String           @unique
   request           Request          @relation(fields: [requestId], references: [id], onDelete: Cascade)
   createdAt         DateTime         @default(now())
@@ -172,33 +171,33 @@ model InventoryItem {
   updatedAt         DateTime           @updatedAt
 }
 
-model ConsumableRequest {
-  id         String           @id
-  items      ConsumableItem[]
-  quantity   Int
-  dateNeeded DateTime
-  purpose    String?
-  status     RequestStatus    @default(PENDING)
-  requestId  String           @unique
-  request    Request          @relation(fields: [requestId], references: [id], onDelete: Cascade)
-  createdAt  DateTime         @default(now())
-  updatedAt  DateTime         @updatedAt
+model SupplyRequest {
+  id                String       @id
+  items             SupplyItem[]
+  quantity          Int
+  dateAndTimeNeeded DateTime
+  purpose           String
+  requestId         String       @unique
+  request           Request      @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
 }
 
-model ConsumableItem {
-  id                  String               @id
-  name                String
-  description         String?
-  status              ConsumableItemStatus @default(IN_STOCK)
-  imageUrl            String?
-  quantity            Int
-  unit                String
-  lowStockThreshold   Int
-  expirationDate      DateTime?
-  createdAt           DateTime             @default(now())
-  updatedAt           DateTime             @updatedAt
-  consumableRequest   ConsumableRequest?   @relation(fields: [consumableRequestId], references: [id])
-  consumableRequestId String?
+model SupplyItem {
+  id                String             @id
+  name              String
+  description       String?
+  status            SupplyItemStatus   @default(IN_STOCK)
+  imageUrl          String?
+  quantity          Int
+  unit              String
+  lowStockThreshold Int
+  expirationDate    DateTime?
+  category          SupplyItemCategory
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  supplyRequest     SupplyRequest?     @relation(fields: [supplyRequestId], references: [id])
+  supplyRequestId   String?
 }
 
 model TransportRequest {
@@ -245,21 +244,22 @@ enum ItemStatus {
   PENDING_RETURN
 }
 
-enum ConsumableItemStatus {
+enum SupplyItemCategory {
+  OFFICE_SUPPLIES
+  ELECTRONICS
+  FURNITURE
+  CLEANING
+  MEDICAL
+  EDUCATIONAL
+  OTHER
+}
+
+enum SupplyItemStatus {
   IN_STOCK
   LOW_STOCK
   OUT_OF_STOCK
   ORDERED
   EXPIRED
-}
-
-enum RequestStatus {
-  PENDING
-  APPROVED
-  REJECTED
-  FULFILLED
-  RETURNED
-  PARTIALLY_FULFILLED
 }
 
 enum VenueStatus {

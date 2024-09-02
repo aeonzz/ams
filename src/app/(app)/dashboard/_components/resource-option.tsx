@@ -15,6 +15,7 @@ import {
   useDialogManager,
 } from "@/lib/hooks/use-dialog-manager";
 import ReturnableResourceDialog from "@/components/dialogs/returnable-resource-dialog";
+import SupplyResourceDialog from "@/components/dialogs/supply-resource-dialog";
 
 type ResourceType = {
   value: "Returnable" | "Consumable";
@@ -34,7 +35,7 @@ const RequestTypes: ResourceType[] = [
     value: "Consumable",
     label: "Supplies Request",
     icon: Box,
-    dialog: "consumableResourceDialog",
+    dialog: "supplyResourceDialog",
   },
 ];
 
@@ -73,6 +74,7 @@ export default function ResourceOption() {
         </DialogContent>
       </Dialog>
       <ReturnableResourceDialog />
+      <SupplyResourceDialog />
     </>
   );
 }

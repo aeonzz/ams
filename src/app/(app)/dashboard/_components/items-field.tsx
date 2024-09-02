@@ -102,8 +102,8 @@ export default function ItemsField({ form, name, isPending }: ItemsFieldProps) {
                   )}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-[500px] p-0">
-                <Command className="max-h-[250px]">
+              <PopoverContent className="w-[470px] p-0">
+                <Command className="max-h-[300px]">
                   <CommandInput placeholder="Search items..." />
                   <CommandList>
                     <CommandEmpty>No items found.</CommandEmpty>

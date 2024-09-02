@@ -36,7 +36,7 @@ export default function MyRequestScreenParams({
     RequestWithRelations[]
   >({
     queryFn: async () => {
-      const res = await axios.get("/api/overview/user-dashboard-overview");
+      const res = await axios.get(`/api/overview/${params}`);
       return res.data.data;
     },
     queryKey: ["user-dashboard-overview"],
@@ -65,7 +65,7 @@ export default function MyRequestScreenParams({
           <P className="font-semibold">{data.title}</P>
         </div>
         <ScrollArea className="h-[calc(100vh_-_70px)]">
-          {data.type === "JOB" && <JobRequest data={data} />}
+          
         </ScrollArea>
       </div>
       <Separator orientation="vertical" className="h-full" />
