@@ -450,55 +450,6 @@ export async function getCancelledRequests(input: GetRequestsSchema) {
   }
 }
 
-export const getRequestById = authedProcedure
-  .createServerAction()
-  .input(
-    z.object({
-      id: z.string(),
-    })
-  )
-  .handler(async ({ input }) => {
-    const { id } = input;
-    try {
-      const data = await db.request.findFirst({
-        where: {
-          id: id,
-        },
-        include: {
-          jobRequest: {
-            include: {
-              files: true,
-            },
-          },
-          resourceRequest: true,
-          venueRequest: true,
-        },
-      });
-
-      if (!data) {
-        throw "Request not found";
-      }
-
-      if (data.jobRequest?.files) {
-        data.jobRequest.files = await Promise.all(
-          data.jobRequest.files.map(async (file) => {
-            const filePath = path.join(file.url);
-            const fileBuffer = await readFile(filePath);
-            const base64String = fileBuffer.toString("base64");
-            return {
-              ...file,
-              url: `data:image/png;base64,${base64String}`,
-            };
-          })
-        );
-      }
-
-      return data as RequestWithRelations;
-    } catch (error) {
-      getErrorMessage(error);
-    }
-  });
-
 export const updateRequest = authedProcedure
   .createServerAction()
   .input(extendedUpdateJobRequestSchema)

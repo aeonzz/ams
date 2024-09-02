@@ -3,11 +3,16 @@ import { z } from "zod";
 import { requestSchemaBase } from "../request";
 
 export const supplyResourceRequestSchema = z.object({
-  items: z.array(SupplyItemSchema),
-  quantity: z
-    .string()
-    .transform((val) => parseInt(val, 10))
-    .pipe(z.number().min(1, "Quantity is required")),
+  items: z
+    .array(
+      z.object({
+        supplyItemId: z.string().refine((val) => val !== "", {
+          message: "Supply item ID is required",
+        }),
+        quantity: z.number().min(1, "Quantity must be at least 1"),
+      })
+    )
+    .min(1, "At least one item is required"),
   dateAndTimeNeeded: z
     .date({
       required_error: "Date needed is required",
@@ -38,5 +43,29 @@ export const extendedSupplyResourceRequestSchema = requestSchemaBase.merge(
 );
 
 export type ExtendedSupplyResourceRequestSchema = z.infer<
+  typeof extendedSupplyResourceRequestSchema
+>;
+
+export const supplyResourceRequestSchemaServer = z.object({
+  items: z.array(z.string()),
+  quantity: z.number(),
+  dateAndTimeNeeded: z.date(),
+  purpose: z.array(z.string()),
+  otherPurpose: z.string().optional(),
+});
+
+export type SupplyResourceRequestSchemaServer = z.infer<
+  typeof supplyResourceRequestSchemaServer
+>;
+
+export const supplyResourceRequestSchemaServerWithPath =
+  supplyResourceRequestSchemaServer.extend({
+    path: z.string(),
+  });
+
+export const extendedSupplyResourceRequestSchemaServer =
+  requestSchemaBase.merge(supplyResourceRequestSchemaServerWithPath);
+
+export type ExtendedSupplyResourceRequestSchemaServer = z.infer<
   typeof extendedSupplyResourceRequestSchema
 >;

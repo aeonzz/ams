@@ -173,14 +173,13 @@ model InventoryItem {
 
 model SupplyRequest {
   id                String       @id
-  items             SupplyItem[]
-  quantity          Int
   dateAndTimeNeeded DateTime
   purpose           String
   requestId         String       @unique
   request           Request      @relation(fields: [requestId], references: [id], onDelete: Cascade)
   createdAt         DateTime     @default(now())
   updatedAt         DateTime     @updatedAt
+  items             SupplyRequestItem[]
 }
 
 model SupplyItem {
@@ -196,8 +195,20 @@ model SupplyItem {
   category          SupplyItemCategory
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
-  supplyRequest     SupplyRequest?     @relation(fields: [supplyRequestId], references: [id])
-  supplyRequestId   String?
+  supplyRequestItems SupplyRequestItem[]
+}
+
+model SupplyRequestItem {
+  id                String       @id
+  supplyRequestId   String
+  supplyItemId      String
+  quantity          Int
+  supplyRequest     SupplyRequest @relation(fields: [supplyRequestId], references: [id], onDelete: Cascade)
+  supplyItem        SupplyItem    @relation(fields: [supplyItemId], references: [id], onDelete: Cascade)
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  @@unique([supplyRequestId, supplyItemId])
 }
 
 model TransportRequest {

@@ -34,7 +34,6 @@ export default function SupplyResourceDialog() {
     resolver: zodResolver(supplyResourceRequestSchema),
     defaultValues: {
       items: undefined,
-      quantity: 0,
       dateAndTimeNeeded: undefined,
       purpose: [],
       otherPurpose: "other",

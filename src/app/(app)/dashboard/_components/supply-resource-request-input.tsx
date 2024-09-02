@@ -50,7 +50,10 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import ResourceDateTimePicker from "./resource-date-time-picker";
 import { isOverlapping } from "@/lib/utils";
-import { ExtendedSupplyResourceRequestSchema, type SupplyResourceRequestSchema } from "@/lib/schema/resource/supply-resource";
+import {
+  ExtendedSupplyResourceRequestSchema,
+  type SupplyResourceRequestSchema,
+} from "@/lib/schema/resource/supply-resource";
 import SupplyItemsField from "./supply-items-field";
 
 const purpose = [
@@ -112,8 +115,13 @@ export default function SupplyResourceRequestInput({
   const queryClient = useQueryClient();
   const items = form.watch("items");
 
-  async function onSubmit(values: SupplyResourceRequestSchema) {
+  const handleItemsChange = (
+    newItems: { supplyItemId: string; quantity: number }[]
+  ) => {
+    form.setValue("items", newItems);
+  };
 
+  async function onSubmit(values: SupplyResourceRequestSchema) {
     const data: ExtendedSupplyResourceRequestSchema = {
       ...values,
       priority: "LOW",
@@ -147,7 +155,16 @@ export default function SupplyResourceRequestInput({
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="scroll-bar flex max-h-[60vh] gap-6 overflow-y-auto px-4 py-1">
             <div className="flex w-full flex-col space-y-2">
-              <SupplyItemsField form={form} name="items" isPending={isPending} />
+              <SupplyItemsField
+                onItemsChange={handleItemsChange}
+                isPending={isPending}
+              />
+              <DateTimePicker
+                form={form}
+                name="dateAndTimeNeeded"
+                label="Date and Time needed"
+                disabled={isPending}
+              />
               <FormField
                 control={form.control}
                 name="purpose"

@@ -5,7 +5,6 @@ import FetchDataError from "@/components/card/fetch-data-error";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
 import { H3, H4, H5, P } from "@/components/typography/text";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { getRequestById } from "@/lib/actions/requests";
 import { useServerActionQuery } from "@/lib/hooks/server-action-hooks";
 import React from "react";
 import JobRequest from "./job-request";

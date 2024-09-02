@@ -1,167 +1,161 @@
 "use client";
 
-import React, { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
-import { ChevronsUpDown, Check, ChevronRight } from "lucide-react";
-import type { Path, UseFormReturn } from "react-hook-form";
-
-import { cn, getReturnableItemStatusIcon, textTransform } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import * as React from "react";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { cn, textTransform } from "@/lib/utils";
 import {
   Popover,
-  PopoverContent,
   PopoverTrigger,
+  PopoverContent,
 } from "@/components/ui/popover";
 import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectGroup,
+  SelectValue,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
-import { type ReturnableResourceRequestSchema } from "@/lib/schema/resource/returnable-resource";
-import { P } from "@/components/typography/text";
-import Image from "next/image";
 import {
   SupplyItemCategorySchema,
-  type SupplyItemWithRelations,
+  SupplyItemWithRelations,
 } from "prisma/generated/zod";
-import { type SupplyResourceRequestSchema } from "@/lib/schema/resource/supply-resource";
+import axios from "axios";
+import { useQuery } from "@tanstack/react-query";
+import {
+  Command,
+  CommandInput,
+  CommandList,
+  CommandEmpty,
+  CommandItem,
+} from "@/components/ui/command";
 
-interface SupplyItemsFieldProps {
-  form: UseFormReturn<SupplyResourceRequestSchema>;
-  name: Path<SupplyResourceRequestSchema>;
+interface CommandProps {
+  onItemsChange: (items: { supplyItemId: string; quantity: number }[]) => void;
   isPending: boolean;
 }
 
 export default function SupplyItemsField({
-  form,
-  name,
+  onItemsChange,
   isPending,
-}: SupplyItemsFieldProps) {
-  const [open, setOpen] = React.useState(false);
-
-  const { data, isLoading } = useQuery<SupplyItemWithRelations[]>({
-    queryFn: async () => {
-      const res = await axios.get("/api/input-data/resource-items/supply");
-      return res.data.data;
-    },
+}: CommandProps) {
+  const { data: items, isLoading } = useQuery<SupplyItemWithRelations[]>({
     queryKey: ["get-input-supply-resource"],
+    queryFn: async () => {
+      const response = await axios.get("/api/input-data/resource-items/supply");
+      return response.data.data;
+    },
   });
 
-  const handleSubItemSelect = (item: SupplyItemWithRelations) => {
-    form.setValue(name, item);
+  const [open, setOpen] = React.useState(false);
+  const [selectedCategory, setSelectedCategory] = React.useState<string>(
+    SupplyItemCategorySchema.options[0] // Default category
+  );
+  const [selectedItems, setSelectedItems] = React.useState<
+    { supplyItemId: string; quantity: number }[]
+  >([]);
+
+  const categories = SupplyItemCategorySchema.options;
+
+  const filteredItems = items?.filter(
+    (item) => item.category === selectedCategory
+  );
+
+  const handleItemSelect = (itemId: string) => {
+    setSelectedItems((prevItems) => {
+      const itemExists = prevItems.find((item) => item.supplyItemId === itemId);
+      if (itemExists) {
+        return prevItems;
+      }
+      return [...prevItems, { supplyItemId: itemId, quantity: 1 }];
+    });
     setOpen(false);
   };
 
+  const handleQuantityChange = (index: number, quantity: number) => {
+    const newItems = [...selectedItems];
+    newItems[index].quantity = quantity;
+    setSelectedItems(newItems);
+    onItemsChange(newItems);
+  };
+
+  const handleRemoveItem = (index: number) => {
+    const newItems = selectedItems.filter((_, i) => i !== index);
+    setSelectedItems(newItems);
+    onItemsChange(newItems);
+  };
+
   return (
-    <FormField
-      control={form.control}
-      name={name}
-      render={({ field }) => (
-        <FormItem className="flex flex-col">
-          <FormLabel className="text-muted-foreground">Supplies</FormLabel>
-          <FormControl>
-            <Popover open={open} onOpenChange={setOpen} modal>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="secondary"
-                  role="combobox"
-                  disabled={isPending || isLoading}
-                  className={cn(
-                    "justify-start truncate",
-                    !field.value && "text-muted-foreground"
-                  )}
-                >
-                  {field.value ? (
-                    <p className="truncate">
-                      {field.value}
-                    </p>
-                  ) : (
-                    "Select item"
-                  )}
-                  {isLoading ? (
-                    <LoadingSpinner className="ml-auto" />
-                  ) : (
-                    <ChevronsUpDown className="ml-auto h-4 w-4 shrink-0 opacity-50" />
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-[470px] p-0">
-                <Command className="max-h-[300px]">
-                  <CommandInput placeholder="Search items..." />
-                  <CommandList>
-                    <CommandEmpty>No items found.</CommandEmpty>
-                    <CommandGroup>
-                      {data?.map((item) => {
-                        return (
-                          <CommandItem
-                            value={item.id}
-                            key={item.id}
-                            onSelect={() => handleSubItemSelect(item)}
-                          >
-                            <div className="flex w-full space-x-4">
-                              <Check
-                                className={cn(
-                                  "mr-2 h-4 w-4",
-                                  item.id === field.value
-                                    ? "opacity-100"
-                                    : "opacity-0"
-                                )}
-                              />
-                              <div className="relative aspect-square h-20 cursor-pointer transition-colors hover:brightness-75">
-                                {/* <Image
-                                  src={item.imageUrl}
-                                  alt={`Image of ${item.name}`}
-                                  fill
-                                  className="rounded-md border object-cover"
-                                /> */}
-                              </div>
-                              <div className="flex flex-grow flex-col justify-between">
-                                <div>
-                                  <P className="font-semibold">{item.name}</P>
-                                  <P className="line-clamp-2 text-sm text-muted-foreground">
-                                    {item.description}
-                                  </P>
-                                </div>
-                                <div className="flex items-center justify-between">
-                                  <Badge variant="green">
-                                    {item.quantity} available
-                                  </Badge>
-                                  <P className="text-xs text-muted-foreground">
-                                    Created:{" "}
-                                    {new Date(
-                                      item.createdAt
-                                    ).toLocaleDateString()}
-                                  </P>
-                                </div>
-                              </div>
-                              <ChevronRight className="h-4 w-4 opacity-50" />
-                            </div>
-                          </CommandItem>
-                        );
-                      })}
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      )}
-    />
+    <div>
+      <Popover open={open} onOpenChange={setOpen} modal>
+        <PopoverTrigger asChild>
+          <Button
+            onClick={(e) => {
+              e.preventDefault();
+              setOpen(true);
+            }}
+            disabled={isPending || isLoading}
+          >
+            Add Item
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-[470px] p-0">
+          <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select Category" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                {categories.map((category) => (
+                  <SelectItem key={category} value={category}>
+                    {textTransform(category)}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+          {filteredItems?.length ? (
+            <Command>
+              <CommandInput placeholder="Search items..." />
+              <CommandList>
+                {filteredItems.map((item) => (
+                  <CommandItem
+                    key={item.id}
+                    onSelect={() => handleItemSelect(item.id)}
+                    className="flex items-center cursor-pointer"
+                  >
+                    <Check
+                      className={`mr-2 h-4 w-4 ${selectedItems.some((selectedItem) => selectedItem.supplyItemId === item.id) ? "opacity-100" : "opacity-0"}`}
+                    />
+                    {item.name}
+                  </CommandItem>
+                ))}
+                <CommandEmpty>No items found</CommandEmpty>
+              </CommandList>
+            </Command>
+          ) : (
+            <div>No items found</div>
+          )}
+        </PopoverContent>
+      </Popover>
+      {selectedItems.map((item, index) => (
+        <div key={index} className="flex items-center space-x-2">
+          <p className="truncate">{item.supplyItemId}</p>
+          <input
+            type="number"
+            value={item.quantity}
+            onChange={(e) =>
+              handleQuantityChange(index, parseInt(e.target.value, 10))
+            }
+            className="input"
+          />
+          <Button variant="destructive" onClick={() => handleRemoveItem(index)}>
+            Remove
+          </Button>
+        </div>
+      ))}
+    </div>
   );
 }

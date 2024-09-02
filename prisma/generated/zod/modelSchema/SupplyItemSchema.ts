@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import { SupplyItemStatusSchema } from '../inputTypeSchemas/SupplyItemStatusSchema'
 import { SupplyItemCategorySchema } from '../inputTypeSchemas/SupplyItemCategorySchema'
-import type { SupplyRequestWithRelations } from './SupplyRequestSchema'
-import { SupplyRequestWithRelationsSchema } from './SupplyRequestSchema'
+import type { SupplyRequestItemWithRelations } from './SupplyRequestItemSchema'
+import { SupplyRequestItemWithRelationsSchema } from './SupplyRequestItemSchema'
 
 /////////////////////////////////////////
 // SUPPLY ITEM SCHEMA
@@ -21,7 +21,6 @@ export const SupplyItemSchema = z.object({
   expirationDate: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
-  supplyRequestId: z.string().nullable(),
 })
 
 export type SupplyItem = z.infer<typeof SupplyItemSchema>
@@ -31,13 +30,13 @@ export type SupplyItem = z.infer<typeof SupplyItemSchema>
 /////////////////////////////////////////
 
 export type SupplyItemRelations = {
-  supplyRequest?: SupplyRequestWithRelations | null;
+  supplyRequestItems: SupplyRequestItemWithRelations[];
 };
 
 export type SupplyItemWithRelations = z.infer<typeof SupplyItemSchema> & SupplyItemRelations
 
 export const SupplyItemWithRelationsSchema: z.ZodType<SupplyItemWithRelations> = SupplyItemSchema.merge(z.object({
-  supplyRequest: z.lazy(() => SupplyRequestWithRelationsSchema).nullable(),
+  supplyRequestItems: z.lazy(() => SupplyRequestItemWithRelationsSchema).array(),
 }))
 
 export default SupplyItemSchema;

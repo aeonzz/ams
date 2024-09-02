@@ -1,8 +1,8 @@
 import { z } from 'zod';
-import type { SupplyItemWithRelations } from './SupplyItemSchema'
 import type { RequestWithRelations } from './RequestSchema'
-import { SupplyItemWithRelationsSchema } from './SupplyItemSchema'
+import type { SupplyRequestItemWithRelations } from './SupplyRequestItemSchema'
 import { RequestWithRelationsSchema } from './RequestSchema'
+import { SupplyRequestItemWithRelationsSchema } from './SupplyRequestItemSchema'
 
 /////////////////////////////////////////
 // SUPPLY REQUEST SCHEMA
@@ -10,7 +10,6 @@ import { RequestWithRelationsSchema } from './RequestSchema'
 
 export const SupplyRequestSchema = z.object({
   id: z.string(),
-  quantity: z.number().int(),
   dateAndTimeNeeded: z.coerce.date(),
   purpose: z.string(),
   requestId: z.string(),
@@ -25,15 +24,15 @@ export type SupplyRequest = z.infer<typeof SupplyRequestSchema>
 /////////////////////////////////////////
 
 export type SupplyRequestRelations = {
-  items: SupplyItemWithRelations[];
   request: RequestWithRelations;
+  items: SupplyRequestItemWithRelations[];
 };
 
 export type SupplyRequestWithRelations = z.infer<typeof SupplyRequestSchema> & SupplyRequestRelations
 
 export const SupplyRequestWithRelationsSchema: z.ZodType<SupplyRequestWithRelations> = SupplyRequestSchema.merge(z.object({
-  items: z.lazy(() => SupplyItemWithRelationsSchema).array(),
   request: z.lazy(() => RequestWithRelationsSchema),
+  items: z.lazy(() => SupplyRequestItemWithRelationsSchema).array(),
 }))
 
 export default SupplyRequestSchema;

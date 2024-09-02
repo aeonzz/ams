@@ -14,6 +14,7 @@ export { InventorySubItemScalarFieldEnumSchema } from './InventorySubItemScalarF
 export { InventoryItemScalarFieldEnumSchema } from './InventoryItemScalarFieldEnumSchema';
 export { SupplyRequestScalarFieldEnumSchema } from './SupplyRequestScalarFieldEnumSchema';
 export { SupplyItemScalarFieldEnumSchema } from './SupplyItemScalarFieldEnumSchema';
+export { SupplyRequestItemScalarFieldEnumSchema } from './SupplyRequestItemScalarFieldEnumSchema';
 export { TransportRequestScalarFieldEnumSchema } from './TransportRequestScalarFieldEnumSchema';
 export { VehicleScalarFieldEnumSchema } from './VehicleScalarFieldEnumSchema';
 export { MaintenanceRecordScalarFieldEnumSchema } from './MaintenanceRecordScalarFieldEnumSchema';
