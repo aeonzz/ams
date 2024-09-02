@@ -20,7 +20,7 @@ export default function VenuesScreen({ params }: VenuesScreenProps) {
     <div className="flex h-full w-full">
       <div className="flex-1">
         <div className="flex h-[50px] items-center justify-between border-b px-3">
-          <P className="font-medium">Users</P>
+          <P className="font-medium">Facilities</P>
           {/**
            * The `DateRangePicker` component is used to render the date range picker UI.
            * It is used to filter the tasks based on the selected date range it was created at.

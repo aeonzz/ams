@@ -8,10 +8,14 @@ import { convertToBase64 } from "@/lib/actions/utils";
 export async function GET(req: Request) {
   await checkAuth();
   try {
-    const returnableItems = await db.returnableItem.findMany({});
+    const inventoryItems = await db.inventoryItem.findMany({
+      include: {
+        inventorySubItems: true,
+      }
+    });
 
     const dataWithBase64Images = await Promise.all(
-      returnableItems.map(async (item) => {
+      inventoryItems.map(async (item) => {
         let imageUrl = item.imageUrl || placeholder;
 
         try {

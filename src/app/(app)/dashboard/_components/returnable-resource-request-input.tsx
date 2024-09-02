@@ -121,7 +121,6 @@ export default function ReturnableResourceRequestInput({
     },
     queryKey: [itemId],
     enabled: !!itemId,
-    refetchOnWindowFocus: false,
   });
 
   React.useEffect(() => {

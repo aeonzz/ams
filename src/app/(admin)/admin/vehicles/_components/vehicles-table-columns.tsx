@@ -82,7 +82,7 @@ export function getVehiclesColumns(): ColumnDef<Vehicle>[] {
           <div className="flex items-center justify-start">
             <Dialog>
               <DialogTrigger asChild>
-                <div className="relative aspect-square h-20 cursor-pointer transition-colors hover:brightness-75">
+                <div className="relative aspect-square h-10 cursor-pointer transition-colors hover:brightness-75">
                   <Image
                     src={row.original.imageUrl}
                     alt={`Image of ${row.original.name}`}
@@ -183,7 +183,7 @@ export function getVehiclesColumns(): ColumnDef<Vehicle>[] {
     {
       accessorKey: "createdAt",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Created At" />
+        <DataTableColumnHeader column={column} title="Date Created" />
       ),
       cell: ({ cell }) => formatDate(cell.getValue() as Date),
     },

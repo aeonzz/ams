@@ -75,7 +75,7 @@ export function getVenuesColumns(): ColumnDef<Venue>[] {
           <div className="flex items-center justify-start">
             <Dialog>
               <DialogTrigger asChild>
-                <div className="relative aspect-square h-20 cursor-pointer transition-colors hover:brightness-75">
+                <div className="relative aspect-square h-10 cursor-pointer transition-colors hover:brightness-75">
                   <Image
                     src={row.original.imageUrl}
                     alt={`Image of ${row.original.name}`}
@@ -141,7 +141,7 @@ export function getVenuesColumns(): ColumnDef<Venue>[] {
     {
       accessorKey: "status",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="status" />
+        <DataTableColumnHeader column={column} title="Status" />
       ),
       cell: ({ row }) => {
         const { icon: Icon, variant } = getVenueStatusIcon(row.original.status);
@@ -161,7 +161,7 @@ export function getVenuesColumns(): ColumnDef<Venue>[] {
     {
       accessorKey: "createdAt",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Created At" />
+        <DataTableColumnHeader column={column} title="Date Created" />
       ),
       cell: ({ cell }) => formatDate(cell.getValue() as Date),
     },

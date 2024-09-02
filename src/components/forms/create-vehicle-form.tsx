@@ -70,10 +70,10 @@ export default function CreateVehicleForm({
       };
 
       toast.promise(mutateAsync(data), {
-        loading: "Submitting...",
+        loading: "Creating...",
         success: () => {
           dialogManager.setActiveDialog(null);
-          return "Your request has been submitted and is awaiting approval.";
+          return "Vehicle created successfully";
         },
         error: (err) => {
           console.log(err);

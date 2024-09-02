@@ -3,10 +3,7 @@
 import * as React from "react";
 import { type ColumnDef } from "@tanstack/react-table";
 
-import {
-  cn,
-  formatDate,
-} from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
 
 import { P } from "@/components/typography/text";
@@ -122,16 +119,13 @@ export function getInventoryColumns(): ColumnDef<InventoryItemType>[] {
       cell: ({ row }) => {
         return (
           <div className="flex items-center space-x-2">
-            <P className="truncate font-medium">
-              {row.original.inventoryCount}
-            </P>
             <Link
-              href={`/admin/${row.original.id}`}
-              className={cn(
-                buttonVariants({ variant: "link", size: "sm" })
-              )}
+              href={`/admin/i/${row.original.id}`}
+              className={cn(buttonVariants({ variant: "link", size: "sm" }))}
             >
-              View
+              <P className="truncate font-medium">
+                {row.original.inventoryCount}
+              </P>
             </Link>
           </div>
         );
@@ -155,7 +149,15 @@ export function getInventoryColumns(): ColumnDef<InventoryItemType>[] {
     {
       accessorKey: "createdAt",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Created At" />
+        <DataTableColumnHeader column={column} title="Date Created" />
+      ),
+      cell: ({ cell }) => formatDate(cell.getValue() as Date),
+      size: 0,
+    },
+    {
+      accessorKey: "updatedAt",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Last Modified" />
       ),
       cell: ({ cell }) => formatDate(cell.getValue() as Date),
       size: 0,

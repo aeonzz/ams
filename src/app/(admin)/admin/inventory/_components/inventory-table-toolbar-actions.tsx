@@ -34,7 +34,7 @@ export function InventoryTableToolbarActions({
         onClick={() => dialogManager.setActiveDialog("adminCreateInventoryItemDialog")}
       >
         <PlusIcon className="mr-2 size-4" aria-hidden="true" />
-        New equipment
+        Create Inventory
       </Button>
       <Button
         variant="secondary"

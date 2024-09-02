@@ -142,7 +142,7 @@ export function getInventorySubItemsColumns(): ColumnDef<InventorySubItemType>[]
     {
       accessorKey: "createdAt",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Created At" />
+        <DataTableColumnHeader column={column} title="Date Created" />
       ),
       cell: ({ cell }) => formatDate(cell.getValue() as Date),
     },

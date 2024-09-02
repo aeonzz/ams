@@ -28,7 +28,9 @@ export async function getInventory(input: GetInventoryItemSchema) {
       "asc" | "desc" | undefined,
     ];
 
-    const where: any = {};
+    const where: any = {
+      isArchived: false,
+    };
 
     if (name) {
       where.name = { contains: name, mode: "insensitive" };
@@ -191,11 +193,14 @@ export const deleteInventories = authedProcedure
     const { path, ...rest } = input;
 
     try {
-      await db.inventoryItem.deleteMany({
+      await db.inventoryItem.updateMany({
         where: {
           id: {
             in: rest.ids,
           },
+        },
+        data: {
+          isArchived: true,
         },
       });
 

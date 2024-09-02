@@ -1,9 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { ChevronsUpDown, Check } from "lucide-react";
+import { ChevronsUpDown, Check, ChevronRight } from "lucide-react";
 import type { Path, UseFormReturn } from "react-hook-form";
 
 import { cn, getReturnableItemStatusIcon, textTransform } from "@/lib/utils";
@@ -31,9 +31,9 @@ import {
 } from "@/components/ui/form";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
 import { type ReturnableResourceRequestSchema } from "@/lib/schema/resource/returnable-resource";
-import { type ReturnableItem } from "prisma/generated/zod";
 import { P } from "@/components/typography/text";
 import Image from "next/image";
+import { InventoryItemWithRelations } from "prisma/generated/zod";
 
 interface ItemsFieldProps {
   form: UseFormReturn<ReturnableResourceRequestSchema>;
@@ -43,15 +43,26 @@ interface ItemsFieldProps {
 
 export default function ItemsField({ form, name, isPending }: ItemsFieldProps) {
   const [open, setOpen] = React.useState(false);
+  const [selectedItem, setSelectedItem] =
+    useState<InventoryItemWithRelations | null>(null);
 
-  const { data, isLoading } = useQuery<ReturnableItem[]>({
+  const { data, isLoading } = useQuery<InventoryItemWithRelations[]>({
     queryFn: async () => {
       const res = await axios.get("/api/input-data/resource-items/returnable");
       return res.data.data;
     },
     queryKey: ["get-input-returnable-resource"],
-    refetchOnWindowFocus: false,
   });
+
+  const handleItemSelect = (item: InventoryItemWithRelations) => {
+    setSelectedItem(item);
+  };
+
+  const handleSubItemSelect = (subItemId: string) => {
+    form.setValue(name, subItemId);
+    setOpen(false);
+  };
+
   return (
     <FormField
       control={form.control}
@@ -60,7 +71,7 @@ export default function ItemsField({ form, name, isPending }: ItemsFieldProps) {
         <FormItem className="flex flex-col">
           <FormLabel className="text-muted-foreground">Resources</FormLabel>
           <FormControl>
-            <Popover open={open} onOpenChange={setOpen}>
+            <Popover open={open} onOpenChange={setOpen} modal>
               <PopoverTrigger asChild>
                 <Button
                   variant="secondary"
@@ -73,7 +84,13 @@ export default function ItemsField({ form, name, isPending }: ItemsFieldProps) {
                 >
                   {field.value ? (
                     <p className="truncate">
-                      {data?.find((item) => item.id === field.value)?.name}
+                      {
+                        data?.find((item) =>
+                          item.inventorySubItems.some(
+                            (subItem) => subItem.id === field.value
+                          )
+                        )?.name
+                      }
                     </p>
                   ) : (
                     "Select item"
@@ -85,27 +102,65 @@ export default function ItemsField({ form, name, isPending }: ItemsFieldProps) {
                   )}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-[450px] p-0">
-                <Command>
+              <PopoverContent className="w-[500px] p-0">
+                <Command className="max-h-[250px]">
                   <CommandInput placeholder="Search items..." />
                   <CommandList>
                     <CommandEmpty>No items found.</CommandEmpty>
                     <CommandGroup>
-                      {data?.map((item) => {
-                        const { icon: Icon, variant } =
-                          getReturnableItemStatusIcon(item.status);
-                        return (
-                          <CommandItem
-                            value={item.id}
-                            key={item.id}
-                            onSelect={() => {
-                              form.setValue("itemId", item.id);
-                              setOpen(false);
-                            }}
-                          >
-                            <div className="flex w-full justify-between">
-                              <div className="flex space-x-2 truncate">
-                                <div className="relative aspect-square h-14 cursor-pointer transition-colors hover:brightness-75">
+                      {selectedItem ? (
+                        <>
+                          <CommandItem onSelect={() => setSelectedItem(null)}>
+                            <ChevronRight className="mr-2 h-4 w-4" />
+                            Back to items
+                          </CommandItem>
+                          {selectedItem.inventorySubItems
+                            // .filter((subItem) => subItem.status === "AVAILABLE")
+                            .map((subItem) => {
+                              const { icon: Icon, variant } =
+                                getReturnableItemStatusIcon(subItem.status);
+                              return (
+                                <CommandItem
+                                  key={subItem.id}
+                                  onSelect={() =>
+                                    handleSubItemSelect(subItem.id)
+                                  }
+                                  disabled={
+                                    subItem.status === "MAINTENANCE" ||
+                                    subItem.status === "LOST"
+                                  }
+                                >
+                                  <Check
+                                    className={cn(
+                                      "mr-2 h-4 w-4",
+                                      subItem.id === field.value
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                  {selectedItem.name} - SubItem {subItem.id}
+                                  <Badge variant={variant} className="ml-auto">
+                                    <Icon className="mr-1 size-4" />
+                                    {textTransform(subItem.status)}
+                                  </Badge>
+                                </CommandItem>
+                              );
+                            })}
+                        </>
+                      ) : (
+                        data?.map((item) => {
+                          const availableSubItems =
+                            item.inventorySubItems.filter(
+                              (subItem) => subItem.status === "AVAILABLE"
+                            ).length;
+                          return (
+                            <CommandItem
+                              value={item.id}
+                              key={item.id}
+                              onSelect={() => handleItemSelect(item)}
+                            >
+                              <div className="flex w-full space-x-4">
+                                <div className="relative aspect-square h-20 cursor-pointer transition-colors hover:brightness-75">
                                   <Image
                                     src={item.imageUrl}
                                     alt={`Image of ${item.name}`}
@@ -113,26 +168,31 @@ export default function ItemsField({ form, name, isPending }: ItemsFieldProps) {
                                     className="rounded-md border object-cover"
                                   />
                                 </div>
-                                <div className="flex flex-col justify-between">
-                                  <P className="truncate">{item.name}</P>
-                                  <Badge variant={variant} className="ml-auto">
-                                    <Icon className="mr-1 size-4" />
-                                    {textTransform(item.status)}
-                                  </Badge>
+                                <div className="flex flex-grow flex-col justify-between">
+                                  <div>
+                                    <P className="font-semibold">{item.name}</P>
+                                    <P className="line-clamp-2 text-sm text-muted-foreground">
+                                      {item.description}
+                                    </P>
+                                  </div>
+                                  <div className="flex items-center justify-between">
+                                    <Badge variant="green">
+                                      {availableSubItems} available
+                                    </Badge>
+                                    <P className="text-xs text-muted-foreground">
+                                      Created:{" "}
+                                      {new Date(
+                                        item.createdAt
+                                      ).toLocaleDateString()}
+                                    </P>
+                                  </div>
                                 </div>
+                                <ChevronRight className="h-4 w-4 opacity-50" />
                               </div>
-                              <Check
-                                className={cn(
-                                  "h-4 w-4",
-                                  item.id === field.value
-                                    ? "opacity-100"
-                                    : "opacity-0"
-                                )}
-                              />
-                            </div>
-                          </CommandItem>
-                        );
-                      })}
+                            </CommandItem>
+                          );
+                        })
+                      )}
                     </CommandGroup>
                   </CommandList>
                 </Command>
