@@ -26,13 +26,13 @@ type ResourceType = {
 const RequestTypes: ResourceType[] = [
   {
     value: "Returnable",
-    label: "Equipments",
+    label: "Borrow Request",
     icon: RotateCw,
     dialog: "returnableResourceDialog",
   },
   {
     value: "Consumable",
-    label: "Materials",
+    label: "Supplies Request",
     icon: Box,
     dialog: "consumableResourceDialog",
   },
@@ -53,9 +53,9 @@ export default function ResourceOption() {
         open={dialogManager.activeDialog === "resourceDialog"}
         onOpenChange={handleOpenChange}
       >
-        <DialogContent className="max-w-3xl">
+        <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle>New Request</DialogTitle>
+            <DialogTitle>Resource Request</DialogTitle>
             <div className="flex h-full items-center space-x-4 pb-4">
               {RequestTypes.map(({ icon: Icon, ...type }, index) => (
                 <Button

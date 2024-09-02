@@ -13,10 +13,15 @@ import {
   PriorityTypeSchema,
   Request,
   RequestStatusTypeSchema,
+  RequestTypeSchema,
 } from "prisma/generated/zod";
 import { RequestTableToolbarActions } from "./request-table-toolbar-actions";
 import { getRequests } from "@/lib/actions/requests";
-import { getPriorityIcon, getStatusIcon } from "@/lib/utils";
+import {
+  getPriorityIcon,
+  getRequestTypeIcon,
+  getStatusIcon,
+} from "@/lib/utils";
 import { RequestTableFloatingBar } from "./request-table-floating-bar";
 import { ModifiedDataTable } from "@/components/data-table/modified-data-table";
 
@@ -60,14 +65,14 @@ export function RequestTable({ requestPromise }: RequestTableProps) {
       })),
     },
     {
-      label: "Priority",
-      value: "priority",
-      options: PriorityTypeSchema.options.map((priority) => ({
+      label: "Type",
+      value: "type",
+      options: RequestTypeSchema.options.map((type) => ({
         label:
-          priority.charAt(0).toUpperCase() +
-          priority.slice(1).toLowerCase().replace(/_/g, " "),
-        value: priority,
-        icon: getPriorityIcon(priority),
+          type.charAt(0).toUpperCase() +
+          type.slice(1).toLowerCase().replace(/_/g, " "),
+        value: type,
+        icon: getRequestTypeIcon(type).icon,
         withCount: true,
       })),
     },
@@ -92,7 +97,7 @@ export function RequestTable({ requestPromise }: RequestTableProps) {
     <ModifiedDataTable
       showSelectedRows={false}
       table={table}
-      route="requests"
+      route="request"
       floatingBar={<RequestTableFloatingBar table={table} />}
     >
       <DataTableToolbar table={table} filterFields={filterFields}>

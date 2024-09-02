@@ -31,14 +31,14 @@ import {
   Search,
   RotateCcw,
 } from "lucide-react";
-import { RequestStatusTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestStatusTypeSchema";
-import { PriorityTypeType } from "prisma/generated/zod/inputTypeSchemas/PriorityTypeSchema";
-import { RoleTypeType } from "prisma/generated/zod/inputTypeSchemas/RoleTypeSchema";
-import { RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTypeSchema";
+import { type RequestStatusTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestStatusTypeSchema";
+import { type PriorityTypeType } from "prisma/generated/zod/inputTypeSchemas/PriorityTypeSchema";
+import { type RoleTypeType } from "prisma/generated/zod/inputTypeSchemas/RoleTypeSchema";
+import { type RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTypeSchema";
 import { BadgeVariant } from "@/components/ui/badge";
-import { VehicleStatusType } from "prisma/generated/zod/inputTypeSchemas/VehicleStatusSchema";
-import { VenueStatusType } from "prisma/generated/zod/inputTypeSchemas/VenueStatusSchema";
-import { ReturnableItemStatusType } from "prisma/generated/zod/inputTypeSchemas/ReturnableItemStatusSchema";
+import { type VehicleStatusType } from "prisma/generated/zod/inputTypeSchemas/VehicleStatusSchema";
+import { type VenueStatusType } from "prisma/generated/zod/inputTypeSchemas/VenueStatusSchema";
+import { type ItemStatusType } from "prisma/generated/zod/inputTypeSchemas/ItemStatusSchema";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -148,23 +148,23 @@ export function getStatusIcon(status: RequestStatusTypeType): StatusIconConfig {
     },
     PENDING: {
       icon: Hourglass,
-      variant: "outline",
+      variant: "yellow",
     },
     IN_PROGRESS: {
       icon: Clock,
-      variant: "default",
+      variant: "blue",
     },
     REJECTED: {
       icon: XCircle,
-      variant: "default",
+      variant: "red",
     },
     CANCELLED: {
       icon: XCircle,
-      variant: "default",
+      variant: "secondary",
     },
     COMPLETED: {
       icon: CheckCircle,
-      variant: "default",
+      variant: "green",
     },
   };
 
@@ -186,19 +186,19 @@ export function getRequestTypeIcon(
   const requestTypeIcons: RequestTypeIconsMap = {
     JOB: {
       icon: Briefcase,
-      variant: "green",
+      variant: "default",
     },
     RESOURCE: {
       icon: Package,
-      variant: "outline",
+      variant: "blue",
     },
     VENUE: {
       icon: MapPin,
-      variant: "default",
+      variant: "yellow",
     },
     TRANSPORT: {
       icon: CarFront,
-      variant: "default",
+      variant: "green",
     },
   };
 
@@ -283,11 +283,11 @@ type ReturnableItemStatusIconConfig = {
 };
 
 type ReturnableItemStatusIconMap = {
-  [key in ReturnableItemStatusType]: ReturnableItemStatusIconConfig;
+  [key in ItemStatusType]: ReturnableItemStatusIconConfig;
 };
 
 export function getReturnableItemStatusIcon(
-  status: ReturnableItemStatusType
+  status: ItemStatusType
 ): ReturnableItemStatusIconConfig {
   const ReturnableItemStatusIcons: ReturnableItemStatusIconMap = {
     AVAILABLE: {

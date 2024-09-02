@@ -339,7 +339,8 @@ export const getUserReqcount = authedProcedure
   });
 
 export async function getRequests(input: GetRequestsSchema) {
-  const { page, per_page, sort, title, status, priority, from, to } = input;
+  const { page, per_page, sort, title, status, type, priority, from, to } =
+    input;
 
   try {
     const skip = (page - 1) * per_page;
@@ -359,6 +360,10 @@ export async function getRequests(input: GetRequestsSchema) {
 
     if (status) {
       where.status = status;
+    }
+
+    if (type) {
+      where.type = { in: type.split(".") };
     }
 
     if (priority) {

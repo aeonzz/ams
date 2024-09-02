@@ -75,39 +75,39 @@ export function getMenuList(pathname: string): Group[] {
         },
       ],
     },
-    {
-      groupLabel: "Resources",
-      menus: [
-        {
-          href: "/facilities",
-          label: "Facilities",
-          active: pathname.includes("/facilities"),
-          icon: Building,
-          submenus: [],
-        },
-        {
-          href: "/equipment",
-          label: "Equipment",
-          active: pathname.includes("/equipment"),
-          icon: Briefcase,
-          submenus: [],
-        },
-        {
-          href: "/materials",
-          label: "Materials",
-          active: pathname.includes("/materials"),
-          icon: BookOpen,
-          submenus: [],
-        },
-        {
-          href: "/vehicles",
-          label: "Vehicles",
-          active: pathname.includes("/vehicles"),
-          icon: Truck,
-          submenus: [],
-        },
-      ],
-    },
+    // {
+    //   groupLabel: "Resources",
+    //   menus: [
+    //     {
+    //       href: "/facilities",
+    //       label: "Facilities",
+    //       active: pathname.includes("/facilities"),
+    //       icon: Building,
+    //       submenus: [],
+    //     },
+    //     {
+    //       href: "/equipment",
+    //       label: "Equipment",
+    //       active: pathname.includes("/equipment"),
+    //       icon: Briefcase,
+    //       submenus: [],
+    //     },
+    //     {
+    //       href: "/materials",
+    //       label: "Materials",
+    //       active: pathname.includes("/materials"),
+    //       icon: BookOpen,
+    //       submenus: [],
+    //     },
+    //     {
+    //       href: "/vehicles",
+    //       label: "Vehicles",
+    //       active: pathname.includes("/vehicles"),
+    //       icon: Truck,
+    //       submenus: [],
+    //     },
+    //   ],
+    // },
     {
       groupLabel: "Preferences",
       menus: [
@@ -120,28 +120,28 @@ export function getMenuList(pathname: string): Group[] {
         },
       ],
     },
-    {
-      groupLabel: "Help & Support",
-      menus: [
-        {
-          href: "/help",
-          label: "Help & Support",
-          active: pathname.includes("/help"),
-          icon: HelpCircle,
-          submenus: [
-            {
-              href: "/help/faq",
-              label: "FAQ",
-              active: pathname === "/help/faq",
-            },
-            {
-              href: "/help/contact",
-              label: "Contact Support",
-              active: pathname === "/help/contact",
-            },
-          ],
-        },
-      ],
-    },
+    // {
+    //   groupLabel: "Help & Support",
+    //   menus: [
+    //     {
+    //       href: "/help",
+    //       label: "Help & Support",
+    //       active: pathname.includes("/help"),
+    //       icon: HelpCircle,
+    //       submenus: [
+    //         {
+    //           href: "/help/faq",
+    //           label: "FAQ",
+    //           active: pathname === "/help/faq",
+    //         },
+    //         {
+    //           href: "/help/contact",
+    //           label: "Contact Support",
+    //           active: pathname === "/help/contact",
+    //         },
+    //       ],
+    //     },
+    //   ],
+    // },
   ];
 }

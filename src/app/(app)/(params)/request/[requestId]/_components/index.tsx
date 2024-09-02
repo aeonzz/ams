@@ -21,6 +21,9 @@ import { Calendar, User } from "lucide-react";
 import { SelectSeparator } from "@/components/ui/select";
 import RequestActions from "./request-actions";
 import { Badge } from "@/components/ui/badge";
+import { useQuery } from "@tanstack/react-query";
+import { type RequestWithRelations } from "prisma/generated/zod";
+import axios from "axios";
 
 interface MyRequestScreenParamsProps {
   params: string;
@@ -29,13 +32,15 @@ interface MyRequestScreenParamsProps {
 export default function MyRequestScreenParams({
   params,
 }: MyRequestScreenParamsProps) {
-  const { data, isLoading, isError, refetch } =
-    useServerActionQuery(getRequestById, {
-      input: {
-        id: params,
-      },
-      queryKey: [params],
-    });
+  const { data, isLoading, refetch, isError } = useQuery<
+    RequestWithRelations[]
+  >({
+    queryFn: async () => {
+      const res = await axios.get("/api/overview/user-dashboard-overview");
+      return res.data.data;
+    },
+    queryKey: ["user-dashboard-overview"],
+  });
 
   if (isLoading) {
     return <LoadingSpinner />;

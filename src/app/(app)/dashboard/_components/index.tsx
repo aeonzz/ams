@@ -9,10 +9,9 @@ import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { CirclePlus } from "lucide-react";
 import { H1, H2, H3, P } from "@/components/typography/text";
-import PendingRequestOverview from "@/components/card/pending-request-overview";
 import PendingRequest from "./pending-requests";
-import TotalRequestOverview from "@/components/card/total-request-overview";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
+import UserRequestOverview from "./user-request-overview";
 
 export default function DashboardScreen() {
   const currentUser = useSession();
@@ -25,7 +24,7 @@ export default function DashboardScreen() {
         <div className="flex h-[50px] items-center border-b px-3">
           <P className="font-medium">Dashboard</P>
         </div>
-        <ScrollArea className="h-[calc(100vh_-_68px)] py-3">
+        <div className="scroll-bar h-[calc(100vh_-_68px)] overflow-y-auto py-3">
           <div className="mb-3 flex justify-between px-3">
             <H1 className="font-semibold tracking-tight">
               Good day,{" "}
@@ -40,17 +39,8 @@ export default function DashboardScreen() {
             </Button>
           </div>
           <Separator className="mb-3" />
-          <div className="grid grid-cols-2 gap-3 px-3">
-            <PendingRequestOverview />
-            <TotalRequestOverview />
-          </div>
-          <div className="mt-3 flex flex-col px-3">
-            <H3 className="font-semibold text-muted-foreground">
-              Pending requests
-            </H3>
-            <PendingRequest />
-          </div>
-        </ScrollArea>
+          <UserRequestOverview />
+        </div>
       </div>
       <Separator orientation="vertical" className="h-full" />
       <Inbox />

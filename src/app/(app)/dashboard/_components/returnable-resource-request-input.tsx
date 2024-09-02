@@ -187,7 +187,7 @@ export default function ReturnableResourceRequestInput({
   return (
     <>
       <DialogHeader>
-        <DialogTitle>Returnable Resource Request</DialogTitle>
+        <DialogTitle>Borrow Request</DialogTitle>
       </DialogHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>

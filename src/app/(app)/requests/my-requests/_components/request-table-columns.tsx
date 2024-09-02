@@ -3,7 +3,13 @@
 import * as React from "react";
 import { type ColumnDef } from "@tanstack/react-table";
 
-import { formatDate, getPriorityIcon, getStatusIcon } from "@/lib/utils";
+import {
+  formatDate,
+  getPriorityIcon,
+  getRequestTypeIcon,
+  getStatusIcon,
+  textTransform,
+} from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 
@@ -18,18 +24,17 @@ export function getRequestColumns(): ColumnDef<Request>[] {
         <DataTableColumnHeader column={column} title="Status" />
       ),
       cell: ({ row }) => {
-        const { icon: Icon } = getStatusIcon(row.original.status);
-        const status = `${row.original.status.charAt(0)}${row.original.status.slice(1).toLowerCase()}`;
+        const { icon: Icon, variant } = getStatusIcon(row.original.status);
         return (
-          <div className="flex items-center">
-            <Icon
-              className="mr-2 size-4 text-muted-foreground"
-              aria-hidden="true"
-            />
-            <P>{status}</P>
+          <div className="flex w-fit items-center">
+            <Badge variant={variant}>
+              <Icon className="mr- size-4" aria-hidden="true" />
+              {textTransform(row.original.status)}
+            </Badge>
           </div>
         );
       },
+      size: 0,
       filterFn: (row, id, value) => {
         return Array.isArray(value) && value.includes(row.getValue(id));
       },
@@ -41,32 +46,25 @@ export function getRequestColumns(): ColumnDef<Request>[] {
       ),
       cell: ({ row }) => {
         return (
-          <div className="flex space-x-2">
-            <Badge variant="outline">{row.original.type}</Badge>
-            <P className="truncate font-medium">{row.getValue("title")}</P>
+          <div className="flex w-[30vw] space-x-2">
+            <P className="truncate font-medium">{row.original.title}</P>
           </div>
         );
       },
     },
     {
-      accessorKey: "priority",
-      header: ({ column }) => <></>,
+      accessorKey: "type",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Type" />
+      ),
       cell: ({ row }) => {
-        const Icon = getPriorityIcon(row.original.priority);
-        const priority = row.original.priority
-          .split("_")
-          .map(
-            (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-          )
-          .join(" ");
-
+        const { icon: Icon, variant } = getRequestTypeIcon(row.original.type);
         return (
           <div className="flex items-center">
-            <Icon
-              className="mr-2 size-4 text-muted-foreground"
-              aria-hidden="true"
-            />
-            <P>{priority}</P>
+            <Badge variant={variant}>
+              <Icon className="mr-1 size-4" />
+              {textTransform(row.original.type)}
+            </Badge>
           </div>
         );
       },
