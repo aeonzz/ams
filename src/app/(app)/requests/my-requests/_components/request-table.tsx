@@ -55,14 +55,16 @@ export function RequestTable({ requestPromise }: RequestTableProps) {
     {
       label: "Status",
       value: "status",
-      options: RequestStatusTypeSchema.options.map((status) => ({
-        label:
-          status.charAt(0).toUpperCase() +
-          status.slice(1).toLowerCase().replace(/_/g, " "),
-        value: status,
-        icon: getStatusIcon(status).icon,
-        withCount: true,
-      })),
+      options: RequestStatusTypeSchema.options
+        .filter((status) => status !== "CANCELLED")
+        .map((status) => ({
+          label:
+            status.charAt(0).toUpperCase() +
+            status.slice(1).toLowerCase().replace(/_/g, " "),
+          value: status,
+          icon: getStatusIcon(status).icon,
+          withCount: true,
+        })),
     },
     {
       label: "Type",

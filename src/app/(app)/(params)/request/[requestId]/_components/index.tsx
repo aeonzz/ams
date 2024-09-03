@@ -32,6 +32,7 @@ import {
 import RequestActions from "./request-actions";
 import SupplyItemCard from "./supply-item-card";
 import Image from "next/image";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface RequestDetailsProps {
   params: string;
@@ -61,7 +62,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
           <H3 className="font-semibold text-muted-foreground">{data.title}</H3>
         </div>
         <div className="scroll-bar flex h-[calc(100vh_-_75px)] justify-center overflow-y-auto px-10 py-10">
-          <div className="w-[750px]">
+          <div className="h-auto w-[750px]">
             <div className="mb-6">
               <H2 className="mb-3 font-semibold">{data.title}</H2>
               <div className="mb-4 flex items-center space-x-2">
@@ -82,30 +83,31 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                 Request details for {data.type.toLowerCase()} request.
               </P>
             </div>
-            <div className="mb-6 space-y-4">
+            <div className="space-y-4">
               <div className="flex items-center space-x-2">
-                <div className="relative aspect-square h-5 cursor-pointer transition-colors hover:brightness-75">
-                  <Image
-                    src={data.user.profileUrl ?? ""}
-                    alt={`Image of ${data.user.username}`}
-                    fill
-                    className="rounded-full border object-cover"
-                  />
-                </div>
-                <P>Requester: {data.user.username}</P>
+                <Avatar className="size-5 rounded-full">
+                  <AvatarImage src={`${data.user.profileUrl}` ?? ""} />
+                  <AvatarFallback className="rounded-md">
+                    {data.user.username.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <P>Requested by: {data.user.username}</P>
               </div>
               <div className="flex items-center space-x-2">
                 <Calendar className="h-5 w-5" />
-                <P>Created: {format(new Date(data.createdAt), "PPP")}</P>
+                <P>Created: {format(new Date(data.createdAt), "PPP p")}</P>
               </div>
               <div className="flex items-center space-x-2">
                 <AlertTriangle className="h-5 w-5" />
                 <P>Department: {data.department}</P>
               </div>
             </div>
+            <Separator className="my-6" />
             {data.type === "JOB" && data.jobRequest && (
-              <div className="mb-6 space-y-4">
-                <H4 className="">Job Request Details</H4>
+              <div className="space-y-4">
+                <H4 className="font-semibold text-muted-foreground">
+                  Job Request Details
+                </H4>
                 <div className="flex items-center space-x-2">
                   <FileText className="h-5 w-5" />
                   <P>Job Type: {data.jobRequest.jobType}</P>
@@ -117,18 +119,38 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                 <div className="flex items-center space-x-2">
                   <Calendar className="h-5 w-5" />
                   <P>
-                    Due Date: {format(new Date(data.jobRequest.dueDate), "PPP")}
+                    Due Date:{" "}
+                    {format(new Date(data.jobRequest.dueDate), "PPP p")}
                   </P>
                 </div>
                 <div>
-                  <H5 className="mb-2">Notes:</H5>
+                  <H5 className="mb-2 font-semibold text-muted-foreground">
+                    Notes:
+                  </H5>
                   <P>{data.jobRequest.notes}</P>
+                </div>
+                <div>
+                  {data.jobRequest.files.map((file) => (
+                    <div className="relative mb-3 w-full">
+                      <Image
+                        src={file.url}
+                        alt={`Image of ${file.url}`}
+                        quality={100}
+                        width={0}
+                        height={0}
+                        sizes="100vw"
+                        className="h-auto w-full rounded-sm border object-contain"
+                      />
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
             {data.type === "VENUE" && data.venueRequest && (
-              <div className="mb-6 space-y-4">
-                <H4 className="">Venue Request Details</H4>
+              <div className="space-y-4">
+                <H4 className="font-semibold text-muted-foreground">
+                  Venue Request Details
+                </H4>
                 <div className="flex items-center space-x-2">
                   <MapPin className="h-5 w-5" />
                   <P>Venue: {data.venueRequest.venue.name}</P>
@@ -147,13 +169,23 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                   </P>
                 </div>
                 <div>
-                  <H5 className="mb-2">Setup Requirements:</H5>
-                  <P>{data.venueRequest.setupRequirements}</P>
+                  <H5 className="mb-2 font-semibold text-muted-foreground">
+                    Setup Requirements:
+                  </H5>
+                  <ul className="mt-2 list-disc ml-4">
+                    {data.venueRequest.setupRequirements
+                      .split(", ")
+                      .map((requirement, index) => (
+                        <li key={index} className="mb-1 text-sm">
+                          {requirement}
+                        </li>
+                      ))}
+                  </ul>
                 </div>
               </div>
             )}
             {data.type === "RESOURCE" && data.supplyRequest && (
-              <div className="mb-6 space-y-4">
+              <div className="space-y-4">
                 <H4 className="font-semibold text-muted-foreground">
                   Supply Request Details
                 </H4>
@@ -186,7 +218,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
               </div>
             )}
             {data.type === "RESOURCE" && data.returnableRequest && (
-              <div className="mb-6 space-y-4">
+              <div className="space-y-4">
                 <H4 className="font-semibold text-muted-foreground">
                   Supply Request Details
                 </H4>
@@ -229,7 +261,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
               </div>
             )}
             {data.type === "TRANSPORT" && data.transportRequest && (
-              <div className="mb-6 space-y-4">
+              <div className="space-y-4">
                 <H4 className="">Transport Request Details</H4>
                 <div className="flex items-center space-x-2">
                   <Truck className="h-5 w-5" />
@@ -255,8 +287,9 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                 </div>
               </div>
             )}
-            <div className="space-y-4">
-              <H4 className="">Activity</H4>
+            <Separator className="my-6" />
+            <div className="space-y-4 pb-20">
+              <H4 className="font-semibold">Activity</H4>
               <div className="space-y-4">
                 <div className="flex items-center space-x-2">
                   <div className="h-6 w-6 rounded-full bg-blue-500" />
@@ -305,17 +338,15 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
               </Badge>
             </div>
             <div>
-              <P className="mb-1 text-sm">Requester</P>
+              <P className="mb-1 text-sm">Requested by</P>
               <div className="flex items-center space-x-2 p-1">
-                <div className="relative aspect-square h-6 cursor-pointer transition-colors hover:brightness-75">
-                  <Image
-                    src={data.user.profileUrl ?? ""}
-                    alt={`Image of ${data.user.username}`}
-                    fill
-                    className="rounded-full border object-cover"
-                  />
-                </div>
-                <P>Requester: {data.user.username}</P>
+                <Avatar className="size-5 rounded-full">
+                  <AvatarImage src={`${data.user.profileUrl}` ?? ""} />
+                  <AvatarFallback className="rounded-md">
+                    {data.user.username.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <P>{data.user.username}</P>
               </div>
             </div>
           </div>

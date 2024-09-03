@@ -147,7 +147,7 @@ export default function SupplyResourceRequestInput({
   return (
     <>
       <DialogHeader>
-        <DialogTitle>Borrow Request</DialogTitle>
+        <DialogTitle>Supplies Request</DialogTitle>
       </DialogHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>

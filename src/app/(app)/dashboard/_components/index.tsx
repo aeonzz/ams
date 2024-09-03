@@ -12,6 +12,7 @@ import { H1, H2, H3, P } from "@/components/typography/text";
 import PendingRequest from "./pending-requests";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import UserRequestOverview from "./user-request-overview";
+import SearchInput from "../../_components/search-input";
 
 export default function DashboardScreen() {
   const currentUser = useSession();
@@ -23,6 +24,7 @@ export default function DashboardScreen() {
       <div className="flex-1">
         <div className="flex h-[50px] items-center border-b px-3">
           <P className="font-medium">Dashboard</P>
+          <SearchInput />
         </div>
         <div className="scroll-bar h-[calc(100vh_-_68px)] overflow-y-auto py-3">
           <div className="mb-3 flex justify-between px-3">

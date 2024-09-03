@@ -57,7 +57,7 @@ export default function UserRequestOverview() {
         <div className="flex items-center justify-between bg-tertiary px-3 py-1">
           <H5 className="font-semibold text-muted-foreground">Your Requests</H5>
           <Link
-            href="/requests"
+            href="/requests/my-requests?page=1&per_page=10&sort=createdAt.desc"
             className={cn(
               buttonVariants({ variant: "link", size: "sm" }),
               "text-sm"
@@ -86,13 +86,13 @@ export default function UserRequestOverview() {
           ))}
         </div>
       </div>
-      <div className="border-y">
+      <div className="border-t">
         <div className="flex items-center justify-between bg-tertiary px-3 py-1">
           <H5 className="font-semibold text-muted-foreground">
             Pending Requests
           </H5>
           <Link
-            href="/requests"
+            href="/requests/my-requests?page=1&per_page=10&sort=createdAt.desc&status=PENDING"
             className={cn(
               buttonVariants({ variant: "link", size: "sm" }),
               "text-sm"
@@ -109,40 +109,41 @@ export default function UserRequestOverview() {
           ) : (
             getPendingRequests().map((request) => {
               const { icon: Icon, variant } = getStatusIcon(request.status);
-
               return (
-                <Card key={request.id} className="bg-secondary">
-                  <CardHeader className="pb-2">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-sm font-medium">
-                        {request.title}
-                      </CardTitle>
-                      <Badge variant="secondary">
-                        {textTransform(request.type)}
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground">
-                      {request.jobRequest?.notes ||
-                        request.venueRequest?.purpose ||
-                        request.returnableRequest?.purpose ||
-                        request.supplyRequest?.purpose ||
-                        request.transportRequest?.description ||
-                        "No description available"}
-                    </p>
-                    <div className="mt-2 flex items-center justify-between">
-                      <Badge variant={variant}>
-                        <Icon className="mr-1 size-4" />
-                        {textTransform(request.status)}
-                      </Badge>
-                      <span className="text-xs text-muted-foreground">
-                        Created:{" "}
-                        {new Date(request.createdAt).toLocaleDateString()}
-                      </span>
-                    </div>
-                  </CardContent>
-                </Card>
+                <Link href={`request/${request.id}`}>
+                  <Card key={request.id} className="bg-secondary">
+                    <CardHeader className="pb-2">
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="text-sm font-medium">
+                          {request.title}
+                        </CardTitle>
+                        <Badge variant="secondary">
+                          {textTransform(request.type)}
+                        </Badge>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-muted-foreground">
+                        {request.jobRequest?.notes ||
+                          request.venueRequest?.purpose ||
+                          request.returnableRequest?.purpose ||
+                          request.supplyRequest?.purpose ||
+                          request.transportRequest?.description ||
+                          "No description available"}
+                      </p>
+                      <div className="mt-2 flex items-center justify-between">
+                        <Badge variant={variant}>
+                          <Icon className="mr-1 size-4" />
+                          {textTransform(request.status)}
+                        </Badge>
+                        <span className="text-xs text-muted-foreground">
+                          Created:{" "}
+                          {new Date(request.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
               );
             })
           )}

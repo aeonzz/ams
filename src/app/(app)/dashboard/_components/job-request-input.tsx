@@ -217,9 +217,8 @@ export default function JobRequestInput({
         department: department,
         jobType: values.jobtype,
         path: pathname,
-        // Only include files if there are any
         ...(uploadedFilesResult.length > 0 && {
-          files: uploadedFilesResult.map(
+          images: uploadedFilesResult.map(
             (result: { filePath: string }) => result.filePath
           ),
         }),
@@ -228,7 +227,9 @@ export default function JobRequestInput({
       toast.promise(mutateAsync(data), {
         loading: "Submitting...",
         success: () => {
-          queryClient.invalidateQueries({ queryKey: ["user-dashboard-overview"] });
+          queryClient.invalidateQueries({
+            queryKey: ["user-dashboard-overview"],
+          });
           handleOpenChange(false);
           return "Your request has been submitted and is awaiting approval.";
         },
@@ -304,6 +305,7 @@ export default function JobRequestInput({
                         <FormControl>
                           <Button
                             variant="secondary"
+                            disabled={isUploading || isPending}
                             role="combobox"
                             className={cn(
                               "w-[230px] justify-between",
@@ -365,6 +367,7 @@ export default function JobRequestInput({
                           <Button
                             variant="secondary"
                             role="combobox"
+                            disabled={isUploading || isPending}
                             className={cn(
                               "w-[230px] justify-between",
                               !field.value && "text-muted-foreground"
@@ -484,6 +487,7 @@ export default function JobRequestInput({
                     form.reset();
                   }}
                   variant="destructive"
+                  disabled={isUploading || isPending}
                 >
                   Reset form
                 </Button>

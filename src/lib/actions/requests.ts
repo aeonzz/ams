@@ -33,6 +33,7 @@ export const createRequest = authedProcedure
 
     const { jobType, path, ...rest } = input;
 
+    console.log(input)
     if (!jobType) {
       throw "Jobtype is undefined";
     }

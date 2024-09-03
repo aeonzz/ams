@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import {
+  ArrowRight,
   Mail,
   PaletteIcon,
   PanelRight,
@@ -76,27 +77,43 @@ export default function CommandSearchDialog({
                 <CommandShortcut>C</CommandShortcut>
               </div>
             </CommandItem>
-            <CommandItem>
-              <Smile className="mr-2 h-4 w-4" />
-              <span>Search Emoji</span>
+          </CommandGroup>
+          <CommandSeparator />
+          <CommandGroup heading="Navigation">
+            <CommandItem
+              onSelect={() => {
+                router.push("/notification");
+                dialogManager.setActiveDialog(null);
+              }}
+            >
+              <ArrowRight className="mr-2 h-4 w-4" />
+              <span>Go to my notifications</span>
             </CommandItem>
-            <CommandItem>
-              <RocketIcon className="mr-2 h-4 w-4" />
-              <span>Launch</span>
+            <CommandItem
+              onSelect={() => {
+                router.push(
+                  "/requests/my-requests?page=1&per_page=10&sort=createdAt.desc"
+                );
+                dialogManager.setActiveDialog(null);
+              }}
+            >
+              <ArrowRight className="mr-2 h-4 w-4" />
+              <span>Go to my requests</span>
+            </CommandItem>
+            <CommandItem
+              onSelect={() => {
+                router.push(
+                  "/requests/my-requests?page=1&per_page=10&sort=createdAt.desc&status=PENDING"
+                );
+                dialogManager.setActiveDialog(null);
+              }}
+            >
+              <ArrowRight className="mr-2 h-4 w-4" />
+              <span>Go to pending requests</span>
             </CommandItem>
           </CommandGroup>
           <CommandSeparator />
           <CommandGroup heading="Settings">
-            <CommandItem>
-              <UserRound className="mr-2 h-4 w-4" />
-              <span>Profile</span>
-              <CommandShortcut>⌘P</CommandShortcut>
-            </CommandItem>
-            <CommandItem>
-              <Mail className="mr-2 h-4 w-4" />
-              <span>Mail</span>
-              <CommandShortcut>⌘B</CommandShortcut>
-            </CommandItem>
             <CommandItem
               onSelect={() => {
                 dialogManager.setActiveDialog("settingsDialog");
@@ -114,6 +131,7 @@ export default function CommandSearchDialog({
               <span>Change theme</span>
             </CommandItem>
           </CommandGroup>
+          <CommandSeparator />
           <CommandGroup heading="Miscellaneous">
             <CommandItem
               onSelect={() => {
