@@ -33,7 +33,7 @@ export default function VehicleScheduleCard({
       <CardContent>
         <div className="flex items-center justify-between">
           <span className="space-y-1">
-            <p className="text-xs">From:</p>
+            <p className="text-xs">Needed:</p>
             <p className="text-sm">{format(data.dateAndTimeNeeded, "PPP")}</p>
           </span>
         </div>

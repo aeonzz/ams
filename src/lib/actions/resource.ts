@@ -7,7 +7,10 @@ import { cohere } from "@ai-sdk/cohere";
 import { generateId } from "lucia";
 import { revalidatePath } from "next/cache";
 import { extendedReturnableResourceRequestSchema } from "../schema/resource/returnable-resource";
-import { extendedSupplyResourceRequestSchema, extendedSupplyResourceRequestSchemaServer } from "../schema/resource/supply-resource";
+import {
+  extendedSupplyResourceRequestSchema,
+  extendedSupplyResourceRequestSchemaServer,
+} from "../schema/resource/supply-resource";
 
 export const createReturnableResourceRequest = authedProcedure
   .createServerAction()
@@ -88,7 +91,7 @@ export const createReturnableResourceRequest = authedProcedure
 
 export const createSupplyResourceRequest = authedProcedure
   .createServerAction()
-  .input(extendedSupplyResourceRequestSchemaServer)
+  .input(extendedSupplyResourceRequestSchema)
   .handler(async ({ ctx, input }) => {
     const { user } = ctx;
 
@@ -150,10 +153,11 @@ export const createSupplyResourceRequest = authedProcedure
                     rest.otherPurpose,
                   ].join(", ")
                 : rest.purpose.join(", "),
-              quantity: rest.quantity,
               items: {
-                connect: rest.items.map((item) => ({
-                  id: item,
+                create: rest.items.map((item) => ({
+                  id: generateId(15),
+                  quantity: item.quantity,
+                  supplyItemId: item.supplyItemId,
                 })),
               },
             },

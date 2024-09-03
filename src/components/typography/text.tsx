@@ -89,6 +89,23 @@ const H5 = forwardRef<
 });
 H5.displayName = "H5";
 
+const H6 = forwardRef<
+  HTMLHeadingElement,
+  React.HTMLAttributes<HTMLHeadingElement>
+>(({ className, ...props }, ref) => {
+  const { fontSize } = useFontSize();
+
+  const fontSizeClass = getFontSizeClass(
+    fontSize,
+    "text-xs",
+    "text-xs",
+    "text-base"
+  );
+
+  return <h5 ref={ref} className={cn(fontSizeClass, className)} {...props} />;
+});
+H5.displayName = "H5";
+
 const P = forwardRef<
   HTMLHeadingElement,
   React.HTMLAttributes<HTMLHeadingElement>
@@ -124,4 +141,4 @@ const Tspan = forwardRef<SVGTSpanElement, React.SVGProps<SVGTSpanElement>>(
 );
 Tspan.displayName = "Tspan";
 
-export { H1, H2, H3, H4, H5, P, Tspan };
+export { H1, H2, H3, H4, H5, H6, P, Tspan };

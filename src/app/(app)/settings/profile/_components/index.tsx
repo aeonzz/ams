@@ -32,7 +32,7 @@ export default function ProfileScreen() {
             </CardHeader>
             <CardContent className="flex justify-center">
               <Avatar className="size-32">
-                <AvatarImage src={currentUser.profileImageData ?? ""} />
+                <AvatarImage src={`${currentUser.profileUrl}` ?? ""} />
                 <AvatarFallback className="rounded-md">
                   {currentUser.username.charAt(0).toUpperCase()}
                 </AvatarFallback>

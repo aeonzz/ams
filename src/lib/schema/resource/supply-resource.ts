@@ -47,8 +47,12 @@ export type ExtendedSupplyResourceRequestSchema = z.infer<
 >;
 
 export const supplyResourceRequestSchemaServer = z.object({
-  items: z.array(z.string()),
-  quantity: z.number(),
+  items: z.array(
+    z.object({
+      supplyItemId: z.string().refine((val) => val !== ""),
+      quantity: z.number(),
+    })
+  ),
   dateAndTimeNeeded: z.date(),
   purpose: z.array(z.string()),
   otherPurpose: z.string().optional(),

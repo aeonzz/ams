@@ -14,8 +14,6 @@ import {
   extendedUpdateVehicleServerSchema,
   updateVehicleStatusesSchema,
 } from "../schema/vehicle";
-import { convertToBase64 } from "./utils";
-import placeholder from "public/placeholder.svg";
 
 export async function getVehicles(input: GetVehicleSchema) {
   await checkAuth();
@@ -55,36 +53,11 @@ export async function getVehicles(input: GetVehicleSchema) {
           [column || "createdAt"]: order || "desc",
         },
       }),
-      db.user.count({ where }),
+      db.vehicle.count({ where }),
     ]);
     const pageCount = Math.ceil(total / per_page);
 
-    const dataWithBase64Images = await Promise.all(
-      data.map(async (vehicle) => {
-        let imageUrl = vehicle.imageUrl || placeholder;
-
-        try {
-          if (vehicle.imageUrl) {
-            const result = await convertToBase64(vehicle.imageUrl);
-            if ("base64Url" in result) {
-              imageUrl = result.base64Url;
-            }
-          }
-        } catch (error) {
-          console.error(
-            `Error converting image for vehicle ${vehicle.id}:`,
-            error
-          );
-          imageUrl = placeholder;
-        }
-        return {
-          ...vehicle,
-          imageUrl: imageUrl,
-        };
-      })
-    );
-
-    return { data: dataWithBase64Images, pageCount };
+    return { data, pageCount };
   } catch (err) {
     console.error(err);
     return { data: [], pageCount: 0 };

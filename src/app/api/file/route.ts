@@ -40,13 +40,14 @@ export async function POST(request: NextRequest) {
 
         // Generate a unique filename
         const filename = `${generateId(10)}-${file.name}`;
-        const filePath = path.join(uploadPath, filename);
+        const fullPath = path.join(process.cwd(), 'public', 'uploads', filename);
+        const relativePath = path.posix.join('/uploads', filename);
 
         // Write the file
-        await writeFile(filePath, buffer);
-        console.log(`File saved: ${filePath}`);
+        await writeFile(fullPath, buffer);
+        console.log(`File saved: ${fullPath}`);
 
-        return { name: file.name, success: true, filePath };
+        return { name: file.name, success: true, filePath: relativePath };
       })
     );
 

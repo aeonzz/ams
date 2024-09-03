@@ -36,9 +36,7 @@ import { toast } from "sonner";
 import { useSession } from "@/lib/hooks/use-session";
 import { type RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTypeSchema";
 import axios from "axios";
-import {
-  ReservedTransportDateAndTime,
-} from "@/lib/schema/utils";
+import { ReservedTransportDateAndTime } from "@/lib/schema/utils";
 import DateTimePicker from "@/components/ui/date-time-picker";
 import VehicleField from "./vehicle-field";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
@@ -73,8 +71,6 @@ export default function TransportRequestInput({
   const { department } = currentUser;
   const queryClient = useQueryClient();
   const vehicleId = form.watch("vehicleId");
-
-  const [open, setOpen] = React.useState(false);
 
   const { data, isLoading, refetch, isRefetching } = useQuery<
     ReservedTransportDateAndTime[]
@@ -112,9 +108,7 @@ export default function TransportRequestInput({
     toast.promise(mutateAsync(data), {
       loading: "Submitting...",
       success: () => {
-        queryClient.invalidateQueries({ queryKey: ["pending-req-overview"] });
-        queryClient.invalidateQueries({ queryKey: ["pending-req"] });
-        queryClient.invalidateQueries({ queryKey: ["total-req-overview"] });
+        queryClient.invalidateQueries({ queryKey: ["user-dashboard-overview"] });
         handleOpenChange(false);
         return "Your request has been submitted and is awaiting approval.";
       },

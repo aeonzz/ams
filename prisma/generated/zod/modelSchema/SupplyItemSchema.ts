@@ -14,7 +14,7 @@ export const SupplyItemSchema = z.object({
   id: z.string(),
   name: z.string(),
   description: z.string().nullable(),
-  imageUrl: z.string().nullable(),
+  imageUrl: z.string(),
   quantity: z.number().int(),
   unit: z.string(),
   lowStockThreshold: z.number().int(),

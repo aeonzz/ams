@@ -217,36 +217,36 @@ export const currentUser = authedProcedure
         },
       });
 
-      if (!data) {
-        throw "User not found";
-      }
+      // if (!data) {
+      //   throw "User not found";
+      // }
 
-      let profileImageData = null;
-      if (data.profileUrl) {
-        const filename = path.basename(data.profileUrl);
-        const filePath = path.join(uploadPath, filename);
-        const fileBuffer = await readFile(filePath);
-        const fileExtension = path.extname(filename).toLowerCase() as
-          | ".svg"
-          | ".png"
-          | ".jpg"
-          | ".jpeg"
-          | ".gif";
+      // let profileImageData = null;
+      // if (data.profileUrl) {
+      //   const filename = path.basename(data.profileUrl);
+      //   const filePath = path.join(uploadPath, filename);
+      //   const fileBuffer = await readFile(filePath);
+      //   const fileExtension = path.extname(filename).toLowerCase() as
+      //     | ".svg"
+      //     | ".png"
+      //     | ".jpg"
+      //     | ".jpeg"
+      //     | ".gif";
 
-        const mimeTypes: Record<string, string> = {
-          ".svg": "image/svg+xml",
-          ".png": "image/png",
-          ".jpg": "image/jpeg",
-          ".jpeg": "image/jpeg",
-          ".gif": "image/gif",
-        };
-        const mimeType = mimeTypes[fileExtension] || "application/octet-stream";
+      //   const mimeTypes: Record<string, string> = {
+      //     ".svg": "image/svg+xml",
+      //     ".png": "image/png",
+      //     ".jpg": "image/jpeg",
+      //     ".jpeg": "image/jpeg",
+      //     ".gif": "image/gif",
+      //   };
+      //   const mimeType = mimeTypes[fileExtension] || "application/octet-stream";
 
-        const base64 = fileBuffer.toString("base64");
-        profileImageData = `data:${mimeType};base64,${base64}`;
-      }
+      //   const base64 = fileBuffer.toString("base64");
+      //   profileImageData = `data:${mimeType};base64,${base64}`;
+      // }
 
-      return { ...data, profileImageData };
+      return data;
     } catch (error) {
       getErrorMessage(error);
     }

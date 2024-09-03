@@ -160,7 +160,7 @@ export function getStatusIcon(status: RequestStatusTypeType): StatusIconConfig {
     },
     CANCELLED: {
       icon: XCircle,
-      variant: "secondary",
+      variant: "outline",
     },
     COMPLETED: {
       icon: CheckCircle,

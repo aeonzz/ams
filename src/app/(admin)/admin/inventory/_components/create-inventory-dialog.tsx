@@ -42,7 +42,7 @@ export default function CreateInventoryDialog() {
       name: "",
       description: "",
       imageUrl: undefined,
-      inventoryCount: 1,
+      inventoryCount: 0,
     },
   });
 

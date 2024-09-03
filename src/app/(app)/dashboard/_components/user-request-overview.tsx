@@ -127,7 +127,7 @@ export default function UserRequestOverview() {
                       {request.jobRequest?.notes ||
                         request.venueRequest?.purpose ||
                         request.returnableRequest?.purpose ||
-                        request.consumableRequest?.purpose ||
+                        request.supplyRequest?.purpose ||
                         request.transportRequest?.description ||
                         "No description available"}
                     </p>

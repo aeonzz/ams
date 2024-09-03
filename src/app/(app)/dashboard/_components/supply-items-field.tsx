@@ -1,23 +1,18 @@
 "use client";
 
 import * as React from "react";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Check, ChevronsUpDown, X } from "lucide-react";
 import { cn, textTransform } from "@/lib/utils";
 import {
   Popover,
   PopoverTrigger,
   PopoverContent,
 } from "@/components/ui/popover";
-import {
-  Select,
-  SelectTrigger,
-  SelectContent,
-  SelectItem,
-  SelectGroup,
-  SelectValue,
-} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import LoadingSpinner from "@/components/loaders/loading-spinner";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   SupplyItemCategorySchema,
   SupplyItemWithRelations,
@@ -30,9 +25,12 @@ import {
   CommandList,
   CommandEmpty,
   CommandItem,
+  CommandGroup,
 } from "@/components/ui/command";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import LoadingSpinner from "@/components/loaders/loading-spinner";
 
-interface CommandProps {
+interface SupplyItemsFieldProps {
   onItemsChange: (items: { supplyItemId: string; quantity: number }[]) => void;
   isPending: boolean;
 }
@@ -40,7 +38,7 @@ interface CommandProps {
 export default function SupplyItemsField({
   onItemsChange,
   isPending,
-}: CommandProps) {
+}: SupplyItemsFieldProps) {
   const { data: items, isLoading } = useQuery<SupplyItemWithRelations[]>({
     queryKey: ["get-input-supply-resource"],
     queryFn: async () => {
@@ -51,7 +49,7 @@ export default function SupplyItemsField({
 
   const [open, setOpen] = React.useState(false);
   const [selectedCategory, setSelectedCategory] = React.useState<string>(
-    SupplyItemCategorySchema.options[0] // Default category
+    SupplyItemCategorySchema.options[0]
   );
   const [selectedItems, setSelectedItems] = React.useState<
     { supplyItemId: string; quantity: number }[]
@@ -59,103 +57,206 @@ export default function SupplyItemsField({
 
   const categories = SupplyItemCategorySchema.options;
 
-  const filteredItems = items?.filter(
-    (item) => item.category === selectedCategory
+  const filteredItems = React.useMemo(
+    () => items?.filter((item) => item.category === selectedCategory),
+    [items, selectedCategory]
   );
 
-  const handleItemSelect = (itemId: string) => {
-    setSelectedItems((prevItems) => {
-      const itemExists = prevItems.find((item) => item.supplyItemId === itemId);
-      if (itemExists) {
-        return prevItems;
-      }
-      return [...prevItems, { supplyItemId: itemId, quantity: 1 }];
-    });
-    setOpen(false);
-  };
+  const handleItemSelect = React.useCallback(
+    (item: SupplyItemWithRelations) => {
+      setSelectedItems((prevItems) => {
+        const itemExists = prevItems.find((i) => i.supplyItemId === item.id);
+        if (itemExists) {
+          return prevItems;
+        }
+        const newItems = [...prevItems, { supplyItemId: item.id, quantity: 1 }];
+        onItemsChange(newItems);
+        return newItems;
+      });
+    },
+    [onItemsChange]
+  );
 
-  const handleQuantityChange = (index: number, quantity: number) => {
-    const newItems = [...selectedItems];
-    newItems[index].quantity = quantity;
-    setSelectedItems(newItems);
-    onItemsChange(newItems);
-  };
+  const handleQuantityChange = React.useCallback(
+    (supplyItemId: string, quantity: number) => {
+      setSelectedItems((prevItems) => {
+        const newItems = prevItems.map((item) =>
+          item.supplyItemId === supplyItemId ? { ...item, quantity } : item
+        );
+        onItemsChange(newItems);
+        return newItems;
+      });
+    },
+    [onItemsChange]
+  );
 
-  const handleRemoveItem = (index: number) => {
-    const newItems = selectedItems.filter((_, i) => i !== index);
-    setSelectedItems(newItems);
-    onItemsChange(newItems);
-  };
+  const handleRemoveItem = React.useCallback(
+    (supplyItemId: string) => {
+      setSelectedItems((prevItems) => {
+        const newItems = prevItems.filter(
+          (item) => item.supplyItemId !== supplyItemId
+        );
+        onItemsChange(newItems);
+        return newItems;
+      });
+    },
+    [onItemsChange]
+  );
 
   return (
-    <div>
-      <Popover open={open} onOpenChange={setOpen} modal>
-        <PopoverTrigger asChild>
-          <Button
-            onClick={(e) => {
-              e.preventDefault();
-              setOpen(true);
-            }}
-            disabled={isPending || isLoading}
-          >
-            Add Item
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-[470px] p-0">
-          <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select Category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                {categories.map((category) => (
-                  <SelectItem key={category} value={category}>
-                    {textTransform(category)}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-          {filteredItems?.length ? (
-            <Command>
-              <CommandInput placeholder="Search items..." />
-              <CommandList>
-                {filteredItems.map((item) => (
-                  <CommandItem
-                    key={item.id}
-                    onSelect={() => handleItemSelect(item.id)}
-                    className="flex items-center cursor-pointer"
-                  >
-                    <Check
-                      className={`mr-2 h-4 w-4 ${selectedItems.some((selectedItem) => selectedItem.supplyItemId === item.id) ? "opacity-100" : "opacity-0"}`}
-                    />
-                    {item.name}
-                  </CommandItem>
-                ))}
-                <CommandEmpty>No items found</CommandEmpty>
-              </CommandList>
-            </Command>
+    <Popover open={open} onOpenChange={setOpen} modal>
+      <PopoverTrigger asChild>
+        <Button
+          variant="secondary"
+          role="combobox"
+          aria-expanded={open}
+          className="w-full justify-between"
+          disabled={isPending || isLoading}
+        >
+          {selectedItems.length > 0
+            ? `${selectedItems.length} item${
+                selectedItems.length > 1 ? "s" : ""
+              } selected`
+            : "Select items"}
+          {isLoading ? (
+            <LoadingSpinner className="ml-2" />
           ) : (
-            <div>No items found</div>
+            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           )}
-        </PopoverContent>
-      </Popover>
-      {selectedItems.map((item, index) => (
-        <div key={index} className="flex items-center space-x-2">
-          <p className="truncate">{item.supplyItemId}</p>
-          <input
-            type="number"
-            value={item.quantity}
-            onChange={(e) =>
-              handleQuantityChange(index, parseInt(e.target.value, 10))
-            }
-            className="input"
-          />
-          <Button variant="destructive" onClick={() => handleRemoveItem(index)}>
-            Remove
-          </Button>
-        </div>
-      ))}
-    </div>
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[600px] p-3">
+        <Tabs defaultValue="select" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="select">Select Items</TabsTrigger>
+            <TabsTrigger value="selected">Selected Items</TabsTrigger>
+          </TabsList>
+          <TabsContent value="select">
+            <div className="flex">
+              <Command>
+                <CommandInput placeholder="Search category..." />
+                <CommandList>
+                  <CommandEmpty>No category found.</CommandEmpty>
+                  <CommandGroup heading="Categories">
+                    {categories.map((category) => (
+                      <CommandItem
+                        key={category}
+                        onSelect={() => setSelectedCategory(category)}
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            selectedCategory === category
+                              ? "opacity-100"
+                              : "opacity-0"
+                          )}
+                        />
+                        {textTransform(category)}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+              {selectedCategory && (
+                <Command>
+                  <CommandInput placeholder="Search items..." />
+                  <CommandList>
+                    <CommandEmpty>No items found.</CommandEmpty>
+                    <CommandGroup heading="Items">
+                      <ScrollArea className="h-[200px]">
+                        {filteredItems?.map((item) => (
+                          <CommandItem
+                            key={item.id}
+                            onSelect={() => handleItemSelect(item)}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                selectedItems.some(
+                                  (i) => i.supplyItemId === item.id
+                                )
+                                  ? "opacity-100"
+                                  : "opacity-0"
+                              )}
+                            />
+                            {item.name}
+                          </CommandItem>
+                        ))}
+                      </ScrollArea>
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              )}
+            </div>
+          </TabsContent>
+          <TabsContent value="selected">
+            <div className="scroll-bar h-[300px] overflow-y-auto p-4">
+              {selectedItems.length > 0 ? (
+                <div className="space-y-4">
+                  {selectedItems.map((selectedItem) => {
+                    const item = items?.find(
+                      (i) => i.id === selectedItem.supplyItemId
+                    );
+                    return (
+                      <Card
+                        key={selectedItem.supplyItemId}
+                        className="bg-secondary"
+                      >
+                        <CardContent className="p-4">
+                          <div className="mb-2 flex items-center justify-between">
+                            <h3 className="text-lg font-semibold">
+                              {item?.name}
+                            </h3>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() =>
+                                handleRemoveItem(selectedItem.supplyItemId)
+                              }
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                          <p className="mb-2 text-sm text-gray-500">
+                            {item?.description}
+                          </p>
+                          <div className="flex items-center space-x-2">
+                            <Label
+                              htmlFor={`quantity-${selectedItem.supplyItemId}`}
+                            >
+                              Quantity:
+                            </Label>
+                            <Input
+                              id={`quantity-${selectedItem.supplyItemId}`}
+                              type="number"
+                              min="1"
+                              value={selectedItem.quantity}
+                              onChange={(e) =>
+                                handleQuantityChange(
+                                  selectedItem.supplyItemId,
+                                  parseInt(e.target.value, 10)
+                                )
+                              }
+                              className="w-20"
+                            />
+                            <span className="text-sm text-gray-500">
+                              {item?.unit}
+                            </span>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="text-center text-gray-500">
+                  No items selected yet.
+                </p>
+              )}
+            </div>
+          </TabsContent>
+        </Tabs>
+      </PopoverContent>
+    </Popover>
   );
 }

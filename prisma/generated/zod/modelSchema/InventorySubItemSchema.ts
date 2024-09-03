@@ -13,6 +13,8 @@ export const InventorySubItemSchema = z.object({
   status: ItemStatusSchema,
   id: z.string(),
   inventoryId: z.string(),
+  subName: z.string(),
+  serialNumber: z.string().nullable(),
   isArchived: z.boolean(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),

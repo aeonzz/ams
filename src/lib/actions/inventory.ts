@@ -62,20 +62,6 @@ export async function getInventory(input: GetInventoryItemSchema) {
 
     const dataWithInventoryAndImages = await Promise.all(
       data.map(async (item) => {
-        let imageUrl = item.imageUrl || placeholder;
-
-        try {
-          if (item.imageUrl) {
-            const result = await convertToBase64(item.imageUrl);
-            if ("base64Url" in result) {
-              imageUrl = result.base64Url;
-            }
-          }
-        } catch (error) {
-          console.error(`Error converting image for item ${item.id}:`, error);
-          imageUrl = placeholder;
-        }
-
         const inventoryCount = item.inventorySubItems.length;
         const availableCount = item.inventorySubItems.filter(
           (inv) => inv.status === "AVAILABLE"
@@ -83,7 +69,6 @@ export async function getInventory(input: GetInventoryItemSchema) {
 
         return {
           ...item,
-          imageUrl: imageUrl,
           inventoryCount,
           availableCount,
           inventorySubItems: item.inventorySubItems,
@@ -122,6 +107,7 @@ export const createInventory = authedProcedure
             id: generateId(15),
             inventoryId: inventoryItem.id,
             status: "AVAILABLE",
+            subName: `${rest.name}-${generateId(5)}`,
           },
         });
         inventorySubItems.push(subItem);

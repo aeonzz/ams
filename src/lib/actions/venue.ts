@@ -14,7 +14,6 @@ import {
 import { revalidatePath } from "next/cache";
 import { generateId } from "lucia";
 import { Venue } from "prisma/generated/zod";
-import placeholder from "public/placeholder.svg";
 
 export async function getVenues(input: GetVenuesSchema) {
   await checkAuth();
@@ -58,29 +57,7 @@ export async function getVenues(input: GetVenuesSchema) {
     ]);
     const pageCount = Math.ceil(total / per_page);
 
-    const dataWithBase64Images = await Promise.all(
-      data.map(async (venue) => {
-        let imageUrl = venue.imageUrl || placeholder;
-
-        try {
-          if (venue.imageUrl) {
-            const result = await convertToBase64(venue.imageUrl);
-            if ("base64Url" in result) {
-              imageUrl = result.base64Url;
-            }
-          }
-        } catch (error) {
-          console.error(`Error converting image for venue ${venue.id}:`, error);
-          imageUrl = placeholder;
-        }
-        return {
-          ...venue,
-          imageUrl: imageUrl,
-        };
-      })
-    );
-
-    return { data: dataWithBase64Images, pageCount };
+    return { data, pageCount };
   } catch (err) {
     console.error(err);
     return { data: [], pageCount: 0 };

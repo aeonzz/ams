@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db/index";
 import { errorMonitor } from "stream";
+import { currentUser } from "@/lib/actions/users";
+import { checkAuth } from "@/lib/auth/utils";
+import placeholder from "public/placeholder.svg";
 
 interface Context {
   params: {
@@ -11,16 +14,52 @@ interface Context {
 export async function GET(req: Request, params: Context) {
   const { requestId } = params.params;
   try {
-    const result = await db.request.findMany({
+    await checkAuth();
+    const [data] = await currentUser();
+    const result = await db.request.findFirst({
       where: {
         id: requestId,
+        userId: data?.id,
       },
       include: {
-        consumableRequest: true,
-        jobRequest: true,
-        returnableRequest: true,
-        transportRequest: true,
-        venueRequest: true,
+        user: true,
+        supplyRequest: {
+          include: {
+            items: {
+              include: {
+                supplyItem: true, 
+              },
+            },
+          },
+        },
+        jobRequest: {
+          include: {
+            files: true,
+          },
+        },
+        returnableRequest: {
+          include: {
+            item: {
+              include: {
+                inventory: {
+                  include: {
+                    inventorySubItems: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        transportRequest: {
+          include: {
+            vehicle: true,
+          },
+        },
+        venueRequest: {
+          include: {
+            venue: true,
+          },
+        },
       },
     });
 

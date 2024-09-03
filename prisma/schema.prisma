@@ -152,6 +152,8 @@ model ReturnableRequest {
 model InventorySubItem {
   id                String              @id
   inventoryId       String
+  subName           String
+  serialNumber      String?
   inventory         InventoryItem       @relation(fields: [inventoryId], references: [id])
   status            ItemStatus          @default(AVAILABLE)
   isArchived        Boolean             @default(false)
@@ -172,41 +174,41 @@ model InventoryItem {
 }
 
 model SupplyRequest {
-  id                String       @id
+  id                String              @id
   dateAndTimeNeeded DateTime
   purpose           String
-  requestId         String       @unique
-  request           Request      @relation(fields: [requestId], references: [id], onDelete: Cascade)
-  createdAt         DateTime     @default(now())
-  updatedAt         DateTime     @updatedAt
+  requestId         String              @unique
+  request           Request             @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
   items             SupplyRequestItem[]
 }
 
 model SupplyItem {
-  id                String             @id
-  name              String
-  description       String?
-  status            SupplyItemStatus   @default(IN_STOCK)
-  imageUrl          String?
-  quantity          Int
-  unit              String
-  lowStockThreshold Int
-  expirationDate    DateTime?
-  category          SupplyItemCategory
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
+  id                 String              @id
+  name               String
+  description        String?
+  status             SupplyItemStatus    @default(IN_STOCK)
+  imageUrl           String
+  quantity           Int
+  unit               String
+  lowStockThreshold  Int
+  expirationDate     DateTime?
+  category           SupplyItemCategory
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
   supplyRequestItems SupplyRequestItem[]
 }
 
 model SupplyRequestItem {
-  id                String       @id
-  supplyRequestId   String
-  supplyItemId      String
-  quantity          Int
-  supplyRequest     SupplyRequest @relation(fields: [supplyRequestId], references: [id], onDelete: Cascade)
-  supplyItem        SupplyItem    @relation(fields: [supplyItemId], references: [id], onDelete: Cascade)
-  createdAt         DateTime     @default(now())
-  updatedAt         DateTime     @updatedAt
+  id              String        @id
+  supplyRequestId String
+  supplyItemId    String
+  quantity        Int
+  supplyRequest   SupplyRequest @relation(fields: [supplyRequestId], references: [id], onDelete: Cascade)
+  supplyItem      SupplyItem    @relation(fields: [supplyItemId], references: [id], onDelete: Cascade)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 
   @@unique([supplyRequestId, supplyItemId])
 }

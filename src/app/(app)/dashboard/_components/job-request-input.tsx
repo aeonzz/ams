@@ -228,9 +228,7 @@ export default function JobRequestInput({
       toast.promise(mutateAsync(data), {
         loading: "Submitting...",
         success: () => {
-          queryClient.invalidateQueries({ queryKey: ["pending-req-overview"] });
-          queryClient.invalidateQueries({ queryKey: ["pending-req"] });
-          queryClient.invalidateQueries({ queryKey: ["total-req-overview"] });
+          queryClient.invalidateQueries({ queryKey: ["user-dashboard-overview"] });
           handleOpenChange(false);
           return "Your request has been submitted and is awaiting approval.";
         },
