@@ -21,7 +21,8 @@
     "paths": {
       "@/*": ["./src/*"],
       "@components/*": ["./src/components/*"],
-      "@/zodAutoGenSchemas": ["./prisma/zod/index"]
+      "@/zodAutoGenSchemas": ["./prisma/zod/index"],
+      "@/middleware/*": ["./middleware/*"]
     },
     "baseUrl": "./"
   },

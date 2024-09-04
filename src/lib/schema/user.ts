@@ -1,11 +1,9 @@
-import { RoleTypeSchema } from "prisma/generated/zod";
 import { z } from "zod";
 
 export const createUserSchemaBase = z.object({
   email: z.string().min(1, "Email is required").email("Invalid email"),
   department: z.string().min(1, "Department is required"),
   username: z.string().min(1, "Username is required"),
-  role: RoleTypeSchema,
   password: z
     .string()
     .min(4, { message: "Must be at least 4 characters long" })
@@ -33,7 +31,6 @@ export const updateUserSchemaBase = z.object({
   department: z.string().optional(),
   username: z.string().optional(),
   profileUrl: z.string().optional(),
-  role: RoleTypeSchema.optional(),
   password: z
     .string()
     .max(15, { message: "Cannot be more than 15 characters long" })
@@ -65,7 +62,6 @@ export type DeleteUsersSchema = z.infer<typeof deleteUsersSchema>;
 
 export const updateUsersSchema = z.object({
   ids: z.string().array(),
-  role: RoleTypeSchema.optional(),
   path: z.string(),
 });
 

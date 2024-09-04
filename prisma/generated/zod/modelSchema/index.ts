@@ -1,4 +1,6 @@
 export * from './UserSchema';
+export * from './UserRoleSchema';
+export * from './RoleSchema';
 export * from './DepartmentSchema';
 export * from './SessionSchema';
 export * from './FileSchema';

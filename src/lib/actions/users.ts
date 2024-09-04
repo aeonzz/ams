@@ -203,17 +203,19 @@ export const currentUser = authedProcedure
     const { user } = ctx;
 
     try {
-      const uploadPath = process.env.UPLOAD_PATH;
-
-      if (!uploadPath) {
-        throw "Upload file path variable is missing";
-      }
+      
       const data = await db.user.findUnique({
         where: {
           id: user.id,
         },
         include: {
           setting: true,
+          sessions: true,
+          userRole: {
+            include: {
+              role: true,
+            },
+          },
         },
       });
 

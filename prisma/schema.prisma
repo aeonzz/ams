@@ -24,28 +24,54 @@ datasource db {
 }
 
 model User {
-  id                       String    @id
-  email                    String    @unique
+  id                       String     @id
+  email                    String     @unique
   profileUrl               String?
   hashedPassword           String
-  resetPasswordToken       String?   @unique
+  resetPasswordToken       String?    @unique
   resetPasswordTokenExpiry DateTime?
   username                 String
   department               String
-  createdAt                DateTime  @default(now())
-  updatedAt                DateTime  @updatedAt
+  createdAt                DateTime   @default(now())
+  updatedAt                DateTime   @updatedAt
   sessions                 Session[]
-  role                     RoleType  @default(USER)
   setting                  Setting?
   request                  Request[]
+  userRole                 UserRole[]
+}
+
+model UserRole {
+  id           String     @id
+  userId       String
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  roleId       String
+  role         Role       @relation(fields: [roleId], references: [id])
+  departmentId String
+  department   Department @relation(fields: [departmentId], references: [id])
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@unique([userId, roleId, departmentId])
+}
+
+model Role {
+  id          String     @id
+  name        String     @unique
+  description String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  userRoles   UserRole[]
 }
 
 model Department {
-  id        String   @id
-  label     String
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                String              @id
+  label             String
+  name              String
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  UserRole          UserRole[]
+  inventoryItem     InventoryItem[]
+  ReturnableRequest ReturnableRequest[]
 }
 
 model Session {
@@ -147,6 +173,8 @@ model ReturnableRequest {
   request           Request          @relation(fields: [requestId], references: [id], onDelete: Cascade)
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
+  departmentId      String
+  department        Department       @relation(fields: [departmentId], references: [id])
 }
 
 model InventorySubItem {
@@ -171,6 +199,8 @@ model InventoryItem {
   isArchived        Boolean            @default(false)
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
+  departmentId      String
+  department        Department         @relation(fields: [departmentId], references: [id])
 }
 
 model SupplyRequest {
@@ -295,12 +325,6 @@ enum RequestType {
   RESOURCE
   VENUE
   TRANSPORT
-}
-
-enum RoleType {
-  USER
-  REQUEST_MANAGER
-  ADMIN
 }
 
 enum PriorityType {

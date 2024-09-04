@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { writeFile } from "fs/promises";
 import { generateId } from "lucia";
 import path from "path";
+import { withRoles } from '@/middleware/withRole'
 
-export async function POST(request: NextRequest) {
+async function handler(request: NextRequest) {
   try {
     // const uploadPath = '/app/uploads';
     const uploadPath = process.env.UPLOAD_PATH;
@@ -60,3 +61,5 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+export const POST = withRoles(handler, ['ADMIN'])

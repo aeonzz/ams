@@ -11,7 +11,7 @@ export type AuthSession = {
       id: string;
       email?: string;
       username?: string;
-      role?: string;
+      roles: string[];
     };
   } | null;
 };
@@ -22,8 +22,8 @@ export const getUserAuth = async (): Promise<AuthSession> => {
     session: {
       user: {
         id: user.id,
-        email: user.email,
-        role: user.role,
+        email: (await user).email,
+        roles: (await user).roles,
       },
     },
   };

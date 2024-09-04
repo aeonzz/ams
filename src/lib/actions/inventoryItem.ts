@@ -63,26 +63,12 @@ export async function getInventorySubItems(
 
     const dataWithInventorySubAndImages = await Promise.all(
       data.map(async (item) => {
-        let imageUrl = item.inventory.imageUrl || placeholder;
-
-        try {
-          if (item.inventory.imageUrl) {
-            const result = await convertToBase64(item.inventory.imageUrl);
-            if ("base64Url" in result) {
-              imageUrl = result.base64Url;
-            }
-          }
-        } catch (error) {
-          console.error(`Error converting image for item ${item.id}:`, error);
-          imageUrl = placeholder;
-        }
-
         return {
           id: item.id,
           name: item.inventory.name,
           description: item.inventory.description,
           status: item.status,
-          imageUrl: imageUrl,
+          imageUrl: item.inventory.imageUrl,
           createdAt: item.createdAt,
           updatedAt: item.updatedAt,
         };

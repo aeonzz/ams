@@ -99,3 +99,14 @@ export const reservationSearchParamsSchema = z.object({
 });
 
 export type GetReservationsSchema = z.infer<typeof reservationSearchParamsSchema>;
+
+export const roleManagementSearchParamsSchema = z.object({
+  page: z.coerce.number().default(1),
+  per_page: z.coerce.number().default(10),
+  sort: z.string().optional(),
+  name: z.string().optional(),
+  from: z.string().optional(),
+  to: z.string().optional(),
+});
+
+export type GetRoleManagementSchema = z.infer<typeof roleManagementSearchParamsSchema>;

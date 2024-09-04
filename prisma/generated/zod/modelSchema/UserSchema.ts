@@ -1,18 +1,18 @@
 import { z } from 'zod';
-import { RoleTypeSchema } from '../inputTypeSchemas/RoleTypeSchema'
 import type { SessionWithRelations } from './SessionSchema'
 import type { SettingWithRelations } from './SettingSchema'
 import type { RequestWithRelations } from './RequestSchema'
+import type { UserRoleWithRelations } from './UserRoleSchema'
 import { SessionWithRelationsSchema } from './SessionSchema'
 import { SettingWithRelationsSchema } from './SettingSchema'
 import { RequestWithRelationsSchema } from './RequestSchema'
+import { UserRoleWithRelationsSchema } from './UserRoleSchema'
 
 /////////////////////////////////////////
 // USER SCHEMA
 /////////////////////////////////////////
 
 export const UserSchema = z.object({
-  role: RoleTypeSchema,
   id: z.string(),
   email: z.string(),
   profileUrl: z.string().nullable(),
@@ -35,6 +35,7 @@ export type UserRelations = {
   sessions: SessionWithRelations[];
   setting?: SettingWithRelations | null;
   request: RequestWithRelations[];
+  userRole: UserRoleWithRelations[];
 };
 
 export type UserWithRelations = z.infer<typeof UserSchema> & UserRelations
@@ -43,6 +44,7 @@ export const UserWithRelationsSchema: z.ZodType<UserWithRelations> = UserSchema.
   sessions: z.lazy(() => SessionWithRelationsSchema).array(),
   setting: z.lazy(() => SettingWithRelationsSchema).nullable(),
   request: z.lazy(() => RequestWithRelationsSchema).array(),
+  userRole: z.lazy(() => UserRoleWithRelationsSchema).array(),
 }))
 
 export default UserSchema;

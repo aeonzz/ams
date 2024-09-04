@@ -14,12 +14,16 @@ export const lucia = new Lucia(adapter, {
       secure: process.env.NODE_ENV === "production",
     },
   },
-  getUserAttributes: (attributes) => {
+  getUserAttributes: async (attributes) => {
+    const userRoles = await db.userRole.findMany({
+      where: { userId: attributes.id },
+      include: { role: true },
+    });
     return {
-      // attributes has the type of DatabaseUserAttributes
+      id: attributes.id,
       email: attributes.email,
       name: attributes.name,
-      role: attributes.role
+      roles: userRoles.map((ur) => ur.role.name),
     };
   },
 });
@@ -32,13 +36,16 @@ declare module "lucia" {
 }
 
 interface DatabaseUserAttributes {
+  id: string;
   email: string;
   name: string;
-  role: string;
+  roles: string[];
 }
 
 export const validateRequest = cache(
-  async (): Promise<{ user: User; session: Session } | { user: null; session: null }> => {
+  async (): Promise<
+    { user: User; session: Session } | { user: null; session: null }
+  > => {
     const sessionId = cookies().get(lucia.sessionCookieName)?.value ?? null;
     if (!sessionId) {
       return {
@@ -52,11 +59,19 @@ export const validateRequest = cache(
     try {
       if (result.session && result.session.fresh) {
         const sessionCookie = lucia.createSessionCookie(result.session.id);
-        cookies().set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
+        cookies().set(
+          sessionCookie.name,
+          sessionCookie.value,
+          sessionCookie.attributes
+        );
       }
       if (!result.session) {
         const sessionCookie = lucia.createBlankSessionCookie();
-        cookies().set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
+        cookies().set(
+          sessionCookie.name,
+          sessionCookie.value,
+          sessionCookie.attributes
+        );
       }
     } catch {}
     return result;
