@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-
+import { useRouter } from "next/navigation";
 import {
   CommandDialog,
   CommandEmpty,
@@ -9,10 +9,8 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-  CommandShortcut,
 } from "@/components/ui/command";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
-import { useRouter } from "next/navigation";
 import { Cog } from "lucide-react";
 
 const settingLinks = [
@@ -25,10 +23,21 @@ export default function SettingsDialog() {
   const dialogManager = useDialogManager();
   const router = useRouter();
 
+  React.useEffect(() => {
+    settingLinks.forEach((link) => {
+      router.prefetch(link.href);
+    });
+  }, [router]);
+
   const handleOpenChange = (open: boolean) => {
     if (!open) {
       dialogManager.setActiveDialog(null);
     }
+  };
+
+  const handleSelect = (href: string) => {
+    dialogManager.setActiveDialog(null);
+    router.push(href);
   };
 
   return (
@@ -43,10 +52,7 @@ export default function SettingsDialog() {
           {settingLinks.map((item) => (
             <CommandItem
               key={item.name}
-              onSelect={() => {
-                dialogManager.setActiveDialog(null);
-                router.push(item.href);
-              }}
+              onSelect={() => handleSelect(item.href)}
             >
               <Cog className="mr-2 h-4 w-4" />
               <span>{item.name}</span>

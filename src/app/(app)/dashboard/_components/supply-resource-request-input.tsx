@@ -58,28 +58,28 @@ import SupplyItemsField from "./supply-items-field";
 
 const purpose = [
   {
-    id: "Classroom Instruction",
-    label: "Classroom Instruction",
+    id: "Office Supplies",
+    label: "Office Supplies",
   },
   {
-    id: "Student Presentation",
-    label: "Student Presentation",
+    id: "Classroom Materials",
+    label: "Classroom Materials",
   },
   {
-    id: "Research Project",
-    label: "Research Project",
+    id: "Laboratory Equipment",
+    label: "Laboratory Equipment",
   },
   {
-    id: "School Event",
-    label: "School Event",
+    id: "Maintenance Tools",
+    label: "Maintenance Tools",
   },
   {
-    id: "Extracurricular Activity",
-    label: "Extracurricular Activity",
+    id: "Event Supplies",
+    label: "Event Supplies",
   },
   {
-    id: "Faculty Meeting",
-    label: "Faculty Meeting",
+    id: "Technology Equipment",
+    label: "Technology Equipment",
   },
   {
     id: "other",
@@ -133,7 +133,9 @@ export default function SupplyResourceRequestInput({
     toast.promise(mutateAsync(data), {
       loading: "Submitting...",
       success: () => {
-        queryClient.invalidateQueries({ queryKey: ["user-dashboard-overview"] });
+        queryClient.invalidateQueries({
+          queryKey: ["user-dashboard-overview"],
+        });
         handleOpenChange(false);
         return "Your request has been submitted and is awaiting approval.";
       },

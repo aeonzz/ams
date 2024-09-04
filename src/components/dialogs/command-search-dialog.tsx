@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import React from "react";
 import {
   ArrowRight,
   Mail,
@@ -28,6 +28,19 @@ import { useRouter } from "next/navigation";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 
+const NavigationLinks = [
+  { name: "Go to notifications", href: "/notification" },
+  {
+    name: "Go to my requests",
+    href: "/requests/my-requests?page=1&per_page=10&sort=createdAt.desc",
+  },
+  {
+    name: "Go to pending requests",
+    href: "/requests/my-requests?page=1&per_page=10&sort=createdAt.desc&status=PENDING",
+  },
+  { name: "Go to my reservations", href: "/reservations/my-reservations" },
+];
+
 interface CommandSearchDialogProps {
   children: React.ReactNode;
 }
@@ -38,6 +51,12 @@ export default function CommandSearchDialog({
   const dialogManager = useDialogManager();
   const sidebar = useSidebarToggle();
   const router = useRouter();
+
+  React.useEffect(() => {
+    NavigationLinks.forEach((link) => {
+      router.prefetch(link.href);
+    });
+  }, [router]);
 
   useHotkeys(
     "mod+k",
@@ -54,6 +73,11 @@ export default function CommandSearchDialog({
     if (!open) {
       dialogManager.setActiveDialog(null);
     }
+  };
+
+  const handleSelect = (href: string) => {
+    dialogManager.setActiveDialog(null);
+    router.push(href);
   };
 
   return (
@@ -80,37 +104,15 @@ export default function CommandSearchDialog({
           </CommandGroup>
           <CommandSeparator />
           <CommandGroup heading="Navigation">
-            <CommandItem
-              onSelect={() => {
-                router.push("/notification");
-                dialogManager.setActiveDialog(null);
-              }}
-            >
-              <ArrowRight className="mr-2 h-4 w-4" />
-              <span>Go to my notifications</span>
-            </CommandItem>
-            <CommandItem
-              onSelect={() => {
-                router.push(
-                  "/requests/my-requests?page=1&per_page=10&sort=createdAt.desc"
-                );
-                dialogManager.setActiveDialog(null);
-              }}
-            >
-              <ArrowRight className="mr-2 h-4 w-4" />
-              <span>Go to my requests</span>
-            </CommandItem>
-            <CommandItem
-              onSelect={() => {
-                router.push(
-                  "/requests/my-requests?page=1&per_page=10&sort=createdAt.desc&status=PENDING"
-                );
-                dialogManager.setActiveDialog(null);
-              }}
-            >
-              <ArrowRight className="mr-2 h-4 w-4" />
-              <span>Go to pending requests</span>
-            </CommandItem>
+            {NavigationLinks.map((link) => (
+              <CommandItem
+                key={link.name}
+                onSelect={() => handleSelect(link.href)}
+              >
+                <ArrowRight className="mr-2 h-4 w-4" />
+                <span>{link.name}</span>
+              </CommandItem>
+            ))}
           </CommandGroup>
           <CommandSeparator />
           <CommandGroup heading="Settings">

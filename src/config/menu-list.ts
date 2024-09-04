@@ -44,7 +44,7 @@ export function getMenuList(pathname: string): Group[] {
           icon: Mails,
           submenus: [
             {
-              href: "/requests/my-requests",
+              href: "/requests/my-requests?page=1&per_page=10&sort=createdAt.desc",
               label: "My Requests",
               active: pathname === "/requests/my-requests",
             },
@@ -56,20 +56,15 @@ export function getMenuList(pathname: string): Group[] {
           ],
         },
         {
-          href: "/my-reservations",
+          href: "/reservation/my-reservations",
           label: "Reservations",
-          active: pathname.includes("/my-reservations"),
+          active: pathname.includes("/reservations"),
           icon: Calendar,
           submenus: [
             {
-              href: "/my-reservations",
+              href: "/reservations/my-reservations",
               label: "All Reservations",
-              active: pathname === "/my-reservations",
-            },
-            {
-              href: "/my-reservations/new",
-              label: "New Reservation",
-              active: pathname === "/my-reservations/new",
+              active: pathname === "/reservations/my-reservations",
             },
           ],
         },

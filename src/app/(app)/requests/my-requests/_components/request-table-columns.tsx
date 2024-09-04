@@ -15,6 +15,7 @@ import { DataTableColumnHeader } from "@/components/data-table/data-table-column
 
 import { Request, RequestSchema } from "prisma/generated/zod";
 import { P } from "@/components/typography/text";
+import { format } from "date-fns";
 
 export function getRequestColumns(): ColumnDef<Request>[] {
   return [
@@ -77,7 +78,7 @@ export function getRequestColumns(): ColumnDef<Request>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Created" />
       ),
-      cell: ({ cell }) => formatDate(cell.getValue() as Date),
+      cell: ({ cell }) => format(cell.getValue() as Date, "PPP p"),
     },
   ];
 }

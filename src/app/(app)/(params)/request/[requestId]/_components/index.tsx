@@ -33,6 +33,8 @@ import RequestActions from "./request-actions";
 import SupplyItemCard from "./supply-item-card";
 import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import RequestDetailsSkeleton from "./request-details-skeleton";
+import SearchInput from "@/app/(app)/_components/search-input";
 
 interface RequestDetailsProps {
   params: string;
@@ -47,7 +49,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
     queryKey: ["user-request-details", params],
   });
 
-  if (isLoading) return <LoadingSpinner />;
+  if (isLoading) return <RequestDetailsSkeleton />;
   if (isError) return <FetchDataError refetch={refetch} />;
   if (!data) return <NotFound />;
 
@@ -59,7 +61,8 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
     <div className="flex h-full w-full">
       <div className="flex-1 overflow-hidden">
         <div className="flex h-[50px] items-center border-b px-6">
-          <H3 className="font-semibold text-muted-foreground">{data.title}</H3>
+          <H5 className="font-semibold text-muted-foreground">{data.title}</H5>
+          <SearchInput />
         </div>
         <div className="scroll-bar flex h-[calc(100vh_-_75px)] justify-center overflow-y-auto px-10 py-10">
           <div className="h-auto w-[750px]">

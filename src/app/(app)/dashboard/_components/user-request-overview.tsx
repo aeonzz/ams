@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
 import FetchDataError from "@/components/card/fetch-data-error";
+import DashboardSkeleton from "./dashboard-skeleton";
 
 export default function UserRequestOverview() {
   const { data, isLoading, refetch, isError } = useQuery<
@@ -35,11 +36,7 @@ export default function UserRequestOverview() {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex h-[75%] w-full items-center justify-center">
-        <LoadingSpinner />
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
   if (isError) {
     return (
@@ -101,7 +98,7 @@ export default function UserRequestOverview() {
             See all
           </Link>
         </div>
-        <div className="space-y-3 p-3">
+        <div className="flex flex-col gap-3 p-3">
           {getPendingRequests().length === 0 ? (
             <p className="text-center text-muted-foreground">
               No pending requests
@@ -110,8 +107,8 @@ export default function UserRequestOverview() {
             getPendingRequests().map((request) => {
               const { icon: Icon, variant } = getStatusIcon(request.status);
               return (
-                <Link href={`request/${request.id}`}>
-                  <Card key={request.id} className="bg-secondary">
+                <Link key={request.id} href={`request/${request.id}`}>
+                  <Card className="bg-secondary">
                     <CardHeader className="pb-2">
                       <div className="flex items-center justify-between">
                         <CardTitle className="text-sm font-medium">

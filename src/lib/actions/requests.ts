@@ -5,15 +5,12 @@ import { authedProcedure, getErrorMessage } from "./utils";
 
 import { db } from "@/lib/db/index";
 import { revalidatePath } from "next/cache";
-import { RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTypeSchema";
 import { createCohere } from "@ai-sdk/cohere";
 import { generateText } from "ai";
 import { z } from "zod";
 import { GetRequestsSchema } from "../schema";
-import { unstable_noStore as noStore } from "next/cache";
 import { Request, RequestWithRelations } from "prisma/generated/zod";
 import path from "path";
-import { readFile } from "fs/promises";
 import {
   extendedJobRequestSchema,
   extendedTransportRequestSchema,
