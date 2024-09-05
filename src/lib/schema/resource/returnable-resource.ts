@@ -62,6 +62,7 @@ export type ExtendedReturnableResourceRequestSchema = z.infer<
 export const createInventoryItemSchemaServer = z.object({
   name: z.string(),
   description: z.string(),
+  departmentId: z.string(),
   imageUrl: z.array(
     z.string({
       required_error: "Image is required",

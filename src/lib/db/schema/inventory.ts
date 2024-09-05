@@ -12,13 +12,16 @@ export const createInventoryItemSchema = z.object({
   imageUrl: z.array(z.instanceof(File), {
     required_error: "Image is required",
   }),
+  departmentId: z.string().min(1, "Department is required"),
   inventoryCount: z
     .string()
     .transform((val) => parseInt(val, 10))
     .pipe(z.number().min(1, "Inventory count is required")),
 });
 
-export type CreateInventoryItemSchema = z.infer<typeof createInventoryItemSchema>;
+export type CreateInventoryItemSchema = z.infer<
+  typeof createInventoryItemSchema
+>;
 
 export const updateInventoryItemSchema = z.object({
   name: z.string().optional(),
@@ -26,9 +29,12 @@ export const updateInventoryItemSchema = z.object({
   imageUrl: z.array(z.instanceof(File)).optional(),
 });
 
-export type UpdateInventoryItemSchema = z.infer<typeof updateInventoryItemSchema>;
+export type UpdateInventoryItemSchema = z.infer<
+  typeof updateInventoryItemSchema
+>;
 
-export const extendedUpdateInventoryItemSchema = updateInventoryItemSchema.extend({
-  path: z.string(),
-  id: z.string().optional(),
-});
+export const extendedUpdateInventoryItemSchema =
+  updateInventoryItemSchema.extend({
+    path: z.string(),
+    id: z.string().optional(),
+  });

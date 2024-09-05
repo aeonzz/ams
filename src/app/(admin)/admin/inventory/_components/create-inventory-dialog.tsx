@@ -30,7 +30,7 @@ import {
   type CreateInventoryItemSchema,
 } from "@/lib/db/schema/inventory";
 import { createInventory } from "@/lib/actions/inventory";
-import CreateInventoryForm from "@/components/forms/create-inventory-form";
+import CreateInventoryForm from "./create-inventory-form";
 
 export default function CreateInventoryDialog() {
   const dialogManager = useDialogManager();
@@ -42,6 +42,7 @@ export default function CreateInventoryDialog() {
       name: "",
       description: "",
       imageUrl: undefined,
+      departmentId: undefined,
       inventoryCount: 0,
     },
   });

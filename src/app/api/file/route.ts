@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { writeFile } from "fs/promises";
 import { generateId } from "lucia";
 import path from "path";
-import { withRoles } from '@/middleware/withRole'
+import { withRoles } from "@/middleware/withRole";
 
-async function handler(request: NextRequest) {
+export async function POST(request: NextRequest) {
   try {
     // const uploadPath = '/app/uploads';
     const uploadPath = process.env.UPLOAD_PATH;
@@ -15,7 +15,7 @@ async function handler(request: NextRequest) {
         { status: 500 }
       );
     }
-    
+
     const { files } = await request.json();
 
     if (!files || !Array.isArray(files) || files.length === 0) {
@@ -41,8 +41,13 @@ async function handler(request: NextRequest) {
 
         // Generate a unique filename
         const filename = `${generateId(10)}-${file.name}`;
-        const fullPath = path.join(process.cwd(), 'public', 'uploads', filename);
-        const relativePath = path.posix.join('/uploads', filename);
+        const fullPath = path.join(
+          process.cwd(),
+          "public",
+          "uploads",
+          filename
+        );
+        const relativePath = path.posix.join("/uploads", filename);
 
         // Write the file
         await writeFile(fullPath, buffer);
@@ -55,11 +60,12 @@ async function handler(request: NextRequest) {
     return NextResponse.json({ success: true, results });
   } catch (error) {
     console.error("Error processing files:", error);
-    return NextResponse.json(
+    return NextResponse.json(-
       { success: false, message: "Server error" },
       { status: 500 }
     );
   }
 }
 
-export const POST = withRoles(handler, ['ADMIN'])
+// export const POST = withRoles(handler, ['ADMIN'])
+

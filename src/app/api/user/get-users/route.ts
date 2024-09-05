@@ -4,7 +4,11 @@ import { db } from "@/lib/db/index";
 
 export async function GET(request: NextRequest) {
   try {
-    const result = await db.user.findMany();
+    const result = await db.user.findMany({
+      include: {
+        userRole: true,
+      },
+    });
 
     return NextResponse.json({ data: result }, { status: 200 });
   } catch (error) {
@@ -15,4 +19,3 @@ export async function GET(request: NextRequest) {
     );
   }
 }
-

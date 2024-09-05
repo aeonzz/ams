@@ -47,6 +47,9 @@ export function InventoryTable({ inventoryPromise }: InventoryTableProps) {
     <DataTable
       table={table}
       floatingBar={<InventoryTableFloatingBar table={table} />}
+      renderSubComponent={({ row }) => (
+        <></>
+      )}
     >
       <DataTableToolbar table={table} filterFields={filterFields}>
         <InventoryTableToolbarActions table={table} />

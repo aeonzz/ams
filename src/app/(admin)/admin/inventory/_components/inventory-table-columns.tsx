@@ -32,6 +32,7 @@ import { type InventoryItemType } from "@/lib/types/item";
 import { updateInventory } from "@/lib/actions/inventory";
 import { UpdateInventorySheet } from "./inventory-inventory-sheet";
 import { DeleteInventoryDialog } from "./delete-inventories-dialog";
+import { ChevronDownIcon, ChevronRightIcon } from "lucide-react";
 
 export function getInventoryColumns(): ColumnDef<InventoryItemType>[] {
   return [
@@ -105,7 +106,7 @@ export function getInventoryColumns(): ColumnDef<InventoryItemType>[] {
       ),
       cell: ({ row }) => {
         return (
-          <div className="flex w-[25vw] space-x-2">
+          <div className="flex w-[15vw] space-x-2">
             <P className="truncate font-medium">{row.original.name}</P>
           </div>
         );
@@ -160,6 +161,27 @@ export function getInventoryColumns(): ColumnDef<InventoryItemType>[] {
         <DataTableColumnHeader column={column} title="Last Modified" />
       ),
       cell: ({ cell }) => formatDate(cell.getValue() as Date),
+      size: 0,
+    },
+    {
+      id: "expander",
+      header: () => <P>Inventory</P>,
+      cell: ({ row }) => {
+        return (
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => row.toggleExpanded()}
+            aria-label="Toggle row details"
+          >
+            {row.getIsExpanded() ? (
+              <ChevronDownIcon className="h-4 w-4" />
+            ) : (
+              <ChevronRightIcon className="h-4 w-4" />
+            )}
+          </Button>
+        );
+      },
       size: 0,
     },
     {

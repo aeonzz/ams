@@ -6,7 +6,12 @@ import { authedProcedure, getErrorMessage } from "./utils";
 import { db } from "@/lib/db/index";
 import { type GetRoleManagementSchema } from "../schema";
 import { type RoleWithRelations } from "prisma/generated/zod";
-import { roleSchemaWithPath } from "../schema/role";
+import {
+  assignRoleSchema,
+  deleteRolesSchema,
+  roleSchemaWithPath,
+  updateRoleSchemaWithPath,
+} from "../schema/role";
 import { revalidatePath } from "next/cache";
 
 export async function getRoles(input: GetRoleManagementSchema) {
@@ -20,7 +25,9 @@ export async function getRoles(input: GetRoleManagementSchema) {
       "asc" | "desc" | undefined,
     ];
 
-    const where: any = {};
+    const where: any = {
+      isArchived: false,
+    };
 
     if (name) {
       where.name = { contains: name, mode: "insensitive" };
@@ -89,6 +96,102 @@ export const createRole = authedProcedure
 
       return revalidatePath(path);
     } catch (error) {
+      getErrorMessage(error);
+    }
+  });
+
+export const assignRoles = authedProcedure
+  .createServerAction()
+  .input(assignRoleSchema)
+  .handler(async ({ ctx, input }) => {
+    const { users, roleId, path } = input;
+    try {
+      const departmentIds = Array.from(
+        new Set(users.map((user) => user.departmentId))
+      );
+
+      const existingDepartments = await db.department.findMany({
+        where: { id: { in: departmentIds } },
+        select: { id: true },
+      });
+
+      const existingDepartmentIds = new Set(
+        existingDepartments.map((d) => d.id)
+      );
+
+      const validUsers = users.filter((user) =>
+        existingDepartmentIds.has(user.departmentId)
+      );
+
+      if (validUsers.length !== users.length) {
+        console.warn(`Some users were skipped due to invalid department IDs`);
+      }
+
+      await db.$transaction(
+        validUsers.map(({ id: userId, departmentId }) =>
+          db.userRole.upsert({
+            where: {
+              userId_roleId_departmentId: { userId, roleId, departmentId },
+            },
+            update: {},
+            create: {
+              id: generateId(15),
+              userId,
+              roleId,
+              departmentId,
+            },
+          })
+        )
+      );
+
+      return revalidatePath(path);
+    } catch (error) {
+      getErrorMessage(error);
+    }
+  });
+
+export const updateRole = authedProcedure
+  .createServerAction()
+  .input(updateRoleSchemaWithPath)
+  .handler(async ({ ctx, input }) => {
+    const { path, id, ...rest } = input;
+    console.log(id);
+    try {
+      await db.role.update({
+        where: {
+          id: id,
+        },
+        data: {
+          ...rest,
+        },
+      });
+      return revalidatePath(path);
+    } catch (error) {
+      getErrorMessage(error);
+    }
+  });
+
+export const deleteRoles = authedProcedure
+  .createServerAction()
+  .input(deleteRolesSchema)
+  .handler(async ({ input }) => {
+    const { path, ...rest } = input;
+
+    try {
+      await db.role.updateMany({
+        where: {
+          id: {
+            in: rest.ids,
+          },
+        },
+        data: {
+          isArchived: true,
+        },
+      });
+
+      return revalidatePath(path);
+    } catch (error) {
+      console.log(error);
       getErrorMessage(error);
     }
   });

@@ -9,6 +9,7 @@ import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import { PlusIcon } from "lucide-react";
 import { type InventoryItemType } from "@/lib/types/item";
 import type { RoleType } from "@/lib/types/role";
+import { DeleteRolesDialog } from "./delete-roles-dialog";
 
 interface RoleManagementTableToolbarActionsProps {
   table: Table<RoleType>;
@@ -20,14 +21,14 @@ export function RoleManagementTableToolbarActions({
   const dialogManager = useDialogManager();
   return (
     <div className="flex items-center gap-2">
-      {/* {table.getFilteredSelectedRowModel().rows.length > 0 ? (
-        <DeleteInventoryDialog
-          inventories={table
+      {table.getFilteredSelectedRowModel().rows.length > 0 ? (
+        <DeleteRolesDialog
+          roles={table
             .getFilteredSelectedRowModel()
             .rows.map((row) => row.original)}
           onSuccess={() => table.toggleAllRowsSelected(false)}
         />
-      ) : null} */}
+      ) : null}
       <Button
         variant="secondary"
         size="sm"

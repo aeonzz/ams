@@ -21,17 +21,15 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { usePathname } from "next/navigation";
-import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
-import Link from "next/link";
-import { updateInventory } from "@/lib/actions/inventory";
 import type { RoleType } from "@/lib/types/role";
 import { ChevronDownIcon, ChevronRightIcon } from "lucide-react";
 import AssignRoleSheet from "./assign-role-sheet";
+import { UpdateRoleSheet } from "./update-role-sheet";
+import { DeleteRolesDialog } from "./delete-roles-dialog";
 
 export function getRoleColumns(): ColumnDef<RoleType>[] {
   return [
@@ -133,30 +131,46 @@ export function getRoleColumns(): ColumnDef<RoleType>[] {
       cell: function Cell({ row }) {
         const dialogManager = useDialogManager();
         const pathname = usePathname();
-        const [showUpdateTaskSheet, setShowUpdateTaskSheet] =
+        const [showUpdateRoleSheet, setShowUpdateRoleSheet] =
           React.useState(false);
-        const [showDeleteTaskDialog, setShowDeleteTaskDialog] =
+        const [showDeleteRoleDialog, setShowDeleteRoleDialog] =
           React.useState(false);
         const [showAssignRoleSheet, setShowAssignRoleSheet] =
           React.useState(false);
 
-        const { isPending, mutateAsync } =
-          useServerActionMutation(updateInventory);
-
         React.useEffect(() => {
-          if (showAssignRoleSheet) {
-            dialogManager.setActiveDialog("adminAssignRoleSheet");
+          if (showUpdateRoleSheet) {
+            dialogManager.setActiveDialog("adminUpdateRoleSheet");
           } else {
             dialogManager.setActiveDialog(null);
           }
-        }, [showUpdateTaskSheet]);
+        }, [showUpdateRoleSheet]);
+
+        React.useEffect(() => {
+          if (showDeleteRoleDialog) {
+            dialogManager.setActiveDialog("adminDeleteRoleDialog");
+          } else {
+            dialogManager.setActiveDialog(null);
+          }
+        }, [showDeleteRoleDialog]);
 
         return (
           <div className="grid place-items-center">
+            <UpdateRoleSheet
+              open={showUpdateRoleSheet}
+              onOpenChange={setShowUpdateRoleSheet}
+              role={row.original}
+            />
+            <DeleteRolesDialog
+              open={showDeleteRoleDialog}
+              onOpenChange={setShowDeleteRoleDialog}
+              roles={[row.original]}
+              showTrigger={false}
+              onSuccess={() => row.toggleSelected(false)}
+            />
             <AssignRoleSheet
               roleId={row.original.id}
               roleName={row.original.name}
-              isPending={isPending}
               open={showAssignRoleSheet}
               onOpenChange={setShowAssignRoleSheet}
             />
@@ -174,12 +188,12 @@ export function getRoleColumns(): ColumnDef<RoleType>[] {
                 <DropdownMenuItem onSelect={() => setShowAssignRoleSheet(true)}>
                   Assign
                 </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setShowUpdateTaskSheet(true)}>
+                <DropdownMenuItem onSelect={() => setShowUpdateRoleSheet(true)}>
                   Edit
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
-                  onSelect={() => setShowDeleteTaskDialog(true)}
+                  onSelect={() => setShowDeleteRoleDialog(true)}
                   className="focus:bg-destructive focus:text-destructive-foreground"
                 >
                   Delete
