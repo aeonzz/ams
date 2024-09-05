@@ -1,5 +1,10 @@
 import * as React from "react";
-import { flexRender, type Table as TanstackTable } from "@tanstack/react-table";
+import {
+  flexRender,
+  Row,
+  type Table as TanstackTable,
+} from "@tanstack/react-table";
+import { ChevronDownIcon, ChevronRightIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import {
@@ -12,23 +17,13 @@ import {
 } from "@/components/ui/table";
 import { DataTablePagination } from "@/components/data-table/data-table-pagination";
 import { getCommonPinningStyles } from "@/lib/data-table";
+import { Button } from "@/components/ui/button";
 
 interface DataTableProps<TData> extends React.HTMLAttributes<HTMLDivElement> {
-  /**
-   * The table instance returned from useDataTable hook with pagination, sorting, filtering, etc.
-   * @type TanstackTable<TData>
-   */
   table: TanstackTable<TData>;
-
-  /**
-   * The floating bar to render at the bottom of the table on row selection.
-   * @default null
-   * @type React.ReactNode | null
-   * @example floatingBar={<TasksTableFloatingBar table={table} />}
-   */
   floatingBar?: React.ReactNode | null;
-
   showSelectedRows?: boolean;
+  renderSubComponent?: (props: { row: Row<TData> }) => React.ReactNode;
 }
 
 export function DataTable<TData>({
@@ -36,6 +31,7 @@ export function DataTable<TData>({
   floatingBar = null,
   children,
   className,
+  renderSubComponent,
   ...props
 }: DataTableProps<TData>) {
   return (
@@ -57,7 +53,6 @@ export function DataTable<TData>({
                       style={{
                         ...getCommonPinningStyles({ column: header.column }),
                       }}
-                      // className={header.index === 0 ? "" : "border-l"}
                     >
                       {header.isPlaceholder
                         ? null
@@ -74,24 +69,45 @@ export function DataTable<TData>({
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      key={cell.id}
-                      style={{
-                        ...getCommonPinningStyles({ column: cell.column }),
-                      }}
-                    >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
+                <React.Fragment key={row.id}>
+                  <TableRow data-state={row.getIsSelected() && "selected"}>
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell
+                        key={cell.id}
+                        style={{
+                          ...getCommonPinningStyles({ column: cell.column }),
+                        }}
+                      >
+                        {cell.column.id === "expander" ? (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => row.toggleExpanded()}
+                            aria-label="Toggle row details"
+                          >
+                            {row.getIsExpanded() ? (
+                              <ChevronDownIcon className="h-4 w-4" />
+                            ) : (
+                              <ChevronRightIcon className="h-4 w-4" />
+                            )}
+                          </Button>
+                        ) : (
+                          flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                  {row.getIsExpanded() && renderSubComponent && (
+                    <TableRow>
+                      <TableCell colSpan={row.getVisibleCells().length} className="p-0">
+                        {renderSubComponent({ row })}
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </React.Fragment>
               ))
             ) : (
               <TableRow>

@@ -13,14 +13,13 @@ import { UsersTableToolbarActions } from "./users-table-toolbar-actions";
 import { getRoleIcon } from "@/lib/utils";
 import { UsersTableFloatingBar } from "./users-table-floating-bar";
 import { getUsers } from "@/lib/actions/users";
-import { RoleTypeSchema, User } from "prisma/generated/zod";
+import { type User } from "prisma/generated/zod";
 
 interface UsersTableProps {
   usersPromise: ReturnType<typeof getUsers>;
 }
 
 export function UsersTable({ usersPromise }: UsersTableProps) {
-
   const { data, pageCount } = React.use(usersPromise);
 
   // Memoize the columns so they don't re-render on every render
@@ -48,18 +47,18 @@ export function UsersTable({ usersPromise }: UsersTableProps) {
       value: "username",
       placeholder: "Filter usernames...",
     },
-    {
-      label: "Role",
-      value: "role",
-      options: RoleTypeSchema.options.map((role) => ({
-        label:
-          role.charAt(0).toUpperCase() +
-          role.slice(1).toLowerCase().replace(/_/g, " "),
-        value: role,
-        icon: getRoleIcon(role).icon,
-        withCount: true,
-      })),
-    },
+    // {
+    //   label: "Role",
+    //   value: "role",
+    //   options: RoleTypeSchema.options.map((role) => ({
+    //     label:
+    //       role.charAt(0).toUpperCase() +
+    //       role.slice(1).toLowerCase().replace(/_/g, " "),
+    //     value: role,
+    //     icon: getRoleIcon(role).icon,
+    //     withCount: true,
+    //   })),
+    // },
   ];
 
   const { table } = useDataTable({

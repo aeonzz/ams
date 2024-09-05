@@ -10,7 +10,7 @@ export async function GET(req: Request) {
   } catch (error) {
     console.log(errorMonitor);
     return NextResponse.json(
-      { error: "Form submission failed" },
+      { error: "Something went wrong! try again later" },
       { status: 500 }
     );
   }

@@ -32,7 +32,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 
-import { Department, RoleTypeSchema, User } from "prisma/generated/zod";
+import { Department, User } from "prisma/generated/zod";
 import { updateUserSchema, UpdateUserSchema } from "@/lib/schema/user";
 import { Input } from "@/components/ui/input";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
@@ -58,7 +58,6 @@ export function UpdateUserSheet({ user, ...props }: UpdateUserSheetProps) {
       email: user.email ?? "",
       department: user.department,
       username: user.username,
-      role: user.role,
     },
   });
 
@@ -78,7 +77,6 @@ export function UpdateUserSheet({ user, ...props }: UpdateUserSheetProps) {
       email: user.email ?? "",
       department: user.department,
       username: user.username,
-      role: user.role,
     });
   }, [user, form]);
 
@@ -212,7 +210,7 @@ export function UpdateUserSheet({ user, ...props }: UpdateUserSheetProps) {
                   </FormItem>
                 )}
               />
-              <FormField
+              {/* <FormField
                 control={form.control}
                 name="role"
                 render={({ field }) => (
@@ -253,7 +251,7 @@ export function UpdateUserSheet({ user, ...props }: UpdateUserSheetProps) {
                     <FormMessage />
                   </FormItem>
                 )}
-              />
+              /> */}
             </div>
             <div>
               <Separator className="my-2" />

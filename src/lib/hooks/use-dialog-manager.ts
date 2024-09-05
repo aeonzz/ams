@@ -18,6 +18,8 @@ export type DialogType =
   | "adminUpdateInventoryItemSheet"
   | "adminCreateInventorySubItemDialog"
   | "adminUpdateInventorySubItemDialog"
+  | "adminCreateRoleDialog"
+  | "adminAssignRoleSheet"
   | null;
 
 export interface DialogState {

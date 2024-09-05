@@ -109,9 +109,9 @@ export function getAdminMenuList(pathname: string): Group[] {
           submenus: [],
         },
         {
-          href: "/roles",
+          href: "/admin/role-management",
           label: "Role Management",
-          active: pathname.includes("/roles"),
+          active: pathname.includes("/admin/role-management"),
           icon: ShieldAlert,
           submenus: [],
         },

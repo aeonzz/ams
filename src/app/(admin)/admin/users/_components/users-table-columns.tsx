@@ -30,10 +30,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 
-// import { updateTask } from "../_lib/actions"
-// import { getPriorityIcon, getStatusIcon } from "../_lib/utils"
-// import { DeleteTasksDialog } from "./delete-tasks-dialog"
-// import { UpdateTaskSheet } from "./update-task-sheet"
 import { P } from "@/components/typography/text";
 import { User } from "prisma/generated/zod";
 import { UpdateUserSheet } from "./update-user-sheet";
@@ -42,9 +38,6 @@ import {
   useServerActionQuery,
 } from "@/lib/hooks/server-action-hooks";
 import { updateUser } from "@/lib/actions/users";
-import RoleTypeSchema, {
-  RoleTypeType,
-} from "prisma/generated/zod/inputTypeSchemas/RoleTypeSchema";
 import { usePathname } from "next/navigation";
 import { DeleteUsersDialog } from "./delete-users-dialog";
 
@@ -121,26 +114,26 @@ export function getUsersColumns(): ColumnDef<User>[] {
         return Array.isArray(value) && value.includes(row.getValue(id));
       },
     },
-    {
-      accessorKey: "role",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Role" />
-      ),
-      cell: ({ row }) => {
-        const { icon: Icon, variant } = getRoleIcon(row.original.role);
-        return (
-          <div className="flex items-center">
-            <Badge variant={variant}>
-              <Icon className="mr-1 size-4" />
-              {textTransform(row.original.role)}
-            </Badge>
-          </div>
-        );
-      },
-      filterFn: (row, id, value) => {
-        return Array.isArray(value) && value.includes(row.getValue(id));
-      },
-    },
+    // {
+    //   accessorKey: "role",
+    //   header: ({ column }) => (
+    //     <DataTableColumnHeader column={column} title="Role" />
+    //   ),
+    //   cell: ({ row }) => {
+    //     const { icon: Icon, variant } = getRoleIcon(row.original.role);
+    //     return (
+    //       <div className="flex items-center">
+    //         <Badge variant={variant}>
+    //           <Icon className="mr-1 size-4" />
+    //           {textTransform(row.original.role)}
+    //         </Badge>
+    //       </div>
+    //     );
+    //   },
+    //   filterFn: (row, id, value) => {
+    //     return Array.isArray(value) && value.includes(row.getValue(id));
+    //   },
+    // },
     {
       accessorKey: "createdAt",
       header: ({ column }) => (
@@ -190,7 +183,7 @@ export function getUsersColumns(): ColumnDef<User>[] {
                 <DropdownMenuSub>
                   <DropdownMenuSubTrigger>Roles</DropdownMenuSubTrigger>
                   <DropdownMenuSubContent>
-                    <DropdownMenuRadioGroup
+                    {/* <DropdownMenuRadioGroup
                       value={row.original.role}
                       onValueChange={(value) => {
                         toast.promise(
@@ -228,7 +221,7 @@ export function getUsersColumns(): ColumnDef<User>[] {
                           </DropdownMenuRadioItem>
                         );
                       })}
-                    </DropdownMenuRadioGroup>
+                    </DropdownMenuRadioGroup> */}
                   </DropdownMenuSubContent>
                 </DropdownMenuSub>
                 <DropdownMenuSeparator />
