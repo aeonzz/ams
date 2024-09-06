@@ -24,20 +24,21 @@ datasource db {
 }
 
 model User {
-  id                       String     @id
-  email                    String     @unique
+  id                       String       @id
+  email                    String       @unique
   profileUrl               String?
   hashedPassword           String
-  resetPasswordToken       String?    @unique
+  resetPasswordToken       String?      @unique
   resetPasswordTokenExpiry DateTime?
   username                 String
   department               String
-  createdAt                DateTime   @default(now())
-  updatedAt                DateTime   @updatedAt
+  createdAt                DateTime     @default(now())
+  updatedAt                DateTime     @updatedAt
   sessions                 Session[]
   setting                  Setting?
   request                  Request[]
   userRole                 UserRole[]
+  JobRequest               JobRequest[]
 }
 
 model UserRole {
@@ -119,22 +120,31 @@ model Request {
   transportRequest  TransportRequest?
 }
 
-model ItemCategory {
-  id        String   @id
-  name      String
-  label     String
-  createdAt DateTime @default(now())
+model JobRequest {
+  id           String    @id
+  notes        String
+  dueDate      DateTime
+  jobType      String
+  files        File[]
+  requestId    String    @unique
+  request      Request   @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  section      Section?  @relation(fields: [sectionId], references: [id])
+  sectionId    String?
+  status       JobStatus @default(PENDING)
+  assignedTo   String?
+  assignedUser User?     @relation(fields: [assignedTo], references: [id])
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 }
 
-model JobRequest {
-  id        String   @id
-  notes     String
-  dueDate   DateTime
-  jobType   String
-  assignTo  String
-  files     File[]
-  requestId String   @unique
-  request   Request  @relation(fields: [requestId], references: [id], onDelete: Cascade)
+model Section {
+  id          String       @id
+  name        String       @unique
+  description String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  isArchived  Boolean      @default(false)
+  jobRequests JobRequest[]
 }
 
 model VenueRequest {
@@ -269,6 +279,14 @@ model Vehicle {
   status            VehicleStatus       @default(AVAILABLE)
   TransportRequest  TransportRequest[]
   MaintenanceRecord MaintenanceRecord[]
+}
+
+enum JobStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  ON_HOLD
+  CANCELLED
 }
 
 model MaintenanceRecord {

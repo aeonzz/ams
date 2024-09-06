@@ -3,10 +3,12 @@ import type { SessionWithRelations } from './SessionSchema'
 import type { SettingWithRelations } from './SettingSchema'
 import type { RequestWithRelations } from './RequestSchema'
 import type { UserRoleWithRelations } from './UserRoleSchema'
+import type { JobRequestWithRelations } from './JobRequestSchema'
 import { SessionWithRelationsSchema } from './SessionSchema'
 import { SettingWithRelationsSchema } from './SettingSchema'
 import { RequestWithRelationsSchema } from './RequestSchema'
 import { UserRoleWithRelationsSchema } from './UserRoleSchema'
+import { JobRequestWithRelationsSchema } from './JobRequestSchema'
 
 /////////////////////////////////////////
 // USER SCHEMA
@@ -36,6 +38,7 @@ export type UserRelations = {
   setting?: SettingWithRelations | null;
   request: RequestWithRelations[];
   userRole: UserRoleWithRelations[];
+  JobRequest: JobRequestWithRelations[];
 };
 
 export type UserWithRelations = z.infer<typeof UserSchema> & UserRelations
@@ -45,6 +48,7 @@ export const UserWithRelationsSchema: z.ZodType<UserWithRelations> = UserSchema.
   setting: z.lazy(() => SettingWithRelationsSchema).nullable(),
   request: z.lazy(() => RequestWithRelationsSchema).array(),
   userRole: z.lazy(() => UserRoleWithRelationsSchema).array(),
+  JobRequest: z.lazy(() => JobRequestWithRelationsSchema).array(),
 }))
 
 export default UserSchema;

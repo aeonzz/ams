@@ -7,8 +7,8 @@ export { SessionScalarFieldEnumSchema } from './SessionScalarFieldEnumSchema';
 export { FileScalarFieldEnumSchema } from './FileScalarFieldEnumSchema';
 export { SettingScalarFieldEnumSchema } from './SettingScalarFieldEnumSchema';
 export { RequestScalarFieldEnumSchema } from './RequestScalarFieldEnumSchema';
-export { ItemCategoryScalarFieldEnumSchema } from './ItemCategoryScalarFieldEnumSchema';
 export { JobRequestScalarFieldEnumSchema } from './JobRequestScalarFieldEnumSchema';
+export { SectionScalarFieldEnumSchema } from './SectionScalarFieldEnumSchema';
 export { VenueRequestScalarFieldEnumSchema } from './VenueRequestScalarFieldEnumSchema';
 export { VenueScalarFieldEnumSchema } from './VenueScalarFieldEnumSchema';
 export { ReturnableRequestScalarFieldEnumSchema } from './ReturnableRequestScalarFieldEnumSchema';
@@ -23,6 +23,7 @@ export { MaintenanceRecordScalarFieldEnumSchema } from './MaintenanceRecordScala
 export { SortOrderSchema } from './SortOrderSchema';
 export { QueryModeSchema } from './QueryModeSchema';
 export { NullsOrderSchema } from './NullsOrderSchema';
+export { JobStatusSchema } from './JobStatusSchema';
 export { ItemStatusSchema } from './ItemStatusSchema';
 export { SupplyItemCategorySchema } from './SupplyItemCategorySchema';
 export { SupplyItemStatusSchema } from './SupplyItemStatusSchema';

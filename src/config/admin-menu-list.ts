@@ -135,9 +135,9 @@ export function getAdminMenuList(pathname: string): Group[] {
           submenus: [],
         },
         {
-          href: "/materials",
-          label: "Materials",
-          active: pathname.includes("/materials"),
+          href: "/admin/job-sections",
+          label: "Job Sections",
+          active: pathname.includes("/admin/job-sections"),
           icon: BookOpen,
           submenus: [],
         },
