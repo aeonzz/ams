@@ -26,8 +26,8 @@ services:
       - RESEND_API_KEY
       - COHERE_API_KEY
       - UPLOAD_PATH
-    volumes:
-      - uploads:/app/uploads
+    # volumes:
+    #   - uploads:/app/uploads
     depends_on:
       db:
         condition: service_healthy
@@ -72,4 +72,4 @@ services:
 volumes:
   db-data:
   pgadmin-data:
-  uploads:
+  # uploads:
