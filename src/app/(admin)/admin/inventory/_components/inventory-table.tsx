@@ -13,13 +13,14 @@ import { getInventoryColumns } from "./inventory-table-columns";
 import { type InventoryItemType } from "@/lib/types/item";
 import { InventoryTableFloatingBar } from "./inventory-table-floating-bar";
 import { InventoryTableToolbarActions } from "./inventory-table-toolbar-actions";
+import SubItemsTable from "./sub-items-table";
 
 interface InventoryTableProps {
   inventoryPromise: ReturnType<typeof getInventory>;
 }
 
 export function InventoryTable({ inventoryPromise }: InventoryTableProps) {
-  const { data, pageCount } = React.use(inventoryPromise);
+  const { data, pageCount, departments } = React.use(inventoryPromise);
 
   const columns = React.useMemo(() => getInventoryColumns(), []);
 
@@ -29,6 +30,22 @@ export function InventoryTable({ inventoryPromise }: InventoryTableProps) {
       value: "name",
       placeholder: "Filter names...",
     },
+    {
+      label: "Name",
+      value: "department",
+      placeholder: "Filter names...",
+    },
+    // {
+    //   label: "Department",
+    //   value: "department",
+    //   options: departments?.map((department) => ({
+    //     label:
+    //       department.name.charAt(0).toUpperCase() +
+    //       department.name.slice(1).toLowerCase().replace(/_/g, " "),
+    //     value: department.name,
+    //     withCount: true,
+    //   })),
+    // },
   ];
 
   const { table } = useDataTable({
@@ -48,7 +65,10 @@ export function InventoryTable({ inventoryPromise }: InventoryTableProps) {
       table={table}
       floatingBar={<InventoryTableFloatingBar table={table} />}
       renderSubComponent={({ row }) => (
-        <></>
+        <SubItemsTable
+          subItems={row.original.inventorySubItems}
+          inventoryId={row.original.id}
+        />
       )}
     >
       <DataTableToolbar table={table} filterFields={filterFields}>

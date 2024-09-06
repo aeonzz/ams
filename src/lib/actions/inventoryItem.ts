@@ -15,11 +15,9 @@ import {
   updateInventorySubItemStatusesSchema,
 } from "../schema/resource/returnable-resource";
 
-export async function getInventorySubItems(
-  input: GetInventorySubItemSchema & { id: string }
-) {
+export async function getInventorySubItems(input: GetInventorySubItemSchema) {
   await checkAuth();
-  const { page, per_page, sort, name, id, from, to } = input;
+  const { page, per_page, sort, subName, id, from, to } = input;
 
   try {
     const skip = (page - 1) * per_page;
@@ -30,11 +28,12 @@ export async function getInventorySubItems(
     ];
 
     const where: any = {
+      isArchived: false,
       inventoryId: id,
     };
 
-    if (name) {
-      where.name = { contains: name, mode: "insensitive" };
+    if (subName) {
+      where.subName = { contains: subName, mode: "insensitive" };
     }
 
     if (from && to) {
@@ -61,11 +60,13 @@ export async function getInventorySubItems(
 
     const pageCount = Math.ceil(total / per_page);
 
-    const dataWithInventorySubAndImages = await Promise.all(
+    const modifiedData = await Promise.all(
       data.map(async (item) => {
         return {
           id: item.id,
           name: item.inventory.name,
+          subName: item.subName,
+          serialNumber: item.serialNumber,
           description: item.inventory.description,
           status: item.status,
           imageUrl: item.inventory.imageUrl,
@@ -75,7 +76,7 @@ export async function getInventorySubItems(
       })
     );
 
-    return { data: dataWithInventorySubAndImages, pageCount };
+    return { data: modifiedData, pageCount };
   } catch (err) {
     console.error(err);
     return { data: [], pageCount: 0 };

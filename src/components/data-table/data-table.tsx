@@ -53,6 +53,7 @@ export function DataTable<TData>({
                       style={{
                         ...getCommonPinningStyles({ column: header.column }),
                       }}
+                      className="border-r"
                     >
                       {header.isPlaceholder
                         ? null
@@ -77,6 +78,7 @@ export function DataTable<TData>({
                         style={{
                           ...getCommonPinningStyles({ column: cell.column }),
                         }}
+                        className="border-r"
                       >
                         {cell.column.id === "expander" ? (
                           <Button
@@ -101,8 +103,11 @@ export function DataTable<TData>({
                     ))}
                   </TableRow>
                   {row.getIsExpanded() && renderSubComponent && (
-                    <TableRow>
-                      <TableCell colSpan={row.getVisibleCells().length} className="p-0">
+                    <TableRow className="hover:bg-transparent">
+                      <TableCell
+                        colSpan={row.getVisibleCells().length}
+                        className="p-0"
+                      >
                         {renderSubComponent({ row })}
                       </TableCell>
                     </TableRow>

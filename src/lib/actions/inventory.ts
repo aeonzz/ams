@@ -43,7 +43,7 @@ export async function getInventory(input: GetInventoryItemSchema) {
       };
     }
 
-    const [data, total] = await db.$transaction([
+    const [data, total, department] = await db.$transaction([
       db.inventoryItem.findMany({
         where,
         take: per_page,
@@ -53,9 +53,11 @@ export async function getInventory(input: GetInventoryItemSchema) {
         },
         include: {
           inventorySubItems: true,
+          department: true,
         },
       }),
       db.inventoryItem.count({ where }),
+      db.department.findMany(),
     ]);
 
     const pageCount = Math.ceil(total / per_page);
@@ -72,11 +74,16 @@ export async function getInventory(input: GetInventoryItemSchema) {
           inventoryCount,
           availableCount,
           inventorySubItems: item.inventorySubItems,
+          departments: [item.department],
         };
       })
     );
 
-    return { data: dataWithInventoryAndImages, pageCount };
+    return {
+      data: dataWithInventoryAndImages,
+      pageCount,
+      departments: department,
+    };
   } catch (err) {
     console.error(err);
     return { data: [], pageCount: 0 };

@@ -113,25 +113,17 @@ export function getInventoryColumns(): ColumnDef<InventoryItemType>[] {
       },
     },
     {
-      accessorKey: "inventory",
+      accessorKey: "deparment",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Inventory" />
+        <DataTableColumnHeader column={column} title="Deparment" />
       ),
       cell: ({ row }) => {
         return (
-          <div className="flex items-center space-x-2">
-            <Link
-              href={`/admin/i/${row.original.id}`}
-              className={cn(buttonVariants({ variant: "link", size: "sm" }))}
-            >
-              <P className="truncate font-medium">
-                {row.original.inventoryCount}
-              </P>
-            </Link>
+          <div className="flex w-[15vw] space-x-2">
+            <P className="truncate font-medium">{row.original.department.name}</P>
           </div>
         );
       },
-      size: 0,
     },
     {
       accessorKey: "description",

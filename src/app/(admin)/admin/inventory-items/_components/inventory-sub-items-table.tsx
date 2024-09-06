@@ -28,8 +28,8 @@ export function InventorySubItemsTable({
   const filterFields: DataTableFilterField<InventorySubItemType>[] = [
     {
       label: "Name",
-      value: "name",
-      placeholder: "Filter names...",
+      value: "subName",
+      placeholder: "Filter name...",
     },
   ];
 

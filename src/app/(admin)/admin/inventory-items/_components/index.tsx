@@ -10,19 +10,18 @@ import { InventorySubItemsTable } from "./inventory-sub-items-table";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
 
 interface InventorySubItemsScreenProps {
-  params: GetInventorySubItemSchema & { id: string };
+  params: GetInventorySubItemSchema;
 }
 
 export default function InventorySubItemsScreen({
   params,
 }: InventorySubItemsScreenProps) {
   const inventorySubItemsPromise = getInventorySubItems(params);
-  console.log(inventorySubItemsPromise);
   return (
     <div className="flex h-full w-full">
       <div className="flex-1">
         <div className="flex h-[50px] items-center justify-between border-b px-3">
-          <P className="font-medium">Equipment</P>
+          <P className="font-medium">Inventory Items</P>
           <React.Suspense fallback={<Skeleton className="h-7 w-52" />}>
             <DateRangePicker
               triggerVariant="secondary"
@@ -33,7 +32,17 @@ export default function InventorySubItemsScreen({
           </React.Suspense>
         </div>
         <div className="grid min-h-[calc(100vh_-_100px)] place-items-center items-center py-3">
-          <React.Suspense fallback={<LoadingSpinner />}>
+          <React.Suspense
+            fallback={
+              <DataTableSkeleton
+                columnCount={4}
+                searchableColumnCount={1}
+                filterableColumnCount={2}
+                cellWidths={["10rem", "30rem", "12rem", "12rem", "8rem"]}
+                shrinkZero
+              />
+            }
+          >
             <InventorySubItemsTable
               inventorySubItemsPromise={inventorySubItemsPromise}
             />

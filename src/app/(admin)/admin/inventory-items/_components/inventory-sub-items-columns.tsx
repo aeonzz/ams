@@ -105,14 +105,29 @@ export function getInventorySubItemsColumns(): ColumnDef<InventorySubItemType>[]
       size: 0,
     },
     {
-      accessorKey: "name",
+      accessorKey: "subName",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Name" />
       ),
       cell: ({ row }) => {
         return (
-          <div className="flex w-[25vw] space-x-2">
-            <P className="truncate font-medium">{row.original.name}</P>
+          <div className="flex w-[20vw] space-x-2">
+            <P className="truncate font-medium">{row.original.subName}</P>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "serialNumber",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Serial Number" />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="flex space-x-2">
+            <P className="truncate font-medium">
+              {row.original.serialNumber ? row.original.serialNumber : "N/A"}
+            </P>
           </div>
         );
       },
@@ -120,7 +135,7 @@ export function getInventorySubItemsColumns(): ColumnDef<InventorySubItemType>[]
     {
       accessorKey: "status",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="status" />
+        <DataTableColumnHeader column={column} title="Status" />
       ),
       cell: ({ row }) => {
         const { icon: Icon, variant } = getReturnableItemStatusIcon(
@@ -145,6 +160,14 @@ export function getInventorySubItemsColumns(): ColumnDef<InventorySubItemType>[]
         <DataTableColumnHeader column={column} title="Date Created" />
       ),
       cell: ({ cell }) => formatDate(cell.getValue() as Date),
+    },
+    {
+      accessorKey: "updatedAt",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Last Modified" />
+      ),
+      cell: ({ cell }) => formatDate(cell.getValue() as Date),
+      size: 0,
     },
     {
       id: "actions",

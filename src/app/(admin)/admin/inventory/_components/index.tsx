@@ -31,7 +31,17 @@ export default function InventoryScreen({ params }: InventoryScreenProps) {
           </React.Suspense>
         </div>
         <div className="grid min-h-[calc(100vh_-_100px)] place-items-center items-center py-3">
-          <React.Suspense fallback={<LoadingSpinner />}>
+          <React.Suspense
+            fallback={
+              <DataTableSkeleton
+                columnCount={4}
+                searchableColumnCount={1}
+                filterableColumnCount={2}
+                cellWidths={["10rem", "30rem", "12rem", "12rem", "8rem"]}
+                shrinkZero
+              />
+            }
+          >
             <InventoryTable inventoryPromise={inventoryPromise} />
           </React.Suspense>
         </div>

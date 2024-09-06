@@ -68,23 +68,28 @@ export const inventoryItemSearchParamsSchema = z.object({
   per_page: z.coerce.number().default(10),
   sort: z.string().optional(),
   name: z.string().optional(),
+  department: z.string().optional(),
   from: z.string().optional(),
   to: z.string().optional(),
 });
 
-export type GetInventoryItemSchema = z.infer<typeof inventoryItemSearchParamsSchema>;
+export type GetInventoryItemSchema = z.infer<
+  typeof inventoryItemSearchParamsSchema
+>;
 
 export const inventorySubItemSearchParamsSchema = z.object({
   page: z.coerce.number().default(1),
   per_page: z.coerce.number().default(10),
   sort: z.string().optional(),
-  name: z.string().optional(),
+  id: z.string().optional(),
+  subName: z.string().optional(),
   from: z.string().optional(),
   to: z.string().optional(),
 });
 
-export type GetInventorySubItemSchema = z.infer<typeof inventorySubItemSearchParamsSchema>;
-
+export type GetInventorySubItemSchema = z.infer<
+  typeof inventorySubItemSearchParamsSchema
+>;
 
 export const reservationSearchParamsSchema = z.object({
   page: z.coerce.number().default(1),
@@ -98,7 +103,9 @@ export const reservationSearchParamsSchema = z.object({
   to: z.string().optional(),
 });
 
-export type GetReservationsSchema = z.infer<typeof reservationSearchParamsSchema>;
+export type GetReservationsSchema = z.infer<
+  typeof reservationSearchParamsSchema
+>;
 
 export const roleManagementSearchParamsSchema = z.object({
   page: z.coerce.number().default(1),
@@ -109,4 +116,6 @@ export const roleManagementSearchParamsSchema = z.object({
   to: z.string().optional(),
 });
 
-export type GetRoleManagementSchema = z.infer<typeof roleManagementSearchParamsSchema>;
+export type GetRoleManagementSchema = z.infer<
+  typeof roleManagementSearchParamsSchema
+>;
