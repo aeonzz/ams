@@ -31,21 +31,16 @@ export function InventoryTable({ inventoryPromise }: InventoryTableProps) {
       placeholder: "Filter names...",
     },
     {
-      label: "Name",
-      value: "department",
-      placeholder: "Filter names...",
+      label: "Department",
+      value: "departmentName",
+      options: departments?.map((department) => ({
+        label:
+          department.name.charAt(0).toUpperCase() +
+          department.name.slice(1).toLowerCase().replace(/_/g, " "),
+        value: department.name,
+        withCount: true,
+      })),
     },
-    // {
-    //   label: "Department",
-    //   value: "department",
-    //   options: departments?.map((department) => ({
-    //     label:
-    //       department.name.charAt(0).toUpperCase() +
-    //       department.name.slice(1).toLowerCase().replace(/_/g, " "),
-    //     value: department.name,
-    //     withCount: true,
-    //   })),
-    // },
   ];
 
   const { table } = useDataTable({

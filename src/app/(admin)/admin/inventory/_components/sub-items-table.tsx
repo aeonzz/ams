@@ -1,7 +1,15 @@
 "use client";
 
 import React from "react";
-
+import {
+  useReactTable,
+  getCoreRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  getFilteredRowModel,
+  ColumnDef,
+  flexRender,
+} from "@tanstack/react-table";
 import {
   Table,
   TableBody,
@@ -17,17 +25,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  InventoryItem,
-  InventorySubItem,
-  ItemStatusSchema,
-} from "prisma/generated/zod";
+import { type InventorySubItem, ItemStatusSchema } from "prisma/generated/zod";
 import { formatDate } from "date-fns";
 import { Input } from "@/components/ui/input";
 import { cn, getReturnableItemStatusIcon, textTransform } from "@/lib/utils";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { P } from "@/components/typography/text";
+import { DataTablePagination } from "@/components/data-table/data-table-pagination";
+import type { ItemStatusType } from "prisma/generated/zod/inputTypeSchemas/ItemStatusSchema";
 
 interface SubItemsTableProps {
   subItems: InventorySubItem[];
@@ -38,17 +45,67 @@ export default function SubItemsTable({
   subItems,
   inventoryId,
 }: SubItemsTableProps) {
-  const [filter, setFilter] = React.useState("");
+  const [globalFilter, setGlobalFilter] = React.useState("");
   const [statusFilter, setStatusFilter] = React.useState<string | null>(null);
 
-  const filteredSubItems = subItems.filter((item) => {
-    const matchesFilter =
-      item.subName.toLowerCase().includes(filter.toLowerCase()) ||
-      (item.serialNumber &&
-        item.serialNumber.toLowerCase().includes(filter.toLowerCase()));
-    const matchesStatus = !statusFilter || item.status === statusFilter;
-    return matchesFilter && matchesStatus;
+  const columns: ColumnDef<InventorySubItem>[] = React.useMemo(
+    () => [
+      {
+        accessorKey: "subName",
+        header: "Name",
+        cell: ({ row }) => <div>{row.getValue("subName")}</div>,
+      },
+      {
+        accessorKey: "serialNumber",
+        header: "Serial Number",
+        cell: ({ row }) => <div>{row.getValue("serialNumber") || "N/A"}</div>,
+      },
+      {
+        accessorKey: "status",
+        header: "Status",
+        cell: ({ row }) => {
+          const status = row.getValue("status") as ItemStatusType;
+          const { icon: Icon, variant } = getReturnableItemStatusIcon(status);
+          return (
+            <Badge variant={variant}>
+              <Icon className="mr-1 size-4" />
+              {status}
+            </Badge>
+          );
+        },
+      },
+      {
+        accessorKey: "createdAt",
+        header: "Date Created",
+        cell: ({ row }) => formatDate(row.getValue("createdAt"), "PPP p"),
+      },
+      {
+        accessorKey: "updatedAt",
+        header: "Last Modified",
+        cell: ({ row }) => formatDate(row.getValue("updatedAt"), "PPP p"),
+      },
+    ],
+    []
+  );
+
+  const table = useReactTable({
+    data: subItems,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    state: {
+      globalFilter,
+    },
+    onGlobalFilterChange: setGlobalFilter,
+    globalFilterFn: (row, columnId, filterValue) => {
+      const value = row.getValue(columnId) as string;
+      return value?.toLowerCase().includes(filterValue.toLowerCase()) ?? false;
+    },
   });
+
+  const filteredSubItems = table.getFilteredRowModel().rows;
 
   return (
     <div className="m-4 space-y-4">
@@ -56,15 +113,16 @@ export default function SubItemsTable({
         <div className="flex space-x-2">
           <Input
             placeholder="Filter by name or serial number"
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
+            value={globalFilter}
+            onChange={(e) => setGlobalFilter(e.target.value)}
             className="max-w-sm"
           />
           <Select
             value={statusFilter || "all"}
-            onValueChange={(value) =>
-              setStatusFilter(value === "all" ? null : value)
-            }
+            onValueChange={(value) => {
+              setStatusFilter(value === "all" ? null : value);
+              table.getColumn("status")?.setFilterValue(value === "all" ? "" : value);
+            }}
           >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Filter by status" />
@@ -72,58 +130,61 @@ export default function SubItemsTable({
             <SelectContent>
               <SelectItem value="all">All</SelectItem>
               {ItemStatusSchema.options.map((status) => (
-                <SelectItem value={status}>{textTransform(status)}</SelectItem>
+                <SelectItem key={status} value={status}>{textTransform(status)}</SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
-        <Link
-          href={`/admin/inventory-items?page=1&per_page=10&sort=createdAt.desc&id=${inventoryId}`}
-          className={cn(buttonVariants({ variant: "link", size: "sm" }))}
-        >
-          See all
-        </Link>
+        <div className="flex items-center space-x-3">
+          <P>Total: {filteredSubItems.length} Items</P>
+          <Link
+            href={`/admin/inventory-items?page=1&per_page=10&sort=createdAt.desc&id=${inventoryId}`}
+            className={cn(buttonVariants({ variant: "link", size: "sm" }))}
+          >
+            See all
+          </Link>
+        </div>
       </div>
-      <div className="scroll-bar max-h-64 overflow-y-auto">
+      <div className="scroll-bar max-h-[420px] overflow-y-auto">
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead className="px-5">Name</TableHead>
-              <TableHead className="px-5">Serial Number</TableHead>
-              <TableHead className="px-5">Status</TableHead>
-              <TableHead className="px-5">Date Created</TableHead>
-              <TableHead className="px-5">Last Modified</TableHead>
-            </TableRow>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id} className="px-5">
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </TableHead>
+                ))}
+              </TableRow>
+            ))}
           </TableHeader>
           <TableBody>
-            {filteredSubItems.map((item) => {
-              const { icon: Icon, variant } = getReturnableItemStatusIcon(
-                item.status
-              );
-              return (
-                <TableRow key={item.id} className="border">
-                  <TableCell className="border-r">{item.subName}</TableCell>
-                  <TableCell className="border-r">
-                    {item.serialNumber || "N/A"}
-                  </TableCell>
-                  <TableCell className="border-r">
-                    <Badge variant={variant}>
-                      <Icon className="mr-1 size-4" />
-                      {item.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="border-r">
-                    {formatDate(item.createdAt, "PPP p")}
-                  </TableCell>
-                  <TableCell className="border-r">
-                    {formatDate(item.updatedAt, "PPP p")}
-                  </TableCell>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id} className="border-r">
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                  ))}
                 </TableRow>
-              );
-            })}
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={columns.length} className="h-24 text-center">
+                  No results.
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </div>
+      <DataTablePagination table={table} />
     </div>
   );
 }

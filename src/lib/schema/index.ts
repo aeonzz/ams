@@ -68,7 +68,7 @@ export const inventoryItemSearchParamsSchema = z.object({
   per_page: z.coerce.number().default(10),
   sort: z.string().optional(),
   name: z.string().optional(),
-  department: z.string().optional(),
+  departmentName: z.string().optional(),
   from: z.string().optional(),
   to: z.string().optional(),
 });

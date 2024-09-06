@@ -18,7 +18,15 @@ import { type GetInventoryItemSchema } from "../schema";
 
 export async function getInventory(input: GetInventoryItemSchema) {
   await checkAuth();
-  const { page, per_page, sort, name, from, to } = input;
+  const {
+    page,
+    per_page,
+    sort,
+    name,
+    from,
+    to,
+    departmentName: deptName,
+  } = input;
 
   try {
     const skip = (page - 1) * per_page;
@@ -34,6 +42,19 @@ export async function getInventory(input: GetInventoryItemSchema) {
 
     if (name) {
       where.name = { contains: name, mode: "insensitive" };
+    }
+
+    if (deptName) {
+      const departments = deptName
+        .split(".")
+        .map((d) => d.trim().replace(/\+/g, " "));
+
+      where.department = {
+        name: {
+          in: departments,
+          mode: "insensitive",
+        },
+      };
     }
 
     if (from && to) {
@@ -73,8 +94,8 @@ export async function getInventory(input: GetInventoryItemSchema) {
           ...item,
           inventoryCount,
           availableCount,
+          departmentName: item.department.name,
           inventorySubItems: item.inventorySubItems,
-          departments: [item.department],
         };
       })
     );

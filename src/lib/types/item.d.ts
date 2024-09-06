@@ -6,12 +6,13 @@ export type InventoryItemType = {
   name: string;
   description: string;
   imageUrl: string;
+  departmentId: string;
+  departmentName: string;
   department: Department;
   inventoryCount: number;
   availableCount: number;
   createdAt: Date;
   inventorySubItems: InventorySubItem[];
-  departments: Department[];
 };
 
 export type InventorySubItemType = {

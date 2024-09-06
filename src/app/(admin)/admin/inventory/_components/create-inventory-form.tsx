@@ -89,7 +89,7 @@ export default function CreateInventoryForm({
       };
 
       toast.promise(mutateAsync(data), {
-        loading: "Submitting...",
+        loading: "Creating...",
         success: () => {
           dialogManager.setActiveDialog(null);
           return "Inventory created successfuly";

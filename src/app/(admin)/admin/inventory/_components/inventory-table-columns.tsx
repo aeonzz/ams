@@ -106,21 +106,21 @@ export function getInventoryColumns(): ColumnDef<InventoryItemType>[] {
       ),
       cell: ({ row }) => {
         return (
-          <div className="flex w-[15vw] space-x-2">
+          <div className="flex space-x-2">
             <P className="truncate font-medium">{row.original.name}</P>
           </div>
         );
       },
     },
     {
-      accessorKey: "deparment",
+      accessorKey: "departmentName",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Deparment" />
       ),
       cell: ({ row }) => {
         return (
-          <div className="flex w-[15vw] space-x-2">
-            <P className="truncate font-medium">{row.original.department.name}</P>
+          <div className="flex space-x-2">
+            <P className="truncate font-medium">{row.original.departmentName}</P>
           </div>
         );
       },
