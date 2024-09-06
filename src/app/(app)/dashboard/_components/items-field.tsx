@@ -39,12 +39,12 @@ interface ItemsFieldProps {
   form: UseFormReturn<ReturnableResourceRequestSchema>;
   name: Path<ReturnableResourceRequestSchema>;
   isPending: boolean;
+  onDepartmentIdChange: (departmentId: string) => void;
 }
 
-export default function ItemsField({ form, name, isPending }: ItemsFieldProps) {
+export default function ItemsField({ form, name, isPending, onDepartmentIdChange }: ItemsFieldProps) {
   const [open, setOpen] = React.useState(false);
-  const [selectedItem, setSelectedItem] =
-    useState<InventoryItemWithRelations | null>(null);
+  const [selectedItem, setSelectedItem] = useState<InventoryItemWithRelations | null>(null);
 
   const { data, isLoading } = useQuery<InventoryItemWithRelations[]>({
     queryFn: async () => {
@@ -56,6 +56,7 @@ export default function ItemsField({ form, name, isPending }: ItemsFieldProps) {
 
   const handleItemSelect = (item: InventoryItemWithRelations) => {
     setSelectedItem(item);
+    onDepartmentIdChange(item.departmentId);
   };
 
   const handleSubItemSelect = (subItemId: string) => {
@@ -115,7 +116,6 @@ export default function ItemsField({ form, name, isPending }: ItemsFieldProps) {
                             Back to items
                           </CommandItem>
                           {selectedItem.inventorySubItems
-                            // .filter((subItem) => subItem.status === "AVAILABLE")
                             .map((subItem) => {
                               const { icon: Icon, variant } =
                                 getReturnableItemStatusIcon(subItem.status);

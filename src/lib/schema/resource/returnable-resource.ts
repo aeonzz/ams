@@ -49,6 +49,7 @@ export type ReturnableResourceRequestSchema = z.infer<
 export const returnableResourceRequestSchemaWithPath =
   returnableResourceRequestSchemaBase.extend({
     path: z.string(),
+    departmentId: z.string(),
   });
 
 export const extendedReturnableResourceRequestSchema = requestSchemaBase.merge(

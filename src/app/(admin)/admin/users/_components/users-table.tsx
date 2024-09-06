@@ -10,7 +10,6 @@ import { useDataTable } from "@/lib/hooks/use-data-table";
 import { type DataTableFilterField } from "@/lib/types";
 import { getUsersColumns } from "./users-table-columns";
 import { UsersTableToolbarActions } from "./users-table-toolbar-actions";
-import { getRoleIcon } from "@/lib/utils";
 import { UsersTableFloatingBar } from "./users-table-floating-bar";
 import { getUsers } from "@/lib/actions/users";
 import { type User } from "prisma/generated/zod";

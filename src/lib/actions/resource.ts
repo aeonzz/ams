@@ -69,6 +69,7 @@ export const createReturnableResourceRequest = authedProcedure
           returnableRequest: {
             create: {
               id: resourceRequestId,
+              departmentId: rest.departmentId,
               dateAndTimeNeeded: rest.dateAndTimeNeeded,
               returnDateAndTime: rest.returnDateAndTime,
               purpose: rest.purpose.includes("other")

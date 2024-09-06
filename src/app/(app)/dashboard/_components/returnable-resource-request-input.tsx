@@ -106,6 +106,8 @@ export default function ReturnableResourceRequestInput({
   const { department } = currentUser;
   const queryClient = useQueryClient();
   const itemId = form.watch("itemId");
+  const [selectedDepartmentId, setSelectedDepartmentId] =
+    React.useState<string>();
 
   const {
     data: reservedDates,
@@ -140,6 +142,10 @@ export default function ReturnableResourceRequestInput({
     );
   }, [reservedDates]);
 
+  const handleDepartmentIdChange = (departmentId: string) => {
+    setSelectedDepartmentId(departmentId);
+  };
+
   async function onSubmit(values: ReturnableResourceRequestSchema) {
     const { dateAndTimeNeeded, returnDateAndTime } = values;
 
@@ -164,6 +170,7 @@ export default function ReturnableResourceRequestInput({
       ...values,
       priority: "LOW",
       type: type,
+      departmentId: selectedDepartmentId!,
       department: department,
       path: pathname,
     };
@@ -171,7 +178,9 @@ export default function ReturnableResourceRequestInput({
     toast.promise(mutateAsync(data), {
       loading: "Submitting...",
       success: () => {
-        queryClient.invalidateQueries({ queryKey: ["user-dashboard-overview"] });
+        queryClient.invalidateQueries({
+          queryKey: ["user-dashboard-overview"],
+        });
         handleOpenChange(false);
         return "Your request has been submitted and is awaiting approval.";
       },
@@ -191,7 +200,12 @@ export default function ReturnableResourceRequestInput({
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="scroll-bar flex max-h-[60vh] gap-6 overflow-y-auto px-4 py-1">
             <div className="flex w-full flex-col space-y-2">
-              <ItemsField form={form} name="itemId" isPending={isPending} />
+              <ItemsField
+                form={form}
+                name="itemId"
+                isPending={isPending}
+                onDepartmentIdChange={handleDepartmentIdChange}
+              />
               <ResourceDateTimePicker
                 form={form}
                 name="dateAndTimeNeeded"

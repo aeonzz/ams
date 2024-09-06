@@ -31,7 +31,7 @@ import { CommandShortcut } from "@/components/ui/command";
 import { P } from "@/components/typography/text";
 import { User2 } from "lucide-react";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
-import { deleteUsers, updateUsers } from "@/lib/actions/users";
+import { deleteUsers } from "@/lib/actions/users";
 import { usePathname } from "next/navigation";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
 import {
@@ -45,7 +45,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { getRoleIcon, textTransform } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 
 interface UsersTableFloatingBarProps {
@@ -61,7 +60,7 @@ export function UsersTableFloatingBar({ table }: UsersTableFloatingBarProps) {
     "update-role" | "export" | "delete"
   >();
 
-  const { isPending, mutateAsync } = useServerActionMutation(updateUsers);
+  // const { isPending, mutateAsync } = useServerActionMutation(updateUsers);
   const { isPending: isPendingDeletion, mutateAsync: deleteUsersMutateAsync } =
     useServerActionMutation(deleteUsers);
 
@@ -186,7 +185,7 @@ export function UsersTableFloatingBar({ table }: UsersTableFloatingBarProps) {
                       });
                     });
                   }}
-                  disabled={isPending || isLoading || isPendingDeletion}
+                  disabled={isLoading || isPendingDeletion}
                 >
                   {isLoading && method === "export" ? (
                     <LoadingSpinner />
@@ -207,10 +206,9 @@ export function UsersTableFloatingBar({ table }: UsersTableFloatingBarProps) {
                       variant="secondary"
                       size="icon"
                       className="size-10 border"
-                      disabled={isPending || isPendingDeletion}
+                      disabled={isPendingDeletion}
                     >
-                      {isPending ||
-                      (isPendingDeletion && method === "delete") ? (
+                      {isPendingDeletion && method === "delete" ? (
                         <LoadingSpinner />
                       ) : (
                         <TrashIcon className="size-5" aria-hidden="true" />
@@ -253,7 +251,7 @@ export function UsersTableFloatingBar({ table }: UsersTableFloatingBarProps) {
                         );
                       }}
                       className="bg-destructive hover:bg-destructive/90"
-                      disabled={isPending || isPendingDeletion}
+                      disabled={isPendingDeletion}
                     >
                       Delete
                     </AlertDialogAction>

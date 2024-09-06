@@ -134,7 +134,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                 </div>
                 <div>
                   {data.jobRequest.files.map((file) => (
-                    <div className="relative mb-3 w-full">
+                    <div key={file.id} className="relative mb-3 w-full">
                       <Image
                         src={file.url}
                         alt={`Image of ${file.url}`}

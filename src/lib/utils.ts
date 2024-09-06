@@ -33,7 +33,6 @@ import {
 } from "lucide-react";
 import { type RequestStatusTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestStatusTypeSchema";
 import { type PriorityTypeType } from "prisma/generated/zod/inputTypeSchemas/PriorityTypeSchema";
-import { type RoleTypeType } from "prisma/generated/zod/inputTypeSchemas/RoleTypeSchema";
 import { type RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTypeSchema";
 import { BadgeVariant } from "@/components/ui/badge";
 import { type VehicleStatusType } from "prisma/generated/zod/inputTypeSchemas/VehicleStatusSchema";
@@ -92,32 +91,32 @@ export function formatDate(
   }).format(new Date(date));
 }
 
-type RoleIconConfig = {
-  icon: LucideIcon;
-  variant: BadgeVariant;
-};
+// type RoleIconConfig = {
+//   icon: LucideIcon;
+//   variant: BadgeVariant;
+// };
 
-type RoleIconMap = {
-  [key in RoleTypeType]: RoleIconConfig;
-};
+// type RoleIconMap = {
+//   [key in RoleTypeType]: RoleIconConfig;
+// };
 
-export function getRoleIcon(role: RoleTypeType): RoleIconConfig {
-  const RoleIcons: RoleIconMap = {
-    USER: {
-      icon: UserIcon,
-      variant: "blue",
-    },
-    REQUEST_MANAGER: {
-      icon: Shield,
-      variant: "green",
-    },
-    ADMIN: {
-      icon: ShieldCheck,
-      variant: "red",
-    },
-  };
-  return RoleIcons[role] || { icon: CircleIcon, variant: "default" };
-}
+// export function getRoleIcon(role: RoleTypeType): RoleIconConfig {
+//   const RoleIcons: RoleIconMap = {
+//     USER: {
+//       icon: UserIcon,
+//       variant: "blue",
+//     },
+//     REQUEST_MANAGER: {
+//       icon: Shield,
+//       variant: "green",
+//     },
+//     ADMIN: {
+//       icon: ShieldCheck,
+//       variant: "red",
+//     },
+//   };
+//   return RoleIcons[role] || { icon: CircleIcon, variant: "default" };
+// }
 
 export function getPriorityIcon(priority: PriorityTypeType) {
   const priorityIcons = {

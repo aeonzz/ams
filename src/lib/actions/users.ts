@@ -354,28 +354,28 @@ export const updateUser = authedProcedure
     }
   });
 
-export const updateUsers = authedProcedure
-  .createServerAction()
-  .input(updateUsersSchema)
-  .handler(async ({ input }) => {
-    const { path, ...rest } = input;
-    try {
-      await db.user.updateMany({
-        where: {
-          id: {
-            in: rest.ids,
-          },
-        },
-        data: {
-          ...(rest.role !== undefined && { role: rest.role }),
-        },
-      });
+// export const updateUsers = authedProcedure
+//   .createServerAction()
+//   .input(updateUsersSchema)
+//   .handler(async ({ input }) => {
+//     const { path, ...rest } = input;
+//     try {
+//       await db.user.updateMany({
+//         where: {
+//           id: {
+//             in: rest.ids,
+//           },
+//         },
+//         data: {
+//           ...(rest.role !== undefined && { role: rest.role }),
+//         },
+//       });
 
-      return revalidatePath(path);
-    } catch (error) {
-      getErrorMessage(error);
-    }
-  });
+//       return revalidatePath(path);
+//     } catch (error) {
+//       getErrorMessage(error);
+//     }
+//   });
 
 export const createUser = authedProcedure
   .createServerAction()

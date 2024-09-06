@@ -24,7 +24,7 @@ import { Button } from "../ui/button";
 import { createUser } from "@/lib/actions/users";
 import { Separator } from "../ui/separator";
 import { DialogFooter } from "../ui/dialog";
-import { Department, RoleTypeSchema } from "prisma/generated/zod";
+import { Department } from "prisma/generated/zod";
 import { SubmitButton } from "../ui/submit-button";
 import { PasswordInput } from "../ui/password-input";
 import {
@@ -128,7 +128,7 @@ export default function CreateUserForm({
               </FormItem>
             )}
           />
-          <div className="flex justify-between space-x-3">
+          {/* <div className="flex justify-between space-x-3">
             <FormField
               control={form.control}
               name="role"
@@ -217,7 +217,7 @@ export default function CreateUserForm({
                 </FormItem>
               )}
             />
-          </div>
+          </div> */}
           <FormField
             control={form.control}
             name="password"

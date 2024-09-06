@@ -42,7 +42,7 @@ import { Separator } from "@/components/ui/separator";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { getRoleIcon, textTransform } from "@/lib/utils";
+import {  textTransform } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 
 interface UpdateUserSheetProps

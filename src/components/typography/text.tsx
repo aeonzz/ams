@@ -102,9 +102,9 @@ const H6 = forwardRef<
     "text-base"
   );
 
-  return <h5 ref={ref} className={cn(fontSizeClass, className)} {...props} />;
+  return <h6 ref={ref} className={cn(fontSizeClass, className)} {...props} />;
 });
-H5.displayName = "H5";
+H6.displayName = "H6";
 
 const P = forwardRef<
   HTMLHeadingElement,

@@ -93,6 +93,7 @@ export const createInventorySubItem = authedProcedure
       const item = await db.inventorySubItem.create({
         data: {
           id: itemId,
+          subName: "test",
           ...rest,
         },
       });

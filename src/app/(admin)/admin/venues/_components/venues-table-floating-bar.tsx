@@ -26,9 +26,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { type Venue } from "prisma/generated/zod";
-import RoleTypeSchema, {
-  RoleTypeType,
-} from "prisma/generated/zod/inputTypeSchemas/RoleTypeSchema";
 import CommandTooltip from "@/components/ui/command-tooltip";
 import { CommandShortcut } from "@/components/ui/command";
 import { P } from "@/components/typography/text";

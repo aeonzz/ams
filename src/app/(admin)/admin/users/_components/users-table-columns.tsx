@@ -9,7 +9,6 @@ import { toast } from "sonner";
 import {
   formatDate,
   getPriorityIcon,
-  getRoleIcon,
   textTransform,
 } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
