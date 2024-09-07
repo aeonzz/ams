@@ -20,35 +20,38 @@ import { type UseFormReturn } from "react-hook-form";
 import { usePathname } from "next/navigation";
 import { DialogState } from "@/lib/hooks/use-dialog-manager";
 import { Textarea } from "@/components/ui/text-area";
-import { createRole } from "@/lib/actions/role";
-import { type RoleSchemaWithPath, type RoleSchema } from "@/lib/schema/role";
+import {
+  type CreateJobSectionSchemaWithPath,
+  type CreateJobSectionSchema,
+} from "@/lib/schema/job-section";
+import { creatJobSection } from "@/lib/actions/job-section";
 
-interface CreateRoleFormProps {
+interface CreateJobSectionFormProps {
   setAlertOpen: React.Dispatch<React.SetStateAction<boolean>>;
   mutateAsync: UseMutateAsyncFunction<
     any,
     Error,
-    Parameters<typeof createRole>[0],
+    Parameters<typeof creatJobSection>[0],
     unknown
   >;
-  form: UseFormReturn<RoleSchema>;
+  form: UseFormReturn<CreateJobSectionSchema>;
   isPending: boolean;
   isFieldsDirty: boolean;
   dialogManager: DialogState;
 }
 
-export default function CreateRoleForm({
+export default function CreateJobSectionForm({
   mutateAsync,
   isPending,
   form,
   isFieldsDirty,
   setAlertOpen,
   dialogManager,
-}: CreateRoleFormProps) {
+}: CreateJobSectionFormProps) {
   const pathname = usePathname();
 
-  async function onSubmit(values: RoleSchema) {
-    const data: RoleSchemaWithPath = {
+  async function onSubmit(values: CreateJobSectionSchema) {
+    const data: CreateJobSectionSchemaWithPath = {
       name: values.name,
       description: values.description,
       path: pathname,
@@ -57,9 +60,10 @@ export default function CreateRoleForm({
       loading: "Creating...",
       success: () => {
         dialogManager.setActiveDialog(null);
-        return "Role created successfuly";
+        return "Job section created successfuly";
       },
       error: (err) => {
+        console.log(err);
         return err.message;
       },
     });
@@ -78,7 +82,7 @@ export default function CreateRoleForm({
                 <FormControl>
                   <Input
                     autoComplete="off"
-                    placeholder="Admin"
+                    placeholder="Mechanical Section"
                     disabled={isPending}
                     {...field}
                   />

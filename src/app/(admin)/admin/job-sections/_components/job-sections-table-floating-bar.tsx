@@ -13,12 +13,6 @@ import { toast } from "sonner";
 
 import { exportTableToCSV } from "@/lib/export";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import {
   Tooltip,
@@ -28,7 +22,6 @@ import {
 import CommandTooltip from "@/components/ui/command-tooltip";
 import { CommandShortcut } from "@/components/ui/command";
 import { P } from "@/components/typography/text";
-import { Activity } from "lucide-react";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
 import { usePathname } from "next/navigation";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
@@ -43,15 +36,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { getReturnableItemStatusIcon, textTransform } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
-import type { InventorySubItemType } from "@/lib/types/item";
-import {
-  deleteInventorySubItems,
-  updateInventorySubItemStatuses,
-} from "@/lib/actions/inventoryItem";
-import ItemStatusSchema, { ItemStatusType } from "prisma/generated/zod/inputTypeSchemas/ItemStatusSchema";
-import { type Section } from "prisma/generated/zod";
+import type { Section } from "prisma/generated/zod";
+import { deleteJobSections } from "@/lib/actions/job-section";
 
 interface JobSectionsTableFloatingBarProps {
   table: Table<Section>;
@@ -64,17 +50,9 @@ export function JobSectionsTableFloatingBar({
   const pathname = usePathname();
 
   const [isLoading, startTransition] = React.useTransition();
-  const [method, setMethod] = React.useState<
-    "update-status" | "export" | "delete"
-  >();
+  const [method, setMethod] = React.useState<"export" | "delete">();
 
-  const { isPending, mutateAsync } = useServerActionMutation(
-    updateInventorySubItemStatuses
-  );
-  const {
-    isPending: isPendingDeletion,
-    mutateAsync: deleteInventorysMutateAsync,
-  } = useServerActionMutation(deleteInventorySubItems);
+  const { isPending, mutateAsync } = useServerActionMutation(deleteJobSections);
 
   // Clear selection on Escape key press
   React.useEffect(() => {
@@ -118,71 +96,6 @@ export function JobSectionsTableFloatingBar({
           </div>
           <Separator orientation="vertical" className="hidden h-5 sm:block" />
           <div className="flex items-center gap-1.5">
-            <Select
-              onValueChange={(value: ItemStatusType) => {
-                setMethod("update-status");
-                toast.promise(
-                  mutateAsync({
-                    ids: rows.map((row) => row.original.id),
-                    status: value as ItemStatusType,
-                    path: pathname,
-                  }),
-                  {
-                    loading: "Updating...",
-                    success: () => {
-                      return "Status/es updated successfully";
-                    },
-                    error: (err) => {
-                      console.log(err);
-                      return err.message;
-                    },
-                  }
-                );
-              }}
-            >
-              <Tooltip delayDuration={250}>
-                <SelectTrigger asChild>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="secondary"
-                      size="icon"
-                      className="size-10 border data-[state=open]:bg-accent data-[state=open]:text-accent-foreground"
-                      disabled={isPending || isPendingDeletion}
-                    >
-                      {isPending ||
-                      (isPendingDeletion && method === "update-status") ? (
-                        <LoadingSpinner />
-                      ) : (
-                        <Activity className="size-5" aria-hidden="true" />
-                      )}
-                    </Button>
-                  </TooltipTrigger>
-                </SelectTrigger>
-                <TooltipContent className="border bg-accent font-semibold text-foreground dark:bg-zinc-900">
-                  <P>Update status</P>
-                </TooltipContent>
-              </Tooltip>
-              <SelectContent align="center">
-                <SelectGroup>
-                  {ItemStatusSchema.options.map((status) => {
-                    const { icon: Icon, variant } =
-                      getReturnableItemStatusIcon(status);
-                    return (
-                      <SelectItem
-                        key={status}
-                        value={status}
-                        className="capitalize"
-                      >
-                        <Badge variant={variant}>
-                          <Icon className="mr-1 size-4" />
-                          {textTransform(status)}
-                        </Badge>
-                      </SelectItem>
-                    );
-                  })}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
             <Tooltip delayDuration={250}>
               <TooltipTrigger asChild>
                 <Button
@@ -198,7 +111,7 @@ export function JobSectionsTableFloatingBar({
                       });
                     });
                   }}
-                  disabled={isPending || isLoading || isPendingDeletion}
+                  disabled={isPending || isLoading}
                 >
                   {isLoading && method === "export" ? (
                     <LoadingSpinner />
@@ -208,7 +121,7 @@ export function JobSectionsTableFloatingBar({
                 </Button>
               </TooltipTrigger>
               <TooltipContent className="border bg-accent font-semibold text-foreground dark:bg-zinc-900">
-                <P>Export inventorys</P>
+                <P>Export inventory</P>
               </TooltipContent>
             </Tooltip>
             <Tooltip delayDuration={250}>
@@ -219,10 +132,9 @@ export function JobSectionsTableFloatingBar({
                       variant="secondary"
                       size="icon"
                       className="size-10 border"
-                      disabled={isPending || isPendingDeletion}
+                      disabled={isPending}
                     >
-                      {isPending ||
-                      (isPendingDeletion && method === "delete") ? (
+                      {isPending || method === "delete" ? (
                         <LoadingSpinner />
                       ) : (
                         <TrashIcon className="size-5" aria-hidden="true" />
@@ -237,7 +149,7 @@ export function JobSectionsTableFloatingBar({
                     </AlertDialogTitle>
                     <AlertDialogDescription>
                       This action cannot be undone. This will permanently delete
-                      the selected inventory/s and all related records from our
+                      the selected section/s and all related records from our
                       servers.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
@@ -247,7 +159,7 @@ export function JobSectionsTableFloatingBar({
                       onClick={() => {
                         setMethod("delete");
                         toast.promise(
-                          deleteInventorysMutateAsync({
+                          mutateAsync({
                             ids: rows.map((row) => row.original.id),
                             path: pathname,
                           }),
@@ -255,7 +167,7 @@ export function JobSectionsTableFloatingBar({
                             loading: "Deleting...",
                             success: () => {
                               table.toggleAllRowsSelected(false);
-                              return "inventory/s deleted successfully";
+                              return "Section/s deleted successfully";
                             },
                             error: (err) => {
                               console.log(err);
@@ -265,7 +177,7 @@ export function JobSectionsTableFloatingBar({
                         );
                       }}
                       className="bg-destructive hover:bg-destructive/90"
-                      disabled={isPending || isPendingDeletion}
+                      disabled={isPending}
                     >
                       Delete
                     </AlertDialogAction>
@@ -273,7 +185,7 @@ export function JobSectionsTableFloatingBar({
                 </AlertDialogContent>
               </AlertDialog>
               <TooltipContent className="border bg-accent font-semibold text-foreground dark:bg-zinc-900">
-                <P>Delete inventorys</P>
+                <P>Delete inventory</P>
               </TooltipContent>
             </Tooltip>
           </div>

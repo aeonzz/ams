@@ -27,6 +27,8 @@ import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import { updateInventorySubItem } from "@/lib/actions/inventoryItem";
 import { type Section } from "prisma/generated/zod";
+import { UpdateJobSectionSheet } from "./update-job-section-sheet";
+import { DeleteJobSectionsDialog } from "../delete-job-sections-dialog";
 
 export function getJobSectionsColumns(): ColumnDef<Section>[] {
   return [
@@ -107,9 +109,9 @@ export function getJobSectionsColumns(): ColumnDef<Section>[] {
       cell: function Cell({ row }) {
         const dialogManager = useDialogManager();
         const pathname = usePathname();
-        const [showUpdateTaskSheet, setShowUpdateTaskSheet] =
+        const [showUpdateJobSectionSheet, setShowUpdateJobSectionSheet] =
           React.useState(false);
-        const [showDeleteTaskDialog, setShowDeleteTaskDialog] =
+        const [showDeleteJobSectionDialog, setShowDeleteJobSectionDialog] =
           React.useState(false);
 
         const { isPending, mutateAsync } = useServerActionMutation(
@@ -117,27 +119,27 @@ export function getJobSectionsColumns(): ColumnDef<Section>[] {
         );
 
         React.useEffect(() => {
-          if (showUpdateTaskSheet) {
-            dialogManager.setActiveDialog("adminUpdateInventorySubItemDialog");
+          if (showUpdateJobSectionSheet) {
+            dialogManager.setActiveDialog("adminUpdateJobSectionSheet");
           } else {
             dialogManager.setActiveDialog(null);
           }
-        }, [showUpdateTaskSheet]);
-        console.log(row.original.id);
+        }, [showUpdateJobSectionSheet]);
+
         return (
           <div className="grid place-items-center">
-            {/* <UpdateEquipmentSheet
-              open={showUpdateTaskSheet}
-              onOpenChange={setShowUpdateTaskSheet}
-              equipment={row.original}
-            /> */}
-            {/* <DeleteEquipmentsDialog
-              open={showDeleteTaskDialog}
-              onOpenChange={setShowDeleteTaskDialog}
-              equipments={[row.original]}
+            <UpdateJobSectionSheet
+              open={showUpdateJobSectionSheet}
+              onOpenChange={setShowUpdateJobSectionSheet}
+              jobSection={row.original}
+            />
+            <DeleteJobSectionsDialog
+              open={showDeleteJobSectionDialog}
+              onOpenChange={setShowDeleteJobSectionDialog}
+              jobSections={[row.original]}
               showTrigger={false}
               onSuccess={() => row.toggleSelected(false)}
-            /> */}
+            />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -149,12 +151,14 @@ export function getJobSectionsColumns(): ColumnDef<Section>[] {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-40">
-                <DropdownMenuItem onSelect={() => setShowUpdateTaskSheet(true)}>
+                <DropdownMenuItem
+                  onSelect={() => setShowUpdateJobSectionSheet(true)}
+                >
                   Edit
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
-                  onSelect={() => setShowDeleteTaskDialog(true)}
+                  onSelect={() => setShowDeleteJobSectionDialog(true)}
                   className="focus:bg-destructive focus:text-destructive-foreground"
                 >
                   Delete

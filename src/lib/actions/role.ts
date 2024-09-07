@@ -84,12 +84,24 @@ export const createRole = authedProcedure
   .createServerAction()
   .input(roleSchemaWithPath)
   .handler(async ({ input, ctx }) => {
-    const { path, ...rest } = input;
+    const { path, name, ...rest } = input;
+    const role = name.toUpperCase().replace(/ /g, "_");
+
     try {
+      const existingRole = await db.role.findUnique({
+        where: { name: role },
+      });
+
+      if (existingRole) {
+        throw `Role "${role}" already exists.`;
+      }
+
       const roleId = generateId(15);
+
       await db.role.create({
         data: {
           id: roleId,
+          name: role,
           ...rest,
         },
       });
@@ -154,14 +166,24 @@ export const updateRole = authedProcedure
   .createServerAction()
   .input(updateRoleSchemaWithPath)
   .handler(async ({ ctx, input }) => {
-    const { path, id, ...rest } = input;
-    console.log(id);
+    const { path, id, name, ...rest } = input;
+    const role = name?.toUpperCase().replace(/ /g, "_");
+
     try {
+      const existingRole = await db.role.findUnique({
+        where: { name: role },
+      });
+
+      if (existingRole) {
+        throw `Role "${role}" already exists.`;
+      }
+
       await db.role.update({
         where: {
           id: id,
         },
         data: {
+          name: role,
           ...rest,
         },
       });
