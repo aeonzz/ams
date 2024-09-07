@@ -8,11 +8,11 @@ import { DataTableToolbar } from "@/components/data-table/data-table-toolbar";
 
 import { useDataTable } from "@/lib/hooks/use-data-table";
 import { type DataTableFilterField } from "@/lib/types";
-import { getJobSections } from "@/lib/actions/job-section";
 import { type Section } from "prisma/generated/zod";
 import { getJobSectionsColumns } from "./job-sections-columns";
 import { JobSectionsTableFloatingBar } from "./job-sections-table-floating-bar";
 import { JobSectionsTableToolbarActions } from "./job-sections-table-toolbar-actions";
+import { getJobSections } from "@/lib/actions/job";
 
 interface JobSectionsTableProps {
   jobSectionPromise: ReturnType<typeof getJobSections>;

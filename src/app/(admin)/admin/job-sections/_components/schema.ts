@@ -1,4 +1,3 @@
-import path from "path";
 import { z } from "zod";
 
 export const createJobSectionSchema = z.object({
@@ -38,3 +37,4 @@ export const deleteJobSectionsSchema = z.object({
 });
 
 export type DeleteJobSectionsSchema = z.infer<typeof deleteJobSectionsSchema>;
+

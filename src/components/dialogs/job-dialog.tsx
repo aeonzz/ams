@@ -25,26 +25,29 @@ import {
   jobRequestSchema,
   type JobRequestSchema,
 } from "@/lib/db/schema/request";
+import { createJobRequest } from "@/lib/actions/job";
+import {
+  createjobRequestSchema,
+  type CreateJobRequestSchema,
+} from "@/app/(app)/dashboard/_components/schema";
 
 export default function JobDialog() {
   const dialogManager = useDialogManager();
   const [alertOpen, setAlertOpen] = React.useState(false);
 
-  const form = useForm<JobRequestSchema>({
-    resolver: zodResolver(jobRequestSchema),
+  const form = useForm<CreateJobRequestSchema>({
+    resolver: zodResolver(createjobRequestSchema),
     defaultValues: {
-      notes: "",
-      jobtype: undefined,
-      priority: undefined,
-      dueDate: undefined,
+      description: "",
       images: undefined,
+      sectionId: undefined,
     },
   });
 
   const { dirtyFields } = useFormState({ control: form.control });
   const isFieldsDirty = Object.keys(dirtyFields).length > 0;
 
-  const { mutateAsync, isPending } = useServerActionMutation(createRequest);
+  const { mutateAsync, isPending } = useServerActionMutation(createJobRequest);
 
   const handleOpenChange = (open: boolean) => {
     if (!open) {
@@ -71,7 +74,6 @@ export default function JobDialog() {
             setAlertOpen(true);
           }
         }}
-        className="max-w-3xl"
         isLoading={isPending}
       >
         <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>

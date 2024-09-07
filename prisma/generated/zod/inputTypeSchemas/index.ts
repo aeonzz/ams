@@ -24,6 +24,7 @@ export { SortOrderSchema } from './SortOrderSchema';
 export { QueryModeSchema } from './QueryModeSchema';
 export { NullsOrderSchema } from './NullsOrderSchema';
 export { JobStatusSchema } from './JobStatusSchema';
+export { JobTypeSchema } from './JobTypeSchema';
 export { ItemStatusSchema } from './ItemStatusSchema';
 export { SupplyItemCategorySchema } from './SupplyItemCategorySchema';
 export { SupplyItemStatusSchema } from './SupplyItemStatusSchema';

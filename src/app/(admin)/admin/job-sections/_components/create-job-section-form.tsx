@@ -20,11 +20,11 @@ import { type UseFormReturn } from "react-hook-form";
 import { usePathname } from "next/navigation";
 import { DialogState } from "@/lib/hooks/use-dialog-manager";
 import { Textarea } from "@/components/ui/text-area";
-import {
-  type CreateJobSectionSchemaWithPath,
-  type CreateJobSectionSchema,
-} from "@/lib/schema/job-section";
-import { creatJobSection } from "@/lib/actions/job-section";
+import { creatJobSection } from "@/lib/actions/job";
+import type {
+  CreateJobSectionSchema,
+  CreateJobSectionSchemaWithPath,
+} from "./schema";
 
 interface CreateJobSectionFormProps {
   setAlertOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -100,7 +100,7 @@ export default function CreateJobSectionForm({
                 <FormControl>
                   <Textarea
                     rows={1}
-                    maxRows={5}
+                    maxRows={10}
                     placeholder="description..."
                     className="min-h-[100px] flex-grow resize-none"
                     disabled={isPending}

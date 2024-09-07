@@ -20,7 +20,7 @@ import {
 import { type Section } from "prisma/generated/zod";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
 import { usePathname } from "next/navigation";
-import { deleteJobSections } from "@/lib/actions/job-section";
+import { deleteJobSections } from "@/lib/actions/job";
 
 interface DeleteJobSectionsDialogProps
   extends React.ComponentPropsWithoutRef<typeof AlertDialog> {

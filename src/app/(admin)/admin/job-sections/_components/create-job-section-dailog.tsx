@@ -25,12 +25,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { X } from "lucide-react";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
-import {
-  createJobSectionSchema,
-  type CreateJobSectionSchema,
-} from "@/lib/schema/job-section";
-import { creatJobSection } from "@/lib/actions/job-section";
+import { creatJobSection } from "@/lib/actions/job";
 import CreateJobSectionForm from "./create-job-section-form";
+import { createJobSectionSchema, type CreateJobSectionSchema } from "./schema";
 
 export default function CreateJobSectionDialog() {
   const dialogManager = useDialogManager();

@@ -29,12 +29,12 @@ import { usePathname } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/text-area";
 import { type Section } from "prisma/generated/zod";
+import { updateJobSection } from "@/lib/actions/job";
 import {
   updateJobSectionSchema,
   type UpdateJobSectionSchema,
   type UpdateJobSectionSchemaWithPath,
-} from "@/lib/schema/job-section";
-import { updateJobSection } from "@/lib/actions/job-section";
+} from "./schema";
 
 interface UpdateJobSectionSheetProps
   extends React.ComponentPropsWithRef<typeof Sheet> {

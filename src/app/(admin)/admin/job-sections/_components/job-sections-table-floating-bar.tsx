@@ -37,7 +37,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import type { Section } from "prisma/generated/zod";
-import { deleteJobSections } from "@/lib/actions/job-section";
+import { deleteJobSections } from "@/lib/actions/job";
 
 interface JobSectionsTableFloatingBarProps {
   table: Table<Section>;

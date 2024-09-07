@@ -4,9 +4,9 @@ import { P } from "@/components/typography/text";
 import { type GetJobSectionSchema } from "@/lib/schema";
 import { DateRangePicker } from "@/components/date-range-picker";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getJobSections } from "@/lib/actions/job-section";
 import { DataTableSkeleton } from "@/components/data-table/data-table-skeleton";
 import { JobSectionsTable } from "./job-sections-table";
+import { getJobSections } from "@/lib/actions/job";
 
 interface JobSectionScreenProps {
   params: GetJobSectionSchema;

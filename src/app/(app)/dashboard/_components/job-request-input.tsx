@@ -66,7 +66,7 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { addDays, format } from "date-fns";
-import { cn, isDateInPast } from "@/lib/utils";
+import { cn, isDateInPast, textTransform } from "@/lib/utils";
 import { useSession } from "@/lib/hooks/use-session";
 import {
   Command,
@@ -78,20 +78,11 @@ import {
 } from "@/components/ui/command";
 import { PriorityTypeType } from "prisma/generated/zod/inputTypeSchemas/PriorityTypeSchema";
 import { JobRequestSchema } from "@/lib/db/schema/request";
-
-interface JobRequestInputProps {
-  mutateAsync: UseMutateAsyncFunction<
-    any,
-    Error,
-    Parameters<typeof createRequest>[0],
-    unknown
-  >;
-  isPending: boolean;
-  type: RequestTypeType;
-  form: UseFormReturn<JobRequestSchema>;
-  handleOpenChange: (open: boolean) => void;
-  isFieldsDirty: boolean;
-}
+import { createJobRequest } from "@/lib/actions/job";
+import { ExtendedJobRequestSchemaServer } from "@/lib/db/schema/job";
+import JobSectionField from "./job-section-field";
+import { type CreateJobRequestSchema } from "./schema";
+import { JobTypeSchema } from "prisma/generated/zod";
 
 const jobs = [
   {
@@ -156,33 +147,47 @@ const jobs = [
   },
 ] as const;
 
-const priorities = [
-  {
-    value: "NO_PRIORITY",
-    label: "No priority",
-    icon: Minus,
-  },
-  {
-    value: "URGENT",
-    label: "Urgent",
-    icon: TriangleAlert,
-  },
-  {
-    value: "HIGH",
-    label: "High",
-    icon: SignalHigh,
-  },
-  {
-    value: "MEDIUM",
-    label: "Medium",
-    icon: SignalMedium,
-  },
-  {
-    value: "LOW",
-    label: "Low",
-    icon: SignalLow,
-  },
-] as const;
+// const priorities = [
+//   {
+//     value: "NO_PRIORITY",
+//     label: "No priority",
+//     icon: Minus,
+//   },
+//   {
+//     value: "URGENT",
+//     label: "Urgent",
+//     icon: TriangleAlert,
+//   },
+//   {
+//     value: "HIGH",
+//     label: "High",
+//     icon: SignalHigh,
+//   },
+//   {
+//     value: "MEDIUM",
+//     label: "Medium",
+//     icon: SignalMedium,
+//   },
+//   {
+//     value: "LOW",
+//     label: "Low",
+//     icon: SignalLow,
+//   },
+// ] as const;
+
+interface JobRequestInputProps {
+  mutateAsync: UseMutateAsyncFunction<
+    any,
+    Error,
+    Parameters<typeof createJobRequest>[0],
+    unknown
+  >;
+  isPending: boolean;
+  type: RequestTypeType;
+  form: UseFormReturn<CreateJobRequestSchema>;
+  handleOpenChange: (open: boolean) => void;
+  isFieldsDirty: boolean;
+}
 
 export default function JobRequestInput({
   mutateAsync,
@@ -200,23 +205,23 @@ export default function JobRequestInput({
   const { uploadFiles, progresses, isUploading, uploadedFiles } =
     useUploadFile();
 
-  async function onSubmit(values: JobRequestSchema) {
+  async function onSubmit(values: CreateJobRequestSchema) {
     try {
       let uploadedFilesResult: { filePath: string }[] = [];
 
-      // Check if there are files to upload
       if (values.images && values.images.length > 0) {
         uploadedFilesResult = await uploadFiles(values.images);
       }
 
-      const data: ExtendedJobRequestSchema = {
-        notes: values.notes,
-        priority: values.priority as PriorityTypeType,
-        dueDate: values.dueDate,
+      const data: ExtendedJobRequestSchemaServer = {
+        description: values.description,
         type: type,
         department: department,
+        sectionId: values.sectionId,
+        dueDate: values.dueDate,
         jobType: values.jobtype,
         path: pathname,
+        priority: "LOW",
         ...(uploadedFilesResult.length > 0 && {
           images: uploadedFilesResult.map(
             (result: { filePath: string }) => result.filePath
@@ -251,257 +256,203 @@ export default function JobRequestInput({
       </DialogHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <div className="relative space-y-2 px-4">
-            <div className="rounded-md border p-3">
-              <FormField
-                control={form.control}
-                name="notes"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Textarea
-                        rows={1}
-                        maxRows={10}
-                        minRows={3}
-                        placeholder="Describe your request..."
-                        className="border-none p-0 focus-visible:ring-0"
-                        disabled={isUploading || isPending}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+          <div className="scroll-bar flex max-h-[60vh] gap-6 overflow-y-auto px-4 py-1">
+            <div className="flex flex-1 flex-col space-y-2">
+              <JobSectionField
+                form={form}
+                name="sectionId"
+                isPending={isPending}
               />
-              <FormField
-                control={form.control}
-                name="images"
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormControl>
-                      <FileUploader
-                        value={field.value}
-                        onValueChange={field.onChange}
-                        maxFiles={4}
-                        maxSize={4 * 1024 * 1024}
-                        progresses={progresses}
-                        disabled={isUploading || isPending}
-                        drop={false}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            <div className="flex flex-wrap gap-2 py-1">
-              <FormField
-                control={form.control}
-                name="jobtype"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col">
-                    <Popover modal>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant="secondary"
-                            disabled={isUploading || isPending}
-                            role="combobox"
-                            className={cn(
-                              "w-[230px] justify-between",
-                              !field.value && "text-muted-foreground"
-                            )}
+              <div className="flex flex-wrap gap-2 py-1">
+                <FormField
+                  control={form.control}
+                  name="dueDate"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-1 flex-col">
+                      <FormLabel className="text-muted-foreground">
+                        Due date
+                      </FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant={"secondary"}
+                              className={cn(
+                                "justify-start px-2 text-left font-normal",
+                                !field.value && "text-muted-foreground"
+                              )}
+                              disabled={isUploading || isPending}
+                            >
+                              <CalendarIcon className="mr-2 h-4 w-4" />
+                              {field.value ? (
+                                format(field.value, "PPP")
+                              ) : (
+                                <span>Due date</span>
+                              )}
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="flex w-auto flex-col space-y-2 p-2">
+                          <Select
+                            onValueChange={(value) =>
+                              field.onChange(
+                                addDays(new Date(), parseInt(value))
+                              )
+                            }
                           >
-                            {field.value
-                              ? jobs.find((job) => job.value === field.value)
-                                  ?.label
-                              : "Select job"}
-                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-[230px] p-0" align="start">
-                        <Command className="max-h-72">
-                          <CommandInput placeholder="Search job..." />
-                          <CommandList>
-                            <CommandEmpty>No job found.</CommandEmpty>
-                            <CommandGroup>
-                              {jobs.map((job) => (
-                                <CommandItem
-                                  value={job.label}
-                                  key={job.value}
-                                  onSelect={() => {
-                                    form.setValue("jobtype", job.value);
-                                  }}
-                                >
-                                  <job.icon className="mr-2 size-4" />
-                                  {job.label}
-                                  <Check
-                                    className={cn(
-                                      "ml-auto h-4 w-4",
-                                      job.value === field.value
-                                        ? "opacity-100"
-                                        : "opacity-0"
-                                    )}
-                                  />
-                                </CommandItem>
-                              ))}
-                            </CommandGroup>
-                          </CommandList>
-                        </Command>
-                      </PopoverContent>
-                    </Popover>
-                    <FormLabel>Job type</FormLabel>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="priority"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col">
-                    <Popover modal>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant="secondary"
-                            role="combobox"
-                            disabled={isUploading || isPending}
-                            className={cn(
-                              "w-[230px] justify-between",
-                              !field.value && "text-muted-foreground"
-                            )}
-                          >
-                            {field.value
-                              ? priorities.find(
-                                  (priority) => priority.value === field.value
-                                )?.label
-                              : "Select priority"}
-                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-[230px] p-0" align="start">
-                        <Command className="max-h-72">
-                          <CommandInput placeholder="Search priority..." />
-                          <CommandList>
-                            <CommandEmpty>No job found.</CommandEmpty>
-                            <CommandGroup>
-                              {priorities.map((priority) => (
-                                <CommandItem
-                                  value={priority.label}
-                                  key={priority.value}
-                                  onSelect={() => {
-                                    form.setValue("priority", priority.value);
-                                  }}
-                                >
-                                  <priority.icon className="mr-2 size-4" />
-                                  {priority.label}
-                                  <Check
-                                    className={cn(
-                                      "ml-auto h-4 w-4",
-                                      priority.value === field.value
-                                        ? "opacity-100"
-                                        : "opacity-0"
-                                    )}
-                                  />
-                                </CommandItem>
-                              ))}
-                            </CommandGroup>
-                          </CommandList>
-                        </Command>
-                      </PopoverContent>
-                    </Popover>
-                    <FormLabel>Priority type</FormLabel>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="dueDate"
-                render={({ field }) => (
-                  <FormItem className="flex flex-1 flex-col">
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant={"secondary"}
-                            className={cn(
-                              "justify-start px-2 text-left font-normal",
-                              !field.value && "text-muted-foreground"
-                            )}
-                            disabled={isUploading || isPending}
-                          >
-                            <CalendarIcon className="mr-2 h-4 w-4" />
-                            {field.value ? (
-                              format(field.value, "PPP")
-                            ) : (
-                              <span>Due date</span>
-                            )}
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="flex w-auto flex-col space-y-2 p-2">
-                        <Select
-                          onValueChange={(value) =>
-                            field.onChange(addDays(new Date(), parseInt(value)))
-                          }
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select" />
-                          </SelectTrigger>
-                          <SelectContent position="popper">
-                            <SelectItem value="0">Today</SelectItem>
-                            <SelectItem value="1">Tomorrow</SelectItem>
-                            <SelectItem value="3">In 3 days</SelectItem>
-                            <SelectItem value="7">In a week</SelectItem>
-                            <SelectItem value="30">In a month</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <div className="rounded-md border">
-                          <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            disabled={isDateInPast}
-                          />
-                        </div>
-                      </PopoverContent>
-                    </Popover>
-                    <FormLabel>Due date</FormLabel>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select" />
+                            </SelectTrigger>
+                            <SelectContent position="popper">
+                              <SelectItem value="0">Today</SelectItem>
+                              <SelectItem value="1">Tomorrow</SelectItem>
+                              <SelectItem value="3">In 3 days</SelectItem>
+                              <SelectItem value="7">In a week</SelectItem>
+                              <SelectItem value="30">In a month</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <div className="rounded-md border">
+                            <Calendar
+                              mode="single"
+                              selected={field.value}
+                              onSelect={field.onChange}
+                              disabled={isDateInPast}
+                            />
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="jobtype"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel className="text-muted-foreground">
+                        Job type
+                      </FormLabel>
+                      <Popover modal>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="secondary"
+                              disabled={isUploading || isPending}
+                              role="combobox"
+                              className={cn(
+                                "w-[230px] justify-between",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              <span className="truncate">
+                                {field.value
+                                  ? textTransform(field.value)
+                                  : "Select job type"}
+                              </span>
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[230px] p-0" align="start">
+                          <Command className="max-h-72">
+                            <CommandInput placeholder="Search job..." />
+                            <CommandList>
+                              <CommandEmpty>No job found.</CommandEmpty>
+                              <CommandGroup>
+                                {JobTypeSchema.options.map((job, index) => (
+                                  <CommandItem
+                                    value={job}
+                                    key={index}
+                                    onSelect={() => {
+                                      form.setValue("jobtype", job);
+                                    }}
+                                  >
+                                    {textTransform(job)}
+                                    <Check
+                                      className={cn(
+                                        "ml-auto h-4 w-4",
+                                        job === field.value
+                                          ? "opacity-100"
+                                          : "opacity-0"
+                                      )}
+                                    />
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div className="rounded-md border p-3">
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Textarea
+                          rows={1}
+                          maxRows={7}
+                          minRows={3}
+                          placeholder="Job description..."
+                          className="border-none p-0 focus-visible:ring-0"
+                          disabled={isUploading || isPending}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="images"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormControl>
+                        <FileUploader
+                          value={field.value}
+                          onValueChange={field.onChange}
+                          maxFiles={4}
+                          maxSize={4 * 1024 * 1024}
+                          progresses={progresses}
+                          disabled={isUploading || isPending}
+                          drop={false}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
             </div>
           </div>
-          <MotionLayout>
-            <Separator className="my-4" />
-            <DialogFooter>
-              {isFieldsDirty ? (
-                <Button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    form.reset();
-                  }}
-                  variant="destructive"
-                  disabled={isUploading || isPending}
-                >
-                  Reset form
-                </Button>
-              ) : (
-                <div></div>
-              )}
-              <SubmitButton
+          <Separator className="my-4" />
+          <DialogFooter>
+            {isFieldsDirty ? (
+              <Button
+                onClick={(e) => {
+                  e.preventDefault();
+                  form.reset();
+                }}
+                variant="destructive"
                 disabled={isUploading || isPending}
-                className="w-28"
               >
-                Submit
-              </SubmitButton>
-            </DialogFooter>
-          </MotionLayout>
+                Reset form
+              </Button>
+            ) : (
+              <div></div>
+            )}
+            <SubmitButton disabled={isUploading || isPending} className="w-28">
+              Submit
+            </SubmitButton>
+          </DialogFooter>
         </form>
       </Form>
     </>

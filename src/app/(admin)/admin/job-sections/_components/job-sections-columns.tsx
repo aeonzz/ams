@@ -28,7 +28,7 @@ import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import { updateInventorySubItem } from "@/lib/actions/inventoryItem";
 import { type Section } from "prisma/generated/zod";
 import { UpdateJobSectionSheet } from "./update-job-section-sheet";
-import { DeleteJobSectionsDialog } from "../delete-job-sections-dialog";
+import { DeleteJobSectionsDialog } from "./delete-job-sections-dialog";
 
 export function getJobSectionsColumns(): ColumnDef<Section>[] {
   return [

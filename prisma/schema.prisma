@@ -121,20 +121,26 @@ model Request {
 }
 
 model JobRequest {
-  id           String    @id
-  notes        String
-  dueDate      DateTime
-  jobType      String
-  files        File[]
-  requestId    String    @unique
-  request      Request   @relation(fields: [requestId], references: [id], onDelete: Cascade)
-  section      Section?  @relation(fields: [sectionId], references: [id])
-  sectionId    String?
-  status       JobStatus @default(PENDING)
-  assignedTo   String?
-  assignedUser User?     @relation(fields: [assignedTo], references: [id])
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  id            String    @id
+  description   String
+  dueDate       DateTime
+  estimatedTime Int?
+  startDate     DateTime?
+  endDate       DateTime?
+  costEstimate  Float?
+  actualCost    Float?
+  jobType       JobType
+  files         File[]
+  progressNotes String?
+  requestId     String    @unique
+  request       Request   @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  section       Section   @relation(fields: [sectionId], references: [id])
+  sectionId     String
+  status        JobStatus @default(PENDING)
+  assignedTo    String?
+  assignedUser  User?     @relation(fields: [assignedTo], references: [id])
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }
 
 model Section {
@@ -287,6 +293,29 @@ enum JobStatus {
   COMPLETED
   ON_HOLD
   CANCELLED
+}
+
+enum JobType {
+  ROUTINE_MAINTENANCE
+  REPAIRS
+  INSTALLATION
+  INSPECTION
+  EMERGENCY_REPAIR
+  UPGRADES_RENOVATIONS
+  PREVENTIVE_MAINTENANCE
+  CALIBRATION_TESTING
+  CLEANING_JANITORIAL
+  EVENT_SETUP_SUPPORT
+  SAFETY_COMPLIANCE_CHECKS
+  FURNITURE_ASSEMBLY_MOVING
+  PAINTING_SURFACE_TREATMENT
+  LANDSCAPING_GROUNDS_MAINTENANCE
+  IT_SUPPORT_TROUBLESHOOTING
+  SECURITY_SYSTEMS_MAINTENANCE
+  WASTE_MANAGEMENT_RECYCLING
+  TRANSPORT_VEHICLE_MAINTENANCE
+  SPECIAL_PROJECTS
+  RESOURCE_SETUP_BREAKDOWN
 }
 
 model MaintenanceRecord {
