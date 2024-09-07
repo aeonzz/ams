@@ -11,6 +11,7 @@ export type DialogType =
   | "supplyResourceDialog"
   | "transportDialog"
   | "settingsDialog"
+  | "jobDetailsDialog"
   | "adminCreateVenueDialog"
   | "adminCreateVehicleDialog"
   | "adminUpdateVenueSheet"

@@ -28,6 +28,7 @@ export const JobRequestSchema = z.object({
   progressNotes: z.string().nullable(),
   requestId: z.string(),
   sectionId: z.string(),
+  reviewedBy: z.string().nullable(),
   assignedTo: z.string().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
@@ -43,6 +44,7 @@ export type JobRequestRelations = {
   files: FileWithRelations[];
   request: RequestWithRelations;
   section: SectionWithRelations;
+  reviewer?: UserWithRelations | null;
   assignedUser?: UserWithRelations | null;
 };
 
@@ -52,6 +54,7 @@ export const JobRequestWithRelationsSchema: z.ZodType<JobRequestWithRelations> =
   files: z.lazy(() => FileWithRelationsSchema).array(),
   request: z.lazy(() => RequestWithRelationsSchema),
   section: z.lazy(() => SectionWithRelationsSchema),
+  reviewer: z.lazy(() => UserWithRelationsSchema).nullable(),
   assignedUser: z.lazy(() => UserWithRelationsSchema).nullable(),
 }))
 

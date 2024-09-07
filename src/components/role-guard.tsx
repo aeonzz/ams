@@ -1,25 +1,28 @@
-import { redirect } from 'next/navigation'
-import { validateRequest } from '@/lib/auth/lucia'
+import { currentUser } from "@/lib/actions/users";
+import { redirect } from "next/navigation";
+import { ReactNode } from "react";
 
 interface RoleGuardProps {
-  children: React.ReactNode
-  allowedRoles: string[]
+  children: ReactNode;
+  allowedRoles: string[];
 }
 
 export async function RoleGuard({ children, allowedRoles }: RoleGuardProps) {
-  const { user } = await validateRequest()
+  const [data] = await currentUser();
 
-  if (!user) {
-    redirect('/sign-in')
+  if (!data) {
+    redirect("/sign-in");
   }
 
-  const userRoles = Array.isArray((await user).roles) ? (await user).roles : []
+  const userRoles = Array.isArray(data.userRole) ? data.userRole : [];
 
-  const hasAllowedRole = userRoles.some(role => allowedRoles.includes(role))
+  const hasAllowedRole = userRoles.some((role) =>
+    allowedRoles.includes(role.role.name)
+  );
 
   if (!hasAllowedRole) {
-    redirect('/unauthorized')
+    redirect("/unauthorized");
   }
 
-  return <>{children}</>
+  return <>{children}</>;
 }

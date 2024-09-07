@@ -78,7 +78,7 @@ export default function RequestActions({ data, params }: RequestActionsProps) {
   return (
     <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <AlertDialogTrigger asChild>
-        <Button variant="secondary">Cancel Request</Button>
+        <Button variant="secondary" className="w-full">Cancel Request</Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>

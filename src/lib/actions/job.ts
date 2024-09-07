@@ -15,6 +15,10 @@ import {
   deleteJobSectionsSchema,
   updateJobSectionSchemaWithPath,
 } from "@/app/(admin)/admin/job-sections/_components/schema";
+import {
+  assignPersonnelSchemaWithPath,
+  updateRequestStatusSchemaWithPath,
+} from "@/app/(app)/(params)/request/[requestId]/_components/schema";
 
 export async function getJobSections(input: GetJobSectionSchema) {
   const { page, per_page, sort, name, from, to } = input;
@@ -199,6 +203,70 @@ export const createJobRequest = authedProcedure
 
       return revalidatePath(path);
     } catch (error) {
+      getErrorMessage(error);
+    }
+  });
+
+export const assignPersonnel = authedProcedure
+  .createServerAction()
+  .input(assignPersonnelSchemaWithPath)
+  .handler(async ({ input }) => {
+    const { path, requestId, ...rest } = input;
+
+    try {
+      const checkRequestId = await db.jobRequest.findFirst({
+        where: {
+          id: requestId,
+        },
+      });
+
+      if (!checkRequestId) {
+        throw "Request not found";
+      }
+      await db.jobRequest.update({
+        where: {
+          id: requestId,
+        },
+        data: {
+          assignedTo: rest.personnelId,
+        },
+      });
+
+      return revalidatePath(path);
+    } catch (error) {
+      console.log(error);
+      getErrorMessage(error);
+    }
+  });
+
+export const updateRequestStatus = authedProcedure
+  .createServerAction()
+  .input(updateRequestStatusSchemaWithPath)
+  .handler(async ({ input }) => {
+    const { path, requestId, ...rest } = input;
+
+    try {
+      const checkRequestId = await db.request.findFirst({
+        where: {
+          id: requestId,
+        },
+      });
+
+      if (!checkRequestId) {
+        throw "Request not found";
+      }
+      await db.request.update({
+        where: {
+          id: requestId,
+        },
+        data: {
+          ...rest,
+        },
+      });
+
+      return revalidatePath(path);
+    } catch (error) {
+      console.log(error);
       getErrorMessage(error);
     }
   });

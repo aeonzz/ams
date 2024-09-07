@@ -223,7 +223,7 @@ export default function AssignRoleSheet({
                             {user.department}
                           </p>
                           <div className="flex flex-wrap gap-1">
-                            {user.userRole?.map((role) => (
+                            {/* {user.userRole?.map((role) => (
                               <Badge
                                 key={role.id}
                                 variant="secondary"
@@ -231,7 +231,7 @@ export default function AssignRoleSheet({
                               >
                                 {role.role.name}
                               </Badge>
-                            ))}
+                            ))} */}
                           </div>
                         </div>
                       </div>

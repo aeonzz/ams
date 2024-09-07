@@ -27,7 +27,7 @@ export async function GET(req: Request, params: Context) {
           include: {
             items: {
               include: {
-                supplyItem: true, 
+                supplyItem: true,
               },
             },
           },
@@ -35,6 +35,9 @@ export async function GET(req: Request, params: Context) {
         jobRequest: {
           include: {
             files: true,
+            assignedUser: true,
+            reviewer: true,
+            section: true,
           },
         },
         returnableRequest: {

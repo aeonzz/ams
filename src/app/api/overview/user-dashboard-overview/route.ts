@@ -20,6 +20,9 @@ export async function GET(req: Request) {
         transportRequest: true,
         venueRequest: true,
       },
+      orderBy: {
+        createdAt: "asc"
+      }
     });
 
     return NextResponse.json({ data: result }, { status: 200 });

@@ -38,7 +38,8 @@ export type UserRelations = {
   setting?: SettingWithRelations | null;
   request: RequestWithRelations[];
   userRole: UserRoleWithRelations[];
-  JobRequest: JobRequestWithRelations[];
+  jobRequestsAsReviewer: JobRequestWithRelations[];
+  jobRequestsAsAssigned: JobRequestWithRelations[];
 };
 
 export type UserWithRelations = z.infer<typeof UserSchema> & UserRelations
@@ -48,7 +49,8 @@ export const UserWithRelationsSchema: z.ZodType<UserWithRelations> = UserSchema.
   setting: z.lazy(() => SettingWithRelationsSchema).nullable(),
   request: z.lazy(() => RequestWithRelationsSchema).array(),
   userRole: z.lazy(() => UserRoleWithRelationsSchema).array(),
-  JobRequest: z.lazy(() => JobRequestWithRelationsSchema).array(),
+  jobRequestsAsReviewer: z.lazy(() => JobRequestWithRelationsSchema).array(),
+  jobRequestsAsAssigned: z.lazy(() => JobRequestWithRelationsSchema).array(),
 }))
 
 export default UserSchema;

@@ -35,19 +35,20 @@ import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import RequestDetailsSkeleton from "./request-details-skeleton";
 import SearchInput from "@/app/(app)/_components/search-input";
+import JobRequestDetails from "./job-request-details";
+import JobRequestReviewerActions from "./job-request-reviewer-actions";
+import { useSession } from "@/lib/hooks/use-session";
+import { useRequest } from "@/lib/hooks/use-request-store";
+import { ClientRoleGuard } from "@/components/client-role-guard";
 
 interface RequestDetailsProps {
   params: string;
 }
 
 export default function RequestDetails({ params }: RequestDetailsProps) {
-  const { data, isLoading, refetch, isError } = useQuery<RequestWithRelations>({
-    queryFn: async () => {
-      const res = await axios.get(`/api/request/${params}`);
-      return res.data.data;
-    },
-    queryKey: ["user-request-details", params],
-  });
+  const currentUser = useSession();
+  const { data, isLoading, isError, refetch, globalRequest } =
+    useRequest(params);
 
   if (isLoading) return <RequestDetailsSkeleton />;
   if (isError) return <FetchDataError refetch={refetch} />;
@@ -60,8 +61,10 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
   return (
     <div className="flex h-full w-full">
       <div className="flex-1 overflow-hidden">
-        <div className="flex h-[50px] items-center border-b px-6">
-          <H5 className="font-semibold text-muted-foreground">{data.title}</H5>
+        <div className="flex h-[50px] items-center gap-16 border-b px-6">
+          <H5 className="truncate font-semibold text-muted-foreground">
+            {data.title}
+          </H5>
           <SearchInput />
         </div>
         <div className="scroll-bar flex h-[calc(100vh_-_75px)] justify-center overflow-y-auto px-10 py-10">
@@ -107,47 +110,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
             </div>
             <Separator className="my-6" />
             {data.type === "JOB" && data.jobRequest && (
-              <div className="space-y-4">
-                <H4 className="font-semibold text-muted-foreground">
-                  Job Request Details
-                </H4>
-                <div className="flex items-center space-x-2">
-                  <FileText className="h-5 w-5" />
-                  <P>Job Type: {data.jobRequest.jobType}</P>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <User className="h-5 w-5" />
-                  <P>Assigned To: {data.jobRequest.assignTo}</P>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Calendar className="h-5 w-5" />
-                  <P>
-                    Due Date:{" "}
-                    {format(new Date(data.jobRequest.dueDate), "PPP p")}
-                  </P>
-                </div>
-                <div>
-                  <H5 className="mb-2 font-semibold text-muted-foreground">
-                    Notes:
-                  </H5>
-                  <P>{data.jobRequest.notes}</P>
-                </div>
-                <div>
-                  {data.jobRequest.files.map((file) => (
-                    <div key={file.id} className="relative mb-3 w-full">
-                      <Image
-                        src={file.url}
-                        alt={`Image of ${file.url}`}
-                        quality={100}
-                        width={0}
-                        height={0}
-                        sizes="100vw"
-                        className="h-auto w-full rounded-sm border object-contain"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <JobRequestDetails data={data.jobRequest} />
             )}
             {data.type === "VENUE" && data.venueRequest && (
               <div className="space-y-4">
@@ -175,7 +138,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                   <H5 className="mb-2 font-semibold text-muted-foreground">
                     Setup Requirements:
                   </H5>
-                  <ul className="mt-2 list-disc ml-4">
+                  <ul className="ml-4 mt-2 list-disc">
                     {data.venueRequest.setupRequirements
                       .split(", ")
                       .map((requirement, index) => (
@@ -352,10 +315,40 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                 <P>{data.user.username}</P>
               </div>
             </div>
+            {data.type === "JOB" && data.jobRequest && (
+              <div>
+                <P className="mb-1 text-sm">Assigned to</P>
+                <div className="flex items-center space-x-2 p-1">
+                  <Avatar className="size-5 rounded-full">
+                    <AvatarImage src={`${data.user.profileUrl}` ?? ""} />
+                    <AvatarFallback className="rounded-md">
+                      {data.user.username.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <P>
+                    {data.jobRequest.assignedUser
+                      ? data.jobRequest.assignedUser.username
+                      : "N/A"}
+                  </P>
+                </div>
+              </div>
+            )}
           </div>
         </div>
-        <Separator className="" />
-        <RequestActions data={data} params={params} />
+        <Separator />
+        <div className="flex flex-col gap-3">
+          {currentUser.id === data.userId && (
+            <RequestActions data={data} params={params} />
+          )}
+          {data.type === "JOB" && data.jobRequest && (
+            <ClientRoleGuard
+              allowedRoles={["REQUEST_REVIEWER"]}
+              currentUser={currentUser}
+            >
+              <JobRequestReviewerActions request={data} />
+            </ClientRoleGuard>
+          )}
+        </div>
       </div>
     </div>
   );

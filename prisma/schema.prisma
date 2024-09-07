@@ -38,7 +38,8 @@ model User {
   setting                  Setting?
   request                  Request[]
   userRole                 UserRole[]
-  JobRequest               JobRequest[]
+  jobRequestsAsReviewer    JobRequest[] @relation(name: "ReviewerRelation")
+  jobRequestsAsAssigned    JobRequest[] @relation(name: "AssignedUserRelation")
 }
 
 model UserRole {
@@ -121,26 +122,28 @@ model Request {
 }
 
 model JobRequest {
-  id            String    @id
-  description   String
-  dueDate       DateTime
-  estimatedTime Int?
-  startDate     DateTime?
-  endDate       DateTime?
-  costEstimate  Float?
-  actualCost    Float?
-  jobType       JobType
-  files         File[]
-  progressNotes String?
-  requestId     String    @unique
-  request       Request   @relation(fields: [requestId], references: [id], onDelete: Cascade)
-  section       Section   @relation(fields: [sectionId], references: [id])
-  sectionId     String
-  status        JobStatus @default(PENDING)
-  assignedTo    String?
-  assignedUser  User?     @relation(fields: [assignedTo], references: [id])
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id              String    @id
+  description     String
+  dueDate         DateTime
+  estimatedTime   Int?
+  startDate       DateTime?
+  endDate         DateTime?
+  costEstimate    Float?
+  actualCost      Float?
+  jobType         JobType
+  files           File[]
+  progressNotes   String?
+  requestId       String    @unique
+  request         Request   @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  section         Section   @relation(fields: [sectionId], references: [id])
+  sectionId       String
+  status          JobStatus @default(PENDING)
+  reviewedBy      String?
+  reviewer        User?     @relation(name: "ReviewerRelation", fields: [reviewedBy], references: [id])
+  assignedTo      String?
+  assignedUser    User?     @relation(name: "AssignedUserRelation", fields: [assignedTo], references: [id])
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 }
 
 model Section {
@@ -387,6 +390,8 @@ enum RequestStatusType {
   PENDING
   APPROVED
   IN_PROGRESS
+  UNDER_REVIEW
+  REVIEWED 
   COMPLETED
   REJECTED
   CANCELLED
