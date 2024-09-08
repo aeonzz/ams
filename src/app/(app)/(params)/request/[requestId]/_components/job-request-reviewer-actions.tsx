@@ -1,80 +1,93 @@
 "use client";
 
-import React, { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import React from "react";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { UserPlus } from "lucide-react";
-import type { RequestWithRelations } from "prisma/generated/zod";
-import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
-import JobDetailsActionsDialog from "@/components/dialogs/job-details-actions-dialog";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  UserPlus,
+  Check,
+  AlertCircle,
+  Loader2,
+  ChevronsUpDown,
+} from "lucide-react";
+import type { RequestWithRelations, User } from "prisma/generated/zod";
 import { RequestStatusType } from "@prisma/client";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
-import { updateRequestStatus } from "@/lib/actions/job";
-import { UpdateRequestStatusSchemaWithPath } from "./schema";
+import { updateRequestStatus, assignPersonnel } from "@/lib/actions/job";
+import {
+  UpdateRequestStatusSchemaWithPath,
+  AssignPersonnelSchemaWithPath,
+} from "./schema";
 import { usePathname } from "next/navigation";
 import { toast } from "sonner";
+import axios from "axios";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { P } from "@/components/typography/text";
+import { Separator } from "@/components/ui/separator";
 
-interface JobRequestReviewerActionsProps {
+interface JobRequestReviewerActionsDialogProps {
   request: RequestWithRelations;
 }
 
-export default function JobRequestReviewerActions({
+export default function JobRequestReviewerActionsDialog({
   request,
-}: JobRequestReviewerActionsProps) {
+}: JobRequestReviewerActionsDialogProps) {
   const pathname = usePathname();
   const queryClient = useQueryClient();
-  const dialogManager = useDialogManager();
-  const [optimisticStatus, setOptimisticStatus] =
-    useState<RequestStatusType | null>(null);
+  const [isOpen, setIsOpen] = React.useState(false);
+  const [isPersonnelPopoverOpen, setIsPersonnelPopoverOpen] =
+    React.useState(false);
+  const [selectedPerson, setSelectedPerson] = React.useState<
+    string | undefined | null
+  >(request.jobRequest?.assignedTo);
 
-  const { mutateAsync, isPending } = useServerActionMutation(
-    updateRequestStatus,
-    {
-      onMutate: async (newStatus) => {
-        // Cancel any outgoing refetches
-        await queryClient.cancelQueries({ queryKey: [request.id] });
+  const {
+    data: personnel,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery<User[]>({
+    queryFn: async () => {
+      const res = await axios.get("/api/user/get-personnels");
+      return res.data.data;
+    },
+    queryKey: ["get-personnels"],
+  });
 
-        // Snapshot the previous value
-        const previousRequest = queryClient.getQueryData([request.id]);
+  const { mutateAsync: updateStatusMutate, isPending: isUpdateStatusPending } =
+    useServerActionMutation(updateRequestStatus);
 
-        // Optimistically update to the new value
-        queryClient.setQueryData(
-          [request.id],
-          (old: RequestWithRelations | undefined) => {
-            if (!old) return old;
-            return { ...old, status: newStatus.status };
-          }
-        );
+  const {
+    mutateAsync: assignPersonnelMutate,
+    isPending: isAssignPersonnelPending,
+  } = useServerActionMutation(assignPersonnel);
 
-        setOptimisticStatus(newStatus.status);
-
-        // Return a context object with the snapshotted value
-        return { previousRequest };
-      },
-      onError: (err, newStatus, context) => {
-        // If the mutation fails, use the context returned from onMutate to roll back
-        //@ts-ignore
-        queryClient.setQueryData([request.id], context?.previousRequest);
-        setOptimisticStatus(null);
-      },
-      onSettled: () => {
-        // Always refetch after error or success to ensure we have the latest data
-        queryClient.invalidateQueries({ queryKey: [request.id] });
-        setOptimisticStatus(null);
-      },
-    }
-  );
+  React.useEffect(() => {
+    setSelectedPerson(request.jobRequest?.assignedTo);
+  }, [request.jobRequest?.assignedTo]);
 
   const handleReview = (action: RequestStatusType) => {
     const data: UpdateRequestStatusSchemaWithPath = {
@@ -86,9 +99,16 @@ export default function JobRequestReviewerActions({
     const actionText = action === "REVIEWED" ? "Approving" : "Rejecting";
     const successText = action === "REVIEWED" ? "approved" : "rejected";
 
-    toast.promise(mutateAsync(data), {
+    toast.promise(updateStatusMutate(data), {
       loading: `${actionText} job request...`,
-      success: `Job request ${successText} successfully.`,
+
+      success: () => {
+        queryClient.invalidateQueries({
+          queryKey: [request.id],
+        });
+        setIsOpen(false);
+        return `Job request ${successText} successfully.`;
+      },
       error: (err) => {
         console.error(err);
         return `Failed to ${action.toLowerCase()} job request. Please try again.`;
@@ -96,79 +116,188 @@ export default function JobRequestReviewerActions({
     });
   };
 
-  const currentStatus = optimisticStatus || request.status;
+  const handleAssignPersonnel = async (id: string) => {
+    if (id === selectedPerson) {
+      toast.info("No changes made. The selected user is already assigned.");
+      return;
+    }
+
+    setSelectedPerson(id);
+
+    const data: AssignPersonnelSchemaWithPath = {
+      path: pathname,
+      requestId: request.jobRequest?.id || "",
+      personnelId: id,
+    };
+
+    toast.promise(assignPersonnelMutate(data), {
+      loading: "Assigning...",
+      success: () => {
+        queryClient.invalidateQueries({
+          queryKey: [request.id],
+        });
+        setIsPersonnelPopoverOpen(false);
+        return "Personnel assigned successfully.";
+      },
+      error: (err) => {
+        console.log(err);
+        return err.message;
+      },
+    });
+  };
+
+  const currentStatus = request.status;
 
   return (
-    <div className="space-y-4">
-      <Button
-        onClick={() => dialogManager.setActiveDialog("jobDetailsDialog")}
-        className="w-full"
-        variant="secondary"
-        disabled={currentStatus !== "PENDING"}
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        <Button className="w-full" variant="secondary">
+          <UserPlus className="mr-2 h-4 w-4" />
+          Manage Request
+        </Button>
+      </DialogTrigger>
+      <DialogContent
+        onInteractOutside={(e) => {
+          if (isUpdateStatusPending || isAssignPersonnelPending) {
+            e.preventDefault();
+          }
+        }}
+        className="sm:max-w-[425px]"
+        isLoading={isUpdateStatusPending || isAssignPersonnelPending}
       >
-        <UserPlus className="mr-2 h-4 w-4" />
-        {request.jobRequest?.assignedTo
-          ? "Reassign Personnel"
-          : "Assign Personnel"}
-      </Button>
-      {currentStatus === "PENDING" && (
-        <div className="space-y-4">
-          <div className="flex space-x-2">
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button
-                  disabled={!request.jobRequest?.assignedTo || isPending}
-                  className="flex-1"
-                >
-                  Approve
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Approve Job Request</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Are you sure you want to approve this job request? This
-                    action cannot be undone.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={() => handleReview("REVIEWED")}>
-                    Approve
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button
-                  variant="destructive"
-                  disabled={isPending}
-                  className="flex-1"
-                >
-                  Reject
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Reject Job Request</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Are you sure you want to reject this job request? This
-                    action cannot be undone.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={() => handleReview("REJECTED")}>
-                    Reject
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </div>
+        <DialogHeader>
+          <DialogTitle>Manage Job Request</DialogTitle>
+          <DialogDescription>
+            Review and take action on this job request.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="scroll-bar flex max-h-[60vh] flex-col gap-3 overflow-y-auto px-4 py-1">
+          <Popover
+            open={isPersonnelPopoverOpen}
+            onOpenChange={setIsPersonnelPopoverOpen}
+          >
+            <PopoverTrigger asChild>
+              <Button
+                variant="secondary"
+                role="combobox"
+                aria-expanded={isPersonnelPopoverOpen}
+                className="w-full justify-between"
+                disabled={
+                  currentStatus !== "PENDING" ||
+                  isUpdateStatusPending ||
+                  isAssignPersonnelPending
+                }
+              >
+                {selectedPerson
+                  ? personnel?.find((p) => p.id === selectedPerson)?.username
+                  : "Assign Personnel"}
+                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent
+              onInteractOutside={(e) => {
+                if (isAssignPersonnelPending) {
+                  e.preventDefault();
+                }
+              }}
+              className="w-[300px] p-0"
+            >
+              <Command>
+                <CommandInput placeholder="Search personnel..." />
+                <CommandList>
+                  <CommandEmpty>No personnel found.</CommandEmpty>
+                  {isLoading && (
+                    <div className="flex items-center justify-center p-4">
+                      <Loader2 className="h-6 w-6 animate-spin" />
+                    </div>
+                  )}
+                  {isError && (
+                    <div className="flex flex-col items-center justify-center space-y-2 p-4">
+                      <AlertCircle className="h-6 w-6 text-red-500" />
+                      <P className="text-sm text-red-500">
+                        {error?.message || "An error occurred"}
+                      </P>
+                      <Button
+                        onClick={() => refetch()}
+                        variant="outline"
+                        size="sm"
+                      >
+                        Retry
+                      </Button>
+                    </div>
+                  )}
+                  {!isLoading && !isError && (
+                    <CommandGroup>
+                      {personnel?.map((item) => (
+                        <CommandItem
+                          key={item.id}
+                          onSelect={() => handleAssignPersonnel(item.id)}
+                          disabled={isAssignPersonnelPending}
+                        >
+                          <div className="flex w-full items-center">
+                            <Avatar className="mr-2 h-8 w-8">
+                              <AvatarImage
+                                src={item.profileUrl ?? ""}
+                                alt={item.username}
+                              />
+                              <AvatarFallback>
+                                {item.username.charAt(0).toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1">
+                              <P className="font-medium">{item.username}</P>
+                              <P className="text-sm text-muted-foreground">
+                                {item.department}
+                              </P>
+                            </div>
+                            {item.id === selectedPerson && (
+                              <Check className="ml-auto h-4 w-4 text-green-500" />
+                            )}
+                          </div>
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  )}
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
+          {currentStatus === "PENDING" && (
+            <div className="flex space-x-2">
+              <Button
+                onClick={() => handleReview("REVIEWED")}
+                disabled={
+                  !selectedPerson ||
+                  isUpdateStatusPending ||
+                  isAssignPersonnelPending
+                }
+                className="flex-1"
+              >
+                Approve
+              </Button>
+              <Button
+                onClick={() => handleReview("REJECTED")}
+                variant="destructive"
+                disabled={isUpdateStatusPending || isAssignPersonnelPending}
+                className="flex-1"
+              >
+                Reject
+              </Button>
+            </div>
+          )}
         </div>
-      )}
-      <JobDetailsActionsDialog />
-    </div>
+        <Separator className="my-2" />
+        <DialogFooter>
+          <div></div>
+          <Button
+            variant="secondary"
+            disabled={isAssignPersonnelPending || isUpdateStatusPending}
+            onClick={() => setIsOpen(false)}
+          >
+            Close
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
