@@ -20,10 +20,11 @@ import { getRequests } from "@/lib/actions/requests";
 import {
   getPriorityIcon,
   getRequestTypeIcon,
-  getStatusIcon,
+  getStatusColor,
 } from "@/lib/utils";
 import { RequestTableFloatingBar } from "./request-table-floating-bar";
 import { ModifiedDataTable } from "@/components/data-table/modified-data-table";
+import { Dot } from "lucide-react";
 
 interface RequestTableProps {
   requestPromise: ReturnType<typeof getRequests>;
@@ -62,7 +63,7 @@ export function RequestTable({ requestPromise }: RequestTableProps) {
             status.charAt(0).toUpperCase() +
             status.slice(1).toLowerCase().replace(/_/g, " "),
           value: status,
-          icon: getStatusIcon(status).icon,
+          icon: Dot,
           withCount: true,
         })),
     },

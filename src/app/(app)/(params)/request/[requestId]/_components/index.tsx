@@ -1,8 +1,5 @@
 "use client";
 
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import { format } from "date-fns";
 import {
   Calendar,
@@ -15,18 +12,18 @@ import {
   MessageSquare,
   Plus,
   Link as LinkIcon,
+  Dot,
 } from "lucide-react";
-import { RequestWithRelations } from "prisma/generated/zod";
 import NotFound from "@/app/not-found";
 import FetchDataError from "@/components/card/fetch-data-error";
-import LoadingSpinner from "@/components/loaders/loading-spinner";
 import { H2, H3, H4, H5, P } from "@/components/typography/text";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import {
+  cn,
   getPriorityIcon,
   getRequestTypeIcon,
-  getStatusIcon,
+  getStatusColor,
   textTransform,
 } from "@/lib/utils";
 import RequestActions from "./request-actions";
@@ -55,7 +52,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
   if (!data) return <NotFound />;
 
   const PrioIcon = getPriorityIcon(data.priority);
-  const StatusIcon = getStatusIcon(data.status);
+  const statusColor = getStatusColor(data.status);
   const RequestTypeIcon = getRequestTypeIcon(data.type);
 
   return (
@@ -76,8 +73,12 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                   <RequestTypeIcon.icon className="mr-1 h-4 w-4" />
                   {textTransform(data.type)}
                 </Badge>
-                <Badge variant={StatusIcon.variant}>
-                  <StatusIcon.icon className="mr-1 h-4 w-4" />
+                <Badge variant={statusColor.variant} className="pr-3.5">
+                  <Dot
+                    className="mr-1 size-3"
+                    strokeWidth={statusColor.stroke}
+                    color={statusColor.color}
+                  />
                   {textTransform(data.status)}
                 </Badge>
                 <Badge variant="outline">
@@ -253,27 +254,6 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                 </div>
               </div>
             )}
-            <Separator className="my-6" />
-            <div className="space-y-4 pb-20">
-              <H4 className="font-semibold">Activity</H4>
-              <div className="space-y-4">
-                <div className="flex items-center space-x-2">
-                  <div className="h-6 w-6 rounded-full bg-blue-500" />
-                  <P className="text-sm">
-                    <span className="font-semibold">System</span> created the
-                    request · {format(new Date(data.createdAt), "MMM d")}
-                  </P>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <div className="h-6 w-6 rounded-full bg-green-500" />
-                  <P className="text-sm">
-                    <span className="font-semibold">System</span> updated the
-                    description of the request ·{" "}
-                    {format(new Date(data.updatedAt), "MMM d")}
-                  </P>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -291,8 +271,12 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
             </div>
             <div>
               <P className="mb-1 text-sm">Status</P>
-              <Badge variant={StatusIcon.variant}>
-                <StatusIcon.icon className="mr-2 h-4 w-4" />
+              <Badge variant={statusColor.variant} className="pr-3.5">
+                <Dot
+                  className="mr-1 size-3"
+                  strokeWidth={statusColor.stroke}
+                  color={statusColor.color}
+                />
                 {textTransform(data.status)}
               </Badge>
             </div>

@@ -8,10 +8,18 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, MapPin, Users, Truck, Package } from "lucide-react";
+import {
+  Calendar,
+  Clock,
+  MapPin,
+  Users,
+  Truck,
+  Package,
+  Dot,
+} from "lucide-react";
 import { format } from "date-fns";
 import { type RequestWithRelations } from "prisma/generated/zod";
-import { getStatusIcon } from "@/lib/utils";
+import { cn, getStatusColor, textTransform } from "@/lib/utils";
 
 interface TransportRequestCardProps {
   request: RequestWithRelations;
@@ -20,13 +28,16 @@ interface TransportRequestCardProps {
 export default function TransportRequestCard({
   request,
 }: TransportRequestCardProps) {
-  const { icon: Icon, variant } = getStatusIcon(request.status);
+  const { color, stroke, variant } = getStatusColor(request.status);
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <span>{request.title}</span>
-          <Badge variant={variant}>{request.status}</Badge>
+          <Badge variant={variant} className="pr-3.5">
+            <Dot className={cn("mr-1 size-3", color)} strokeWidth={stroke} />
+            {textTransform(request.status)}
+          </Badge>
         </CardTitle>
       </CardHeader>
       <CardContent>

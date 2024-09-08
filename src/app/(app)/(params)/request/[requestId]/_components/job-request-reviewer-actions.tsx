@@ -35,8 +35,46 @@ export default function JobRequestReviewerActions({
   const pathname = usePathname();
   const queryClient = useQueryClient();
   const dialogManager = useDialogManager();
-  const { mutateAsync, isPending } =
-    useServerActionMutation(updateRequestStatus);
+  const [optimisticStatus, setOptimisticStatus] =
+    useState<RequestStatusType | null>(null);
+
+  const { mutateAsync, isPending } = useServerActionMutation(
+    updateRequestStatus,
+    {
+      onMutate: async (newStatus) => {
+        // Cancel any outgoing refetches
+        await queryClient.cancelQueries({ queryKey: [request.id] });
+
+        // Snapshot the previous value
+        const previousRequest = queryClient.getQueryData([request.id]);
+
+        // Optimistically update to the new value
+        queryClient.setQueryData(
+          [request.id],
+          (old: RequestWithRelations | undefined) => {
+            if (!old) return old;
+            return { ...old, status: newStatus.status };
+          }
+        );
+
+        setOptimisticStatus(newStatus.status);
+
+        // Return a context object with the snapshotted value
+        return { previousRequest };
+      },
+      onError: (err, newStatus, context) => {
+        // If the mutation fails, use the context returned from onMutate to roll back
+        //@ts-ignore
+        queryClient.setQueryData([request.id], context?.previousRequest);
+        setOptimisticStatus(null);
+      },
+      onSettled: () => {
+        // Always refetch after error or success to ensure we have the latest data
+        queryClient.invalidateQueries({ queryKey: [request.id] });
+        setOptimisticStatus(null);
+      },
+    }
+  );
 
   const handleReview = (action: RequestStatusType) => {
     const data: UpdateRequestStatusSchemaWithPath = {
@@ -50,12 +88,7 @@ export default function JobRequestReviewerActions({
 
     toast.promise(mutateAsync(data), {
       loading: `${actionText} job request...`,
-      success: () => {
-        queryClient.invalidateQueries({
-          queryKey: [request.id],
-        });
-        return `Job request ${successText} successfully.`;
-      },
+      success: `Job request ${successText} successfully.`,
       error: (err) => {
         console.error(err);
         return `Failed to ${action.toLowerCase()} job request. Please try again.`;
@@ -63,20 +96,22 @@ export default function JobRequestReviewerActions({
     });
   };
 
+  const currentStatus = optimisticStatus || request.status;
+
   return (
     <div className="space-y-4">
       <Button
         onClick={() => dialogManager.setActiveDialog("jobDetailsDialog")}
         className="w-full"
         variant="secondary"
-        disabled={request.status !== "PENDING"}
+        disabled={currentStatus !== "PENDING"}
       >
         <UserPlus className="mr-2 h-4 w-4" />
         {request.jobRequest?.assignedTo
           ? "Reassign Personnel"
           : "Assign Personnel"}
       </Button>
-      {request.status === "PENDING" && (
+      {currentStatus === "PENDING" && (
         <div className="space-y-4">
           <div className="flex space-x-2">
             <AlertDialog>

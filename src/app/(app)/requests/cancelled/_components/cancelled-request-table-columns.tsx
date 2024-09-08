@@ -4,15 +4,19 @@ import * as React from "react";
 import { type ColumnDef } from "@tanstack/react-table";
 
 import {
+  cn,
   formatDate,
   getPriorityIcon,
   getRequestTypeIcon,
+  getStatusColor,
+  textTransform,
 } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 
 import { type Request } from "prisma/generated/zod";
 import { P } from "@/components/typography/text";
+import { Dot } from "lucide-react";
 
 export function getCancelledRequestColumns(): ColumnDef<Request>[] {
   return [
@@ -22,16 +26,14 @@ export function getCancelledRequestColumns(): ColumnDef<Request>[] {
         <DataTableColumnHeader column={column} title="Type" />
       ),
       cell: ({ row }) => {
-        const { icon: Icon, variant } = getRequestTypeIcon(row.original.type);
-        const type = `${row.original.type.charAt(0)}${row.original.type.slice(1).toLowerCase()}`;
+        const { color, stroke, variant } = getStatusColor(row.original.status);
         return (
-          <Badge variant={variant}>
-            <Icon
-              className="mr-2 size-4"
-              aria-hidden="true"
-            />
-            <P>{type}</P>
-          </Badge>
+          <div className="flex w-fit items-center">
+            <Badge variant={variant} className="pr-3.5">
+              <Dot className="mr-1 size-3" strokeWidth={stroke} color={color} />
+              {textTransform(row.original.status)}
+            </Badge>
+          </div>
         );
       },
       filterFn: (row, id, value) => {

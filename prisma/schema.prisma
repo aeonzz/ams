@@ -24,22 +24,23 @@ datasource db {
 }
 
 model User {
-  id                       String       @id
-  email                    String       @unique
+  id                       String               @id
+  email                    String               @unique
   profileUrl               String?
   hashedPassword           String
-  resetPasswordToken       String?      @unique
+  resetPasswordToken       String?              @unique
   resetPasswordTokenExpiry DateTime?
   username                 String
   department               String
-  createdAt                DateTime     @default(now())
-  updatedAt                DateTime     @updatedAt
+  createdAt                DateTime             @default(now())
+  updatedAt                DateTime             @updatedAt
   sessions                 Session[]
   setting                  Setting?
   request                  Request[]
   userRole                 UserRole[]
-  jobRequestsAsReviewer    JobRequest[] @relation(name: "ReviewerRelation")
-  jobRequestsAsAssigned    JobRequest[] @relation(name: "AssignedUserRelation")
+  jobRequestsAsReviewer    JobRequest[]         @relation(name: "ReviewerRelation")
+  jobRequestsAsAssigned    JobRequest[]         @relation(name: "AssignedUserRelation")
+  JobRequestAuditLog       JobRequestAuditLog[]
 }
 
 model UserRole {
@@ -122,28 +123,41 @@ model Request {
 }
 
 model JobRequest {
-  id              String    @id
-  description     String
-  dueDate         DateTime
-  estimatedTime   Int?
-  startDate       DateTime?
-  endDate         DateTime?
-  costEstimate    Float?
-  actualCost      Float?
-  jobType         JobType
-  files           File[]
-  progressNotes   String?
-  requestId       String    @unique
-  request         Request   @relation(fields: [requestId], references: [id], onDelete: Cascade)
-  section         Section   @relation(fields: [sectionId], references: [id])
-  sectionId       String
-  status          JobStatus @default(PENDING)
-  reviewedBy      String?
-  reviewer        User?     @relation(name: "ReviewerRelation", fields: [reviewedBy], references: [id])
-  assignedTo      String?
-  assignedUser    User?     @relation(name: "AssignedUserRelation", fields: [assignedTo], references: [id])
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id                 String               @id
+  description        String
+  dueDate            DateTime
+  estimatedTime      Int?
+  startDate          DateTime?
+  endDate            DateTime?
+  costEstimate       Float?
+  actualCost         Float?
+  jobType            JobType
+  files              File[]
+  progressNotes      String?
+  requestId          String               @unique
+  request            Request              @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  section            Section              @relation(fields: [sectionId], references: [id])
+  sectionId          String
+  status             JobStatus            @default(PENDING)
+  reviewedBy         String?
+  reviewer           User?                @relation(name: "ReviewerRelation", fields: [reviewedBy], references: [id])
+  assignedTo         String?
+  assignedUser       User?                @relation(name: "AssignedUserRelation", fields: [assignedTo], references: [id])
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  jobRequestAuditLog JobRequestAuditLog[]
+}
+
+model JobRequestAuditLog {
+  id           String     @id
+  jobRequestId String
+  jobRequest   JobRequest @relation(fields: [jobRequestId], references: [id], onDelete: Cascade)
+  changeType   ChangeType
+  oldValue     Json?
+  newValue     Json?
+  changedById  String
+  changedBy    User       @relation(fields: [changedById], references: [id])
+  timestamp    DateTime   @default(now())
 }
 
 model Section {
@@ -298,6 +312,18 @@ enum JobStatus {
   CANCELLED
 }
 
+enum ChangeType {
+  STATUS_CHANGE
+  FIELD_UPDATE
+  ASSIGNMENT_CHANGE
+  REVIEWER_CHANGE
+  APPROVER_CHANGE
+  APPROVED
+  CANCELLED
+  CREATED
+  OTHER
+}
+
 enum JobType {
   ROUTINE_MAINTENANCE
   REPAIRS
@@ -391,7 +417,7 @@ enum RequestStatusType {
   APPROVED
   IN_PROGRESS
   UNDER_REVIEW
-  REVIEWED 
+  REVIEWED
   COMPLETED
   REJECTED
   CANCELLED

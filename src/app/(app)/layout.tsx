@@ -22,6 +22,7 @@ export default async function AppLayout({
   // }
 
   return (
+    //@ts-ignore
     <SessionProvider user={data}>
       <DashboardLayout>
         {/* <CommandLayout> */}

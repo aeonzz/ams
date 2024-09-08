@@ -71,14 +71,16 @@ export default function RequestActions({ data, params }: RequestActionsProps) {
     });
   }
 
-  if (data.status === "CANCELLED" || isPending) {
+  if (data.status !== "PENDING" || isPending) {
     return null;
   }
 
   return (
     <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <AlertDialogTrigger asChild>
-        <Button variant="secondary" className="w-full">Cancel Request</Button>
+        <Button variant="secondary" className="w-full">
+          Cancel Request
+        </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>

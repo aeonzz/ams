@@ -3,11 +3,11 @@
 import React from "react";
 
 import { UserSessionContext } from "@/lib/hooks/use-session";
-import { UserType } from "@/lib/types/user";
+import { type UserWithRelations } from "prisma/generated/zod";
 
 interface SessionProviderProps {
   children: React.ReactNode;
-  user: UserType;
+  user: UserWithRelations;
 }
 
 export default function SessionProvider({

@@ -4,11 +4,13 @@ import type { SettingWithRelations } from './SettingSchema'
 import type { RequestWithRelations } from './RequestSchema'
 import type { UserRoleWithRelations } from './UserRoleSchema'
 import type { JobRequestWithRelations } from './JobRequestSchema'
+import type { JobRequestAuditLogWithRelations } from './JobRequestAuditLogSchema'
 import { SessionWithRelationsSchema } from './SessionSchema'
 import { SettingWithRelationsSchema } from './SettingSchema'
 import { RequestWithRelationsSchema } from './RequestSchema'
 import { UserRoleWithRelationsSchema } from './UserRoleSchema'
 import { JobRequestWithRelationsSchema } from './JobRequestSchema'
+import { JobRequestAuditLogWithRelationsSchema } from './JobRequestAuditLogSchema'
 
 /////////////////////////////////////////
 // USER SCHEMA
@@ -40,6 +42,7 @@ export type UserRelations = {
   userRole: UserRoleWithRelations[];
   jobRequestsAsReviewer: JobRequestWithRelations[];
   jobRequestsAsAssigned: JobRequestWithRelations[];
+  JobRequestAuditLog: JobRequestAuditLogWithRelations[];
 };
 
 export type UserWithRelations = z.infer<typeof UserSchema> & UserRelations
@@ -51,6 +54,7 @@ export const UserWithRelationsSchema: z.ZodType<UserWithRelations> = UserSchema.
   userRole: z.lazy(() => UserRoleWithRelationsSchema).array(),
   jobRequestsAsReviewer: z.lazy(() => JobRequestWithRelationsSchema).array(),
   jobRequestsAsAssigned: z.lazy(() => JobRequestWithRelationsSchema).array(),
+  JobRequestAuditLog: z.lazy(() => JobRequestAuditLogWithRelationsSchema).array(),
 }))
 
 export default UserSchema;

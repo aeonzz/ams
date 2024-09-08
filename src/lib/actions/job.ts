@@ -175,7 +175,7 @@ export const createJobRequest = authedProcedure
                Now, create a title for the request using the provided details above.`,
       });
 
-      await db.request.create({
+      const createRequest = await db.request.create({
         data: {
           id: `REQ-${generateId(15)}`,
           userId: user.id,
@@ -199,6 +199,24 @@ export const createJobRequest = authedProcedure
             },
           },
         },
+        include: {
+          jobRequest: true,
+        },
+      });
+
+      if (!createRequest.jobRequest) {
+        throw "Something went wrong, please try again later.";
+      }
+
+      const newValueJson = JSON.parse(JSON.stringify(createRequest.jobRequest));
+      await db.jobRequestAuditLog.create({
+        data: {
+          id: generateId(15),
+          jobRequestId: createRequest.jobRequest.id,
+          changeType: "CREATED",
+          newValue: newValueJson,
+          changedById: user.id,
+        },
       });
 
       return revalidatePath(path);
@@ -210,26 +228,46 @@ export const createJobRequest = authedProcedure
 export const assignPersonnel = authedProcedure
   .createServerAction()
   .input(assignPersonnelSchemaWithPath)
-  .handler(async ({ input }) => {
+  .handler(async ({ input, ctx }) => {
+    const { user } = ctx;
     const { path, requestId, ...rest } = input;
 
     try {
-      const checkRequestId = await db.jobRequest.findFirst({
-        where: {
-          id: requestId,
-        },
-      });
+      const result = await db.$transaction(async (prisma) => {
+        const currentJobRequest = await prisma.jobRequest.findUnique({
+          where: {
+            id: requestId,
+          },
+        });
 
-      if (!checkRequestId) {
-        throw "Request not found";
-      }
-      await db.jobRequest.update({
-        where: {
-          id: requestId,
-        },
-        data: {
-          assignedTo: rest.personnelId,
-        },
+        if (!currentJobRequest) {
+          throw new Error("JobRequest not found");
+        }
+
+        const updatedJobRequest = await prisma.jobRequest.update({
+          where: {
+            id: requestId,
+          },
+          data: {
+            assignedTo: rest.personnelId,
+          },
+        });
+
+        const oldValueJson = JSON.parse(JSON.stringify(currentJobRequest));
+        const newValueJson = JSON.parse(JSON.stringify(updatedJobRequest));
+
+        await prisma.jobRequestAuditLog.create({
+          data: {
+            id: generateId(15),
+            jobRequestId: updatedJobRequest.id,
+            changeType: "ASSIGNMENT_CHANGE",
+            oldValue: oldValueJson,
+            newValue: newValueJson,
+            changedById: user.id,
+          },
+        });
+
+        return updatedJobRequest;
       });
 
       return revalidatePath(path);
@@ -242,26 +280,50 @@ export const assignPersonnel = authedProcedure
 export const updateRequestStatus = authedProcedure
   .createServerAction()
   .input(updateRequestStatusSchemaWithPath)
-  .handler(async ({ input }) => {
+  .handler(async ({ ctx, input }) => {
+    const { user } = ctx;
     const { path, requestId, ...rest } = input;
 
     try {
-      const checkRequestId = await db.request.findFirst({
-        where: {
-          id: requestId,
-        },
-      });
+      const result = await db.$transaction(async (prisma) => {
+        const currentJobRequest = await prisma.jobRequest.findUnique({
+          where: {
+            requestId: requestId,
+          },
+        });
 
-      if (!checkRequestId) {
-        throw "Request not found";
-      }
-      await db.request.update({
-        where: {
-          id: requestId,
-        },
-        data: {
-          ...rest,
-        },
+        if (!currentJobRequest) {
+          throw "JobRequest or Request not found";
+        }
+
+        const updatedRequest = await prisma.request.update({
+          where: { id: requestId },
+          data: {
+            ...rest,
+            jobRequest: {
+              update: {
+                reviewedBy: user.id,
+              },
+            },
+          },
+          include: { jobRequest: true },
+        });
+        const oldValueJson = JSON.parse(JSON.stringify(currentJobRequest));
+        const newValueJson = JSON.parse(
+          JSON.stringify(updatedRequest.jobRequest)
+        );
+        await prisma.jobRequestAuditLog.create({
+          data: {
+            id: generateId(15),
+            jobRequestId: currentJobRequest.id,
+            changeType: "APPROVER_CHANGE",
+            oldValue: oldValueJson,
+            newValue: newValueJson,
+            changedById: user.id,
+          },
+        });
+
+        return updatedRequest;
       });
 
       return revalidatePath(path);

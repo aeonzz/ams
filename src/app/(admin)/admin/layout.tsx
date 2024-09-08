@@ -21,9 +21,10 @@ export default async function AppLayout({
   }
 
   return (
+    //@ts-ignore
     <SessionProvider user={data}>
       {/* <RoleGuard allowedRoles={["ADMIN"]}> */}
-        <AdminDashboardLayout>{children}</AdminDashboardLayout>
+      <AdminDashboardLayout>{children}</AdminDashboardLayout>
       {/* </RoleGuard> */}
     </SessionProvider>
   );

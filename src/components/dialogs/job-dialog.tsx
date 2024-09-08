@@ -20,7 +20,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { X } from "lucide-react";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
-import { createRequest } from "@/lib/actions/requests";
 import {
   jobRequestSchema,
   type JobRequestSchema,

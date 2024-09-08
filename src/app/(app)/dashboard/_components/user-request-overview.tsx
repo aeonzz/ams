@@ -4,12 +4,12 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { H5 } from "@/components/typography/text";
 import Link from "next/link";
-import { cn, getStatusIcon, textTransform } from "@/lib/utils";
+import { cn, getStatusColor, textTransform } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { type RequestWithRelations } from "prisma/generated/zod";
-import { Loader2 } from "lucide-react";
+import { Dot, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
@@ -105,7 +105,7 @@ export default function UserRequestOverview() {
             </p>
           ) : (
             getPendingRequests().map((request) => {
-              const { icon: Icon, variant } = getStatusIcon(request.status);
+              const { color, stroke, variant } = getStatusColor(request.status);
               return (
                 <Link key={request.id} href={`request/${request.id}`}>
                   <Card className="bg-secondary">
@@ -121,7 +121,7 @@ export default function UserRequestOverview() {
                     </CardHeader>
                     <CardContent>
                       <p className="text-sm text-muted-foreground">
-                        {request.jobRequest?.notes ||
+                        {request.jobRequest?.description ||
                           request.venueRequest?.purpose ||
                           request.returnableRequest?.purpose ||
                           request.supplyRequest?.purpose ||
@@ -129,8 +129,12 @@ export default function UserRequestOverview() {
                           "No description available"}
                       </p>
                       <div className="mt-2 flex items-center justify-between">
-                        <Badge variant={variant}>
-                          <Icon className="mr-1 size-4" />
+                        <Badge variant={variant} className="pr-3.5">
+                          <Dot
+                            className="mr-1 size-3"
+                            strokeWidth={stroke}
+                            color={color}
+                          />
                           {textTransform(request.status)}
                         </Badge>
                         <span className="text-xs text-muted-foreground">

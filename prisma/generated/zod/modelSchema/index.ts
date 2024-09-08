@@ -7,6 +7,7 @@ export * from './FileSchema';
 export * from './SettingSchema';
 export * from './RequestSchema';
 export * from './JobRequestSchema';
+export * from './JobRequestAuditLogSchema';
 export * from './SectionSchema';
 export * from './VenueRequestSchema';
 export * from './VenueSchema';

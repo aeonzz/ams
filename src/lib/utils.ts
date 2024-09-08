@@ -30,6 +30,14 @@ import {
   CircleX,
   Search,
   RotateCcw,
+  RefreshCw,
+  User,
+  UserCheck,
+  MessageSquare,
+  FilePlus,
+  FileMinus,
+  AlertCircle,
+  Plus,
 } from "lucide-react";
 import { type RequestStatusTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestStatusTypeSchema";
 import { type PriorityTypeType } from "prisma/generated/zod/inputTypeSchemas/PriorityTypeSchema";
@@ -38,6 +46,7 @@ import { BadgeVariant } from "@/components/ui/badge";
 import { type VehicleStatusType } from "prisma/generated/zod/inputTypeSchemas/VehicleStatusSchema";
 import { type VenueStatusType } from "prisma/generated/zod/inputTypeSchemas/VenueStatusSchema";
 import { type ItemStatusType } from "prisma/generated/zod/inputTypeSchemas/ItemStatusSchema";
+import { ChangeTypeType } from "prisma/generated/zod/inputTypeSchemas/ChangeTypeSchema";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -130,44 +139,69 @@ export function getPriorityIcon(priority: PriorityTypeType) {
   return priorityIcons[priority] || CircleIcon;
 }
 
-type StatusIconConfig = {
-  icon: LucideIcon;
+type StatusColorConfig = {
+  color: string;
   variant: BadgeVariant;
+  stroke: number;
 };
 
-type StatusIconMap = {
-  [key in RequestStatusTypeType]: StatusIconConfig;
+type StatusColorMap = {
+  [key in RequestStatusTypeType]: StatusColorConfig;
 };
 
-export function getStatusIcon(status: RequestStatusTypeType): StatusIconConfig {
-  const statusIcons: StatusIconMap = {
+export function getStatusColor(
+  status: RequestStatusTypeType
+): StatusColorConfig {
+  const statusColors: StatusColorMap = {
     APPROVED: {
-      icon: CheckCircle,
+      color: "#22c55e",
       variant: "green",
+      stroke: 10,
     },
     PENDING: {
-      icon: Hourglass,
+      color: "#eab308",
       variant: "yellow",
+      stroke: 10,
     },
     IN_PROGRESS: {
-      icon: Clock,
+      color: "#3b82f6",
       variant: "blue",
+      stroke: 10,
     },
     REJECTED: {
-      icon: XCircle,
+      color: "#ef4444",
       variant: "red",
+      stroke: 10,
     },
     CANCELLED: {
-      icon: XCircle,
-      variant: "outline",
+      color: "#6b7280",
+      variant: "gray",
+      stroke: 10,
     },
     COMPLETED: {
-      icon: CheckCircle,
+      color: "#22c55e",
       variant: "green",
+      stroke: 10,
+    },
+    REVIEWED: {
+      color: "#a855f7",
+      variant: "purple",
+      stroke: 10,
+    },
+    UNDER_REVIEW: {
+      color: "#6366f1",
+      variant: "indigo",
+      stroke: 10,
     },
   };
 
-  return statusIcons[status] || { icon: CircleIcon, variant: "default" };
+  return (
+    statusColors[status] || {
+      color: "#64748b",
+      variant: "gray",
+      stroke: 10,
+    }
+  );
 }
 
 type RequestTypeIconConfig = {
@@ -319,6 +353,76 @@ export function getReturnableItemStatusIcon(
     ReturnableItemStatusIcons[status] || {
       icon: CircleIcon,
       variant: "default",
+    }
+  );
+}
+
+type ChangeTypeInfoConfig = {
+  icon: LucideIcon;
+  color: string;
+  message: string;
+};
+
+type ChangeTypeInfoMap = {
+  [key in ChangeTypeType]: ChangeTypeInfoConfig;
+};
+
+export function getChangeTypeInfo(
+  changeType: ChangeTypeType
+): ChangeTypeInfoConfig {
+  const ChangeTypeInfos: ChangeTypeInfoMap = {
+    STATUS_CHANGE: {
+      icon: RefreshCw,
+      color: "#3b82f6",
+      message: "Status changed",
+    },
+    FIELD_UPDATE: {
+      icon: PenTool,
+      color: "#22c55e",
+      message: "Field updated",
+    },
+    ASSIGNMENT_CHANGE: {
+      icon: User,
+      color: "#a855f7",
+      message: "Assignment changed",
+    },
+    REVIEWER_CHANGE: {
+      icon: UserCheck,
+      color: "#6366f1",
+      message: "Reviewer changed",
+    },
+    APPROVER_CHANGE: {
+      icon: UserCheck,
+      color: "#ec4899",
+      message: "Approver changed",
+    },
+    APPROVED: {
+      icon: CheckCircle,
+      color: "#22c55e",
+      message: "Approved",
+    },
+    CANCELLED: {
+      icon: XCircle,
+      color: "#ef4444",
+      message: "Cancelled",
+    },
+    CREATED: {
+      icon: Plus,
+      color: "#3b82f6",
+      message: "System Created the request",
+    },
+    OTHER: {
+      icon: AlertCircle,
+      color: "#6b7280",
+      message: "Other change",
+    },
+  };
+
+  return (
+    ChangeTypeInfos[changeType] || {
+      icon: AlertCircle,
+      color: "#6b7280",
+      message: "Unknown change",
     }
   );
 }

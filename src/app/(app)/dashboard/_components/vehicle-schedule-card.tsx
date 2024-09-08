@@ -5,7 +5,8 @@ import { type ReservedTransportDateAndTime } from "@/lib/schema/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import { getStatusIcon, textTransform } from "@/lib/utils";
+import { cn, getStatusColor, textTransform } from "@/lib/utils";
+import { Dot } from "lucide-react";
 
 interface VehicleScheduleCardProps {
   data: ReservedTransportDateAndTime;
@@ -14,18 +15,17 @@ interface VehicleScheduleCardProps {
 export default function VehicleScheduleCard({
   data,
 }: VehicleScheduleCardProps) {
+  const { color, stroke, variant } = getStatusColor(data.request.status);
   return (
     <Card className="mb-2 bg-secondary">
       <CardHeader>
         <CardTitle className="truncate">{data.request.title}</CardTitle>
-        <div className="flex space-x-2 flex-wrap">
+        <div className="flex flex-wrap space-x-2">
           <Badge variant="outline" className="w-fit">
             {data.request.department}
           </Badge>
-          <Badge
-            variant={getStatusIcon(data.request.status).variant}
-            className="w-fit"
-          >
+          <Badge variant={variant} className="pr-3.5">
+            <Dot className={cn("mr-1 size-3", color)} strokeWidth={stroke} />
             {textTransform(data.request.status)}
           </Badge>
         </div>

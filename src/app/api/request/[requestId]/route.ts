@@ -38,6 +38,7 @@ export async function GET(req: Request, params: Context) {
             assignedUser: true,
             reviewer: true,
             section: true,
+            jobRequestAuditLog: true,
           },
         },
         returnableRequest: {

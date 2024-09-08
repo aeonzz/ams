@@ -5,10 +5,12 @@ import type { FileWithRelations } from './FileSchema'
 import type { RequestWithRelations } from './RequestSchema'
 import type { SectionWithRelations } from './SectionSchema'
 import type { UserWithRelations } from './UserSchema'
+import type { JobRequestAuditLogWithRelations } from './JobRequestAuditLogSchema'
 import { FileWithRelationsSchema } from './FileSchema'
 import { RequestWithRelationsSchema } from './RequestSchema'
 import { SectionWithRelationsSchema } from './SectionSchema'
 import { UserWithRelationsSchema } from './UserSchema'
+import { JobRequestAuditLogWithRelationsSchema } from './JobRequestAuditLogSchema'
 
 /////////////////////////////////////////
 // JOB REQUEST SCHEMA
@@ -46,6 +48,7 @@ export type JobRequestRelations = {
   section: SectionWithRelations;
   reviewer?: UserWithRelations | null;
   assignedUser?: UserWithRelations | null;
+  jobRequestAuditLog: JobRequestAuditLogWithRelations[];
 };
 
 export type JobRequestWithRelations = z.infer<typeof JobRequestSchema> & JobRequestRelations
@@ -56,6 +59,7 @@ export const JobRequestWithRelationsSchema: z.ZodType<JobRequestWithRelations> =
   section: z.lazy(() => SectionWithRelationsSchema),
   reviewer: z.lazy(() => UserWithRelationsSchema).nullable(),
   assignedUser: z.lazy(() => UserWithRelationsSchema).nullable(),
+  jobRequestAuditLog: z.lazy(() => JobRequestAuditLogWithRelationsSchema).array(),
 }))
 
 export default JobRequestSchema;
