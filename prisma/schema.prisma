@@ -30,9 +30,13 @@ model User {
   hashedPassword           String
   resetPasswordToken       String?              @unique
   resetPasswordTokenExpiry DateTime?
-  username                 String
+  firstName                String
+  middleName               String?
+  lastName                 String
   department               String
   createdAt                DateTime             @default(now())
+  sectionId                String?
+  section                  Section?             @relation(fields: [sectionId], references: [id])
   updatedAt                DateTime             @updatedAt
   sessions                 Session[]
   setting                  Setting?
@@ -168,6 +172,7 @@ model Section {
   updatedAt   DateTime     @updatedAt
   isArchived  Boolean      @default(false)
   jobRequests JobRequest[]
+  User        User[]
 }
 
 model VenueRequest {

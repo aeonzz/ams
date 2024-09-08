@@ -42,9 +42,9 @@ export function UsersTable({ usersPromise }: UsersTableProps) {
       placeholder: "Filter emails...",
     },
     {
-      label: "Username",
-      value: "username",
-      placeholder: "Filter usernames...",
+      label: "Last Name",
+      value: "lastName",
+      placeholder: "Filter Last Names...",
     },
     // {
     //   label: "Role",

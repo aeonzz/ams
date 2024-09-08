@@ -2,7 +2,12 @@
 
 import { H4, H5, P } from "@/components/typography/text";
 import { Separator } from "@/components/ui/separator";
-import { cn, getChangeTypeInfo, textTransform } from "@/lib/utils";
+import {
+  cn,
+  formatFullName,
+  getChangeTypeInfo,
+  textTransform,
+} from "@/lib/utils";
 import { format } from "date-fns";
 import { Calendar, Dot, FileText, User } from "lucide-react";
 import Image from "next/image";
@@ -28,7 +33,7 @@ export default function JobRequestDetails({ data }: JobRequestDetailsProps) {
           <User className="h-5 w-5" />
           <P>
             Assigned To:{" "}
-            {data.assignedUser ? data.assignedUser.username : "N/A"}
+            {data.assignedUser ? formatFullName(data.assignedUser) : "N/A"}
           </P>
         </div>
         <div className="flex items-center space-x-2">
@@ -36,7 +41,9 @@ export default function JobRequestDetails({ data }: JobRequestDetailsProps) {
           <P>Due Date: {format(new Date(data.dueDate), "PPP p")}</P>
         </div>
         <div>
-          <H5 className="mb-2 font-semibold text-muted-foreground">Job Description:</H5>
+          <H5 className="mb-2 font-semibold text-muted-foreground">
+            Job Description:
+          </H5>
           <P className="text-wrap break-all">{data.description}</P>
         </div>
         <div>

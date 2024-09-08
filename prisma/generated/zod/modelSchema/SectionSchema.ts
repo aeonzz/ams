@@ -1,6 +1,8 @@
 import { z } from 'zod';
 import type { JobRequestWithRelations } from './JobRequestSchema'
+import type { UserWithRelations } from './UserSchema'
 import { JobRequestWithRelationsSchema } from './JobRequestSchema'
+import { UserWithRelationsSchema } from './UserSchema'
 
 /////////////////////////////////////////
 // SECTION SCHEMA
@@ -23,12 +25,14 @@ export type Section = z.infer<typeof SectionSchema>
 
 export type SectionRelations = {
   jobRequests: JobRequestWithRelations[];
+  User: UserWithRelations[];
 };
 
 export type SectionWithRelations = z.infer<typeof SectionSchema> & SectionRelations
 
 export const SectionWithRelationsSchema: z.ZodType<SectionWithRelations> = SectionSchema.merge(z.object({
   jobRequests: z.lazy(() => JobRequestWithRelationsSchema).array(),
+  User: z.lazy(() => UserWithRelationsSchema).array(),
 }))
 
 export default SectionSchema;

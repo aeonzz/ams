@@ -6,11 +6,7 @@ import { type ColumnDef } from "@tanstack/react-table";
 import { toast } from "sonner";
 
 // import { getErrorMessage } from "@/lib/handle-error"
-import {
-  formatDate,
-  getPriorityIcon,
-  textTransform,
-} from "@/lib/utils";
+import { formatDate, getPriorityIcon, textTransform } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -98,14 +94,46 @@ export function getUsersColumns(): ColumnDef<User>[] {
       },
     },
     {
-      accessorKey: "username",
+      accessorKey: "firstName",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Username" />
+        <DataTableColumnHeader column={column} title="First Name" />
       ),
       cell: ({ row }) => {
         return (
           <div className="flex items-center">
-            <P>{row.original.username}</P>
+            <P>{row.original.firstName}</P>
+          </div>
+        );
+      },
+      filterFn: (row, id, value) => {
+        return Array.isArray(value) && value.includes(row.getValue(id));
+      },
+    },
+    {
+      accessorKey: "middleName",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Middle Name" />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="flex items-center">
+            <P>{row.original.middleName}</P>
+          </div>
+        );
+      },
+      filterFn: (row, id, value) => {
+        return Array.isArray(value) && value.includes(row.getValue(id));
+      },
+    },
+    {
+      accessorKey: "lastName",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Last Name" />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="flex items-center">
+            <P>{row.original.lastName}</P>
           </div>
         );
       },

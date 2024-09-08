@@ -47,6 +47,7 @@ import { type VehicleStatusType } from "prisma/generated/zod/inputTypeSchemas/Ve
 import { type VenueStatusType } from "prisma/generated/zod/inputTypeSchemas/VenueStatusSchema";
 import { type ItemStatusType } from "prisma/generated/zod/inputTypeSchemas/ItemStatusSchema";
 import { ChangeTypeType } from "prisma/generated/zod/inputTypeSchemas/ChangeTypeSchema";
+import { User as UserType } from "prisma/generated/zod";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -434,6 +435,19 @@ export function isOverlapping(
   end2: Date
 ): boolean {
   return start1 < end2 && start2 < end1;
+}
+
+export function formatFullName(user: UserType) {
+  const { firstName, middleName, lastName } = user;
+  const trimmedFirstName = firstName.trim();
+  const trimmedMiddleName = middleName?.trim();
+  const trimmedLastName = lastName.trim();
+
+  if (trimmedMiddleName) {
+    return `${trimmedFirstName} ${trimmedMiddleName} ${trimmedLastName}`;
+  } else {
+    return `${trimmedFirstName} ${trimmedLastName}`;
+  }
 }
 
 export const isDateInPast = (date: Date) => {

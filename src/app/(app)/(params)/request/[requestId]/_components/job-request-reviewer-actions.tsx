@@ -46,6 +46,7 @@ import axios from "axios";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { P } from "@/components/typography/text";
 import { Separator } from "@/components/ui/separator";
+import { formatFullName } from "@/lib/utils";
 
 interface JobRequestReviewerActionsDialogProps {
   request: RequestWithRelations;
@@ -189,7 +190,7 @@ export default function JobRequestReviewerActionsDialog({
                 }
               >
                 {selectedPerson
-                  ? personnel?.find((p) => p.id === selectedPerson)?.username
+                  ? formatFullName(personnel?.find((p) => p.id === selectedPerson))
                   : "Assign Personnel"}
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>

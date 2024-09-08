@@ -21,6 +21,7 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import {
   cn,
+  formatFullName,
   getPriorityIcon,
   getRequestTypeIcon,
   getStatusColor,
@@ -37,6 +38,7 @@ import JobRequestReviewerActions from "./job-request-reviewer-actions";
 import { useSession } from "@/lib/hooks/use-session";
 import { useRequest } from "@/lib/hooks/use-request-store";
 import { ClientRoleGuard } from "@/components/client-role-guard";
+import { PermissionGuard } from "@/components/permission-guard";
 
 interface RequestDetailsProps {
   params: string;
@@ -95,10 +97,10 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                 <Avatar className="size-5 rounded-full">
                   <AvatarImage src={`${data.user.profileUrl}` ?? ""} />
                   <AvatarFallback className="rounded-md">
-                    {data.user.username.charAt(0).toUpperCase()}
+                    {data.user.firstName.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
-                <P>Requested by: {data.user.username}</P>
+                <P>Requested by: {formatFullName(data.user)}</P>
               </div>
               <div className="flex items-center space-x-2">
                 <Calendar className="h-5 w-5" />
@@ -293,10 +295,10 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                 <Avatar className="size-5 rounded-full">
                   <AvatarImage src={`${data.user.profileUrl}` ?? ""} />
                   <AvatarFallback className="rounded-md">
-                    {data.user.username.charAt(0).toUpperCase()}
+                    {data.user.firstName.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
-                <P>{data.user.username}</P>
+                <P>{formatFullName(data.user)}</P>
               </div>
             </div>
             {data.type === "JOB" && data.jobRequest && (
@@ -306,12 +308,12 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                   <Avatar className="size-5 rounded-full">
                     <AvatarImage src={`${data.user.profileUrl}` ?? ""} />
                     <AvatarFallback className="rounded-md">
-                      {data.user.username.charAt(0).toUpperCase()}
+                      {data.user.firstName.charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <P>
                     {data.jobRequest.assignedUser
-                      ? data.jobRequest.assignedUser.username
+                      ? formatFullName(data.user)
                       : "N/A"}
                   </P>
                 </div>
@@ -325,12 +327,13 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
             <RequestActions data={data} params={params} />
           )}
           {data.type === "JOB" && data.jobRequest && (
-            <ClientRoleGuard
+            <PermissionGuard
               allowedRoles={["REQUEST_REVIEWER"]}
+              allowedSection={data.jobRequest.sectionId}
               currentUser={currentUser}
             >
               <JobRequestReviewerActions request={data} />
-            </ClientRoleGuard>
+            </PermissionGuard>
           )}
         </div>
       </div>

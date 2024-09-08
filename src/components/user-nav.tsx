@@ -6,7 +6,7 @@ import { ChevronDown, SquarePen } from "lucide-react";
 
 import { signOutAction } from "@/lib/actions/users";
 import { useSession } from "@/lib/hooks/use-session";
-import { cn } from "@/lib/utils";
+import { cn, formatFullName } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -52,21 +52,17 @@ export default function UserNav({ isOpen }: UserNavProps) {
           <Button variant="ghost" className="w-auto space-x-2 px-3">
             <Avatar className="size-7 rounded-md">
               <AvatarImage src={`${currentUser.profileUrl}` ?? ""} />
-              <AvatarFallback className="rounded-md">c
-              </AvatarFallback>
+              <AvatarFallback className="rounded-md">c</AvatarFallback>
             </Avatar>
             <p
               className={cn(
-                "whitespace-nowrap transition-[transform,opacity,display] duration-300 ease-out-expo",
+                "truncate whitespace-nowrap transition-[transform,opacity,display] duration-300 ease-out-expo",
                 isOpen === false
                   ? "hidden -translate-x-96 opacity-0"
                   : "translate-x-0 opacity-100"
               )}
             >
-              {currentUser.username.slice(0, 10)}
-              {currentUser.username &&
-                currentUser.username.length >= 10 &&
-                "..."}
+              {formatFullName(currentUser)}
             </p>
             {isOpen && (
               <ChevronDown className="size-5 duration-300 ease-out-expo" />
