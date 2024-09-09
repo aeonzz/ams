@@ -2,9 +2,11 @@ import { z } from 'zod';
 import type { UserRoleWithRelations } from './UserRoleSchema'
 import type { InventoryItemWithRelations } from './InventoryItemSchema'
 import type { ReturnableRequestWithRelations } from './ReturnableRequestSchema'
+import type { UserWithRelations } from './UserSchema'
 import { UserRoleWithRelationsSchema } from './UserRoleSchema'
 import { InventoryItemWithRelationsSchema } from './InventoryItemSchema'
 import { ReturnableRequestWithRelationsSchema } from './ReturnableRequestSchema'
+import { UserWithRelationsSchema } from './UserSchema'
 
 /////////////////////////////////////////
 // DEPARTMENT SCHEMA
@@ -28,6 +30,7 @@ export type DepartmentRelations = {
   UserRole: UserRoleWithRelations[];
   inventoryItem: InventoryItemWithRelations[];
   ReturnableRequest: ReturnableRequestWithRelations[];
+  user: UserWithRelations[];
 };
 
 export type DepartmentWithRelations = z.infer<typeof DepartmentSchema> & DepartmentRelations
@@ -36,6 +39,7 @@ export const DepartmentWithRelationsSchema: z.ZodType<DepartmentWithRelations> =
   UserRole: z.lazy(() => UserRoleWithRelationsSchema).array(),
   inventoryItem: z.lazy(() => InventoryItemWithRelationsSchema).array(),
   ReturnableRequest: z.lazy(() => ReturnableRequestWithRelationsSchema).array(),
+  user: z.lazy(() => UserWithRelationsSchema).array(),
 }))
 
 export default DepartmentSchema;

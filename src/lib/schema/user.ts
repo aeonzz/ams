@@ -2,8 +2,12 @@ import { z } from "zod";
 
 export const createUserSchemaBase = z.object({
   email: z.string().min(1, "Email is required").email("Invalid email"),
-  department: z.string().min(1, "Department is required"),
-  username: z.string().min(1, "Username is required"),
+  firstName: z.string().min(1, "First name is required"),
+  middleName: z.string().optional(),
+  lastName: z.string().min(1, "last name is required"),
+  departmentId: z.string({
+    required_error: "Department is required",
+  }),
   password: z
     .string()
     .min(4, { message: "Must be at least 4 characters long" })
@@ -28,8 +32,10 @@ export type ExtendedUserInputSchema = z.infer<typeof extendedUserInputSchema>;
 
 export const updateUserSchemaBase = z.object({
   email: z.string().email("Invalid email").optional(),
-  department: z.string().optional(),
-  username: z.string().optional(),
+  departmentId: z.string().optional(),
+  firstName: z.string().optional(),
+  middleName: z.string().optional(),
+  lastName: z.string().optional(),
   profileUrl: z.string().optional(),
   password: z
     .string()
@@ -67,3 +73,16 @@ export const updateUsersSchema = z.object({
 
 export type UpdateUsersSchema = z.infer<typeof updateUsersSchema>;
 
+export const createUserRoles = z.object({
+  userId: z.string(),
+  roleId: z.array(z.string()),
+  departmentId: z.string(),
+});
+
+export type CreateUserRoles = z.infer<typeof createUserRoles>;
+
+export const createUserRolesWithPath = createUserRoles.extend({
+  path: z.string(),
+});
+
+export type CreateUserRolesWithPath = z.infer<typeof createUserRolesWithPath>;

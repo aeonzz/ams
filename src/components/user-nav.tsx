@@ -43,16 +43,18 @@ export default function UserNav({ isOpen }: UserNavProps) {
   }
 
   return (
-    <div className="flex h-auto w-full items-center justify-between">
+    <div className="flex h-auto w-full items-center ">
       <DropdownMenu>
         <DropdownMenuTrigger
           asChild
           className="data-[state=open]:bg-accent [&[data-state=open]>svg]:rotate-180"
         >
-          <Button variant="ghost" className="w-auto space-x-2 px-3">
+          <Button variant="ghost" className="w-auto space-x-2 truncate px-3">
             <Avatar className="size-7 rounded-md">
               <AvatarImage src={`${currentUser.profileUrl}` ?? ""} />
-              <AvatarFallback className="rounded-md">c</AvatarFallback>
+              <AvatarFallback className="rounded-md">
+                {currentUser.firstName.charAt(0).toUpperCase()}
+              </AvatarFallback>
             </Avatar>
             <p
               className={cn(

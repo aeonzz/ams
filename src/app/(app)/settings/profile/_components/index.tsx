@@ -34,7 +34,7 @@ export default function ProfileScreen() {
               <Avatar className="size-32">
                 <AvatarImage src={`${currentUser.profileUrl}` ?? ""} />
                 <AvatarFallback className="rounded-md">
-                  {currentUser.username.charAt(0).toUpperCase()}
+                  {currentUser.firstName.charAt(0).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
             </CardContent>
@@ -42,10 +42,10 @@ export default function ProfileScreen() {
               <UploadProfileDialog />
             </CardFooter>
           </Card>
-          <UpdateUserForm
+          {/* <UpdateUserForm
             email={currentUser.email}
             username={currentUser.username}
-          />
+          /> */}
         </div>
       </div>
     </ScrollArea>

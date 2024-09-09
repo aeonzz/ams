@@ -28,6 +28,7 @@ import { ServerUpdateUserSchema } from "../db/schema/user";
 import { authedProcedure, getErrorMessage } from "./utils";
 import { GetUsersSchema } from "../schema";
 import {
+  createUserRolesWithPath,
   deleteUsersSchema,
   extendedUpdateUserSchema,
   extendedUserInputSchema,
@@ -85,9 +86,10 @@ export async function signUpAction(
       data: {
         id: userId,
         email: data.email,
-        username: "test",
+        firstName: "Christian",
+        middleName: "Escol",
+        lastName: "Caneos",
         hashedPassword,
-        department: "test",
       },
     });
   } catch (e) {
@@ -203,7 +205,6 @@ export const currentUser = authedProcedure
     const { user } = ctx;
 
     try {
-      
       const data = await db.user.findUnique({
         where: {
           id: user.id,
@@ -267,7 +268,9 @@ export async function getUsers(input: GetUsersSchema) {
       "asc" | "desc" | undefined,
     ];
 
-    const where: any = {};
+    const where: any = {
+      isArchived: false,
+    };
 
     if (email) {
       where.email = { contains: email, mode: "insensitive" };
@@ -299,6 +302,9 @@ export async function getUsers(input: GetUsersSchema) {
         skip,
         orderBy: {
           [column || "createdAt"]: order || "desc",
+        },
+        include: {
+          department: true,
         },
       }),
       db.user.count({ where }),
@@ -381,7 +387,8 @@ export const createUser = authedProcedure
   .createServerAction()
   .input(extendedUserInputSchema)
   .handler(async ({ input }) => {
-    const { confirmPassword, password, path, email, ...rest } = input;
+    const { confirmPassword, password, path, email, departmentId, ...rest } =
+      input;
     try {
       const existingUser = await db.user.findUnique({
         where: { email: email },
@@ -400,6 +407,9 @@ export const createUser = authedProcedure
           email: email,
           hashedPassword: hashedPassword,
           ...rest,
+          department: {
+            connect: { id: departmentId },
+          },
         },
       });
 
@@ -417,17 +427,44 @@ export const deleteUsers = authedProcedure
     const { path, ...rest } = input;
 
     try {
-      await db.user.deleteMany({
+      await db.user.updateMany({
         where: {
           id: {
             in: rest.ids,
           },
+        },
+        data: {
+          isArchived: true,
         },
       });
 
       return revalidatePath(path);
     } catch (error) {
       console.log(error);
+      getErrorMessage(error);
+    }
+  });
+
+export const assignRole = authedProcedure
+  .createServerAction()
+  .input(createUserRolesWithPath)
+  .handler(async ({ ctx, input }) => {
+    const { path, userId, roleId, departmentId } = input;
+
+    try {
+      const userRoles = roleId.map((role) => ({
+        id: generateId(15),
+        userId,
+        roleId: role,
+        departmentId,
+      }));
+
+      await db.userRole.createMany({
+        data: userRoles,
+        skipDuplicates: true,
+      });
+      return revalidatePath(path);
+    } catch (error) {
       getErrorMessage(error);
     }
   });

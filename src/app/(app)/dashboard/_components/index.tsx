@@ -13,11 +13,11 @@ import PendingRequest from "./pending-requests";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import UserRequestOverview from "./user-request-overview";
 import SearchInput from "../../_components/search-input";
+import { formatFullName } from "@/lib/utils";
 
 export default function DashboardScreen() {
   const currentUser = useSession();
   const dialogManager = useDialogManager();
-  const username = `${currentUser.username.charAt(0).toUpperCase()}${currentUser.username.slice(1)}`;
 
   return (
     <div className="flex h-full w-full">
@@ -27,11 +27,13 @@ export default function DashboardScreen() {
           <SearchInput />
         </div>
         <div className="scroll-bar h-[calc(100vh_-_68px)] overflow-y-auto py-3">
-          <div className="mb-3 flex justify-between px-3">
-            <H1 className="font-semibold tracking-tight">
+          <div className="mb-3 flex items-center justify-between px-3">
+            <H2 className="font-semibold tracking-tight">
               Good day,{" "}
-              <span className="text-muted-foreground">{username}</span>
-            </H1>
+              <span className="text-muted-foreground">
+                {formatFullName(currentUser)}
+              </span>
+            </H2>
             <Button
               variant="shine"
               onClick={() => dialogManager.setActiveDialog("requestDialog")}

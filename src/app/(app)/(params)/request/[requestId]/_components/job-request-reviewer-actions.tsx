@@ -190,7 +190,7 @@ export default function JobRequestReviewerActionsDialog({
                 }
               >
                 {selectedPerson
-                  ? formatFullName(personnel?.find((p) => p.id === selectedPerson))
+                  ? personnel?.find((p) => p.id === selectedPerson)?.lastName
                   : "Assign Personnel"}
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
@@ -239,14 +239,16 @@ export default function JobRequestReviewerActionsDialog({
                             <Avatar className="mr-2 h-8 w-8">
                               <AvatarImage
                                 src={item.profileUrl ?? ""}
-                                alt={item.username}
+                                alt={formatFullName(item)}
                               />
                               <AvatarFallback>
-                                {item.username.charAt(0).toUpperCase()}
+                                {item.firstName.charAt(0).toUpperCase()}
                               </AvatarFallback>
                             </Avatar>
                             <div className="flex-1">
-                              <P className="font-medium">{item.username}</P>
+                              <P className="font-medium">
+                                {formatFullName(item)}
+                              </P>
                               <P className="text-sm text-muted-foreground">
                                 {item.department}
                               </P>

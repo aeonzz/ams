@@ -12,7 +12,7 @@ import { getUsersColumns } from "./users-table-columns";
 import { UsersTableToolbarActions } from "./users-table-toolbar-actions";
 import { UsersTableFloatingBar } from "./users-table-floating-bar";
 import { getUsers } from "@/lib/actions/users";
-import { type User } from "prisma/generated/zod";
+import { type UserType } from "@/lib/types/user";
 
 interface UsersTableProps {
   usersPromise: ReturnType<typeof getUsers>;
@@ -35,7 +35,7 @@ export function UsersTable({ usersPromise }: UsersTableProps) {
    * @prop {React.ReactNode} [icon] - An optional icon to display next to the label.
    * @prop {boolean} [withCount] - An optional boolean to display the count of the filter option.
    */
-  const filterFields: DataTableFilterField<User>[] = [
+  const filterFields: DataTableFilterField<UserType>[] = [
     {
       label: "Email",
       value: "email",

@@ -25,7 +25,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { User } from "prisma/generated/zod";
 import CommandTooltip from "@/components/ui/command-tooltip";
 import { CommandShortcut } from "@/components/ui/command";
 import { P } from "@/components/typography/text";
@@ -46,9 +45,10 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
+import { type UserType } from "@/lib/types/user";
 
 interface UsersTableFloatingBarProps {
-  table: Table<User>;
+  table: Table<UserType>;
 }
 
 export function UsersTableFloatingBar({ table }: UsersTableFloatingBarProps) {

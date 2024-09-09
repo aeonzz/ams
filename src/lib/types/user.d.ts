@@ -1,5 +1,7 @@
-import { File, Setting, User } from "prisma/generated/zod";
+import { Department } from "@prisma/client";
+import { File, Role, Setting, User } from "prisma/generated/zod";
 
 export type UserType = User & {
-  setting: Setting | null;
+  role: Role[];
+  department: Department | null;
 };

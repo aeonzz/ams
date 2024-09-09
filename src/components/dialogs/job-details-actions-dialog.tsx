@@ -23,6 +23,7 @@ import { type AssignPersonnelSchemaWithPath } from "@/app/(app)/(params)/request
 import { usePathname } from "next/navigation";
 import { getGlobalRequest } from "@/lib/hooks/use-request-store";
 import { Button } from "@/components/ui/button";
+import { formatFullName } from "@/lib/utils";
 
 export default function JobDetailsActionsDialog() {
   const dialogManager = useDialogManager();
@@ -121,14 +122,14 @@ export default function JobDetailsActionsDialog() {
                     <Avatar className="size-10 rounded-full">
                       <AvatarImage
                         src={item.profileUrl ?? ""}
-                        alt={item.username}
+                        alt={formatFullName(item)}
                       />
                       <AvatarFallback className="rounded-md">
-                        {item.username.charAt(0).toUpperCase()}
+                        {item.firstName.charAt(0).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1">
-                      <P className="font-medium">{item.username}</P>
+                      <P className="font-medium">{formatFullName(item)}</P>
                       <P className="text-muted-foreground">{item.department}</P>
                     </div>
                   </div>

@@ -33,7 +33,9 @@ model User {
   firstName                String
   middleName               String?
   lastName                 String
-  department               String
+  isArchived               Boolean              @default(false)
+  departmentId             String
+  department               Department?         @relation(fields: [departmentId], references: [id])
   createdAt                DateTime             @default(now())
   sectionId                String?
   section                  Section?             @relation(fields: [sectionId], references: [id])
@@ -80,6 +82,7 @@ model Department {
   UserRole          UserRole[]
   inventoryItem     InventoryItem[]
   ReturnableRequest ReturnableRequest[]
+  user              User[]
 }
 
 model Session {

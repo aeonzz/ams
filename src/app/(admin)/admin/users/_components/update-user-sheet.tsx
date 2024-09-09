@@ -32,7 +32,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 
-import { Department, User } from "prisma/generated/zod";
+import { Department } from "prisma/generated/zod";
 import { updateUserSchema, UpdateUserSchema } from "@/lib/schema/user";
 import { Input } from "@/components/ui/input";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
@@ -42,12 +42,13 @@ import { Separator } from "@/components/ui/separator";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import {  textTransform } from "@/lib/utils";
+import { textTransform } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { type UserType } from "@/lib/types/user";
 
 interface UpdateUserSheetProps
   extends React.ComponentPropsWithRef<typeof Sheet> {
-  user: User;
+  user: UserType;
 }
 
 export function UpdateUserSheet({ user, ...props }: UpdateUserSheetProps) {
@@ -56,8 +57,10 @@ export function UpdateUserSheet({ user, ...props }: UpdateUserSheetProps) {
     resolver: zodResolver(updateUserSchema),
     defaultValues: {
       email: user.email ?? "",
-      department: user.department,
-      username: user.username,
+      departmentId: user.department?.id,
+      firstName: user.firstName,
+      middleName: user.middleName ?? "",
+      lastName: user.lastName,
     },
   });
 
@@ -75,8 +78,10 @@ export function UpdateUserSheet({ user, ...props }: UpdateUserSheetProps) {
   React.useEffect(() => {
     form.reset({
       email: user.email ?? "",
-      department: user.department,
-      username: user.username,
+      departmentId: user.department?.id,
+      firstName: user.firstName,
+      middleName: user.middleName ?? "",
+      lastName: user.lastName,
     });
   }, [user, form]);
 
@@ -142,14 +147,14 @@ export function UpdateUserSheet({ user, ...props }: UpdateUserSheetProps) {
               />
               <FormField
                 control={form.control}
-                name="username"
+                name="firstName"
                 render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormLabel>Username</FormLabel>
+                  <FormItem>
+                    <FormLabel>First name</FormLabel>
                     <FormControl>
                       <Input
                         autoComplete="off"
-                        placeholder="Aeonz"
+                        placeholder="Enter first name"
                         disabled={isPending}
                         {...field}
                       />
@@ -160,48 +165,84 @@ export function UpdateUserSheet({ user, ...props }: UpdateUserSheetProps) {
               />
               <FormField
                 control={form.control}
-                name="department"
+                name="middleName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Middle name</FormLabel>
+                    <FormControl>
+                      <Input
+                        autoComplete="off"
+                        placeholder="Enter middle name"
+                        disabled={isPending}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="lastName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Last name</FormLabel>
+                    <FormControl>
+                      <Input
+                        autoComplete="off"
+                        placeholder="Enter last name"
+                        disabled={isPending}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="departmentId"
                 render={({ field }) => (
                   <FormItem className="flex-1">
-                    <FormLabel>Department</FormLabel>
+                    <FormLabel>
+                      Department{" "}
+                      <span className="text-xs text-muted-foreground">
+                        (optional)
+                      </span>
+                    </FormLabel>
                     <Select
+                      disabled={isLoading || isPending}
                       onValueChange={field.onChange}
-                      defaultValue={field.value}
+                      value={field.value}
                     >
                       <FormControl>
-                        <SelectTrigger
-                          className="bg-secondary capitalize"
-                          disabled={isPending}
-                        >
+                        <SelectTrigger className="border bg-input text-muted-foreground">
                           <SelectValue
                             placeholder={
                               isLoading ? (
                                 <LoadingSpinner />
                               ) : (
-                                "Select a department"
+                                "Select department"
                               )
                             }
                           />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent className="bg-secondary">
+                      <SelectContent>
                         <SelectGroup>
-                          {data?.length === 0 ? (
-                            <p className="p-4 text-center text-sm">
-                              No departments yet
-                            </p>
+                          {data && data.length > 0 ? (
+                            data.map((department) => (
+                              <SelectItem
+                                key={department.id}
+                                value={department.id}
+                              >
+                                {department.name}
+                              </SelectItem>
+                            ))
                           ) : (
-                            <>
-                              {data?.map((item) => (
-                                <SelectItem
-                                  key={item.id}
-                                  value={item.name}
-                                  className="capitalize"
-                                >
-                                  {item.name}
-                                </SelectItem>
-                              ))}
-                            </>
+                            <p className="p-4 text-center text-sm">
+                              No departments available
+                            </p>
                           )}
                         </SelectGroup>
                       </SelectContent>

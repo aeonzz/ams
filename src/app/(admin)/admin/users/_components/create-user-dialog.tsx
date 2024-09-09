@@ -14,7 +14,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { PlusIcon, X } from "lucide-react";
-import CreateUserForm from "@/components/forms/create-user-form";
+import CreateUserForm from "./create-user-form";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
 import { createUser } from "@/lib/actions/users";
 import {

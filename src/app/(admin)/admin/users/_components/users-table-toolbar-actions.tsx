@@ -8,10 +8,10 @@ import { Button } from "@/components/ui/button"
 
 import CreateUserDialog from "./create-user-dialog"
 import { DeleteUsersDialog } from "./delete-users-dialog"
-import { User } from "prisma/generated/zod"
+import { type UserType } from "@/lib/types/user"
 
 interface UsersTableToolbarActionsProps {
-  table: Table<User>
+  table: Table<UserType>
 }
 
 export function UsersTableToolbarActions({

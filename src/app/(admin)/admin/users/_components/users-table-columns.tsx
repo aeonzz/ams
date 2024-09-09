@@ -26,7 +26,6 @@ import {
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 
 import { P } from "@/components/typography/text";
-import { User } from "prisma/generated/zod";
 import { UpdateUserSheet } from "./update-user-sheet";
 import {
   useServerActionMutation,
@@ -35,8 +34,10 @@ import {
 import { updateUser } from "@/lib/actions/users";
 import { usePathname } from "next/navigation";
 import { DeleteUsersDialog } from "./delete-users-dialog";
+import { type UserType } from "@/lib/types/user";
+import DropdownRoleSelector from "./dropdown-role-selector";
 
-export function getUsersColumns(): ColumnDef<User>[] {
+export function getUsersColumns(): ColumnDef<UserType>[] {
   return [
     {
       id: "select",
@@ -74,7 +75,7 @@ export function getUsersColumns(): ColumnDef<User>[] {
       ),
       cell: ({ row }) => {
         return (
-          <div className="flex w-[25vw] space-x-2">
+          <div className="flex space-x-2">
             <P className="truncate font-medium">{row.getValue("email")}</P>
           </div>
         );
@@ -88,7 +89,9 @@ export function getUsersColumns(): ColumnDef<User>[] {
       cell: ({ row }) => {
         return (
           <div className="flex space-x-2">
-            <Badge variant="outline">{row.original.department}</Badge>
+            <P className="truncate font-medium">
+              {row.original.department ? row.original.department.label : "N/A"}
+            </P>
           </div>
         );
       },
@@ -207,50 +210,7 @@ export function getUsersColumns(): ColumnDef<User>[] {
                 <DropdownMenuItem onSelect={() => setShowUpdateTaskSheet(true)}>
                   Edit
                 </DropdownMenuItem>
-                <DropdownMenuSub>
-                  <DropdownMenuSubTrigger>Roles</DropdownMenuSubTrigger>
-                  <DropdownMenuSubContent>
-                    {/* <DropdownMenuRadioGroup
-                      value={row.original.role}
-                      onValueChange={(value) => {
-                        toast.promise(
-                          mutateAsync({
-                            id: row.original.id,
-                            role: value as RoleTypeType,
-                            path: pathname,
-                          }),
-                          {
-                            loading: "Saving...",
-                            success: () => {
-                              return "Role updated successfully";
-                            },
-                            error: (err) => {
-                              console.log(err);
-                              return err.message;
-                            },
-                          }
-                        );
-                      }}
-                    >
-                      {RoleTypeSchema.options.map((role) => {
-                        const { icon: Icon, variant } = getRoleIcon(role);
-                        return (
-                          <DropdownMenuRadioItem
-                            key={role}
-                            value={role}
-                            className="capitalize"
-                            disabled={isPending}
-                          >
-                            <Badge variant={variant}>
-                              <Icon className="mr-1 size-4" />
-                              {textTransform(role)}
-                            </Badge>
-                          </DropdownMenuRadioItem>
-                        );
-                      })}
-                    </DropdownMenuRadioGroup> */}
-                  </DropdownMenuSubContent>
-                </DropdownMenuSub>
+                <DropdownRoleSelector user={row.original} />
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onSelect={() => setShowDeleteTaskDialog(true)}
