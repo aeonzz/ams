@@ -36,6 +36,7 @@ import { usePathname } from "next/navigation";
 import { DeleteUsersDialog } from "./delete-users-dialog";
 import { type UserType } from "@/lib/types/user";
 import DropdownRoleSelector from "./dropdown-role-selector";
+import { ChevronDownIcon, ChevronRightIcon } from "lucide-react";
 
 export function getUsersColumns(): ColumnDef<UserType>[] {
   return [
@@ -144,32 +145,33 @@ export function getUsersColumns(): ColumnDef<UserType>[] {
         return Array.isArray(value) && value.includes(row.getValue(id));
       },
     },
-    // {
-    //   accessorKey: "role",
-    //   header: ({ column }) => (
-    //     <DataTableColumnHeader column={column} title="Role" />
-    //   ),
-    //   cell: ({ row }) => {
-    //     const { icon: Icon, variant } = getRoleIcon(row.original.role);
-    //     return (
-    //       <div className="flex items-center">
-    //         <Badge variant={variant}>
-    //           <Icon className="mr-1 size-4" />
-    //           {textTransform(row.original.role)}
-    //         </Badge>
-    //       </div>
-    //     );
-    //   },
-    //   filterFn: (row, id, value) => {
-    //     return Array.isArray(value) && value.includes(row.getValue(id));
-    //   },
-    // },
     {
       accessorKey: "createdAt",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Date Created" />
       ),
       cell: ({ cell }) => formatDate(cell.getValue() as Date),
+    },
+    {
+      id: "expander",
+      header: () => <P>User Roles</P>,
+      cell: ({ row }) => {
+        return (
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => row.toggleExpanded()}
+            aria-label="Toggle row details"
+          >
+            {row.getIsExpanded() ? (
+              <ChevronDownIcon className="h-4 w-4" />
+            ) : (
+              <ChevronRightIcon className="h-4 w-4" />
+            )}
+          </Button>
+        );
+      },
+      size: 0,
     },
     {
       id: "actions",

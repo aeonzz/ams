@@ -66,6 +66,7 @@ export const signInAction = createServerAction()
       const sessionCookie = lucia.createSessionCookie(session.id);
       setAuthCookie(sessionCookie);
     } catch (error) {
+      console.log(error);
       getErrorMessage(error);
     }
   });
@@ -305,6 +306,20 @@ export async function getUsers(input: GetUsersSchema) {
         },
         include: {
           department: true,
+          userRole: {
+            include: {
+              department: {
+                select: {
+                  name: true,
+                },
+              },
+              role: {
+                select: {
+                  name: true,
+                },
+              },
+            },
+          },
         },
       }),
       db.user.count({ where }),

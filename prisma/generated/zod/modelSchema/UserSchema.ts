@@ -31,7 +31,7 @@ export const UserSchema = z.object({
   middleName: z.string().nullable(),
   lastName: z.string(),
   isArchived: z.boolean(),
-  departmentId: z.string(),
+  departmentId: z.string().nullable(),
   createdAt: z.coerce.date(),
   sectionId: z.string().nullable(),
   updatedAt: z.coerce.date(),

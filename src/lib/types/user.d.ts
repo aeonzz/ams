@@ -1,7 +1,19 @@
 import { Department } from "@prisma/client";
-import { File, Role, Setting, User } from "prisma/generated/zod";
+import { User, UserRole } from "prisma/generated/zod";
 
 export type UserType = User & {
-  role: Role[];
+  userRole: {
+    department: {
+      name: string;
+    };
+    role: {
+      name: string;
+    };
+    id: string;
+    departmentId: string;
+    roleId: string;
+    createdAt: Date;
+    updatedAt: Date;
+  }[];
   department: Department | null;
 };

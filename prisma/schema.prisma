@@ -34,7 +34,7 @@ model User {
   middleName               String?
   lastName                 String
   isArchived               Boolean              @default(false)
-  departmentId             String
+  departmentId             String?
   department               Department?         @relation(fields: [departmentId], references: [id])
   createdAt                DateTime             @default(now())
   sectionId                String?

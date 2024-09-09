@@ -13,6 +13,7 @@ import { UsersTableToolbarActions } from "./users-table-toolbar-actions";
 import { UsersTableFloatingBar } from "./users-table-floating-bar";
 import { getUsers } from "@/lib/actions/users";
 import { type UserType } from "@/lib/types/user";
+import UserUserRolesTable from "./user-user-roles-table";
 
 interface UsersTableProps {
   usersPromise: ReturnType<typeof getUsers>;
@@ -46,18 +47,6 @@ export function UsersTable({ usersPromise }: UsersTableProps) {
       value: "lastName",
       placeholder: "Filter Last Names...",
     },
-    // {
-    //   label: "Role",
-    //   value: "role",
-    //   options: RoleTypeSchema.options.map((role) => ({
-    //     label:
-    //       role.charAt(0).toUpperCase() +
-    //       role.slice(1).toLowerCase().replace(/_/g, " "),
-    //     value: role,
-    //     icon: getRoleIcon(role).icon,
-    //     withCount: true,
-    //   })),
-    // },
   ];
 
   const { table } = useDataTable({
@@ -79,6 +68,16 @@ export function UsersTable({ usersPromise }: UsersTableProps) {
     <DataTable
       table={table}
       floatingBar={<UsersTableFloatingBar table={table} />}
+      renderSubComponent={({ row }) => {
+        const formattedUserRoles = row.original.userRole.map((role) => ({
+          departmentName: role.department.name,
+          roleName: role.role.name,
+          createdAt: role.createdAt,
+          updatedAt: role.updatedAt,
+        }));
+
+        return <UserUserRolesTable userRoles={formattedUserRoles} />;
+      }}
     >
       <DataTableToolbar table={table} filterFields={filterFields}>
         <UsersTableToolbarActions table={table} />
