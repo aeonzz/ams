@@ -32,12 +32,20 @@ export function RoleManagementTableToolbarActions({
       <Button
         variant="secondary"
         size="sm"
-        onClick={() =>
-          dialogManager.setActiveDialog("adminCreateRoleDialog")
-        }
+        onClick={() => dialogManager.setActiveDialog("adminCreateRoleDialog")}
       >
         <PlusIcon className="mr-2 size-4" aria-hidden="true" />
         Add role
+      </Button>
+      <Button
+        variant="secondary"
+        size="sm"
+        onClick={() =>
+          dialogManager.setActiveDialog("adminCreateUserRoleDialog")
+        }
+      >
+        <PlusIcon className="mr-2 size-4" aria-hidden="true" />
+        Create user role
       </Button>
       <Button
         variant="secondary"

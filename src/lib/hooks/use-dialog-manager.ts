@@ -25,6 +25,7 @@ export type DialogType =
   | "adminDeleteRoleDialog"
   | "adminCreateJobSectionDialog"
   | "adminUpdateJobSectionSheet"
+  | "adminCreateUserRoleDialog"
   | null;
 
 export interface DialogState {

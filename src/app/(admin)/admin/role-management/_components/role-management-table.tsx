@@ -20,7 +20,7 @@ import { BuildingIcon, CalendarIcon, UserIcon } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { H4, P } from "@/components/typography/text";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { cn, formatFullName } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 
 interface RoleManagementTableProps {
@@ -31,7 +31,6 @@ export function RoleManagementTable({
   roleManagementPromise,
 }: RoleManagementTableProps) {
   const { data, pageCount } = React.use(roleManagementPromise);
-  console.log(data);
 
   const columns = React.useMemo(() => getRoleColumns(), []);
 
@@ -78,7 +77,7 @@ export function RoleManagementTable({
             </div>
             <div className="scroll-bar h-[300px] overflow-y-auto rounded-md border p-4">
               {row.original.userRoles.length === 0 ? (
-                <div className="h-full flex items-center justify-center">
+                <div className="flex h-full items-center justify-center">
                   <P className="text-muted-foreground">
                     No User Roles assigned
                   </P>
@@ -93,15 +92,15 @@ export function RoleManagementTable({
                       <Avatar className="h-10 w-10">
                         <AvatarImage
                           src={userRole.user.profileUrl || undefined}
-                          alt={userRole.user.username}
+                          alt={formatFullName(userRole.user)}
                         />
                         <AvatarFallback>
-                          {userRole.user.username.slice(0, 2).toUpperCase()}
+                          {userRole.user.firstName.charAt(0).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
                       <div className="space-y-1">
                         <h5 className="text-sm font-medium">
-                          {userRole.user.username}
+                          {formatFullName(userRole.user)}
                         </h5>
                         <p className="text-sm text-muted-foreground">
                           {userRole.user.email}

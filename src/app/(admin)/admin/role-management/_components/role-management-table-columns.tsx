@@ -168,12 +168,12 @@ export function getRoleColumns(): ColumnDef<RoleType>[] {
               showTrigger={false}
               onSuccess={() => row.toggleSelected(false)}
             />
-            <AssignRoleSheet
+            {/* <AssignRoleSheet
               roleId={row.original.id}
               roleName={row.original.name}
               open={showAssignRoleSheet}
               onOpenChange={setShowAssignRoleSheet}
-            />
+            /> */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button

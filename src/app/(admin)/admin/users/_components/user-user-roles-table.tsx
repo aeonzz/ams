@@ -18,14 +18,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { ItemStatusSchema } from "prisma/generated/zod";
 import { formatDate } from "date-fns";
 import { Input } from "@/components/ui/input";
 import { cn, textTransform } from "@/lib/utils";
@@ -50,7 +42,6 @@ export default function UserUserRolesTable({
 }: UserUserRolesTableProps) {
   console.log(userRoles);
   const [globalFilter, setGlobalFilter] = React.useState("");
-  const [statusFilter, setStatusFilter] = React.useState<string | null>(null);
 
   const columns: ColumnDef<UserRole>[] = React.useMemo(
     () => [
