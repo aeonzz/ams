@@ -11,20 +11,17 @@ import {
 } from "@/components/ui/form";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { DialogFooter } from "@/components/ui/dialog";
 import { SubmitButton } from "@/components/ui/submit-button";
-import { useQuery, type UseMutateAsyncFunction } from "@tanstack/react-query";
+import { type UseMutateAsyncFunction } from "@tanstack/react-query";
 import { type UseFormReturn } from "react-hook-form";
 import { usePathname } from "next/navigation";
-import { DialogState } from "@/lib/hooks/use-dialog-manager";
 import { createUserRole } from "@/lib/actions/userRole";
 import {
   type CreateUserRoleSchemaWithPath,
   type CreateUserRoleSchema,
 } from "@/lib/schema/userRole";
-import axios from "axios";
-import { type RoleUserDepartmentData } from "./types";
+import type { UserDepartmentData } from "./types";
 import InputPopover, { Option } from "./input-popover";
 import {
   Command,
@@ -34,12 +31,10 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Check } from "lucide-react";
 import { cn, formatFullName } from "@/lib/utils";
-import CreateUserRoleFormSkeleton from "./create-user-role-form-skeleton";
 
-interface CreateUserRoleFormProps {
-  setAlertOpen: React.Dispatch<React.SetStateAction<boolean>>;
+interface AssignUserRoleRowFormProps {
   mutateAsync: UseMutateAsyncFunction<
     any,
     Error,
@@ -48,39 +43,32 @@ interface CreateUserRoleFormProps {
   >;
   form: UseFormReturn<CreateUserRoleSchema>;
   isPending: boolean;
-  isFieldsDirty: boolean;
-  dialogManager: DialogState;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  data: UserDepartmentData;
+  roleId: string;
 }
 
-export default function CreateUserRoleForm({
+export default function AssignUserRoleRowForm({
   mutateAsync,
   isPending,
   form,
-  isFieldsDirty,
-  setAlertOpen,
-  dialogManager,
-}: CreateUserRoleFormProps) {
+  setOpen,
+  data,
+  roleId,
+}: AssignUserRoleRowFormProps) {
   const pathname = usePathname();
-
-  const { data, isLoading } = useQuery<RoleUserDepartmentData>({
-    queryFn: async () => {
-      const res = await axios.get("/api/input-data/user-department-role");
-      return res.data.data;
-    },
-    queryKey: ["create-user-role-selection"],
-  });
 
   async function onSubmit(values: CreateUserRoleSchema) {
     const data: CreateUserRoleSchemaWithPath = {
       path: pathname,
       departmentId: values.departmentId,
       userId: values.userId,
-      roleId: values.userId,
+      roleId: roleId,
     };
     toast.promise(mutateAsync(data), {
       loading: "Creating...",
       success: () => {
-        dialogManager.setActiveDialog(null);
+        setOpen(false);
         return "User role created successfuly";
       },
       error: (err) => {
@@ -89,22 +77,17 @@ export default function CreateUserRoleForm({
     });
   }
 
-  if (isLoading || !data) {
-    return <CreateUserRoleFormSkeleton />;
-  }
-
-  const { roles, users, departments } = data;
+  const { users, departments } = data;
 
   return (
     <Form {...form}>
       <form autoComplete="off" onSubmit={form.handleSubmit(onSubmit)}>
-        <div className="scroll-bar flex max-h-[55vh] flex-col gap-2 overflow-y-auto px-4 py-1">
+        <div className="scroll-bar flex max-h-[55vh] flex-col gap-2 overflow-y-auto p-4 pt-2">
           <FormField
             control={form.control}
             name="userId"
             render={({ field }) => (
               <FormItem className="flex-1">
-                <FormLabel>User</FormLabel>
                 <FormControl>
                   <Command className="max-h-[200px]">
                     <CommandInput placeholder={`Search user...`} />
@@ -143,26 +126,9 @@ export default function CreateUserRoleForm({
           />
           <FormField
             control={form.control}
-            name="roleId"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Role</FormLabel>
-                <InputPopover
-                  title="Role"
-                  options={roles}
-                  selected={field.value}
-                  onSelect={field.onChange}
-                />
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
             name="departmentId"
             render={({ field }) => (
               <FormItem className="flex flex-col">
-                <FormLabel>Department</FormLabel>
                 <InputPopover
                   title="Department"
                   options={departments}
@@ -174,25 +140,26 @@ export default function CreateUserRoleForm({
             )}
           />
         </div>
-        <Separator className="my-4" />
         <DialogFooter>
           <div></div>
           <div className="flex space-x-3">
             <Button
               variant="secondary"
+              size="sm"
               onClick={(e) => {
                 e.preventDefault();
-                if (isFieldsDirty) {
-                  setAlertOpen(true);
-                } else {
-                  dialogManager.setActiveDialog(null);
-                }
+                setOpen(false);
               }}
               disabled={isPending}
             >
               Cancel
             </Button>
-            <SubmitButton disabled={isPending} type="submit" className="w-20">
+            <SubmitButton
+              disabled={isPending}
+              type="submit"
+              size="sm"
+              className="w-20"
+            >
               Create
             </SubmitButton>
           </div>

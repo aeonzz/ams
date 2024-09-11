@@ -13,12 +13,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
   DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { usePathname } from "next/navigation";
@@ -30,6 +25,7 @@ import { ChevronDownIcon, ChevronRightIcon } from "lucide-react";
 import AssignRoleSheet from "./assign-role-sheet";
 import { UpdateRoleSheet } from "./update-role-sheet";
 import { DeleteRolesDialog } from "./delete-roles-dialog";
+import AssignUserRoleRowPopover from "./assign-user-role-row-popover";
 
 export function getRoleColumns(): ColumnDef<RoleType>[] {
   return [
@@ -69,7 +65,7 @@ export function getRoleColumns(): ColumnDef<RoleType>[] {
       ),
       cell: ({ row }) => {
         return (
-          <div className="flex w-[20vw] space-x-2">
+          <div className="flex space-x-2">
             <P className="truncate font-medium">{row.original.name}</P>
           </div>
         );
@@ -185,12 +181,10 @@ export function getRoleColumns(): ColumnDef<RoleType>[] {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-40">
-                <DropdownMenuItem onSelect={() => setShowAssignRoleSheet(true)}>
-                  Assign
-                </DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => setShowUpdateRoleSheet(true)}>
                   Edit
                 </DropdownMenuItem>
+                <AssignUserRoleRowPopover roleId={row.original.id} />
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onSelect={() => setShowDeleteRoleDialog(true)}

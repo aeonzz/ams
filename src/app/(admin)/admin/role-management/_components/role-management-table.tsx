@@ -84,51 +84,63 @@ export function RoleManagementTable({
                 </div>
               ) : (
                 <div className="space-y-6">
-                  {row.original.userRoles.map((userRole) => (
-                    <div
-                      key={userRole.id}
-                      className="flex items-start space-x-4"
-                    >
-                      <Avatar className="h-10 w-10">
-                        <AvatarImage
-                          src={userRole.user.profileUrl || undefined}
-                          alt={formatFullName(userRole.user)}
-                        />
-                        <AvatarFallback>
-                          {userRole.user.firstName.charAt(0).toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="space-y-1">
-                        <h5 className="text-sm font-medium">
-                          {formatFullName(userRole.user)}
-                        </h5>
-                        <p className="text-sm text-muted-foreground">
-                          {userRole.user.email}
-                        </p>
-                        <div className="flex items-center space-x-2 text-xs text-muted-foreground">
-                          <Badge
-                            variant="outline"
-                            className="flex items-center space-x-1"
-                          >
-                            <BuildingIcon className="h-3 w-3" />
-                            <span>{userRole.department.name}</span>
-                          </Badge>
-                          <Badge
-                            variant="outline"
-                            className="flex items-center space-x-1"
-                          >
-                            <CalendarIcon className="h-3 w-3" />
-                            <span>
-                              Joined{" "}
-                              {new Date(
-                                userRole.user.createdAt
-                              ).toLocaleDateString()}
-                            </span>
-                          </Badge>
+                  {row.original.userRoles.map((userRole) => {
+                    const {
+                      firstName,
+                      middleName,
+                      lastName,
+                      profileUrl,
+                      email,
+                      createdAt,
+                    } = userRole.user;
+                    return (
+                      <div
+                        key={userRole.id}
+                        className="flex items-start space-x-4"
+                      >
+                        <Avatar className="h-10 w-10">
+                          <AvatarImage
+                            src={profileUrl || undefined}
+                            alt={formatFullName(
+                              firstName,
+                              middleName,
+                              lastName
+                            )}
+                          />
+                          <AvatarFallback>
+                            {firstName.charAt(0).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="space-y-1">
+                          <h5 className="text-sm font-medium">
+                            {formatFullName(firstName, middleName, lastName)}
+                          </h5>
+                          <p className="text-sm text-muted-foreground">
+                            {email}
+                          </p>
+                          <div className="flex items-center space-x-2 text-xs text-muted-foreground">
+                            <Badge
+                              variant="outline"
+                              className="flex items-center space-x-1"
+                            >
+                              <BuildingIcon className="h-3 w-3" />
+                              <span>{userRole.department.name}</span>
+                            </Badge>
+                            <Badge
+                              variant="outline"
+                              className="flex items-center space-x-1"
+                            >
+                              <CalendarIcon className="h-3 w-3" />
+                              <span>
+                                Joined{" "}
+                                {new Date(createdAt).toLocaleDateString()}
+                              </span>
+                            </Badge>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>

@@ -32,7 +32,11 @@ import {
   Loader2,
   ChevronsUpDown,
 } from "lucide-react";
-import type { RequestWithRelations, User } from "prisma/generated/zod";
+import type {
+  RequestWithRelations,
+  User,
+  UserWithRelations,
+} from "prisma/generated/zod";
 import { RequestStatusType } from "@prisma/client";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
 import { updateRequestStatus, assignPersonnel } from "@/lib/actions/job";
@@ -70,7 +74,7 @@ export default function JobRequestReviewerActionsDialog({
     isError,
     error,
     refetch,
-  } = useQuery<User[]>({
+  } = useQuery<UserWithRelations[]>({
     queryFn: async () => {
       const res = await axios.get("/api/user/get-personnels");
       return res.data.data;
@@ -229,36 +233,46 @@ export default function JobRequestReviewerActionsDialog({
                   )}
                   {!isLoading && !isError && (
                     <CommandGroup>
-                      {personnel?.map((item) => (
-                        <CommandItem
-                          key={item.id}
-                          onSelect={() => handleAssignPersonnel(item.id)}
-                          disabled={isAssignPersonnelPending}
-                        >
-                          <div className="flex w-full items-center">
-                            <Avatar className="mr-2 h-8 w-8">
-                              <AvatarImage
-                                src={item.profileUrl ?? ""}
-                                alt={formatFullName(item)}
-                              />
-                              <AvatarFallback>
-                                {item.firstName.charAt(0).toUpperCase()}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div className="flex-1">
-                              <P className="font-medium">
-                                {formatFullName(item)}
-                              </P>
-                              <P className="text-sm text-muted-foreground">
-                                {item.department}
-                              </P>
+                      {personnel?.map((item) => {
+                        return (
+                          <CommandItem
+                            key={item.id}
+                            onSelect={() => handleAssignPersonnel(item.id)}
+                            disabled={isAssignPersonnelPending}
+                          >
+                            <div className="flex w-full items-center">
+                              <Avatar className="mr-2 h-8 w-8">
+                                <AvatarImage
+                                  src={item.profileUrl ?? ""}
+                                  alt={formatFullName(
+                                    item.firstName,
+                                    item.middleName,
+                                    item.lastName
+                                  )}
+                                />
+                                <AvatarFallback>
+                                  {item.firstName.charAt(0).toUpperCase()}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="flex-1">
+                                <P className="font-medium">
+                                  {formatFullName(
+                                    item.firstName,
+                                    item.middleName,
+                                    item.lastName
+                                  )}
+                                </P>
+                                <P className="text-sm text-muted-foreground">
+                                  {item.department?.name}
+                                </P>
+                              </div>
+                              {item.id === selectedPerson && (
+                                <Check className="ml-auto h-4 w-4 text-green-500" />
+                              )}
                             </div>
-                            {item.id === selectedPerson && (
-                              <Check className="ml-auto h-4 w-4 text-green-500" />
-                            )}
-                          </div>
-                        </CommandItem>
-                      ))}
+                          </CommandItem>
+                        );
+                      })}
                     </CommandGroup>
                   )}
                 </CommandList>

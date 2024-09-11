@@ -16,6 +16,7 @@ export async function GET(request: NextRequest) {
       },
       include: {
         userRole: true,
+        department: true,
       },
     });
 

@@ -33,7 +33,13 @@ export default function JobRequestDetails({ data }: JobRequestDetailsProps) {
           <User className="h-5 w-5" />
           <P>
             Assigned To:{" "}
-            {data.assignedUser ? formatFullName(data.assignedUser) : "N/A"}
+            {data.assignedUser
+              ? formatFullName(
+                  data.assignedUser.firstName,
+                  data.assignedUser.middleName,
+                  data.assignedUser.lastName
+                )
+              : "N/A"}
           </P>
         </div>
         <div className="flex items-center space-x-2">

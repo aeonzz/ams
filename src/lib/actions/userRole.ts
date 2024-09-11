@@ -12,6 +12,17 @@ export const createUserRole = authedProcedure
   .handler(async ({ input }) => {
     const { path, ...rest } = input;
     try {
+      const existingUserRole = await db.userRole.findUnique({
+        where: {
+          userId_roleId_departmentId: {
+            ...rest,
+          },
+        },
+      });
+
+      if (existingUserRole) {
+        throw "This user role already exists.";
+      }
       await db.userRole.create({
         data: {
           id: generateId(15),

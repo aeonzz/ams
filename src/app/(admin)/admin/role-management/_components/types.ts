@@ -26,3 +26,8 @@ export type RoleUserDepartmentData = {
   users: user[];
   departments: Option[];
 };
+
+export type UserDepartmentData = {
+  users: user[];
+  departments: Option[];
+};

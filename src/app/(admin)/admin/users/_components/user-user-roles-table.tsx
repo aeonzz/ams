@@ -113,7 +113,7 @@ export default function UserUserRolesTable({
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className="px-5">
+                  <TableHead key={header.id} className="px-5 border-r">
                     {header.isPlaceholder
                       ? null
                       : flexRender(

@@ -30,6 +30,7 @@ interface InputPopoverProps {
   options: Option[];
   selected: string;
   onSelect: (value: string) => void;
+  contentWidth?: string;
 }
 
 export default function InputPopover({
@@ -37,6 +38,7 @@ export default function InputPopover({
   options,
   selected,
   onSelect,
+  contentWidth = "470px",
 }: InputPopoverProps) {
   const [open, setOpen] = React.useState(false);
 
@@ -57,8 +59,8 @@ export default function InputPopover({
           </Button>
         </FormControl>
       </PopoverTrigger>
-      <PopoverContent className="w-full p-0">
-        <Command>
+      <PopoverContent className={cn("p-0", contentWidth)}>
+        <Command className="max-h-[200px]">
           <CommandInput placeholder={`Search ${title.toLowerCase()}...`} />
           <CommandList>
             <CommandEmpty>No {title.toLowerCase()} found.</CommandEmpty>

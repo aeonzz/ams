@@ -31,7 +31,11 @@ export default function DashboardScreen() {
             <H2 className="font-semibold tracking-tight">
               Good day,{" "}
               <span className="text-muted-foreground">
-                {formatFullName(currentUser)}
+                {formatFullName(
+                  currentUser.firstName,
+                  currentUser.middleName,
+                  currentUser.lastName
+                )}
               </span>
             </H2>
             <Button

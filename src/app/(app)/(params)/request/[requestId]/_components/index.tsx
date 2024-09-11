@@ -100,7 +100,14 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                     {data.user.firstName.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
-                <P>Requested by: {formatFullName(data.user)}</P>
+                <P>
+                  Requested by:{" "}
+                  {formatFullName(
+                    data.user.firstName,
+                    data.user.middleName,
+                    data.user.lastName
+                  )}
+                </P>
               </div>
               <div className="flex items-center space-x-2">
                 <Calendar className="h-5 w-5" />
@@ -298,7 +305,13 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                     {data.user.firstName.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
-                <P>{formatFullName(data.user)}</P>
+                <P>
+                  {formatFullName(
+                    data.user.firstName,
+                    data.user.middleName,
+                    data.user.lastName
+                  )}
+                </P>
               </div>
             </div>
             {data.type === "JOB" && data.jobRequest && (
@@ -313,7 +326,11 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                   </Avatar>
                   <P>
                     {data.jobRequest.assignedUser
-                      ? formatFullName(data.user)
+                      ? formatFullName(
+                          data.user.firstName,
+                          data.user.middleName,
+                          data.user.lastName
+                        )
                       : "N/A"}
                   </P>
                 </div>

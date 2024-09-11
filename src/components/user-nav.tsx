@@ -43,7 +43,7 @@ export default function UserNav({ isOpen }: UserNavProps) {
   }
 
   return (
-    <div className="flex h-auto w-full items-center ">
+    <div className="flex h-auto w-full items-center">
       <DropdownMenu>
         <DropdownMenuTrigger
           asChild
@@ -64,7 +64,11 @@ export default function UserNav({ isOpen }: UserNavProps) {
                   : "translate-x-0 opacity-100"
               )}
             >
-              {formatFullName(currentUser)}
+              {formatFullName(
+                currentUser.firstName,
+                currentUser.middleName,
+                currentUser.lastName
+              )}
             </p>
             {isOpen && (
               <ChevronDown className="size-5 duration-300 ease-out-expo" />

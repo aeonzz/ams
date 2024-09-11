@@ -12,7 +12,7 @@ import {
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import { Check, AlertCircle, Loader2 } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { type User } from "prisma/generated/zod";
+import type { UserWithRelations } from "prisma/generated/zod";
 import axios from "axios";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { P } from "../typography/text";
@@ -35,7 +35,9 @@ export default function JobDetailsActionsDialog() {
     string | undefined | null
   >(globalRequest?.jobRequest?.assignedTo);
 
-  const { data, isLoading, isError, error, refetch } = useQuery<User[]>({
+  const { data, isLoading, isError, error, refetch } = useQuery<
+    UserWithRelations[]
+  >({
     queryFn: async () => {
       const res = await axios.get("/api/user/get-personnels");
       return res.data.data;
@@ -122,15 +124,25 @@ export default function JobDetailsActionsDialog() {
                     <Avatar className="size-10 rounded-full">
                       <AvatarImage
                         src={item.profileUrl ?? ""}
-                        alt={formatFullName(item)}
+                        alt={formatFullName(
+                          item.firstName,
+                          item.middleName,
+                          item.lastName
+                        )}
                       />
                       <AvatarFallback className="rounded-md">
                         {item.firstName.charAt(0).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1">
-                      <P className="font-medium">{formatFullName(item)}</P>
-                      <P className="text-muted-foreground">{item.department}</P>
+                      <P className="font-medium">
+                        {formatFullName(
+                          item.firstName,
+                          item.middleName,
+                          item.lastName
+                        )}
+                      </P>
+                      <P className="text-muted-foreground">{item.department?.name}</P>
                     </div>
                   </div>
                   {item.id === selectedUserId && (

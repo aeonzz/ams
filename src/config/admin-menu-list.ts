@@ -95,7 +95,7 @@ export function getAdminMenuList(pathname: string): Group[] {
       groupLabel: "User Management",
       menus: [
         {
-          href: "/admin/users",
+          href: "/admin/users?page=1&per_page=10&sort=createdAt.desc",
           label: "User Accounts",
           active: pathname.includes("/admin/users"),
           icon: Users,
@@ -109,7 +109,7 @@ export function getAdminMenuList(pathname: string): Group[] {
           submenus: [],
         },
         {
-          href: "/admin/role-management",
+          href: "/admin/role-management?page=1&per_page=10&sort=createdAt.desc",
           label: "Role Management",
           active: pathname.includes("/admin/role-management"),
           icon: ShieldAlert,

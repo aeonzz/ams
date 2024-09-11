@@ -437,8 +437,11 @@ export function isOverlapping(
   return start1 < end2 && start2 < end1;
 }
 
-export function formatFullName(user: UserType) {
-  const { firstName, middleName, lastName } = user;
+export function formatFullName(
+  firstName: string,
+  middleName: string | null,
+  lastName: string
+) {
   const trimmedFirstName = firstName.trim();
   const trimmedMiddleName = middleName?.trim();
   const trimmedLastName = lastName.trim();

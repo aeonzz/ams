@@ -108,9 +108,9 @@ export default function CreateUserRoleDialog() {
           </AlertDialogContent>
         </AlertDialog>
         <DialogHeader>
-          <DialogTitle>Add role</DialogTitle>
+          <DialogTitle>Create user role</DialogTitle>
           <DialogDescription>
-            Fill in the details below to add a role to the system.
+            Fill in the details below to create a new user role.
           </DialogDescription>
         </DialogHeader>
         <CreateUserRoleForm
