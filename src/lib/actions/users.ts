@@ -213,6 +213,7 @@ export const currentUser = authedProcedure
         include: {
           setting: true,
           sessions: true,
+          department: true,
           userRole: {
             include: {
               role: true,
@@ -258,8 +259,19 @@ export const currentUser = authedProcedure
 
 export async function getUsers(input: GetUsersSchema) {
   await checkAuth();
-  const { page, per_page, sort, department, email, role, username, from, to } =
-    input;
+  const {
+    page,
+    per_page,
+    sort,
+    department,
+    email,
+    role,
+    firstName,
+    middleName,
+    lastName,
+    from,
+    to,
+  } = input;
 
   try {
     const skip = (page - 1) * per_page;
@@ -281,8 +293,16 @@ export async function getUsers(input: GetUsersSchema) {
       where.department = { contains: department, mode: "insensitive" };
     }
 
-    if (username) {
-      where.username = { contains: username, mode: "insensitive" };
+    if (firstName) {
+      where.firstName = { contains: firstName, mode: "insensitive" };
+    }
+
+    if (middleName) {
+      where.firstName = { contains: firstName, mode: "insensitive" };
+    }
+
+    if (lastName) {
+      where.firstName = { contains: firstName, mode: "insensitive" };
     }
 
     if (role) {
@@ -296,7 +316,7 @@ export async function getUsers(input: GetUsersSchema) {
       };
     }
 
-    const [data, total] = await db.$transaction([
+    const [userData, total] = await db.$transaction([
       db.user.findMany({
         where,
         take: per_page,
@@ -320,11 +340,26 @@ export async function getUsers(input: GetUsersSchema) {
               },
             },
           },
+          section: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
         },
       }),
       db.user.count({ where }),
     ]);
     const pageCount = Math.ceil(total / per_page);
+
+    const data = userData.map((data) => {
+      const { section, ...rest } = data;
+      return {
+        ...rest,
+        sectionId: section?.id ?? null,
+        sectionName: section?.name ?? null,
+      };
+    });
     return { data, pageCount };
   } catch (err) {
     console.error(err);

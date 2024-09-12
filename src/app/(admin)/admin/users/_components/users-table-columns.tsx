@@ -146,9 +146,32 @@ export function getUsersColumns(): ColumnDef<UserType>[] {
       },
     },
     {
+      accessorKey: "sectionName",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Section" />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="flex items-center">
+            <P>{row.original.sectionName ? row.original.sectionName : "-"}</P>
+          </div>
+        );
+      },
+      filterFn: (row, id, value) => {
+        return Array.isArray(value) && value.includes(row.getValue(id));
+      },
+    },
+    {
       accessorKey: "createdAt",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Date Created" />
+      ),
+      cell: ({ cell }) => formatDate(cell.getValue() as Date),
+    },
+    {
+      accessorKey: "updatedAt",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Last Modified" />
       ),
       cell: ({ cell }) => formatDate(cell.getValue() as Date),
     },

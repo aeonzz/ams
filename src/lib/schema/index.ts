@@ -19,7 +19,9 @@ export const userSearchParamsSchema = z.object({
   per_page: z.coerce.number().default(10),
   sort: z.string().optional(),
   email: z.string().optional(),
-  username: z.string().optional(),
+  firstName: z.string().optional(),
+  middleName: z.string().optional(),
+  lastName: z.string().optional(),
   department: z.string().optional(),
   role: z.string().optional(),
   from: z.string().optional(),
@@ -129,7 +131,4 @@ export const jobSectionSearchParamsSchema = z.object({
   to: z.string().optional(),
 });
 
-export type GetJobSectionSchema = z.infer<
-  typeof jobSectionSearchParamsSchema
->;
-
+export type GetJobSectionSchema = z.infer<typeof jobSectionSearchParamsSchema>;

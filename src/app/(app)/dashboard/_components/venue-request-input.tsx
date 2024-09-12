@@ -200,14 +200,16 @@ export default function VenueRequestInput({
       ...values,
       priority: "LOW",
       type: type,
-      department: department,
+      departmentId: department?.id || "f",
       path: pathname,
     };
 
     toast.promise(mutateAsync(data), {
       loading: "Submitting...",
       success: () => {
-        queryClient.invalidateQueries({ queryKey: ["user-dashboard-overview"] });
+        queryClient.invalidateQueries({
+          queryKey: ["user-dashboard-overview"],
+        });
         handleOpenChange(false);
         return "Your request has been submitted and is awaiting approval.";
       },

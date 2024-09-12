@@ -8,7 +8,7 @@ import {
 export const requestSchemaBase = z.object({
   priority: PriorityTypeSchema,
   type: RequestTypeSchema,
-  department: z.string(),
+  departmentId: z.string(),
 });
 
 export const jobRequestSchemaServer = z.object({
@@ -121,7 +121,7 @@ export const updateRequestSchemaBase = z.object({
   dueDate: z.date().optional(),
   type: RequestTypeSchema.optional(),
   status: RequestStatusTypeSchema.optional(),
-  department: z.string().optional(),
+  departmentId: z.string().optional(),
 });
 
 export const updateJobRequestSchema = updateRequestSchemaBase.extend({

@@ -3,12 +3,14 @@ import { PriorityTypeSchema } from '../inputTypeSchemas/PriorityTypeSchema'
 import { RequestTypeSchema } from '../inputTypeSchemas/RequestTypeSchema'
 import { RequestStatusTypeSchema } from '../inputTypeSchemas/RequestStatusTypeSchema'
 import type { UserWithRelations } from './UserSchema'
+import type { DepartmentWithRelations } from './DepartmentSchema'
 import type { JobRequestWithRelations } from './JobRequestSchema'
 import type { VenueRequestWithRelations } from './VenueRequestSchema'
 import type { ReturnableRequestWithRelations } from './ReturnableRequestSchema'
 import type { SupplyRequestWithRelations } from './SupplyRequestSchema'
 import type { TransportRequestWithRelations } from './TransportRequestSchema'
 import { UserWithRelationsSchema } from './UserSchema'
+import { DepartmentWithRelationsSchema } from './DepartmentSchema'
 import { JobRequestWithRelationsSchema } from './JobRequestSchema'
 import { VenueRequestWithRelationsSchema } from './VenueRequestSchema'
 import { ReturnableRequestWithRelationsSchema } from './ReturnableRequestSchema'
@@ -29,7 +31,7 @@ export const RequestSchema = z.object({
   updatedAt: z.coerce.date(),
   title: z.string(),
   userId: z.string(),
-  department: z.string(),
+  departmentId: z.string(),
 })
 
 export type Request = z.infer<typeof RequestSchema>
@@ -40,6 +42,7 @@ export type Request = z.infer<typeof RequestSchema>
 
 export type RequestRelations = {
   user: UserWithRelations;
+  department: DepartmentWithRelations;
   jobRequest?: JobRequestWithRelations | null;
   venueRequest?: VenueRequestWithRelations | null;
   returnableRequest?: ReturnableRequestWithRelations | null;
@@ -51,6 +54,7 @@ export type RequestWithRelations = z.infer<typeof RequestSchema> & RequestRelati
 
 export const RequestWithRelationsSchema: z.ZodType<RequestWithRelations> = RequestSchema.merge(z.object({
   user: z.lazy(() => UserWithRelationsSchema),
+  department: z.lazy(() => DepartmentWithRelationsSchema),
   jobRequest: z.lazy(() => JobRequestWithRelationsSchema).nullable(),
   venueRequest: z.lazy(() => VenueRequestWithRelationsSchema).nullable(),
   returnableRequest: z.lazy(() => ReturnableRequestWithRelationsSchema).nullable(),

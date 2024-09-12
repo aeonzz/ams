@@ -22,7 +22,11 @@ export async function GET(req: Request, params: Context) {
         userId: data?.id,
       },
       include: {
-        user: true,
+        user: {
+          include: {
+            department: true,
+          },
+        },
         supplyRequest: {
           include: {
             items: {

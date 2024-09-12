@@ -35,7 +35,7 @@ model User {
   lastName                 String
   isArchived               Boolean              @default(false)
   departmentId             String?
-  department               Department?         @relation(fields: [departmentId], references: [id])
+  department               Department?          @relation(fields: [departmentId], references: [id])
   createdAt                DateTime             @default(now())
   sectionId                String?
   section                  Section?             @relation(fields: [sectionId], references: [id])
@@ -83,6 +83,7 @@ model Department {
   inventoryItem     InventoryItem[]
   ReturnableRequest ReturnableRequest[]
   user              User[]
+  request           Request[]
 }
 
 model Session {
@@ -121,7 +122,8 @@ model Request {
   status            RequestStatusType  @default(PENDING)
   userId            String
   user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  department        String
+  departmentId      String
+  department        Department         @relation(fields: [departmentId], references: [id])
   jobRequest        JobRequest?
   venueRequest      VenueRequest?
   returnableRequest ReturnableRequest?

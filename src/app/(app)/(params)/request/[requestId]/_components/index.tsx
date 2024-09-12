@@ -115,7 +115,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
               </div>
               <div className="flex items-center space-x-2">
                 <AlertTriangle className="h-5 w-5" />
-                <P>Department: {data.department}</P>
+                <P>Department: {data.user.department?.name}</P>
               </div>
             </div>
             <Separator className="my-6" />

@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { string, z } from "zod";
 
 export const createJobSectionSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -38,3 +38,13 @@ export const deleteJobSectionsSchema = z.object({
 
 export type DeleteJobSectionsSchema = z.infer<typeof deleteJobSectionsSchema>;
 
+export const assignUserSchema = z.object({
+  userId: z.string({
+    required_error: "User is required",
+  }),
+  sectionId: z.string({
+    required_error: "Section is required",
+  }),
+});
+
+export type AssignUserSchema = z.infer<typeof assignUserSchema>;

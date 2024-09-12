@@ -215,7 +215,7 @@ export default function JobRequestInput({
       const data: ExtendedJobRequestSchemaServer = {
         description: values.description,
         type: type,
-        department: department,
+        departmentId: department?.id || "f",
         sectionId: values.sectionId,
         dueDate: values.dueDate,
         jobType: values.jobtype,

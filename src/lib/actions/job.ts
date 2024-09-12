@@ -182,7 +182,7 @@ export const createJobRequest = authedProcedure
           priority: rest.priority,
           type: rest.type,
           title: text,
-          department: rest.department,
+          departmentId: rest.departmentId,
           jobRequest: {
             create: {
               id: `JRQ-${generateId(15)}`,
@@ -329,6 +329,34 @@ export const updateRequestStatus = authedProcedure
       return revalidatePath(path);
     } catch (error) {
       console.log(error);
+      getErrorMessage(error);
+    }
+  });
+
+export const assignSection = authedProcedure
+  .createServerAction()
+  .input(createUserRoleSchemaWithPath)
+  .handler(async ({ input }) => {
+    const { path, ...rest } = input;
+    try {
+      const existingUserRole = await db.userRole.findUnique({
+        where: {
+          userId_roleId_departmentId: {
+            ...rest,
+          },
+        },
+      });
+
+      if (existingUserRole) {
+        throw "This user role already exists.";
+      }
+      await db.userRole.create({
+        data: {
+          id: generateId(15),
+          ...rest,
+        },
+      });
+    } catch (error) {
       getErrorMessage(error);
     }
   });
