@@ -28,15 +28,15 @@ export type Vehicle = z.infer<typeof VehicleSchema>
 /////////////////////////////////////////
 
 export type VehicleRelations = {
-  TransportRequest: TransportRequestWithRelations[];
-  MaintenanceRecord: MaintenanceRecordWithRelations[];
+  transportRequest: TransportRequestWithRelations[];
+  maintenanceRecord: MaintenanceRecordWithRelations[];
 };
 
 export type VehicleWithRelations = z.infer<typeof VehicleSchema> & VehicleRelations
 
 export const VehicleWithRelationsSchema: z.ZodType<VehicleWithRelations> = VehicleSchema.merge(z.object({
-  TransportRequest: z.lazy(() => TransportRequestWithRelationsSchema).array(),
-  MaintenanceRecord: z.lazy(() => MaintenanceRecordWithRelationsSchema).array(),
+  transportRequest: z.lazy(() => TransportRequestWithRelationsSchema).array(),
+  maintenanceRecord: z.lazy(() => MaintenanceRecordWithRelationsSchema).array(),
 }))
 
 export default VehicleSchema;

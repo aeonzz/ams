@@ -48,3 +48,18 @@ export const assignUserSchema = z.object({
 });
 
 export type AssignUserSchema = z.infer<typeof assignUserSchema>;
+
+export const assignUserSchemaWithPath = assignUserSchema.extend({
+  path: z.string(),
+});
+
+export type AssignUserSchemaWithPath = z.infer<typeof assignUserSchemaWithPath>;
+
+export const unassignUserWithPath = z.object({
+  userId: z.string({
+    required_error: "User is required",
+  }),
+  path: z.string(),
+});
+
+export type UnassignUserWithPath = z.infer<typeof unassignUserWithPath>;

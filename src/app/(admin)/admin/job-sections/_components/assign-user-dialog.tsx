@@ -25,10 +25,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { X } from "lucide-react";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
-import { createUserRole } from "@/lib/actions/userRole";
-import CreateUserRoleForm from "./create-user-role-form";
 import { assignUserSchema, type AssignUserSchema } from "./schema";
 import { assignSection } from "@/lib/actions/job";
+import AssignUserForm from "./assign-user-form";
 
 export default function AssignUserDialog() {
   const dialogManager = useDialogManager();
@@ -59,7 +58,7 @@ export default function AssignUserDialog() {
 
   return (
     <Dialog
-      open={dialogManager.activeDialog === "adminCreateUserRoleDialog"}
+      open={dialogManager.activeDialog === "adminAssignSectionDialog"}
       onOpenChange={handleOpenChange}
     >
       <DialogContent
@@ -105,12 +104,12 @@ export default function AssignUserDialog() {
           </AlertDialogContent>
         </AlertDialog>
         <DialogHeader>
-          <DialogTitle>Create user role</DialogTitle>
+          <DialogTitle>Add user to a section</DialogTitle>
           <DialogDescription>
-            Fill in the details below to create a new user role.
+            Fill in the details below to add a new user.
           </DialogDescription>
         </DialogHeader>
-        <CreateUserRoleForm
+        <AssignUserForm
           mutateAsync={mutateAsync}
           isPending={isPending}
           setAlertOpen={setAlertOpen}

@@ -39,6 +39,7 @@ import { useSession } from "@/lib/hooks/use-session";
 import { useRequest } from "@/lib/hooks/use-request-store";
 import { ClientRoleGuard } from "@/components/client-role-guard";
 import { PermissionGuard } from "@/components/permission-guard";
+import JobRequestApproverActions from "./job-request-approver-actions";
 
 interface RequestDetailsProps {
   params: string;
@@ -352,6 +353,17 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
               <JobRequestReviewerActions request={data} />
             </PermissionGuard>
           )}
+          {data.type === "JOB" &&
+            data.jobRequest &&
+            data.status === "REVIEWED" && (
+              <PermissionGuard
+                allowedRoles={["REQUEST_APPROVER"]}
+                allowedSection={data.jobRequest.sectionId}
+                currentUser={currentUser}
+              >
+                <JobRequestApproverActions jobRequest={data.jobRequest} />
+              </PermissionGuard>
+            )}
         </div>
       </div>
     </div>

@@ -21,6 +21,7 @@ export type DialogType =
   | "adminUpdateInventorySubItemDialog"
   | "adminCreateRoleDialog"
   | "adminAssignRoleSheet"
+  | "adminAssignSectionDialog"
   | "adminUpdateRoleSheet"
   | "adminDeleteRoleDialog"
   | "adminCreateJobSectionDialog"

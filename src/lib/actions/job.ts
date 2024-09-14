@@ -11,8 +11,10 @@ import { generateText } from "ai";
 import { cohere } from "@ai-sdk/cohere";
 import { extendedJobRequestSchemaServer } from "../db/schema/job";
 import {
+  assignUserSchemaWithPath,
   createJobSectionSchemaWithPath,
   deleteJobSectionsSchema,
+  unassignUserWithPath,
   updateJobSectionSchemaWithPath,
 } from "@/app/(admin)/admin/job-sections/_components/schema";
 import {
@@ -53,6 +55,23 @@ export async function getJobSections(input: GetJobSectionSchema) {
         skip,
         orderBy: {
           [column || "createdAt"]: order || "desc",
+        },
+        include: {
+          user: {
+            select: {
+              id: true,
+              email: true,
+              firstName: true,
+              middleName: true,
+              lastName: true,
+              department: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+            },
+          },
         },
       }),
       db.section.count({ where }),
@@ -335,27 +354,52 @@ export const updateRequestStatus = authedProcedure
 
 export const assignSection = authedProcedure
   .createServerAction()
-  .input(createUserRoleSchemaWithPath)
+  .input(assignUserSchemaWithPath)
   .handler(async ({ input }) => {
-    const { path, ...rest } = input;
+    const { path, userId, ...rest } = input;
     try {
-      const existingUserRole = await db.userRole.findUnique({
+      const user = await db.user.findUnique({
         where: {
-          userId_roleId_departmentId: {
-            ...rest,
-          },
+          id: userId,
+        },
+        select: {
+          sectionId: true,
         },
       });
 
-      if (existingUserRole) {
-        throw "This user role already exists.";
+      if (user && user.sectionId !== null) {
+        throw "User already assigned to a section";
       }
-      await db.userRole.create({
+
+      await db.user.update({
+        where: {
+          id: userId,
+        },
         data: {
-          id: generateId(15),
           ...rest,
         },
       });
+      revalidatePath(path);
+    } catch (error) {
+      getErrorMessage(error);
+    }
+  });
+
+export const unassignSection = authedProcedure
+  .createServerAction()
+  .input(unassignUserWithPath)
+  .handler(async ({ input }) => {
+    const { path, userId } = input;
+    try {
+      await db.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          sectionId: null,
+        },
+      });
+      revalidatePath(path);
     } catch (error) {
       getErrorMessage(error);
     }

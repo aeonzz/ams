@@ -29,9 +29,9 @@ export type Department = z.infer<typeof DepartmentSchema>
 /////////////////////////////////////////
 
 export type DepartmentRelations = {
-  UserRole: UserRoleWithRelations[];
+  userRole: UserRoleWithRelations[];
   inventoryItem: InventoryItemWithRelations[];
-  ReturnableRequest: ReturnableRequestWithRelations[];
+  returnableRequest: ReturnableRequestWithRelations[];
   user: UserWithRelations[];
   request: RequestWithRelations[];
 };
@@ -39,9 +39,9 @@ export type DepartmentRelations = {
 export type DepartmentWithRelations = z.infer<typeof DepartmentSchema> & DepartmentRelations
 
 export const DepartmentWithRelationsSchema: z.ZodType<DepartmentWithRelations> = DepartmentSchema.merge(z.object({
-  UserRole: z.lazy(() => UserRoleWithRelationsSchema).array(),
+  userRole: z.lazy(() => UserRoleWithRelationsSchema).array(),
   inventoryItem: z.lazy(() => InventoryItemWithRelationsSchema).array(),
-  ReturnableRequest: z.lazy(() => ReturnableRequestWithRelationsSchema).array(),
+  returnableRequest: z.lazy(() => ReturnableRequestWithRelationsSchema).array(),
   user: z.lazy(() => UserWithRelationsSchema).array(),
   request: z.lazy(() => RequestWithRelationsSchema).array(),
 }))

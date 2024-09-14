@@ -20,8 +20,8 @@ export function PermissionGuard({
     allowedRoles.includes(role.role.name)
   );
 
-  const hasAllowedSection = !allowedSection || currentUser.section?.id === allowedSection;
-
+  const hasAllowedSection =
+    !allowedSection || currentUser.sectionId === allowedSection;
   if (!hasAllowedRole || !hasAllowedSection) {
     return null;
   }

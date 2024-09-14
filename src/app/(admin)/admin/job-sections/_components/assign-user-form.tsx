@@ -24,8 +24,6 @@ import {
   type CreateUserRoleSchema,
 } from "@/lib/schema/userRole";
 import axios from "axios";
-import { type RoleUserDepartmentData } from "./types";
-import InputPopover, { Option } from "../../../../../components/input-popover";
 import {
   Command,
   CommandEmpty,
@@ -36,52 +34,55 @@ import {
 } from "@/components/ui/command";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn, formatFullName } from "@/lib/utils";
-import CreateUserRoleFormSkeleton from "./create-user-role-form-skeleton";
+import type { UsersAndSections } from "./types";
+import InputPopover from "@/components/input-popover";
+import { type AssignUserSchemaWithPath, type AssignUserSchema } from "./schema";
+import { assignSection } from "@/lib/actions/job";
+import AssignUserFormSkeleton from "./assign-user-form-skeleton";
 
-interface CreateUserRoleFormProps {
+interface AssignUserFormProps {
   setAlertOpen: React.Dispatch<React.SetStateAction<boolean>>;
   mutateAsync: UseMutateAsyncFunction<
     any,
     Error,
-    Parameters<typeof createUserRole>[0],
+    Parameters<typeof assignSection>[0],
     unknown
   >;
-  form: UseFormReturn<CreateUserRoleSchema>;
+  form: UseFormReturn<AssignUserSchema>;
   isPending: boolean;
   isFieldsDirty: boolean;
   dialogManager: DialogState;
 }
 
-export default function CreateUserRoleForm({
+export default function AssignUserForm({
   mutateAsync,
   isPending,
   form,
   isFieldsDirty,
   setAlertOpen,
   dialogManager,
-}: CreateUserRoleFormProps) {
+}: AssignUserFormProps) {
   const pathname = usePathname();
 
-  const { data, isLoading } = useQuery<RoleUserDepartmentData>({
+  const { data, isLoading } = useQuery<UsersAndSections>({
     queryFn: async () => {
-      const res = await axios.get("/api/input-data/user-department-role");
+      const res = await axios.get("/api/input-data/section-assignment");
       return res.data.data;
     },
-    queryKey: ["create-user-role-selection"],
+    queryKey: ["assign-user-section-selection"],
   });
 
-  async function onSubmit(values: CreateUserRoleSchema) {
-    const data: CreateUserRoleSchemaWithPath = {
+  async function onSubmit(values: AssignUserSchema) {
+    const data: AssignUserSchemaWithPath = {
       path: pathname,
-      departmentId: values.departmentId,
       userId: values.userId,
-      roleId: values.userId,
+      sectionId: values.sectionId,
     };
     toast.promise(mutateAsync(data), {
-      loading: "Creating...",
+      loading: "Adding...",
       success: () => {
         dialogManager.setActiveDialog(null);
-        return "User role created successfuly";
+        return "User added successfuly";
       },
       error: (err) => {
         return err.message;
@@ -90,10 +91,10 @@ export default function CreateUserRoleForm({
   }
 
   if (isLoading || !data) {
-    return <CreateUserRoleFormSkeleton />;
+    return <AssignUserFormSkeleton />;
   }
 
-  const { roles, users, departments } = data;
+  const { users, sections } = data;
 
   return (
     <Form {...form}>
@@ -143,29 +144,13 @@ export default function CreateUserRoleForm({
           />
           <FormField
             control={form.control}
-            name="roleId"
+            name="sectionId"
             render={({ field }) => (
               <FormItem className="flex flex-col">
-                <FormLabel>Role</FormLabel>
+                <FormLabel>Section</FormLabel>
                 <InputPopover
-                  title="Role"
-                  options={roles}
-                  selected={field.value}
-                  onSelect={field.onChange}
-                />
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="departmentId"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Department</FormLabel>
-                <InputPopover
-                  title="Department"
-                  options={departments}
+                  title="Section"
+                  options={sections}
                   selected={field.value}
                   onSelect={field.onChange}
                 />

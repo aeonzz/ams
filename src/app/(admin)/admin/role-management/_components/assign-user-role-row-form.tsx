@@ -22,7 +22,7 @@ import {
   type CreateUserRoleSchema,
 } from "@/lib/schema/userRole";
 import type { UserDepartmentData } from "./types";
-import InputPopover, { Option } from "./input-popover";
+import InputPopover, { Option } from "../../../../../components/input-popover";
 import {
   Command,
   CommandEmpty,

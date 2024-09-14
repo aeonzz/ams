@@ -7,11 +7,11 @@ import { exportTableToCSV } from "@/lib/export";
 import { Button } from "@/components/ui/button";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import { PlusIcon } from "lucide-react";
-import { type Section } from "prisma/generated/zod";
 import { DeleteJobSectionsDialog } from "./delete-job-sections-dialog";
+import type { JobSectionData } from "./types";
 
 interface JobSectionsTableToolbarActionsProps {
-  table: Table<Section>;
+  table: Table<JobSectionData>;
 }
 
 export function JobSectionsTableToolbarActions({
@@ -37,6 +37,16 @@ export function JobSectionsTableToolbarActions({
       >
         <PlusIcon className="mr-2 size-4" aria-hidden="true" />
         Create job section
+      </Button>
+      <Button
+        variant="secondary"
+        size="sm"
+        onClick={() =>
+          dialogManager.setActiveDialog("adminAssignSectionDialog")
+        }
+      >
+        <PlusIcon className="mr-2 size-4" aria-hidden="true" />
+        Assign user
       </Button>
       <Button
         variant="secondary"

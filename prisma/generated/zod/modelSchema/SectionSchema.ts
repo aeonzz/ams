@@ -25,14 +25,14 @@ export type Section = z.infer<typeof SectionSchema>
 
 export type SectionRelations = {
   jobRequests: JobRequestWithRelations[];
-  User: UserWithRelations[];
+  user: UserWithRelations[];
 };
 
 export type SectionWithRelations = z.infer<typeof SectionSchema> & SectionRelations
 
 export const SectionWithRelationsSchema: z.ZodType<SectionWithRelations> = SectionSchema.merge(z.object({
   jobRequests: z.lazy(() => JobRequestWithRelationsSchema).array(),
-  User: z.lazy(() => UserWithRelationsSchema).array(),
+  user: z.lazy(() => UserWithRelationsSchema).array(),
 }))
 
 export default SectionSchema;

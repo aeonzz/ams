@@ -31,13 +31,13 @@ import {
   AlertCircle,
   Loader2,
   ChevronsUpDown,
+  FolderKanban,
 } from "lucide-react";
 import type {
   RequestWithRelations,
   User,
   UserWithRelations,
 } from "prisma/generated/zod";
-import { RequestStatusType } from "@prisma/client";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
 import { updateRequestStatus, assignPersonnel } from "@/lib/actions/job";
 import {
@@ -51,6 +51,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { P } from "@/components/typography/text";
 import { Separator } from "@/components/ui/separator";
 import { formatFullName } from "@/lib/utils";
+import { type RequestStatusTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestStatusTypeSchema";
 
 interface JobRequestReviewerActionsDialogProps {
   request: RequestWithRelations;
@@ -94,7 +95,7 @@ export default function JobRequestReviewerActionsDialog({
     setSelectedPerson(request.jobRequest?.assignedTo);
   }, [request.jobRequest?.assignedTo]);
 
-  const handleReview = (action: RequestStatusType) => {
+  const handleReview = (action: RequestStatusTypeType) => {
     const data: UpdateRequestStatusSchemaWithPath = {
       path: pathname,
       requestId: request.id,
@@ -157,7 +158,7 @@ export default function JobRequestReviewerActionsDialog({
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button className="w-full" variant="secondary">
-          <UserPlus className="mr-2 h-4 w-4" />
+          <FolderKanban className="mr-2 h-4 w-4" />
           Manage Request
         </Button>
       </DialogTrigger>
@@ -177,108 +178,72 @@ export default function JobRequestReviewerActionsDialog({
           </DialogDescription>
         </DialogHeader>
         <div className="scroll-bar flex max-h-[60vh] flex-col gap-3 overflow-y-auto px-4 py-1">
-          <Popover
-            open={isPersonnelPopoverOpen}
-            onOpenChange={setIsPersonnelPopoverOpen}
-          >
-            <PopoverTrigger asChild>
-              <Button
-                variant="secondary"
-                role="combobox"
-                aria-expanded={isPersonnelPopoverOpen}
-                className="w-full justify-between"
-                disabled={
-                  currentStatus !== "PENDING" ||
-                  isUpdateStatusPending ||
-                  isAssignPersonnelPending
-                }
-              >
-                {selectedPerson
-                  ? personnel?.find((p) => p.id === selectedPerson)?.lastName
-                  : "Assign Personnel"}
-                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent
-              onInteractOutside={(e) => {
-                if (isAssignPersonnelPending) {
-                  e.preventDefault();
-                }
-              }}
-              className="w-[300px] p-0"
-            >
-              <Command>
-                <CommandInput placeholder="Search personnel..." />
-                <CommandList>
-                  <CommandEmpty>No personnel found.</CommandEmpty>
-                  {isLoading && (
-                    <div className="flex items-center justify-center p-4">
-                      <Loader2 className="h-6 w-6 animate-spin" />
-                    </div>
-                  )}
-                  {isError && (
-                    <div className="flex flex-col items-center justify-center space-y-2 p-4">
-                      <AlertCircle className="h-6 w-6 text-red-500" />
-                      <P className="text-sm text-red-500">
-                        {error?.message || "An error occurred"}
-                      </P>
-                      <Button
-                        onClick={() => refetch()}
-                        variant="outline"
-                        size="sm"
+          <Command className="max-h-[250px]">
+            <CommandInput placeholder="Search personnel..." />
+            <CommandList>
+              <CommandEmpty>No personnel found.</CommandEmpty>
+              {isLoading && (
+                <div className="flex items-center justify-center p-4">
+                  <Loader2 className="h-6 w-6 animate-spin" />
+                </div>
+              )}
+              {isError && (
+                <div className="flex flex-col items-center justify-center space-y-2 p-4">
+                  <AlertCircle className="h-6 w-6 text-red-500" />
+                  <P className="text-sm text-red-500">
+                    {error?.message || "An error occurred"}
+                  </P>
+                  <Button onClick={() => refetch()} variant="outline" size="sm">
+                    Retry
+                  </Button>
+                </div>
+              )}
+              {!isLoading && !isError && (
+                <CommandGroup>
+                  {personnel?.map((item) => {
+                    return (
+                      <CommandItem
+                        key={item.id}
+                        onSelect={() => handleAssignPersonnel(item.id)}
+                        disabled={isAssignPersonnelPending}
                       >
-                        Retry
-                      </Button>
-                    </div>
-                  )}
-                  {!isLoading && !isError && (
-                    <CommandGroup>
-                      {personnel?.map((item) => {
-                        return (
-                          <CommandItem
-                            key={item.id}
-                            onSelect={() => handleAssignPersonnel(item.id)}
-                            disabled={isAssignPersonnelPending}
-                          >
-                            <div className="flex w-full items-center">
-                              <Avatar className="mr-2 h-8 w-8">
-                                <AvatarImage
-                                  src={item.profileUrl ?? ""}
-                                  alt={formatFullName(
-                                    item.firstName,
-                                    item.middleName,
-                                    item.lastName
-                                  )}
-                                />
-                                <AvatarFallback>
-                                  {item.firstName.charAt(0).toUpperCase()}
-                                </AvatarFallback>
-                              </Avatar>
-                              <div className="flex-1">
-                                <P className="font-medium">
-                                  {formatFullName(
-                                    item.firstName,
-                                    item.middleName,
-                                    item.lastName
-                                  )}
-                                </P>
-                                <P className="text-sm text-muted-foreground">
-                                  {item.department?.name}
-                                </P>
-                              </div>
-                              {item.id === selectedPerson && (
-                                <Check className="ml-auto h-4 w-4 text-green-500" />
+                        <div className="flex w-full items-center">
+                          <Avatar className="mr-2 h-8 w-8">
+                            <AvatarImage
+                              src={item.profileUrl ?? ""}
+                              alt={formatFullName(
+                                item.firstName,
+                                item.middleName,
+                                item.lastName
                               )}
-                            </div>
-                          </CommandItem>
-                        );
-                      })}
-                    </CommandGroup>
-                  )}
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
+                            />
+                            <AvatarFallback>
+                              {item.firstName.charAt(0).toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1">
+                            <P className="font-medium">
+                              {formatFullName(
+                                item.firstName,
+                                item.middleName,
+                                item.lastName
+                              )}
+                            </P>
+                            <P className="text-sm text-muted-foreground">
+                              {item.department?.name}
+                            </P>
+                          </div>
+                          {item.id === selectedPerson && (
+                            <Check className="ml-auto h-4 w-4 text-green-500" />
+                          )}
+                        </div>
+                      </CommandItem>
+                    );
+                  })}
+                </CommandGroup>
+              )}
+            </CommandList>
+          </Command>
           {currentStatus === "PENDING" && (
             <div className="flex space-x-2">
               <Button

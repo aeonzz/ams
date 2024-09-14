@@ -26,11 +26,12 @@ import { Button } from "@/components/ui/button";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import { updateInventorySubItem } from "@/lib/actions/inventoryItem";
-import { type Section } from "prisma/generated/zod";
 import { UpdateJobSectionSheet } from "./update-job-section-sheet";
 import { DeleteJobSectionsDialog } from "./delete-job-sections-dialog";
+import type { JobSectionData } from "./types";
+import { ChevronDownIcon, ChevronRightIcon } from "lucide-react";
 
-export function getJobSectionsColumns(): ColumnDef<Section>[] {
+export function getJobSectionsColumns(): ColumnDef<JobSectionData>[] {
   return [
     {
       id: "select",
@@ -102,6 +103,27 @@ export function getJobSectionsColumns(): ColumnDef<Section>[] {
         <DataTableColumnHeader column={column} title="Last Modified" />
       ),
       cell: ({ cell }) => formatDate(cell.getValue() as Date),
+      size: 0,
+    },
+    {
+      id: "expander",
+      header: () => <P>Users</P>,
+      cell: ({ row }) => {
+        return (
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => row.toggleExpanded()}
+            aria-label="Toggle row details"
+          >
+            {row.getIsExpanded() ? (
+              <ChevronDownIcon className="h-4 w-4" />
+            ) : (
+              <ChevronRightIcon className="h-4 w-4" />
+            )}
+          </Button>
+        );
+      },
       size: 0,
     },
     {

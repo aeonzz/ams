@@ -5,6 +5,7 @@ import { authedProcedure, getErrorMessage } from "./utils";
 
 import { db } from "@/lib/db/index";
 import { createUserRoleSchemaWithPath } from "../schema/userRole";
+import { revalidatePath } from "next/cache";
 
 export const createUserRole = authedProcedure
   .createServerAction()
@@ -29,6 +30,7 @@ export const createUserRole = authedProcedure
           ...rest,
         },
       });
+      revalidatePath(path)
     } catch (error) {
       getErrorMessage(error);
     }
