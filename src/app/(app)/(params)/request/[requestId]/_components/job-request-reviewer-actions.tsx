@@ -13,11 +13,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
   Command,
   CommandEmpty,
   CommandGroup,
@@ -25,17 +20,9 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import {
-  UserPlus,
-  Check,
-  AlertCircle,
-  Loader2,
-  ChevronsUpDown,
-  FolderKanban,
-} from "lucide-react";
+import { FolderKanban, Check, AlertCircle, Loader2 } from "lucide-react";
 import type {
   RequestWithRelations,
-  User,
   UserWithRelations,
 } from "prisma/generated/zod";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
@@ -52,6 +39,8 @@ import { P } from "@/components/typography/text";
 import { Separator } from "@/components/ui/separator";
 import { formatFullName } from "@/lib/utils";
 import { type RequestStatusTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestStatusTypeSchema";
+import { PermissionGuard } from "@/components/permission-guard";
+import { useSession } from "@/lib/hooks/use-session";
 
 interface JobRequestReviewerActionsDialogProps {
   request: RequestWithRelations;
@@ -60,11 +49,10 @@ interface JobRequestReviewerActionsDialogProps {
 export default function JobRequestReviewerActionsDialog({
   request,
 }: JobRequestReviewerActionsDialogProps) {
+  const currentUser = useSession();
   const pathname = usePathname();
   const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = React.useState(false);
-  const [isPersonnelPopoverOpen, setIsPersonnelPopoverOpen] =
-    React.useState(false);
   const [selectedPerson, setSelectedPerson] = React.useState<
     string | undefined | null
   >(request.jobRequest?.assignedTo);
@@ -95,64 +83,207 @@ export default function JobRequestReviewerActionsDialog({
     setSelectedPerson(request.jobRequest?.assignedTo);
   }, [request.jobRequest?.assignedTo]);
 
-  const handleReview = (action: RequestStatusTypeType) => {
-    const data: UpdateRequestStatusSchemaWithPath = {
-      path: pathname,
-      requestId: request.id,
-      status: action,
-    };
+  const handleReview = React.useCallback(
+    (action: RequestStatusTypeType) => {
+      const data: UpdateRequestStatusSchemaWithPath = {
+        path: pathname,
+        requestId: request.id,
+        status: action,
+      };
 
-    const actionText = action === "REVIEWED" ? "Approving" : "Rejecting";
-    const successText = action === "REVIEWED" ? "approved" : "rejected";
+      const actionText =
+        action === "REVIEWED"
+          ? "Approving"
+          : action === "APPROVED"
+            ? "Finalizing approval of"
+            : "Rejecting";
+      const successText =
+        action === "REVIEWED"
+          ? "approved"
+          : action === "APPROVED"
+            ? "finalized"
+            : "rejected";
 
-    toast.promise(updateStatusMutate(data), {
-      loading: `${actionText} job request...`,
+      toast.promise(updateStatusMutate(data), {
+        loading: `${actionText} job request...`,
+        success: () => {
+          queryClient.invalidateQueries({
+            queryKey: [request.id],
+          });
+          setIsOpen(false);
+          return `Job request ${successText} successfully.`;
+        },
+        error: (err) => {
+          console.error(err);
+          return `Failed to ${action.toLowerCase()} job request. Please try again.`;
+        },
+      });
+    },
+    [pathname, request.id, updateStatusMutate, queryClient]
+  );
 
-      success: () => {
-        queryClient.invalidateQueries({
-          queryKey: [request.id],
-        });
-        setIsOpen(false);
-        return `Job request ${successText} successfully.`;
-      },
-      error: (err) => {
-        console.error(err);
-        return `Failed to ${action.toLowerCase()} job request. Please try again.`;
-      },
-    });
-  };
+  const handleAssignPersonnel = React.useCallback(
+    async (id: string) => {
+      if (id === selectedPerson) {
+        toast.info("No changes made. The selected user is already assigned.");
+        return;
+      }
 
-  const handleAssignPersonnel = async (id: string) => {
-    if (id === selectedPerson) {
-      toast.info("No changes made. The selected user is already assigned.");
-      return;
+      setSelectedPerson(id);
+
+      const data: AssignPersonnelSchemaWithPath = {
+        path: pathname,
+        requestId: request.jobRequest?.id || "",
+        personnelId: id,
+      };
+
+      toast.promise(assignPersonnelMutate(data), {
+        loading: "Assigning...",
+        success: () => {
+          queryClient.invalidateQueries({
+            queryKey: [request.id],
+          });
+          return "Personnel assigned successfully.";
+        },
+        error: (err) => {
+          console.error(err);
+          return err.message;
+        },
+      });
+    },
+    [
+      selectedPerson,
+      pathname,
+      request.jobRequest?.id,
+      request.id,
+      assignPersonnelMutate,
+      queryClient,
+    ]
+  );
+
+  const renderPersonnelList = () => {
+    if (isLoading) {
+      return (
+        <div className="flex items-center justify-center p-4">
+          <Loader2 className="h-6 w-6 animate-spin" />
+        </div>
+      );
     }
 
-    setSelectedPerson(id);
+    if (isError) {
+      return (
+        <div className="flex flex-col items-center justify-center space-y-2 p-4">
+          <AlertCircle className="h-6 w-6 text-red-500" />
+          <P className="text-sm text-red-500">
+            {error?.message || "An error occurred"}
+          </P>
+          <Button onClick={() => refetch()} variant="outline" size="sm">
+            Retry
+          </Button>
+        </div>
+      );
+    }
 
-    const data: AssignPersonnelSchemaWithPath = {
-      path: pathname,
-      requestId: request.jobRequest?.id || "",
-      personnelId: id,
-    };
-
-    toast.promise(assignPersonnelMutate(data), {
-      loading: "Assigning...",
-      success: () => {
-        queryClient.invalidateQueries({
-          queryKey: [request.id],
-        });
-        setIsPersonnelPopoverOpen(false);
-        return "Personnel assigned successfully.";
-      },
-      error: (err) => {
-        console.log(err);
-        return err.message;
-      },
-    });
+    return (
+      <CommandGroup>
+        {personnel?.map((item) => (
+          <CommandItem
+            key={item.id}
+            onSelect={() => handleAssignPersonnel(item.id)}
+            disabled={isAssignPersonnelPending}
+          >
+            <div className="flex w-full items-center">
+              <Avatar className="mr-2 h-8 w-8">
+                <AvatarImage
+                  src={item.profileUrl ?? ""}
+                  alt={formatFullName(
+                    item.firstName,
+                    item.middleName,
+                    item.lastName
+                  )}
+                />
+                <AvatarFallback>
+                  {item.firstName.charAt(0).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1">
+                <P className="font-medium">
+                  {formatFullName(
+                    item.firstName,
+                    item.middleName,
+                    item.lastName
+                  )}
+                </P>
+                <P className="text-sm text-muted-foreground">
+                  {item.department?.name}
+                </P>
+              </div>
+              {item.id === selectedPerson && (
+                <Check className="ml-auto h-4 w-4 text-green-500" />
+              )}
+            </div>
+          </CommandItem>
+        ))}
+      </CommandGroup>
+    );
   };
 
-  const currentStatus = request.status;
+  const renderActionButtons = () => {
+    const isDisabled =
+      !selectedPerson || isUpdateStatusPending || isAssignPersonnelPending;
+
+    if (request.status === "PENDING") {
+      return (
+        <div className="flex space-x-2">
+          <Button
+            onClick={() => handleReview("REVIEWED")}
+            disabled={isDisabled}
+            className="flex-1"
+          >
+            Approve
+          </Button>
+          <Button
+            onClick={() => handleReview("REJECTED")}
+            variant="destructive"
+            disabled={isDisabled}
+            className="flex-1"
+          >
+            Reject
+          </Button>
+        </div>
+      );
+    }
+
+    if (request.status === "REVIEWED") {
+      return (
+        <PermissionGuard
+          allowedRoles={["REQUEST_APPROVER"]}
+          allowedSection={request.jobRequest?.sectionId}
+          currentUser={currentUser}
+        >
+          <div className="flex space-x-2">
+            <Button
+              variant="destructive"
+              disabled={isDisabled}
+              onClick={() => handleReview("REJECTED")}
+              className="flex-1"
+            >
+              Reject
+            </Button>
+            <Button
+              disabled={isDisabled}
+              onClick={() => handleReview("APPROVED")}
+              className="flex-1"
+            >
+              Finalize Approval
+            </Button>
+          </div>
+        </PermissionGuard>
+      );
+    }
+
+    return null;
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -169,7 +300,6 @@ export default function JobRequestReviewerActionsDialog({
           }
         }}
         className="sm:max-w-[425px]"
-        isLoading={isUpdateStatusPending || isAssignPersonnelPending}
       >
         <DialogHeader>
           <DialogTitle>Manage Job Request</DialogTitle>
@@ -182,95 +312,13 @@ export default function JobRequestReviewerActionsDialog({
             <CommandInput placeholder="Search personnel..." />
             <CommandList>
               <CommandEmpty>No personnel found.</CommandEmpty>
-              {isLoading && (
-                <div className="flex items-center justify-center p-4">
-                  <Loader2 className="h-6 w-6 animate-spin" />
-                </div>
-              )}
-              {isError && (
-                <div className="flex flex-col items-center justify-center space-y-2 p-4">
-                  <AlertCircle className="h-6 w-6 text-red-500" />
-                  <P className="text-sm text-red-500">
-                    {error?.message || "An error occurred"}
-                  </P>
-                  <Button onClick={() => refetch()} variant="outline" size="sm">
-                    Retry
-                  </Button>
-                </div>
-              )}
-              {!isLoading && !isError && (
-                <CommandGroup>
-                  {personnel?.map((item) => {
-                    return (
-                      <CommandItem
-                        key={item.id}
-                        onSelect={() => handleAssignPersonnel(item.id)}
-                        disabled={isAssignPersonnelPending}
-                      >
-                        <div className="flex w-full items-center">
-                          <Avatar className="mr-2 h-8 w-8">
-                            <AvatarImage
-                              src={item.profileUrl ?? ""}
-                              alt={formatFullName(
-                                item.firstName,
-                                item.middleName,
-                                item.lastName
-                              )}
-                            />
-                            <AvatarFallback>
-                              {item.firstName.charAt(0).toUpperCase()}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="flex-1">
-                            <P className="font-medium">
-                              {formatFullName(
-                                item.firstName,
-                                item.middleName,
-                                item.lastName
-                              )}
-                            </P>
-                            <P className="text-sm text-muted-foreground">
-                              {item.department?.name}
-                            </P>
-                          </div>
-                          {item.id === selectedPerson && (
-                            <Check className="ml-auto h-4 w-4 text-green-500" />
-                          )}
-                        </div>
-                      </CommandItem>
-                    );
-                  })}
-                </CommandGroup>
-              )}
+              {renderPersonnelList()}
             </CommandList>
           </Command>
-          {currentStatus === "PENDING" && (
-            <div className="flex space-x-2">
-              <Button
-                onClick={() => handleReview("REVIEWED")}
-                disabled={
-                  !selectedPerson ||
-                  isUpdateStatusPending ||
-                  isAssignPersonnelPending
-                }
-                className="flex-1"
-              >
-                Approve
-              </Button>
-              <Button
-                onClick={() => handleReview("REJECTED")}
-                variant="destructive"
-                disabled={isUpdateStatusPending || isAssignPersonnelPending}
-                className="flex-1"
-              >
-                Reject
-              </Button>
-            </div>
-          )}
+          {renderActionButtons()}
         </div>
         <Separator className="my-2" />
         <DialogFooter>
-          <div></div>
           <Button
             variant="secondary"
             disabled={isAssignPersonnelPending || isUpdateStatusPending}

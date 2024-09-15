@@ -1,17 +1,16 @@
-"use client"
+"use client";
 
-import { DownloadIcon } from "@radix-ui/react-icons"
-import { type Table } from "@tanstack/react-table"
+import { DownloadIcon } from "@radix-ui/react-icons";
+import { type Table } from "@tanstack/react-table";
 
-import { exportTableToCSV } from "@/lib/export"
-import { Button } from "@/components/ui/button"
-import { Department } from "prisma/generated/zod"
-import { DeleteDepartmentsDialog } from "./delete-departments-dialog"
-import CreateDepartmentDialog from "./create-department-dialog"
-
+import { exportTableToCSV } from "@/lib/export";
+import { Button } from "@/components/ui/button";
+import { DeleteDepartmentsDialog } from "./delete-departments-dialog";
+import CreateDepartmentDialog from "./create-department-dialog";
+import type { DepartmentsTableType } from "./types";
 
 interface DepartmentsTableToolbarActionsProps {
-  table: Table<Department>
+  table: Table<DepartmentsTableType>;
 }
 
 export function DepartmentsTableToolbarActions({
@@ -46,5 +45,5 @@ export function DepartmentsTableToolbarActions({
        * For example, import, view, etc.
        */}
     </div>
-  )
+  );
 }

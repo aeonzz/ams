@@ -35,6 +35,7 @@ import { type VenueRequestSchema } from "@/lib/schema/request";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
 import { H3, H5, P } from "@/components/typography/text";
 import { Badge } from "@/components/ui/badge";
+import Image from "next/image";
 
 interface VenueProps {
   form: UseFormReturn<VenueRequestSchema>;
@@ -89,7 +90,7 @@ export default function VenueField({ form, name, isPending }: VenueProps) {
               </FormControl>
             </PopoverTrigger>
             <PopoverContent className="p-0" align="start">
-              <Command>
+              <Command className="max-h-[300px]">
                 <CommandInput placeholder="Search venues..." />
                 <CommandList>
                   <CommandEmpty>No venues found.</CommandEmpty>
@@ -107,23 +108,34 @@ export default function VenueField({ form, name, isPending }: VenueProps) {
                             setOpen(false);
                           }}
                         >
-                          <div className="w-10 self-start pt-1">
-                            <Check
-                              className={cn(
-                                "mr-2 h-4 w-4",
-                                venue.id === field.value
-                                  ? "opacity-100"
-                                  : "opacity-0"
-                              )}
-                            />
+                          <div className="flex w-full space-x-3">
+                            <div className="relative aspect-square h-16 cursor-pointer transition-colors hover:brightness-75">
+                              <Image
+                                src={venue.imageUrl}
+                                alt={`Image of ${venue.name}`}
+                                fill
+                                className="rounded-md border object-cover"
+                              />
+                            </div>
+                            <div className="flex flex-grow flex-col justify-between">
+                              <div className="space-y-1 truncate">
+                                <P className="truncate">{venue.name}</P>
+                                <Badge variant={variant} className="ml-auto">
+                                  <Icon className="mr-1 size-4" />
+                                  {textTransform(venue.status)}
+                                </Badge>
+                              </div>
+                            </div>
                           </div>
-                          <div className="space-y-1 truncate">
-                            <P className="truncate">{venue.name}</P>
-                            <Badge variant={variant} className="ml-auto">
-                              <Icon className="mr-1 size-4" />
-                              {textTransform(venue.status)}
-                            </Badge>
-                          </div>
+                          <Check
+                            className={cn(
+                              "h-4 w-4",
+                              venue.id === field.value
+                                ? "opacity-100"
+                                : "opacity-0",
+                              "self-start"
+                            )}
+                          />
                         </CommandItem>
                       );
                     })}

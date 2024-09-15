@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
         userRole: {
           some: {
             role: {
-              name: "REQUEST_REVIEWER",
+              name: "PERSONNEL",
             },
           },
         },

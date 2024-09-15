@@ -5,12 +5,8 @@ import {
   Calendar,
   Clock,
   MapPin,
-  User,
   Truck,
-  FileText,
   AlertTriangle,
-  MessageSquare,
-  Plus,
   Link as LinkIcon,
   Dot,
 } from "lucide-react";
@@ -29,7 +25,6 @@ import {
 } from "@/lib/utils";
 import RequestActions from "./request-actions";
 import SupplyItemCard from "./supply-item-card";
-import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import RequestDetailsSkeleton from "./request-details-skeleton";
 import SearchInput from "@/app/(app)/_components/search-input";
@@ -37,9 +32,7 @@ import JobRequestDetails from "./job-request-details";
 import JobRequestReviewerActions from "./job-request-reviewer-actions";
 import { useSession } from "@/lib/hooks/use-session";
 import { useRequest } from "@/lib/hooks/use-request-store";
-import { ClientRoleGuard } from "@/components/client-role-guard";
 import { PermissionGuard } from "@/components/permission-guard";
-import JobRequestApproverActions from "./job-request-approver-actions";
 
 interface RequestDetailsProps {
   params: string;
@@ -315,22 +308,26 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                 </P>
               </div>
             </div>
-            {data.type === "JOB" && data.jobRequest && (
+            {data.type === "JOB" && data.jobRequest?.assignedUser && (
               <div>
                 <P className="mb-1 text-sm">Assigned to</P>
                 <div className="flex items-center space-x-2 p-1">
                   <Avatar className="size-5 rounded-full">
-                    <AvatarImage src={`${data.user.profileUrl}` ?? ""} />
+                    <AvatarImage
+                      src={`${data.jobRequest.assignedUser.profileUrl}` ?? ""}
+                    />
                     <AvatarFallback className="rounded-md">
-                      {data.user.firstName.charAt(0).toUpperCase()}
+                      {data.jobRequest.assignedUser.firstName
+                        .charAt(0)
+                        .toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <P>
                     {data.jobRequest.assignedUser
                       ? formatFullName(
-                          data.user.firstName,
-                          data.user.middleName,
-                          data.user.lastName
+                          data.jobRequest.assignedUser.firstName,
+                          data.jobRequest.assignedUser.middleName,
+                          data.jobRequest.assignedUser.lastName
                         )
                       : "N/A"}
                   </P>
@@ -353,17 +350,6 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
               <JobRequestReviewerActions request={data} />
             </PermissionGuard>
           )}
-          {data.type === "JOB" &&
-            data.jobRequest &&
-            data.status === "REVIEWED" && (
-              <PermissionGuard
-                allowedRoles={["REQUEST_APPROVER"]}
-                allowedSection={data.jobRequest.sectionId}
-                currentUser={currentUser}
-              >
-                <JobRequestApproverActions jobRequest={data.jobRequest} />
-              </PermissionGuard>
-            )}
         </div>
       </div>
     </div>

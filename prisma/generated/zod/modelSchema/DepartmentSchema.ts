@@ -20,6 +20,7 @@ export const DepartmentSchema = z.object({
   name: z.string(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
+  isArchived: z.boolean(),
 })
 
 export type Department = z.infer<typeof DepartmentSchema>

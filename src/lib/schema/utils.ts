@@ -1,4 +1,8 @@
-import { RequestStatusTypeSchema } from "prisma/generated/zod";
+import {
+  DepartmentSchema,
+  RequestStatusTypeSchema,
+  UserSchema,
+} from "prisma/generated/zod";
 import { z } from "zod";
 
 export const reservedDateTimeSchema = z.object({
@@ -8,7 +12,8 @@ export const reservedDateTimeSchema = z.object({
   request: z.object({
     status: RequestStatusTypeSchema,
     title: z.string(),
-    department: z.string(),
+    department: DepartmentSchema,
+    user: UserSchema,
   }),
 });
 

@@ -3,7 +3,7 @@
 import * as React from "react";
 import { type ColumnDef } from "@tanstack/react-table";
 
-import { formatDate, getVenueStatusIcon, textTransform } from "@/lib/utils";
+import { getVenueStatusIcon, textTransform } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
 
 import { P } from "@/components/typography/text";
@@ -33,6 +33,7 @@ import { usePathname } from "next/navigation";
 import { type VenueStatusType } from "prisma/generated/zod/inputTypeSchemas/VenueStatusSchema";
 import { UpdateVenueSheet } from "./update-venue-sheet";
 import { DeleteVenuesDialog } from "./delete-venues-dialog";
+import { formatDate } from "date-fns";
 
 export function getVenuesColumns(): ColumnDef<Venue>[] {
   return [
@@ -163,7 +164,14 @@ export function getVenuesColumns(): ColumnDef<Venue>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Date Created" />
       ),
-      cell: ({ cell }) => formatDate(cell.getValue() as Date),
+      cell: ({ cell }) => formatDate(cell.getValue() as Date, "PPP p"),
+    },
+    {
+      accessorKey: "updatedAt",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Date Modified" />
+      ),
+      cell: ({ cell }) => formatDate(cell.getValue() as Date, "PPP p"),
     },
     {
       id: "actions",

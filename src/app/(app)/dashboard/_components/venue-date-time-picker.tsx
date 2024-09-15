@@ -37,7 +37,7 @@ import {
 } from "date-fns";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
 import { CalendarIcon } from "lucide-react";
-import { cn, isDateInPast } from "@/lib/utils";
+import { cn, formatFullName, isDateInPast } from "@/lib/utils";
 import { type ReservedDatesAndTimes } from "@/lib/schema/utils";
 import { P } from "@/components/typography/text";
 
@@ -292,7 +292,18 @@ export default function VenueDateTimePicker<T extends FieldValues>({
                                     "MMM d, h:mm a"
                                   )}
                                 </p>
-                                <p>Dept: {reservation.request.department}</p>
+                                <div className="flex flex-col gap-1">
+                                  <p className="text-xs text-muted-foreground">
+                                    Requested by:
+                                  </p>
+                                  <p>
+                                    {formatFullName(
+                                      reservation.request.user.firstName,
+                                      reservation.request.user.middleName,
+                                      reservation.request.user.lastName
+                                    )}
+                                  </p>
+                                </div>
                               </div>
                             )
                           )}

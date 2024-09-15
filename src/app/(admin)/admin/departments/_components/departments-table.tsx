@@ -13,13 +13,16 @@ import { getDepartments } from "@/lib/actions/department";
 import { Department } from "prisma/generated/zod";
 import { DepartmentsTableFloatingBar } from "./departments-table-floating-bar";
 import { DepartmentsTableToolbarActions } from "./departments-table-toolbar-actions";
+import type { DepartmentsTableType } from "./types";
+import DepartmentUsersTable from "./department-users-table";
 
 interface DepartmentsTableProps {
   departmentsPromise: ReturnType<typeof getDepartments>;
 }
 
-export function DepartmentsTable({ departmentsPromise }: DepartmentsTableProps) {
-
+export function DepartmentsTable({
+  departmentsPromise,
+}: DepartmentsTableProps) {
   const { data, pageCount } = React.use(departmentsPromise);
 
   // Memoize the columns so they don't re-render on every render
@@ -36,7 +39,7 @@ export function DepartmentsTable({ departmentsPromise }: DepartmentsTableProps) 
    * @prop {React.ReactNode} [icon] - An optional icon to display next to the label.
    * @prop {boolean} [withCount] - An optional boolean to display the count of the filter option.
    */
-  const filterFields: DataTableFilterField<Department>[] = [
+  const filterFields: DataTableFilterField<DepartmentsTableType>[] = [
     {
       label: "Name",
       value: "name",
@@ -63,6 +66,13 @@ export function DepartmentsTable({ departmentsPromise }: DepartmentsTableProps) 
     <DataTable
       table={table}
       floatingBar={<DepartmentsTableFloatingBar table={table} />}
+      renderSubComponent={({ row }) => {
+        const formattedUsers = row.original.user.map((role) => ({
+          ...role,
+        }));
+
+        return <DepartmentUsersTable users={formattedUsers} />;
+      }}
     >
       <DataTableToolbar table={table} filterFields={filterFields}>
         <DepartmentsTableToolbarActions table={table} />

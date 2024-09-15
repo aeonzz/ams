@@ -62,18 +62,7 @@ export async function getRoles(input: GetRoleManagementSchema) {
     ]);
     const pageCount = Math.ceil(total / per_page);
 
-    const modifiedData = await Promise.all(
-      data.map(async (data) => {
-        const userRolesCount = data.userRoles.length;
-
-        return {
-          ...data,
-          userRolesCount,
-        };
-      })
-    );
-
-    return { data: modifiedData, pageCount };
+    return { data, pageCount };
   } catch (err) {
     console.error(err);
     return { data: [], pageCount: 0 };

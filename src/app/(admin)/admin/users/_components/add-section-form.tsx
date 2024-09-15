@@ -21,7 +21,6 @@ import {
   type CreateUserRoleSchemaWithPath,
   type CreateUserRoleSchema,
 } from "@/lib/schema/userRole";
-import type { UserDepartmentData } from "./types";
 import InputPopover, { Option } from "../../../../../components/input-popover";
 import {
   Command,
@@ -33,44 +32,50 @@ import {
 } from "@/components/ui/command";
 import { Check } from "lucide-react";
 import { cn, formatFullName } from "@/lib/utils";
+import type { RoleDepartmentData } from "./types";
+import { assignSection } from "@/lib/actions/job";
+import {
+  type AssignUserSchemaWithPath,
+  type AssignUserSchema,
+} from "../../job-sections/_components/schema";
+import { type Section } from "prisma/generated/zod";
 import { Separator } from "@/components/ui/separator";
 
-interface AssignUserRoleRowFormProps {
+interface AddSectionFormProps {
   mutateAsync: UseMutateAsyncFunction<
     any,
     Error,
-    Parameters<typeof createUserRole>[0],
+    Parameters<typeof assignSection>[0],
     unknown
   >;
-  form: UseFormReturn<CreateUserRoleSchema>;
+  form: UseFormReturn<AssignUserSchema>;
   isPending: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  data: UserDepartmentData;
-  roleId: string;
+  data: Section[];
+  userId: string;
 }
 
-export default function AssignUserRoleRowForm({
+export default function AddSectionForm({
   mutateAsync,
   isPending,
   form,
   setOpen,
   data,
-  roleId,
-}: AssignUserRoleRowFormProps) {
+  userId,
+}: AddSectionFormProps) {
   const pathname = usePathname();
 
-  async function onSubmit(values: CreateUserRoleSchema) {
-    const data: CreateUserRoleSchemaWithPath = {
+  async function onSubmit(values: AssignUserSchema) {
+    const data: AssignUserSchemaWithPath = {
       path: pathname,
-      departmentId: values.departmentId,
-      userId: values.userId,
-      roleId: roleId,
+      userId: userId,
+      sectionId: values.sectionId,
     };
     toast.promise(mutateAsync(data), {
-      loading: "Creating...",
+      loading: "Adding...",
       success: () => {
         setOpen(false);
-        return "User role created successfuly";
+        return "User added to section succesfuly";
       },
       error: (err) => {
         return err.message;
@@ -78,43 +83,37 @@ export default function AssignUserRoleRowForm({
     });
   }
 
-  const { users, departments } = data;
-
   return (
     <Form {...form}>
       <form autoComplete="off" onSubmit={form.handleSubmit(onSubmit)}>
-        <div className="scroll-bar flex max-h-[55vh] flex-col overflow-y-auto">
+        <div className="scroll-bar flex max-h-[40vh] flex-col overflow-y-auto">
           <FormField
             control={form.control}
-            name="userId"
+            name="sectionId"
             render={({ field }) => (
               <FormItem className="flex-1">
                 <FormControl>
                   <Command className="max-h-[200px]">
-                    <CommandInput placeholder={`Search user...`} />
+                    <CommandInput placeholder={`Search section...`} />
                     <CommandList>
-                      <CommandEmpty>No user found.</CommandEmpty>
+                      <CommandEmpty>No sections found.</CommandEmpty>
                       <CommandGroup>
-                        {users.map((user) => (
+                        {data.map((section) => (
                           <CommandItem
-                            key={user.id}
+                            key={section.id}
                             onSelect={() => {
-                              form.setValue("userId", user.id);
+                              form.setValue("sectionId", section.id);
                             }}
                           >
                             <Check
                               className={cn(
                                 "mr-2 h-4 w-4",
-                                field.value === user.id
+                                field.value === section.id
                                   ? "opacity-100"
                                   : "opacity-0"
                               )}
                             />
-                            {formatFullName(
-                              user.firstName,
-                              user.middleName,
-                              user.lastName
-                            )}
+                            {section.name}
                           </CommandItem>
                         ))}
                       </CommandGroup>
@@ -125,26 +124,10 @@ export default function AssignUserRoleRowForm({
               </FormItem>
             )}
           />
-          <Separator className="mb-1" />
-          <FormField
-            control={form.control}
-            name="departmentId"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <InputPopover
-                  title="Department"
-                  options={departments}
-                  selected={field.value}
-                  onSelect={field.onChange}
-                />
-                <FormMessage />
-              </FormItem>
-            )}
-          />
         </div>
-        <Separator className="mt-1" />
+        <Separator />
         <DialogFooter className="p-1">
-          <div className="flex w-full gap-1">
+          <div className="flex gap-1 w-full">
             <Button
               variant="secondary"
               size="sm"
@@ -163,7 +146,7 @@ export default function AssignUserRoleRowForm({
               type="submit"
               className="flex-1"
             >
-              Create
+              Add
             </Button>
           </div>
         </DialogFooter>

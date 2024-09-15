@@ -22,10 +22,11 @@ import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
 import { usePathname } from "next/navigation";
 import type { RoleType } from "@/lib/types/role";
 import { deleteRoles } from "@/lib/actions/role";
+import type { RoleTableType } from "./types";
 
 interface DeleteRolesDialogProps
   extends React.ComponentPropsWithoutRef<typeof AlertDialog> {
-  roles: Row<RoleType>["original"][];
+  roles: Row<RoleTableType>["original"][];
   showTrigger?: boolean;
   onSuccess?: () => void;
 }

@@ -35,10 +35,11 @@ import {
 } from "@/lib/schema/role";
 import { Textarea } from "@/components/ui/text-area";
 import { updateRole } from "@/lib/actions/role";
+import type { RoleTableType } from "./types";
 
 interface UpdateDeparRoleProps
   extends React.ComponentPropsWithRef<typeof Sheet> {
-  role: RoleType;
+  role: RoleTableType;
 }
 
 export function UpdateRoleSheet({ role, ...props }: UpdateDeparRoleProps) {

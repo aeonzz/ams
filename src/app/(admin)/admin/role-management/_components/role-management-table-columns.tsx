@@ -3,7 +3,7 @@
 import * as React from "react";
 import { type ColumnDef } from "@tanstack/react-table";
 
-import { cn, formatDate } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
 
 import { P } from "@/components/typography/text";
@@ -26,8 +26,10 @@ import AssignRoleSheet from "./assign-role-sheet";
 import { UpdateRoleSheet } from "./update-role-sheet";
 import { DeleteRolesDialog } from "./delete-roles-dialog";
 import AssignUserRoleRowPopover from "./assign-user-role-row-popover";
+import type { RoleTableType } from "./types";
+import { formatDate } from "date-fns";
 
-export function getRoleColumns(): ColumnDef<RoleType>[] {
+export function getRoleColumns(): ColumnDef<RoleTableType>[] {
   return [
     {
       id: "select",
@@ -90,7 +92,7 @@ export function getRoleColumns(): ColumnDef<RoleType>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Date Created" />
       ),
-      cell: ({ cell }) => formatDate(cell.getValue() as Date),
+      cell: ({ cell }) => formatDate(cell.getValue() as Date, "PPP p"),
       size: 0,
     },
     {
@@ -98,7 +100,7 @@ export function getRoleColumns(): ColumnDef<RoleType>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Last Modified" />
       ),
-      cell: ({ cell }) => formatDate(cell.getValue() as Date),
+      cell: ({ cell }) => formatDate(cell.getValue() as Date, "PPP p"),
       size: 0,
     },
     {

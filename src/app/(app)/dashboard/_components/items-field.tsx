@@ -159,7 +159,7 @@ export default function ItemsField({ form, name, isPending, onDepartmentIdChange
                               key={item.id}
                               onSelect={() => handleItemSelect(item)}
                             >
-                              <div className="flex w-full space-x-4">
+                              <div className="flex w-full space-x-3">
                                 <div className="relative aspect-square h-20 cursor-pointer transition-colors hover:brightness-75">
                                   <Image
                                     src={item.imageUrl}

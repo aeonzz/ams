@@ -21,7 +21,6 @@ import {
   type CreateUserRoleSchemaWithPath,
   type CreateUserRoleSchema,
 } from "@/lib/schema/userRole";
-import type { UserDepartmentData } from "./types";
 import InputPopover, { Option } from "../../../../../components/input-popover";
 import {
   Command,
@@ -33,9 +32,10 @@ import {
 } from "@/components/ui/command";
 import { Check } from "lucide-react";
 import { cn, formatFullName } from "@/lib/utils";
+import type { RoleDepartmentData } from "./types";
 import { Separator } from "@/components/ui/separator";
 
-interface AssignUserRoleRowFormProps {
+interface CreateUserRoleFormProps {
   mutateAsync: UseMutateAsyncFunction<
     any,
     Error,
@@ -45,26 +45,26 @@ interface AssignUserRoleRowFormProps {
   form: UseFormReturn<CreateUserRoleSchema>;
   isPending: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  data: UserDepartmentData;
-  roleId: string;
+  data: RoleDepartmentData;
+  userId: string;
 }
 
-export default function AssignUserRoleRowForm({
+export default function CreateUserRoleForm({
   mutateAsync,
   isPending,
   form,
   setOpen,
   data,
-  roleId,
-}: AssignUserRoleRowFormProps) {
+  userId,
+}: CreateUserRoleFormProps) {
   const pathname = usePathname();
 
   async function onSubmit(values: CreateUserRoleSchema) {
     const data: CreateUserRoleSchemaWithPath = {
       path: pathname,
       departmentId: values.departmentId,
-      userId: values.userId,
-      roleId: roleId,
+      userId: userId,
+      roleId: values.roleId,
     };
     toast.promise(mutateAsync(data), {
       loading: "Creating...",
@@ -78,43 +78,39 @@ export default function AssignUserRoleRowForm({
     });
   }
 
-  const { users, departments } = data;
+  const { roles, departments } = data;
 
   return (
     <Form {...form}>
       <form autoComplete="off" onSubmit={form.handleSubmit(onSubmit)}>
-        <div className="scroll-bar flex max-h-[55vh] flex-col overflow-y-auto">
+        <div className="scroll-bar flex max-h-[40vh] flex-col overflow-y-auto">
           <FormField
             control={form.control}
-            name="userId"
+            name="roleId"
             render={({ field }) => (
               <FormItem className="flex-1">
                 <FormControl>
                   <Command className="max-h-[200px]">
-                    <CommandInput placeholder={`Search user...`} />
+                    <CommandInput placeholder={`Search role...`} />
                     <CommandList>
-                      <CommandEmpty>No user found.</CommandEmpty>
+                      <CommandEmpty>No roles found.</CommandEmpty>
                       <CommandGroup>
-                        {users.map((user) => (
+                        {roles.map((role) => (
                           <CommandItem
-                            key={user.id}
+                            key={role.id}
                             onSelect={() => {
-                              form.setValue("userId", user.id);
+                              form.setValue("roleId", role.id);
                             }}
                           >
                             <Check
                               className={cn(
                                 "mr-2 h-4 w-4",
-                                field.value === user.id
+                                field.value === role.id
                                   ? "opacity-100"
                                   : "opacity-0"
                               )}
                             />
-                            {formatFullName(
-                              user.firstName,
-                              user.middleName,
-                              user.lastName
-                            )}
+                            {role.name}
                           </CommandItem>
                         ))}
                       </CommandGroup>
@@ -130,7 +126,7 @@ export default function AssignUserRoleRowForm({
             control={form.control}
             name="departmentId"
             render={({ field }) => (
-              <FormItem className="flex flex-col">
+              <FormItem className="flex flex-col px-1">
                 <InputPopover
                   title="Department"
                   options={departments}

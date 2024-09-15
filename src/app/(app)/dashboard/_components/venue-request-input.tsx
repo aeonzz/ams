@@ -415,7 +415,7 @@ export default function VenueRequestInput({
             </div>
             {venueId && (
               <div
-                className={cn("scroll-bar max-h-[55vh] w-72 overflow-y-auto")}
+                className={cn("scroll-bar max-h-[60vh] w-72 overflow-y-auto")}
               >
                 <P className="mb-2 font-semibold">Schedules</P>
                 {isLoading || isRefetching ? (

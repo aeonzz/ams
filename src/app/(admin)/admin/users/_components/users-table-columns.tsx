@@ -6,7 +6,6 @@ import { type ColumnDef } from "@tanstack/react-table";
 import { toast } from "sonner";
 
 // import { getErrorMessage } from "@/lib/handle-error"
-import { formatDate, getPriorityIcon, textTransform } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -35,8 +34,10 @@ import { updateUser } from "@/lib/actions/users";
 import { usePathname } from "next/navigation";
 import { DeleteUsersDialog } from "./delete-users-dialog";
 import { type UserType } from "@/lib/types/user";
-import DropdownRoleSelector from "./dropdown-role-selector";
 import { ChevronDownIcon, ChevronRightIcon } from "lucide-react";
+import CreateUserRole from "./create-user-role";
+import AddSection from "./add-section";
+import { formatDate } from "date-fns";
 
 export function getUsersColumns(): ColumnDef<UserType>[] {
   return [
@@ -91,7 +92,7 @@ export function getUsersColumns(): ColumnDef<UserType>[] {
         return (
           <div className="flex space-x-2">
             <P className="truncate font-medium">
-              {row.original.department ? row.original.department.label : "N/A"}
+              {row.original.department ? row.original.department.name : "-"}
             </P>
           </div>
         );
@@ -166,14 +167,14 @@ export function getUsersColumns(): ColumnDef<UserType>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Date Created" />
       ),
-      cell: ({ cell }) => formatDate(cell.getValue() as Date),
+      cell: ({ cell }) => formatDate(cell.getValue() as Date, "PPP p"),
     },
     {
       accessorKey: "updatedAt",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Last Modified" />
       ),
-      cell: ({ cell }) => formatDate(cell.getValue() as Date),
+      cell: ({ cell }) => formatDate(cell.getValue() as Date, "PPP p"),
     },
     {
       id: "expander",
@@ -199,13 +200,10 @@ export function getUsersColumns(): ColumnDef<UserType>[] {
     {
       id: "actions",
       cell: function Cell({ row }) {
-        const pathname = usePathname();
         const [showUpdateTaskSheet, setShowUpdateTaskSheet] =
           React.useState(false);
         const [showDeleteTaskDialog, setShowDeleteTaskDialog] =
           React.useState(false);
-
-        const { isPending, mutateAsync } = useServerActionMutation(updateUser);
 
         return (
           <div className="grid place-items-center">
@@ -235,7 +233,8 @@ export function getUsersColumns(): ColumnDef<UserType>[] {
                 <DropdownMenuItem onSelect={() => setShowUpdateTaskSheet(true)}>
                   Edit
                 </DropdownMenuItem>
-                <DropdownRoleSelector user={row.original} />
+                <AddSection userId={row.original.id} />
+                <CreateUserRole userId={row.original.id} />
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onSelect={() => setShowDeleteTaskDialog(true)}

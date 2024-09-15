@@ -21,6 +21,7 @@ export async function GET(req: Request, params: Context) {
             status: true,
             title: true,
             department: true,
+            user: true,
           },
         },
       },

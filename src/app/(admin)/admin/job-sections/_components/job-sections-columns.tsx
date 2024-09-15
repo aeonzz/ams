@@ -3,7 +3,6 @@
 import * as React from "react";
 import { type ColumnDef } from "@tanstack/react-table";
 
-import { formatDate } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
 
 import { P } from "@/components/typography/text";
@@ -30,6 +29,7 @@ import { UpdateJobSectionSheet } from "./update-job-section-sheet";
 import { DeleteJobSectionsDialog } from "./delete-job-sections-dialog";
 import type { JobSectionData } from "./types";
 import { ChevronDownIcon, ChevronRightIcon } from "lucide-react";
+import { formatDate } from "date-fns";
 
 export function getJobSectionsColumns(): ColumnDef<JobSectionData>[] {
   return [
@@ -95,14 +95,14 @@ export function getJobSectionsColumns(): ColumnDef<JobSectionData>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Date Created" />
       ),
-      cell: ({ cell }) => formatDate(cell.getValue() as Date),
+      cell: ({ cell }) => formatDate(cell.getValue() as Date, "PPP p"),
     },
     {
       accessorKey: "updatedAt",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Last Modified" />
       ),
-      cell: ({ cell }) => formatDate(cell.getValue() as Date),
+      cell: ({ cell }) => formatDate(cell.getValue() as Date, "PPP p"),
       size: 0,
     },
     {

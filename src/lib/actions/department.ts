@@ -25,7 +25,9 @@ export async function getDepartments(input: GetDepartmentsSchema) {
       "asc" | "desc" | undefined,
     ];
 
-    const where: any = {};
+    const where: any = {
+      isArchived: false,
+    };
 
     if (name) {
       where.name = { contains: name, mode: "insensitive" };
@@ -45,6 +47,9 @@ export async function getDepartments(input: GetDepartmentsSchema) {
         skip,
         orderBy: {
           [column || "createdAt"]: order || "desc",
+        },
+        include: {
+          user: true,
         },
       }),
       db.department.count({ where }),
@@ -107,11 +112,14 @@ export const deleteDepartments = authedProcedure
     const { path, ...rest } = input;
 
     try {
-      await db.department.deleteMany({
+      await db.department.updateMany({
         where: {
           id: {
             in: rest.ids,
           },
+        },
+        data: {
+          isArchived: true,
         },
       });
 

@@ -4,7 +4,6 @@ import * as React from "react";
 import { type ColumnDef } from "@tanstack/react-table";
 
 import {
-  formatDate,
   getReturnableItemStatusIcon,
   textTransform,
 } from "@/lib/utils";
@@ -38,6 +37,7 @@ import { updateInventorySubItem } from "@/lib/actions/inventoryItem";
 import ItemStatusSchema, {
   type ItemStatusType,
 } from "prisma/generated/zod/inputTypeSchemas/ItemStatusSchema";
+import { formatDate } from "date-fns";
 
 export function getInventorySubItemsColumns(): ColumnDef<InventorySubItemType>[] {
   return [
@@ -159,14 +159,14 @@ export function getInventorySubItemsColumns(): ColumnDef<InventorySubItemType>[]
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Date Created" />
       ),
-      cell: ({ cell }) => formatDate(cell.getValue() as Date),
+      cell: ({ cell }) => formatDate(cell.getValue() as Date, "PPP p"),
     },
     {
       accessorKey: "updatedAt",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Last Modified" />
       ),
-      cell: ({ cell }) => formatDate(cell.getValue() as Date),
+      cell: ({ cell }) => formatDate(cell.getValue() as Date, "PPP p"),
       size: 0,
     },
     {

@@ -2,7 +2,7 @@
 
 import React from "react";
 
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -105,6 +105,9 @@ export default function JobDialog() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+        <DialogHeader>
+          <DialogTitle>Job Request</DialogTitle>
+        </DialogHeader>
         <JobRequestInput
           form={form}
           isPending={isPending}

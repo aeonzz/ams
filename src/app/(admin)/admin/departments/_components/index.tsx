@@ -20,7 +20,7 @@ export default function DepartmentScreen({ params }: DepartmentScreenProps) {
     <div className="flex h-full w-full">
       <div className="flex-1">
         <div className="flex h-[50px] items-center justify-between border-b px-3">
-          <P className="font-medium">Users</P>
+          <P className="font-medium">Departments</P>
           <React.Suspense fallback={<Skeleton className="h-7 w-52" />}>
             <DateRangePicker
               triggerVariant="secondary"

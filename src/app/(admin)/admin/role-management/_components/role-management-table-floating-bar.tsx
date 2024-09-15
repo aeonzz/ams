@@ -38,9 +38,10 @@ import {
 } from "@/components/ui/alert-dialog";
 import type { RoleType } from "@/lib/types/role";
 import { deleteRoles } from "@/lib/actions/role";
+import type { RoleTableType } from "./types";
 
 interface RoleManagementTableFloatingBarProps {
-  table: Table<RoleType>;
+  table: Table<RoleTableType>;
 }
 
 export function RoleManagementTableFloatingBar({

@@ -10,9 +10,10 @@ import { PlusIcon } from "lucide-react";
 import { type InventoryItemType } from "@/lib/types/item";
 import type { RoleType } from "@/lib/types/role";
 import { DeleteRolesDialog } from "./delete-roles-dialog";
+import type { RoleTableType } from "./types";
 
 interface RoleManagementTableToolbarActionsProps {
-  table: Table<RoleType>;
+  table: Table<RoleTableType>;
 }
 
 export function RoleManagementTableToolbarActions({

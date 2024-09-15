@@ -36,10 +36,10 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { deleteDepartments } from "@/lib/actions/department";
-import { Department } from "prisma/generated/zod";
+import type { DepartmentsTableType } from "./types";
 
 interface DepartmentsTableFloatingBarProps {
-  table: Table<Department>;
+  table: Table<DepartmentsTableType>;
 }
 
 export function DepartmentsTableFloatingBar({

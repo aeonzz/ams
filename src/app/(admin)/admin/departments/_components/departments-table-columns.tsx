@@ -18,12 +18,13 @@ import { DataTableColumnHeader } from "@/components/data-table/data-table-column
 
 import { P } from "@/components/typography/text";
 import { usePathname } from "next/navigation";
-import { Department } from "prisma/generated/zod";
 import { UpdateDepartmentSheet } from "./update-department-sheet";
 import { DeleteDepartmentsDialog } from "./delete-departments-dialog";
-import { formatDate } from "@/lib/utils";
+import { ChevronDownIcon, ChevronRightIcon } from "lucide-react";
+import type { DepartmentsTableType } from "./types";
+import { formatDate } from "date-fns";
 
-export function getDepartmentsColumns(): ColumnDef<Department>[] {
+export function getDepartmentsColumns(): ColumnDef<DepartmentsTableType>[] {
   return [
     {
       id: "select",
@@ -52,6 +53,7 @@ export function getDepartmentsColumns(): ColumnDef<Department>[] {
       ),
       enableSorting: false,
       enableHiding: false,
+      size: 0,
     },
     // {
     //   accessorKey: "id",
@@ -99,7 +101,35 @@ export function getDepartmentsColumns(): ColumnDef<Department>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Date Created" />
       ),
-      cell: ({ cell }) => formatDate(cell.getValue() as Date),
+      cell: ({ cell }) => formatDate(cell.getValue() as Date, "PPP p"),
+    },
+    {
+      accessorKey: "updatedAt",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Last Modified" />
+      ),
+      cell: ({ cell }) => formatDate(cell.getValue() as Date, "PPP p"),
+    },
+    {
+      id: "expander",
+      header: () => <P>Users</P>,
+      cell: ({ row }) => {
+        return (
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => row.toggleExpanded()}
+            aria-label="Toggle row details"
+          >
+            {row.getIsExpanded() ? (
+              <ChevronDownIcon className="h-4 w-4" />
+            ) : (
+              <ChevronRightIcon className="h-4 w-4" />
+            )}
+          </Button>
+        );
+      },
+      size: 0,
     },
     {
       id: "actions",

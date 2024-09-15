@@ -35,36 +35,22 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { CreateJobRequestSchema } from "./schema";
-
-interface Section {
-  id: string;
-  name: string;
-  description: string | null;
-  createdAt: string;
-  updatedAt: string;
-  isArchived: boolean;
-}
+import { type Section } from "prisma/generated/zod";
 
 interface JobSectionFieldProps {
   form: UseFormReturn<CreateJobRequestSchema>;
   name: keyof CreateJobRequestSchema;
   isPending: boolean;
+  data: Section[] | undefined;
 }
 
 export default function JobSectionField({
   form,
   name,
   isPending,
+  data,
 }: JobSectionFieldProps) {
   const [open, setOpen] = React.useState(false);
-
-  const { data, isLoading } = useQuery<Section[]>({
-    queryFn: async () => {
-      const res = await axios.get("/api/job-section/job-sections");
-      return res.data.data;
-    },
-    queryKey: ["get-input-job-sections"],
-  });
 
   const selectedSection = data?.find(
     (section) => section.id === form.watch(name)
@@ -83,7 +69,7 @@ export default function JobSectionField({
                 <Button
                   variant="secondary"
                   role="combobox"
-                  disabled={isPending || isLoading}
+                  disabled={isPending}
                   className={cn(
                     "w-full justify-between",
                     !field.value && "text-muted-foreground"
@@ -94,11 +80,7 @@ export default function JobSectionField({
                   ) : (
                     "Select section"
                   )}
-                  {isLoading ? (
-                    <LoadingSpinner className="ml-2 h-4 w-4" />
-                  ) : (
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                  )}
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </FormControl>
             </PopoverTrigger>
@@ -130,13 +112,10 @@ export default function JobSectionField({
                             <P className="truncate">{section.name}</P>
                           </CommandItem>
                         </HoverCardTrigger>
-                        <HoverCardContent
-                          className="w-80"
-                          side="right"
-                        >
+                        <HoverCardContent className="w-80" side="right">
                           <div className="space-y-2">
                             <H3 className="font-semibold">{section.name}</H3>
-                            <div className="scroll-bar overflow-y-auto max-h-52">
+                            <div className="scroll-bar max-h-52 overflow-y-auto">
                               <P className="text-muted-foreground">
                                 {section.description ||
                                   "No description available."}

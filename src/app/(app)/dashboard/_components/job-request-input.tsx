@@ -11,7 +11,6 @@ import {
   CalendarIcon,
   Camera,
   Check,
-  ChevronLeft,
   ChevronsUpDown,
   CircleArrowUp,
   Cog,
@@ -19,14 +18,9 @@ import {
   FileQuestion,
   Laptop,
   Leaf,
-  Minus,
   Paintbrush,
   PenTool,
   PocketKnife,
-  SignalHigh,
-  SignalLow,
-  SignalMedium,
-  TriangleAlert,
   Wrench,
 } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
@@ -46,17 +40,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { MotionLayout } from "@/components/layouts/motion-layout";
 import { usePathname } from "next/navigation";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { useUploadFile } from "@/lib/hooks/use-upload-file";
 import { FileUploader } from "@/components/file-uploader";
 import { toast } from "sonner";
-import { UseMutateAsyncFunction, useQueryClient } from "@tanstack/react-query";
+import {
+  UseMutateAsyncFunction,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/text-area";
 import { Separator } from "@/components/ui/separator";
-import { type ExtendedJobRequestSchema } from "@/lib/schema/request";
 import { type RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTypeSchema";
 import {
   Popover,
@@ -75,13 +71,13 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { PriorityTypeType } from "prisma/generated/zod/inputTypeSchemas/PriorityTypeSchema";
-import { JobRequestSchema } from "@/lib/db/schema/request";
 import { createJobRequest } from "@/lib/actions/job";
 import { ExtendedJobRequestSchemaServer } from "@/lib/db/schema/job";
 import JobSectionField from "./job-section-field";
 import { type CreateJobRequestSchema } from "./schema";
-import { JobTypeSchema } from "prisma/generated/zod";
+import { JobTypeSchema, type Section } from "prisma/generated/zod";
+import axios from "axios";
+import JobRequestInputSkeleton from "./job-request-input-skeleton";
 
 const jobs = [
   {
@@ -146,34 +142,6 @@ const jobs = [
   },
 ] as const;
 
-// const priorities = [
-//   {
-//     value: "NO_PRIORITY",
-//     label: "No priority",
-//     icon: Minus,
-//   },
-//   {
-//     value: "URGENT",
-//     label: "Urgent",
-//     icon: TriangleAlert,
-//   },
-//   {
-//     value: "HIGH",
-//     label: "High",
-//     icon: SignalHigh,
-//   },
-//   {
-//     value: "MEDIUM",
-//     label: "Medium",
-//     icon: SignalMedium,
-//   },
-//   {
-//     value: "LOW",
-//     label: "Low",
-//     icon: SignalLow,
-//   },
-// ] as const;
-
 interface JobRequestInputProps {
   mutateAsync: UseMutateAsyncFunction<
     any,
@@ -200,6 +168,14 @@ export default function JobRequestInput({
   const pathname = usePathname();
   const currentUser = useSession();
   const { department } = currentUser;
+
+  const { data, isLoading } = useQuery<Section[]>({
+    queryFn: async () => {
+      const res = await axios.get("/api/job-section/job-sections");
+      return res.data.data;
+    },
+    queryKey: ["get-input-job-sections"],
+  });
 
   const { uploadFiles, progresses, isUploading, uploadedFiles } =
     useUploadFile();
@@ -248,11 +224,10 @@ export default function JobRequestInput({
     }
   }
 
+  if (isLoading) return <JobRequestInputSkeleton />;
+
   return (
     <>
-      <DialogHeader>
-        <DialogTitle>Job Request</DialogTitle>
-      </DialogHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="scroll-bar flex max-h-[60vh] gap-6 overflow-y-auto px-4 py-1">
@@ -261,6 +236,7 @@ export default function JobRequestInput({
                 form={form}
                 name="sectionId"
                 isPending={isPending}
+                data={data}
               />
               <div className="flex flex-wrap gap-2 py-1">
                 <FormField

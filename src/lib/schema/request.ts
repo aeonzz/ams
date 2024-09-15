@@ -33,7 +33,7 @@ export const extendedJobRequestSchema = requestSchemaBase.merge(
 
 export type ExtendedJobRequestSchema = z.infer<typeof extendedJobRequestSchema>;
 
-export const venueRequestSchema = z.object({
+export const venueRequestSchemaBase = z.object({
   venueId: z.string({
     required_error: "Please select a venue",
   }),
@@ -47,6 +47,9 @@ export const venueRequestSchema = z.object({
     })
     .min(new Date(), {
       message: "Date needed must be in the future",
+    })
+    .refine((date) => date.getHours() !== 0 || date.getMinutes() !== 0, {
+      message: "Time cannot be exactly midnight (00:00)",
     }),
   endTime: z
     .date({
@@ -54,6 +57,9 @@ export const venueRequestSchema = z.object({
     })
     .min(new Date(), {
       message: "Date needed must be in the future",
+    })
+    .refine((date) => date.getHours() !== 0 || date.getMinutes() !== 0, {
+      message: "Time cannot be exactly midnight (00:00)",
     }),
   setupRequirements: z
     .array(z.string())
@@ -64,9 +70,18 @@ export const venueRequestSchema = z.object({
   notes: z.string().optional(),
 });
 
+export const venueRequestSchema = venueRequestSchemaBase.refine(
+  (data) => data.startTime <= data.endTime,
+  {
+    message:
+      "Date and time needed must not be later than the end date and time",
+    path: ["startTime"],
+  }
+);
+
 export type VenueRequestSchema = z.infer<typeof venueRequestSchema>;
 
-export const venueRequestSchemaWithPath = venueRequestSchema.extend({
+export const venueRequestSchemaWithPath = venueRequestSchemaBase.extend({
   path: z.string(),
 });
 
@@ -141,4 +156,3 @@ export const extendedUpdateJobRequestSchema = updateJobRequestSchema.extend({
 export type ExtendedUpdateJobRequestSchema = z.infer<
   typeof extendedUpdateJobRequestSchema
 >;
-

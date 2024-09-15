@@ -3,7 +3,7 @@
 import * as React from "react";
 import { type ColumnDef } from "@tanstack/react-table";
 
-import { cn, formatDate } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
 
 import { P } from "@/components/typography/text";
@@ -33,6 +33,7 @@ import { updateInventory } from "@/lib/actions/inventory";
 import { UpdateInventorySheet } from "./inventory-inventory-sheet";
 import { DeleteInventoryDialog } from "./delete-inventories-dialog";
 import { ChevronDownIcon, ChevronRightIcon } from "lucide-react";
+import { formatDate } from "date-fns";
 
 export function getInventoryColumns(): ColumnDef<InventoryItemType>[] {
   return [
@@ -144,7 +145,7 @@ export function getInventoryColumns(): ColumnDef<InventoryItemType>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Date Created" />
       ),
-      cell: ({ cell }) => formatDate(cell.getValue() as Date),
+      cell: ({ cell }) => formatDate(cell.getValue() as Date, "PPP p"),
       size: 0,
     },
     {
@@ -152,7 +153,7 @@ export function getInventoryColumns(): ColumnDef<InventoryItemType>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Last Modified" />
       ),
-      cell: ({ cell }) => formatDate(cell.getValue() as Date),
+      cell: ({ cell }) => formatDate(cell.getValue() as Date, "PPP p"),
       size: 0,
     },
     {

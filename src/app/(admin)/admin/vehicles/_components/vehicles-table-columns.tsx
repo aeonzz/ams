@@ -4,7 +4,6 @@ import * as React from "react";
 import { type ColumnDef } from "@tanstack/react-table";
 
 import {
-  formatDate,
   getPriorityIcon,
   getVehicleStatusIcon,
   textTransform,
@@ -40,6 +39,7 @@ import VehicleStatusSchema, {
 import { updateVehicle } from "@/lib/actions/vehicle";
 import { UpdateVehicleSheet } from "./update-vehicle-sheet";
 import { DeleteVehiclesDialog } from "./delete-vehicles-dialog";
+import { formatDate } from "date-fns";
 
 export function getVehiclesColumns(): ColumnDef<Vehicle>[] {
   return [
@@ -185,7 +185,14 @@ export function getVehiclesColumns(): ColumnDef<Vehicle>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Date Created" />
       ),
-      cell: ({ cell }) => formatDate(cell.getValue() as Date),
+      cell: ({ cell }) => formatDate(cell.getValue() as Date, "PPP p"),
+    },
+    {
+      accessorKey: "updatedAt",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Date Modified" />
+      ),
+      cell: ({ cell }) => formatDate(cell.getValue() as Date, "PPP p"),
     },
     {
       id: "actions",
