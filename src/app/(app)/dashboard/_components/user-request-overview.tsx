@@ -11,10 +11,10 @@ import axios from "axios";
 import { type RequestWithRelations } from "prisma/generated/zod";
 import { Dot, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import LoadingSpinner from "@/components/loaders/loading-spinner";
 import FetchDataError from "@/components/card/fetch-data-error";
 import DashboardSkeleton from "./dashboard-skeleton";
+import EventsCalendar from "./events-calendar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function UserRequestOverview() {
   const { data, isLoading, refetch, isError } = useQuery<
@@ -83,73 +83,88 @@ export default function UserRequestOverview() {
           ))}
         </div>
       </div>
-      <div className="border-t">
-        <div className="flex items-center justify-between bg-tertiary px-3 py-1">
-          <H5 className="font-semibold text-muted-foreground">
-            Pending Requests
-          </H5>
-          <Link
-            href="/requests/my-requests?page=1&per_page=10&sort=createdAt.desc&status=PENDING"
-            className={cn(
-              buttonVariants({ variant: "link", size: "sm" }),
-              "text-sm"
-            )}
-          >
-            See all
-          </Link>
+      <Tabs defaultValue="calendar" className="w-full">
+        <div className="px-3">
+          <TabsList className="">
+            <TabsTrigger value="calendar" className="text-xs">Event</TabsTrigger>
+            <TabsTrigger value="pending" className="text-xs">Pending Requests</TabsTrigger>
+          </TabsList>
         </div>
-        <div className="flex flex-col gap-3 p-3">
-          {getPendingRequests().length === 0 ? (
-            <p className="text-center text-muted-foreground">
-              No pending requests
-            </p>
-          ) : (
-            getPendingRequests().map((request) => {
-              const { color, stroke, variant } = getStatusColor(request.status);
-              return (
-                <Link key={request.id} href={`request/${request.id}`}>
-                  <Card className="bg-secondary">
-                    <CardHeader className="pb-2">
-                      <div className="flex items-center justify-between">
-                        <CardTitle className="text-sm font-medium">
-                          {request.title}
-                        </CardTitle>
-                        <Badge variant="secondary">
-                          {textTransform(request.type)}
-                        </Badge>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-muted-foreground">
-                        {request.jobRequest?.description ||
-                          request.venueRequest?.purpose ||
-                          request.returnableRequest?.purpose ||
-                          request.supplyRequest?.purpose ||
-                          request.transportRequest?.description ||
-                          "No description available"}
-                      </p>
-                      <div className="mt-2 flex items-center justify-between">
-                        <Badge variant={variant} className="pr-3.5">
-                          <Dot
-                            className="mr-1 size-3"
-                            strokeWidth={stroke}
-                            color={color}
-                          />
-                          {textTransform(request.status)}
-                        </Badge>
-                        <span className="text-xs text-muted-foreground">
-                          Created:{" "}
-                          {new Date(request.createdAt).toLocaleDateString()}
-                        </span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              );
-            })
-          )}
-        </div>
-      </div>
+        <TabsContent value="calendar">
+          <EventsCalendar />
+        </TabsContent>
+        <TabsContent value="pending">
+          <div className="border-t">
+            <div className="flex items-center justify-between bg-tertiary px-3 py-1">
+              <H5 className="font-semibold text-muted-foreground">
+                Pending Requests
+              </H5>
+              <Link
+                href="/requests/my-requests?page=1&per_page=10&sort=createdAt.desc&status=PENDING"
+                className={cn(
+                  buttonVariants({ variant: "link", size: "sm" }),
+                  "text-sm"
+                )}
+              >
+                See all
+              </Link>
+            </div>
+            <div className="flex flex-col gap-3 p-3">
+              {getPendingRequests().length === 0 ? (
+                <p className="text-center text-muted-foreground">
+                  No pending requests
+                </p>
+              ) : (
+                getPendingRequests().map((request) => {
+                  const { color, stroke, variant } = getStatusColor(
+                    request.status
+                  );
+                  return (
+                    <Link key={request.id} href={`request/${request.id}`}>
+                      <Card className="bg-secondary">
+                        <CardHeader className="pb-2">
+                          <div className="flex items-center justify-between">
+                            <CardTitle className="text-sm font-medium">
+                              {request.title}
+                            </CardTitle>
+                            <Badge variant="secondary">
+                              {textTransform(request.type)}
+                            </Badge>
+                          </div>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-sm text-muted-foreground">
+                            {request.jobRequest?.description ||
+                              request.venueRequest?.purpose ||
+                              request.returnableRequest?.purpose ||
+                              request.supplyRequest?.purpose ||
+                              request.transportRequest?.description ||
+                              "No description available"}
+                          </p>
+                          <div className="mt-2 flex items-center justify-between">
+                            <Badge variant={variant} className="pr-3.5">
+                              <Dot
+                                className="mr-1 size-3"
+                                strokeWidth={stroke}
+                                color={color}
+                              />
+                              {textTransform(request.status)}
+                            </Badge>
+                            <span className="text-xs text-muted-foreground">
+                              Created:{" "}
+                              {new Date(request.createdAt).toLocaleDateString()}
+                            </span>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

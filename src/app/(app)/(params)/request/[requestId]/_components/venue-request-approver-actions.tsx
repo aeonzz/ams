@@ -30,10 +30,6 @@ interface VenueRequestApproverActionsProps {
 export default function VenueRequestApproverActions({
   request,
 }: VenueRequestApproverActionsProps) {
-  if (request.status !== "PENDING" && request.status !== "REVIEWED") {
-    return null;
-  }
-
   const currentUser = useSession();
   const pathname = usePathname();
   const queryClient = useQueryClient();
@@ -91,6 +87,10 @@ export default function VenueRequestApproverActions({
   };
 
   const dialogContent = getDialogContent();
+
+  if (request.status !== "PENDING" && request.status !== "REVIEWED") {
+    return null;
+  }
 
   return (
     <div className="space-y-4">

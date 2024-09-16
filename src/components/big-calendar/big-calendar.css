@@ -71,7 +71,7 @@ button.rbc-input::-moz-focus-inner {
   padding: 0 3px;
   text-align: center;
   vertical-align: middle;
-  font-weight: bold;
+  font-weight: 400;
   font-size: 90%;
   min-height: 0;
   border-bottom: 1px solid hsl(var(--border));
@@ -115,12 +115,14 @@ button.rbc-input::-moz-focus-inner {
   flex-grow: 1;
   margin: 0 0.25rem;
   text-align: center;
-  font-weight: 700;
+  font-weight: 400;
   min-width: 200px;
 }
 .rbc-btn-group {
   display: inline-block;
   white-space: nowrap;
+  font-size: 12px;
+  font-weight: 600;
 }
 .rbc-btn-group > button:first-child:not(:last-child) {
   border-top-right-radius: 0;
@@ -595,10 +597,10 @@ button.rbc-input::-moz-focus-inner {
   pointer-events: none;
 }
 .rbc-calendar {
-  background-color: hsl(var(--background));
-  border-radius: var(--radius);
+  background-color: hsl(var(--secondary));
+  /* border-radius: var(--radius); */
   color: hsl(var(--foreground));
-  border: solid 1px hsl(var(--border));
+  border-bottom: solid 1px hsl(var(--border));
   overflow: hidden;
 }
 .rbc-toolbar {
@@ -625,12 +627,12 @@ button.rbc-input::-moz-focus-inner {
   color: hsl(var(--foreground)) !important;
 }
 .rbc-toolbar button.rbc-active {
-  color: hsl(var(--accent-foreground)) !important;
-  background-color: hsl(var(--accent)) !important;
+  color: hsl(var(--tertiary-foreground)) !important;
+  background-color: hsl(var(--tertiary)) !important;
 }
 .rbc-toolbar button:hover {
-  background-color: hsl(var(--accent)) !important;
-  color: hsl(var(--accent-foreground));
+  background-color: hsl(var(--tertiary)) !important;
+  color: hsl(var(--tertiary-foreground));
 }
 .rbc-time-view {
   margin-top: 0;
@@ -644,7 +646,7 @@ button.rbc-input::-moz-focus-inner {
   background-color: hsl(var(--card));
 }
 .rbc-day-bg {
-  background-color: hsl(var(--card));
+  background-color: hsl(var(--secondary));
   border-right: 1px solid hsl(var(--border));
 }
 .rbc-month-view {

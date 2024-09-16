@@ -22,7 +22,6 @@ import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import type { RoleType } from "@/lib/types/role";
 import { ChevronDownIcon, ChevronRightIcon } from "lucide-react";
-import AssignRoleSheet from "./assign-role-sheet";
 import { UpdateRoleSheet } from "./update-role-sheet";
 import { DeleteRolesDialog } from "./delete-roles-dialog";
 import AssignUserRoleRowPopover from "./assign-user-role-row-popover";
@@ -166,12 +165,6 @@ export function getRoleColumns(): ColumnDef<RoleTableType>[] {
               showTrigger={false}
               onSuccess={() => row.toggleSelected(false)}
             />
-            {/* <AssignRoleSheet
-              roleId={row.original.id}
-              roleName={row.original.name}
-              open={showAssignRoleSheet}
-              onOpenChange={setShowAssignRoleSheet}
-            /> */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button

@@ -49,10 +49,6 @@ interface JobRequestReviewerActionsProps {
 export default function JobRequestReviewerActions({
   request,
 }: JobRequestReviewerActionsProps) {
-  if (request.status !== "PENDING" && request.status !== "REVIEWED") {
-    return null;
-  }
-
   const currentUser = useSession();
   const pathname = usePathname();
   const queryClient = useQueryClient();
@@ -173,6 +169,10 @@ export default function JobRequestReviewerActions({
       queryClient,
     ]
   );
+
+  if (request.status !== "PENDING" && request.status !== "REVIEWED") {
+    return null;
+  }
 
   const renderPersonnelList = () => {
     if (isLoading) {
