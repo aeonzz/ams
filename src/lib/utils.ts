@@ -164,11 +164,6 @@ export function getStatusColor(
       variant: "yellow",
       stroke: 10,
     },
-    IN_PROGRESS: {
-      color: "#3b82f6",
-      variant: "blue",
-      stroke: 10,
-    },
     REJECTED: {
       color: "#ef4444",
       variant: "red",
@@ -187,11 +182,6 @@ export function getStatusColor(
     REVIEWED: {
       color: "#a855f7",
       variant: "purple",
-      stroke: 10,
-    },
-    UNDER_REVIEW: {
-      color: "#6366f1",
-      variant: "indigo",
       stroke: 10,
     },
   };
@@ -220,7 +210,7 @@ export function getRequestTypeIcon(
   const requestTypeIcons: RequestTypeIconsMap = {
     JOB: {
       icon: Briefcase,
-      variant: "default",
+      variant: "teal",
     },
     RESOURCE: {
       icon: Package,

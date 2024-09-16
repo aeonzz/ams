@@ -26,7 +26,7 @@ import type {
   UserWithRelations,
 } from "prisma/generated/zod";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
-import { updateRequestStatus, assignPersonnel } from "@/lib/actions/job";
+import { updateJobRequestStatus, assignPersonnel } from "@/lib/actions/job";
 import {
   UpdateRequestStatusSchemaWithPath,
   AssignPersonnelSchemaWithPath,
@@ -38,17 +38,21 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { P } from "@/components/typography/text";
 import { Separator } from "@/components/ui/separator";
 import { formatFullName } from "@/lib/utils";
-import { type RequestStatusTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestStatusTypeSchema";
-import { PermissionGuard } from "@/components/permission-guard";
 import { useSession } from "@/lib/hooks/use-session";
+import JobRequestApproverActions from "./job-request-approver-actions";
+import { PermissionGuard } from "@/components/permission-guard";
 
-interface JobRequestReviewerActionsDialogProps {
+interface JobRequestReviewerActionsProps {
   request: RequestWithRelations;
 }
 
-export default function JobRequestReviewerActionsDialog({
+export default function JobRequestReviewerActions({
   request,
-}: JobRequestReviewerActionsDialogProps) {
+}: JobRequestReviewerActionsProps) {
+  if (request.status !== "PENDING" && request.status !== "REVIEWED") {
+    return null;
+  }
+
   const currentUser = useSession();
   const pathname = usePathname();
   const queryClient = useQueryClient();
@@ -72,7 +76,7 @@ export default function JobRequestReviewerActionsDialog({
   });
 
   const { mutateAsync: updateStatusMutate, isPending: isUpdateStatusPending } =
-    useServerActionMutation(updateRequestStatus);
+    useServerActionMutation(updateJobRequestStatus);
 
   const {
     mutateAsync: assignPersonnelMutate,
@@ -84,42 +88,48 @@ export default function JobRequestReviewerActionsDialog({
   }, [request.jobRequest?.assignedTo]);
 
   const handleReview = React.useCallback(
-    (action: RequestStatusTypeType) => {
+    (action: "REVIEWED" | "REJECTED") => {
       const data: UpdateRequestStatusSchemaWithPath = {
         path: pathname,
         requestId: request.id,
+        reviewerId: currentUser.userRole.some(
+          (role) => role.role.name === "REQUEST_REVIEWER"
+        )
+          ? currentUser.id
+          : undefined,
         status: action,
+        changeType: "REVIEWER_CHANGE",
       };
 
-      const actionText =
-        action === "REVIEWED"
-          ? "Approving"
-          : action === "APPROVED"
-            ? "Finalizing approval of"
-            : "Rejecting";
-      const successText =
-        action === "REVIEWED"
-          ? "approved"
-          : action === "APPROVED"
-            ? "finalized"
-            : "rejected";
+      const actionText = action === "REVIEWED" ? "Approving" : "Rejecting";
+      const successText = action === "REVIEWED" ? "approved" : "rejected";
 
       toast.promise(updateStatusMutate(data), {
-        loading: `${actionText} job request...`,
+        loading: `${actionText} request...`,
         success: () => {
           queryClient.invalidateQueries({
             queryKey: [request.id],
           });
+          queryClient.invalidateQueries({
+            queryKey: [request.jobRequest?.id],
+          });
           setIsOpen(false);
-          return `Job request ${successText} successfully.`;
+          return `Request ${successText} successfully.`;
         },
         error: (err) => {
           console.error(err);
-          return `Failed to ${action.toLowerCase()} job request. Please try again.`;
+          return `Failed to ${action.toLowerCase()} request. Please try again.`;
         },
       });
     },
-    [pathname, request.id, updateStatusMutate, queryClient]
+    [
+      pathname,
+      request.id,
+      updateStatusMutate,
+      queryClient,
+      currentUser.id,
+      currentUser.userRole,
+    ]
   );
 
   const handleAssignPersonnel = React.useCallback(
@@ -142,6 +152,9 @@ export default function JobRequestReviewerActionsDialog({
         success: () => {
           queryClient.invalidateQueries({
             queryKey: [request.id],
+          });
+          queryClient.invalidateQueries({
+            queryKey: [request.jobRequest?.id],
           });
           return "Personnel assigned successfully.";
         },
@@ -228,63 +241,6 @@ export default function JobRequestReviewerActionsDialog({
     );
   };
 
-  const renderActionButtons = () => {
-    const isDisabled =
-      !selectedPerson || isUpdateStatusPending || isAssignPersonnelPending;
-
-    if (request.status === "PENDING") {
-      return (
-        <div className="flex space-x-2">
-          <Button
-            onClick={() => handleReview("REVIEWED")}
-            disabled={isDisabled}
-            className="flex-1"
-          >
-            Approve
-          </Button>
-          <Button
-            onClick={() => handleReview("REJECTED")}
-            variant="destructive"
-            disabled={isDisabled}
-            className="flex-1"
-          >
-            Reject
-          </Button>
-        </div>
-      );
-    }
-
-    if (request.status === "REVIEWED") {
-      return (
-        <PermissionGuard
-          allowedRoles={["REQUEST_APPROVER"]}
-          allowedSection={request.jobRequest?.sectionId}
-          currentUser={currentUser}
-        >
-          <div className="flex space-x-2">
-            <Button
-              variant="destructive"
-              disabled={isDisabled}
-              onClick={() => handleReview("REJECTED")}
-              className="flex-1"
-            >
-              Reject
-            </Button>
-            <Button
-              disabled={isDisabled}
-              onClick={() => handleReview("APPROVED")}
-              className="flex-1"
-            >
-              Finalize Approval
-            </Button>
-          </div>
-        </PermissionGuard>
-      );
-    }
-
-    return null;
-  };
-
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
@@ -315,7 +271,45 @@ export default function JobRequestReviewerActionsDialog({
               {renderPersonnelList()}
             </CommandList>
           </Command>
-          {renderActionButtons()}
+          {request.status === "PENDING" && (
+            <div className="flex space-x-2">
+              <Button
+                onClick={() => handleReview("REVIEWED")}
+                disabled={
+                  !selectedPerson ||
+                  isUpdateStatusPending ||
+                  isAssignPersonnelPending
+                }
+                className="flex-1"
+              >
+                Approve
+              </Button>
+              <Button
+                onClick={() => handleReview("REJECTED")}
+                variant="destructive"
+                disabled={
+                  !selectedPerson ||
+                  isUpdateStatusPending ||
+                  isAssignPersonnelPending
+                }
+                className="flex-1"
+              >
+                Reject
+              </Button>
+            </div>
+          )}
+          {request.status === "REVIEWED" && (
+            <PermissionGuard
+              allowedRoles={["REQUEST_APPROVER"]}
+              allowedSection={request.jobRequest?.sectionId}
+              currentUser={currentUser}
+            >
+              <JobRequestApproverActions
+                request={request}
+                isPending={isUpdateStatusPending || isAssignPersonnelPending}
+              />
+            </PermissionGuard>
+          )}
         </div>
         <Separator className="my-2" />
         <DialogFooter>

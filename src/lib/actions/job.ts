@@ -228,10 +228,11 @@ export const createJobRequest = authedProcedure
       }
 
       const newValueJson = JSON.parse(JSON.stringify(createRequest.jobRequest));
-      await db.jobRequestAuditLog.create({
+      await db.genericAuditLog.create({
         data: {
           id: generateId(15),
-          jobRequestId: createRequest.jobRequest.id,
+          entityId: createRequest.jobRequest.id,
+          entityType: "JOB_REQUEST",
           changeType: "CREATED",
           newValue: newValueJson,
           changedById: user.id,
@@ -275,11 +276,12 @@ export const assignPersonnel = authedProcedure
         const oldValueJson = JSON.parse(JSON.stringify(currentJobRequest));
         const newValueJson = JSON.parse(JSON.stringify(updatedJobRequest));
 
-        await prisma.jobRequestAuditLog.create({
+        await prisma.genericAuditLog.create({
           data: {
             id: generateId(15),
-            jobRequestId: updatedJobRequest.id,
+            entityId: updatedJobRequest.id,
             changeType: "ASSIGNMENT_CHANGE",
+            entityType: "JOB_REQUEST",
             oldValue: oldValueJson,
             newValue: newValueJson,
             changedById: user.id,
@@ -296,12 +298,12 @@ export const assignPersonnel = authedProcedure
     }
   });
 
-export const updateRequestStatus = authedProcedure
+export const updateJobRequestStatus = authedProcedure
   .createServerAction()
   .input(updateRequestStatusSchemaWithPath)
   .handler(async ({ ctx, input }) => {
     const { user } = ctx;
-    const { path, requestId, ...rest } = input;
+    const { path, requestId, reviewerId, changeType, ...rest } = input;
 
     try {
       const result = await db.$transaction(async (prisma) => {
@@ -321,7 +323,7 @@ export const updateRequestStatus = authedProcedure
             ...rest,
             jobRequest: {
               update: {
-                reviewedBy: user.id,
+                reviewedBy: reviewerId,
               },
             },
           },
@@ -331,11 +333,12 @@ export const updateRequestStatus = authedProcedure
         const newValueJson = JSON.parse(
           JSON.stringify(updatedRequest.jobRequest)
         );
-        await prisma.jobRequestAuditLog.create({
+        await prisma.genericAuditLog.create({
           data: {
             id: generateId(15),
-            jobRequestId: currentJobRequest.id,
-            changeType: "APPROVER_CHANGE",
+            entityId: currentJobRequest.id,
+            entityType: "JOB_REQUEST",
+            changeType: changeType,
             oldValue: oldValueJson,
             newValue: newValueJson,
             changedById: user.id,

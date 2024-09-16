@@ -24,29 +24,30 @@ datasource db {
 }
 
 model User {
-  id                       String               @id
-  email                    String               @unique
+  id                       String            @id
+  email                    String            @unique
   profileUrl               String?
   hashedPassword           String
-  resetPasswordToken       String?              @unique
+  resetPasswordToken       String?           @unique
   resetPasswordTokenExpiry DateTime?
   firstName                String
   middleName               String?
   lastName                 String
-  isArchived               Boolean              @default(false)
+  isArchived               Boolean           @default(false)
   departmentId             String?
-  department               Department?          @relation(fields: [departmentId], references: [id])
-  createdAt                DateTime             @default(now())
+  department               Department?       @relation(fields: [departmentId], references: [id])
+  createdAt                DateTime          @default(now())
   sectionId                String?
-  section                  Section?             @relation(fields: [sectionId], references: [id])
-  updatedAt                DateTime             @updatedAt
+  section                  Section?          @relation(fields: [sectionId], references: [id])
+  updatedAt                DateTime          @updatedAt
   sessions                 Session[]
   setting                  Setting?
   request                  Request[]
   userRole                 UserRole[]
-  jobRequestsAsReviewer    JobRequest[]         @relation(name: "ReviewerRelation")
-  jobRequestsAsAssigned    JobRequest[]         @relation(name: "AssignedUserRelation")
-  JobRequestAuditLog       JobRequestAuditLog[]
+  jobRequestsAsReviewer    JobRequest[]      @relation(name: "ReviewerRelation")
+  jobRequestsAsAssigned    JobRequest[]      @relation(name: "AssignedUserRelation")
+  venueRequest             VenueRequest[]
+  genericAuditLog          GenericAuditLog[]
 }
 
 model UserRole {
@@ -132,42 +133,41 @@ model Request {
   transportRequest  TransportRequest?
 }
 
-model JobRequest {
-  id                 String               @id
-  description        String
-  dueDate            DateTime
-  estimatedTime      Int?
-  startDate          DateTime?
-  endDate            DateTime?
-  costEstimate       Float?
-  actualCost         Float?
-  jobType            JobType
-  files              File[]
-  progressNotes      String?
-  requestId          String               @unique
-  request            Request              @relation(fields: [requestId], references: [id], onDelete: Cascade)
-  section            Section              @relation(fields: [sectionId], references: [id])
-  sectionId          String
-  status             JobStatus            @default(PENDING)
-  reviewedBy         String?
-  reviewer           User?                @relation(name: "ReviewerRelation", fields: [reviewedBy], references: [id])
-  assignedTo         String?
-  assignedUser       User?                @relation(name: "AssignedUserRelation", fields: [assignedTo], references: [id])
-  createdAt          DateTime             @default(now())
-  updatedAt          DateTime             @updatedAt
-  jobRequestAuditLog JobRequestAuditLog[]
+model GenericAuditLog {
+  id          String     @id
+  entityId    String
+  entityType  EntityType
+  changeType  ChangeType
+  oldValue    Json?
+  newValue    Json?
+  changedById String
+  changedBy   User       @relation(fields: [changedById], references: [id])
+  timestamp   DateTime   @default(now())
 }
 
-model JobRequestAuditLog {
-  id           String     @id
-  jobRequestId String
-  jobRequest   JobRequest @relation(fields: [jobRequestId], references: [id], onDelete: Cascade)
-  changeType   ChangeType
-  oldValue     Json?
-  newValue     Json?
-  changedById  String
-  changedBy    User       @relation(fields: [changedById], references: [id])
-  timestamp    DateTime   @default(now())
+model JobRequest {
+  id            String    @id
+  description   String
+  dueDate       DateTime
+  estimatedTime Int?
+  startDate     DateTime?
+  endDate       DateTime?
+  costEstimate  Float?
+  actualCost    Float?
+  jobType       JobType
+  files         File[]
+  progressNotes String?
+  requestId     String    @unique
+  request       Request   @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  section       Section   @relation(fields: [sectionId], references: [id])
+  sectionId     String
+  status        JobStatus @default(PENDING)
+  reviewedBy    String?
+  reviewer      User?     @relation(name: "ReviewerRelation", fields: [reviewedBy], references: [id])
+  assignedTo    String?
+  assignedUser  User?     @relation(name: "AssignedUserRelation", fields: [assignedTo], references: [id])
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }
 
 model Section {
@@ -188,6 +188,8 @@ model VenueRequest {
   setupRequirements String
   startTime         DateTime
   endTime           DateTime
+  reviewedBy        String?
+  reviewer          User?    @relation(fields: [reviewedBy], references: [id])
   requestId         String   @unique
   request           Request  @relation(fields: [requestId], references: [id], onDelete: Cascade)
   venueId           String
@@ -332,6 +334,17 @@ enum ChangeType {
   APPROVED
   CANCELLED
   CREATED
+  VENUE_CHANGE
+  TIME_UPDATE
+  OTHER
+}
+
+enum EntityType {
+  JOB_REQUEST
+  VENUE_REQUEST
+  RETURNABLE_REQUEST
+  SUPPLY_REQUEST
+  TRANSPORT_REQUEST
   OTHER
 }
 
@@ -426,8 +439,6 @@ enum PriorityType {
 enum RequestStatusType {
   PENDING
   APPROVED
-  IN_PROGRESS
-  UNDER_REVIEW
   REVIEWED
   COMPLETED
   REJECTED

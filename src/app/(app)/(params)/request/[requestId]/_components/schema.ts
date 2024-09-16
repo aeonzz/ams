@@ -1,4 +1,7 @@
-import { RequestStatusTypeSchema } from "prisma/generated/zod";
+import {
+  ChangeTypeSchema,
+  RequestStatusTypeSchema,
+} from "prisma/generated/zod";
 import { z } from "zod";
 
 export const assignPersonnelSchema = z.object({
@@ -18,7 +21,9 @@ export type AssignPersonnelSchemaWithPath = z.infer<
 
 export const updateRequestStatusSchema = z.object({
   requestId: z.string(),
+  reviewerId: z.string().optional(),
   status: RequestStatusTypeSchema,
+  changeType: ChangeTypeSchema,
 });
 
 export type UpdateRequestStatusSchema = z.infer<

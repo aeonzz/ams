@@ -2,16 +2,22 @@
 
 import { H4, H5, P } from "@/components/typography/text";
 import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   cn,
   formatFullName,
   getChangeTypeInfo,
   textTransform,
 } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 import { format } from "date-fns";
 import { Calendar, Dot, FileText, User } from "lucide-react";
 import Image from "next/image";
-import { type JobRequestWithRelations } from "prisma/generated/zod";
+import {
+  GenericAuditLog,
+  type JobRequestWithRelations,
+} from "prisma/generated/zod";
 import React from "react";
 
 interface JobRequestDetailsProps {
@@ -19,6 +25,14 @@ interface JobRequestDetailsProps {
 }
 
 export default function JobRequestDetails({ data }: JobRequestDetailsProps) {
+  const { data: logs, isLoading } = useQuery<GenericAuditLog[]>({
+    queryFn: async () => {
+      const res = await axios.get(`/api/audit-log/request-log/${data.id}`);
+      return res.data.data;
+    },
+    queryKey: [data.id],
+  });
+
   return (
     <>
       <div className="space-y-4">
@@ -72,24 +86,35 @@ export default function JobRequestDetails({ data }: JobRequestDetailsProps) {
       <Separator className="my-6" />
       <div className="space-y-4 pb-20">
         <H4 className="font-semibold">Activity</H4>
-        <div className="space-y-4">
-          {data.jobRequestAuditLog.map((activity) => {
-            const {
-              color,
-              icon: Icon,
-              message,
-            } = getChangeTypeInfo(activity.changeType);
-            return (
-              <div key={activity.id} className="flex items-center space-x-2">
-                <Icon className="size-5" color={color} />
-                <P className="inline-flex items-center text-muted-foreground">
-                  {message}
-                  <Dot /> {format(new Date(activity.timestamp), "MMM d")}
-                </P>
+        {isLoading ? (
+          <>
+            {[...Array(2)].map((_, index) => (
+              <div key={index} className="flex items-center space-x-2">
+                <Skeleton className="h-6 w-6 rounded-full" />
+                <Skeleton className="h-4 w-2/3" />
               </div>
-            );
-          })}
-        </div>
+            ))}
+          </>
+        ) : (
+          <div className="space-y-4">
+            {logs?.map((activity) => {
+              const {
+                color,
+                icon: Icon,
+                message,
+              } = getChangeTypeInfo(activity.changeType);
+              return (
+                <div key={activity.id} className="flex items-center space-x-2">
+                  <Icon className="size-5" color={color} />
+                  <P className="inline-flex items-center text-muted-foreground">
+                    {message}
+                    <Dot /> {format(new Date(activity.timestamp), "MMM d")}
+                  </P>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </>
   );

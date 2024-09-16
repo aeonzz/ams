@@ -1,45 +1,43 @@
 import { z } from 'zod';
 import { JsonValueSchema } from '../inputTypeSchemas/JsonValueSchema'
+import { EntityTypeSchema } from '../inputTypeSchemas/EntityTypeSchema'
 import { ChangeTypeSchema } from '../inputTypeSchemas/ChangeTypeSchema'
 import type { JsonValueType } from '../inputTypeSchemas/JsonValueSchema';
-import type { JobRequestWithRelations } from './JobRequestSchema'
 import type { UserWithRelations } from './UserSchema'
-import { JobRequestWithRelationsSchema } from './JobRequestSchema'
 import { UserWithRelationsSchema } from './UserSchema'
 
 /////////////////////////////////////////
-// JOB REQUEST AUDIT LOG SCHEMA
+// GENERIC AUDIT LOG SCHEMA
 /////////////////////////////////////////
 
-export const JobRequestAuditLogSchema = z.object({
+export const GenericAuditLogSchema = z.object({
+  entityType: EntityTypeSchema,
   changeType: ChangeTypeSchema,
   id: z.string(),
-  jobRequestId: z.string(),
+  entityId: z.string(),
   oldValue: JsonValueSchema.nullable(),
   newValue: JsonValueSchema.nullable(),
   changedById: z.string(),
   timestamp: z.coerce.date(),
 })
 
-export type JobRequestAuditLog = z.infer<typeof JobRequestAuditLogSchema>
+export type GenericAuditLog = z.infer<typeof GenericAuditLogSchema>
 
 /////////////////////////////////////////
-// JOB REQUEST AUDIT LOG RELATION SCHEMA
+// GENERIC AUDIT LOG RELATION SCHEMA
 /////////////////////////////////////////
 
-export type JobRequestAuditLogRelations = {
-  jobRequest: JobRequestWithRelations;
+export type GenericAuditLogRelations = {
   changedBy: UserWithRelations;
 };
 
-export type JobRequestAuditLogWithRelations = Omit<z.infer<typeof JobRequestAuditLogSchema>, "oldValue" | "newValue"> & {
+export type GenericAuditLogWithRelations = Omit<z.infer<typeof GenericAuditLogSchema>, "oldValue" | "newValue"> & {
   oldValue?: JsonValueType | null;
   newValue?: JsonValueType | null;
-} & JobRequestAuditLogRelations
+} & GenericAuditLogRelations
 
-export const JobRequestAuditLogWithRelationsSchema: z.ZodType<JobRequestAuditLogWithRelations> = JobRequestAuditLogSchema.merge(z.object({
-  jobRequest: z.lazy(() => JobRequestWithRelationsSchema),
+export const GenericAuditLogWithRelationsSchema: z.ZodType<GenericAuditLogWithRelations> = GenericAuditLogSchema.merge(z.object({
   changedBy: z.lazy(() => UserWithRelationsSchema),
 }))
 
-export default JobRequestAuditLogSchema;
+export default GenericAuditLogSchema;

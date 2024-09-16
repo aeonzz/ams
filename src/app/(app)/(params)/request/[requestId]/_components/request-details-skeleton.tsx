@@ -45,15 +45,6 @@ export default function RequestDetailsSkeleton() {
               ))}
             </div>
             <Separator className="my-6" />
-            <div className="space-y-4 pb-20">
-              <Skeleton className="h-6 w-1/4" />
-              {[...Array(2)].map((_, index) => (
-                <div key={index} className="flex items-center space-x-2">
-                  <Skeleton className="h-6 w-6 rounded-full" />
-                  <Skeleton className="h-4 w-2/3" />
-                </div>
-              ))}
-            </div>
           </div>
         </div>
       </div>

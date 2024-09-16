@@ -40,13 +40,13 @@ export async function GET(req: Request, params: Context) {
           include: {
             files: true,
             assignedUser: true,
-            reviewer: true,
-            section: true,
-            jobRequestAuditLog: {
+            reviewer: {
               include: {
-                changedBy: true,
+                department: true,
+                section: true,
               },
             },
+            section: true,
           },
         },
         returnableRequest: {

@@ -38,6 +38,9 @@ export async function GET(req: Request, params: Context) {
             {
               status: "APPROVED",
             },
+            {
+              status: "REVIEWED",
+            },
           ],
         },
       },

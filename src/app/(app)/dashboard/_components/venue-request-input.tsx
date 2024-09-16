@@ -45,6 +45,8 @@ import { H3, P } from "@/components/typography/text";
 import ScheduledEventCard from "./scheduled-event-card";
 import VenueField from "./venue-field";
 import VenueDateTimePicker from "./venue-date-time-picker";
+import { type Venue } from "prisma/generated/zod";
+import VenueRequestInputSkeleton from "./venue-request-input-skeleton";
 
 const purpose = [
   {
@@ -128,6 +130,14 @@ export default function VenueRequestInput({
   const queryClient = useQueryClient();
   const venueId = form.watch("venueId");
 
+  const { data: venueData, isLoading: isLoadingVenueData } = useQuery<Venue[]>({
+    queryFn: async () => {
+      const res = await axios.get("/api/input-data/venue");
+      return res.data.data;
+    },
+    queryKey: ["get-input-venue"],
+  });
+
   const { data, isLoading, refetch, isRefetching } = useQuery<
     ReservedDatesAndTimes[]
   >({
@@ -147,37 +157,52 @@ export default function VenueRequestInput({
     }
   }, [venueId, refetch]);
 
-  const disabledDates = React.useMemo(() => {
-    if (!data) return [];
+  // const disabledDates = React.useMemo(() => {
+  //   if (!data) return [];
 
-    return data.flatMap((item) => {
-      const startDate = new Date(item.startTime);
-      const endDate = new Date(item.endTime);
-      const dates = [];
+  //   return data.flatMap((item) => {
+  //     const startDate = new Date(item.startTime);
+  //     const endDate = new Date(item.endTime);
+  //     const dates = [];
 
-      for (
-        let date = startDate;
-        date <= endDate;
-        date.setDate(date.getDate() + 1)
-      ) {
-        dates.push(new Date(date));
-      }
+  //     for (
+  //       let date = startDate;
+  //       date <= endDate;
+  //       date.setDate(date.getDate() + 1)
+  //     ) {
+  //       dates.push(new Date(date));
+  //     }
 
-      return dates;
-    });
-  }, [data]);
+  //     return dates;
+  //   });
+  // }, [data]);
 
   const disabledTimeRanges = React.useMemo(() => {
     return (
-      data?.map(({ startTime, endTime }) => ({
-        start: new Date(startTime),
-        end: new Date(endTime),
-      })) ?? []
+      data
+        ?.filter(
+          (item) =>
+            item.request.status === "APPROVED" ||
+            item.request.status === "REVIEWED"
+        )
+        .map(({ startTime, endTime }) => ({
+          start: new Date(startTime),
+          end: new Date(endTime),
+        })) ?? []
     );
   }, [data]);
 
   async function onSubmit(values: VenueRequestSchema) {
     const { startTime, endTime } = values;
+    
+    const startDate = new Date(startTime);
+    const endDate = new Date(endTime);
+    
+    if (startDate.getTime() === endDate.getTime() && 
+        startDate.toDateString() === endDate.toDateString()) {
+      toast.error("Start time and end time cannot be the same on the same day.");
+      return;
+    }
 
     // Check for conflicts
     const hasConflict = disabledTimeRanges.some((range) =>
@@ -220,16 +245,20 @@ export default function VenueRequestInput({
     });
   }
 
+  if (isLoadingVenueData) return <VenueRequestInputSkeleton />;
+
   return (
     <>
-      <DialogHeader>
-        <DialogTitle>Venue Request</DialogTitle>
-      </DialogHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="scroll-bar flex max-h-[60vh] gap-6 overflow-y-auto px-4 py-1">
             <div className="flex w-[307px] flex-col space-y-2">
-              <VenueField form={form} name="venueId" isPending={isPending} />
+              <VenueField
+                form={form}
+                name="venueId"
+                isPending={isPending}
+                data={venueData}
+              />
               <VenueDateTimePicker
                 form={form}
                 name="startTime"

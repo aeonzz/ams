@@ -42,19 +42,16 @@ export default function RequestActions({ data, params }: RequestActionsProps) {
     };
 
     // Optimistic update
-    queryClient.setQueryData(
-      ["user-request-details", params],
-      (oldData: RequestWithRelations) => ({
-        ...oldData,
-        status: "CANCELLED",
-      })
-    );
+    queryClient.setQueryData([params], (oldData: RequestWithRelations) => ({
+      ...oldData,
+      status: "CANCELLED",
+    }));
 
     toast.promise(mutateAsync(values), {
       loading: "Cancelling...",
       success: () => {
         queryClient.invalidateQueries({
-          queryKey: ["user-request-details", params],
+          queryKey: [params],
         });
         queryClient.invalidateQueries({
           queryKey: ["user-dashboard-overview"],
@@ -65,7 +62,7 @@ export default function RequestActions({ data, params }: RequestActionsProps) {
       error: (err) => {
         console.error(err);
         // Revert optimistic update on error
-        queryClient.setQueryData(["user-request-details", params], data);
+        queryClient.setQueryData([params], data);
         return "Something went wrong, please try again later.";
       },
     });

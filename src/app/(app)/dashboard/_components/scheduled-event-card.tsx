@@ -41,7 +41,11 @@ export default function ScheduledEventCard({ data }: ScheduledEventCardProps) {
             {data.request.department.name}
           </Badge>
           <Badge variant={variant} className="w-fit pr-3.5">
-            <Dot className={cn("mr-1 size-3", color)} strokeWidth={stroke} />
+            <Dot
+              className={cn("mr-1 size-3")}
+              strokeWidth={stroke}
+              color={color}
+            />
             {textTransform(data.request.status)}
           </Badge>
         </div>

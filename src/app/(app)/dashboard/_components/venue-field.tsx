@@ -29,8 +29,6 @@ import { Button } from "@/components/ui/button";
 import { Path, UseFormReturn } from "react-hook-form";
 import { cn, getVenueStatusIcon, textTransform } from "@/lib/utils";
 import { type Venue } from "prisma/generated/zod";
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import { type VenueRequestSchema } from "@/lib/schema/request";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
 import { H3, H5, P } from "@/components/typography/text";
@@ -41,19 +39,16 @@ interface VenueProps {
   form: UseFormReturn<VenueRequestSchema>;
   name: Path<VenueRequestSchema>;
   isPending: boolean;
+  data: Venue[] | undefined;
 }
 
-export default function VenueField({ form, name, isPending }: VenueProps) {
+export default function VenueField({
+  form,
+  name,
+  isPending,
+  data,
+}: VenueProps) {
   const [open, setOpen] = React.useState(false);
-
-  const { data, isLoading } = useQuery<Venue[]>({
-    queryFn: async () => {
-      const res = await axios.get("/api/input-data/venue");
-      return res.data.data;
-    },
-    queryKey: ["get-input-venue"],
-    refetchOnWindowFocus: false,
-  });
 
   return (
     <FormField
@@ -68,7 +63,7 @@ export default function VenueField({ form, name, isPending }: VenueProps) {
                 <Button
                   variant="secondary"
                   role="combobox"
-                  disabled={isPending || isLoading}
+                  disabled={isPending}
                   className={cn(
                     "justify-start truncate",
                     !field.value && "text-muted-foreground"
@@ -81,11 +76,7 @@ export default function VenueField({ form, name, isPending }: VenueProps) {
                   ) : (
                     "Select venue"
                   )}
-                  {isLoading ? (
-                    <LoadingSpinner className="ml-auto" />
-                  ) : (
-                    <ChevronsUpDown className="ml-auto h-4 w-4 shrink-0 opacity-50" />
-                  )}
+                  <ChevronsUpDown className="ml-auto h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </FormControl>
             </PopoverTrigger>

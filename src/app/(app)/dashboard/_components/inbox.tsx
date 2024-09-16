@@ -16,7 +16,7 @@ import { P } from "@/components/typography/text";
 
 export default function Inbox() {
   return (
-    <div className="h-full w-1/3">
+    <div className="h-full w-[28%]">
       <div className="flex h-[50px] items-center justify-between border-b px-3">
         <P className="font-medium">Notification</P>
         <DropdownMenu>

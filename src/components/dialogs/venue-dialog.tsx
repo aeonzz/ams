@@ -118,6 +118,9 @@ export default function VenueDialog() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+        <DialogHeader>
+          <DialogTitle>Venue Request</DialogTitle>
+        </DialogHeader>
         <VenueRequestInput
           mutateAsync={mutateAsync}
           isPending={isPending}

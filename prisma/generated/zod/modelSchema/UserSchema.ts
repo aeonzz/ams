@@ -6,7 +6,8 @@ import type { SettingWithRelations } from './SettingSchema'
 import type { RequestWithRelations } from './RequestSchema'
 import type { UserRoleWithRelations } from './UserRoleSchema'
 import type { JobRequestWithRelations } from './JobRequestSchema'
-import type { JobRequestAuditLogWithRelations } from './JobRequestAuditLogSchema'
+import type { VenueRequestWithRelations } from './VenueRequestSchema'
+import type { GenericAuditLogWithRelations } from './GenericAuditLogSchema'
 import { DepartmentWithRelationsSchema } from './DepartmentSchema'
 import { SectionWithRelationsSchema } from './SectionSchema'
 import { SessionWithRelationsSchema } from './SessionSchema'
@@ -14,7 +15,8 @@ import { SettingWithRelationsSchema } from './SettingSchema'
 import { RequestWithRelationsSchema } from './RequestSchema'
 import { UserRoleWithRelationsSchema } from './UserRoleSchema'
 import { JobRequestWithRelationsSchema } from './JobRequestSchema'
-import { JobRequestAuditLogWithRelationsSchema } from './JobRequestAuditLogSchema'
+import { VenueRequestWithRelationsSchema } from './VenueRequestSchema'
+import { GenericAuditLogWithRelationsSchema } from './GenericAuditLogSchema'
 
 /////////////////////////////////////////
 // USER SCHEMA
@@ -52,7 +54,8 @@ export type UserRelations = {
   userRole: UserRoleWithRelations[];
   jobRequestsAsReviewer: JobRequestWithRelations[];
   jobRequestsAsAssigned: JobRequestWithRelations[];
-  JobRequestAuditLog: JobRequestAuditLogWithRelations[];
+  venueRequest: VenueRequestWithRelations[];
+  genericAuditLog: GenericAuditLogWithRelations[];
 };
 
 export type UserWithRelations = z.infer<typeof UserSchema> & UserRelations
@@ -66,7 +69,8 @@ export const UserWithRelationsSchema: z.ZodType<UserWithRelations> = UserSchema.
   userRole: z.lazy(() => UserRoleWithRelationsSchema).array(),
   jobRequestsAsReviewer: z.lazy(() => JobRequestWithRelationsSchema).array(),
   jobRequestsAsAssigned: z.lazy(() => JobRequestWithRelationsSchema).array(),
-  JobRequestAuditLog: z.lazy(() => JobRequestAuditLogWithRelationsSchema).array(),
+  venueRequest: z.lazy(() => VenueRequestWithRelationsSchema).array(),
+  genericAuditLog: z.lazy(() => GenericAuditLogWithRelationsSchema).array(),
 }))
 
 export default UserSchema;

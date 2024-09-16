@@ -14,6 +14,7 @@ import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import UserRequestOverview from "./user-request-overview";
 import SearchInput from "../../_components/search-input";
 import { formatFullName } from "@/lib/utils";
+import EventsCalendar from "./events-calendar";
 
 export default function DashboardScreen() {
   const currentUser = useSession();
@@ -27,6 +28,7 @@ export default function DashboardScreen() {
           <SearchInput />
         </div>
         <div className="scroll-bar h-[calc(100vh_-_68px)] overflow-y-auto py-3">
+          <EventsCalendar />
           <div className="mb-3 flex items-center justify-between px-3">
             <H2 className="font-semibold tracking-tight">
               Good day,{" "}
@@ -50,8 +52,8 @@ export default function DashboardScreen() {
           <UserRequestOverview />
         </div>
       </div>
-      <Separator orientation="vertical" className="h-full" />
-      <Inbox />
+      {/* <Separator orientation="vertical" className="h-full" />
+      <Inbox /> */}
     </div>
   );
 }

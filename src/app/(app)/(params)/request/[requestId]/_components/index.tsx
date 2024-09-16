@@ -33,6 +33,8 @@ import JobRequestReviewerActions from "./job-request-reviewer-actions";
 import { useSession } from "@/lib/hooks/use-session";
 import { useRequest } from "@/lib/hooks/use-request-store";
 import { PermissionGuard } from "@/components/permission-guard";
+import VenueRequestDetails from "./venue-request-details";
+import VenueRequestApproverActions from "./venue-request-approver-actions";
 
 interface RequestDetailsProps {
   params: string;
@@ -117,42 +119,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
               <JobRequestDetails data={data.jobRequest} />
             )}
             {data.type === "VENUE" && data.venueRequest && (
-              <div className="space-y-4">
-                <H4 className="font-semibold text-muted-foreground">
-                  Venue Request Details
-                </H4>
-                <div className="flex items-center space-x-2">
-                  <MapPin className="h-5 w-5" />
-                  <P>Venue: {data.venueRequest.venue.name}</P>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Clock className="h-5 w-5" />
-                  <P>
-                    Start:{" "}
-                    {format(new Date(data.venueRequest.startTime), "PPP p")}
-                  </P>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Clock className="h-5 w-5" />
-                  <P>
-                    End: {format(new Date(data.venueRequest.endTime), "PPP p")}
-                  </P>
-                </div>
-                <div>
-                  <H5 className="mb-2 font-semibold text-muted-foreground">
-                    Setup Requirements:
-                  </H5>
-                  <ul className="ml-4 mt-2 list-disc">
-                    {data.venueRequest.setupRequirements
-                      .split(", ")
-                      .map((requirement, index) => (
-                        <li key={index} className="mb-1 text-sm">
-                          {requirement}
-                        </li>
-                      ))}
-                  </ul>
-                </div>
-              </div>
+              <VenueRequestDetails data={data.venueRequest} />
             )}
             {data.type === "RESOURCE" && data.supplyRequest && (
               <div className="space-y-4">
@@ -343,11 +310,19 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
           )}
           {data.type === "JOB" && data.jobRequest && (
             <PermissionGuard
-              allowedRoles={["REQUEST_REVIEWER"]}
+              allowedRoles={["REQUEST_REVIEWER", "REQUEST_APPROVER"]}
               allowedSection={data.jobRequest.sectionId}
               currentUser={currentUser}
             >
               <JobRequestReviewerActions request={data} />
+            </PermissionGuard>
+          )}
+          {data.type === "VENUE" && data.venueRequest && (
+            <PermissionGuard
+              allowedRoles={["REQUEST_APPROVER"]}
+              currentUser={currentUser}
+            >
+              <VenueRequestApproverActions request={data} />
             </PermissionGuard>
           )}
         </div>

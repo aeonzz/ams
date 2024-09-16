@@ -14,6 +14,7 @@ import {
 import { revalidatePath } from "next/cache";
 import { generateId } from "lucia";
 import { Venue } from "prisma/generated/zod";
+import { updateRequestStatusSchemaWithPath } from "@/app/(app)/(params)/request/[requestId]/_components/schema";
 
 export async function getVenues(input: GetVenuesSchema) {
   await checkAuth();
@@ -143,6 +144,63 @@ export const deleteVenues = authedProcedure
             in: rest.ids,
           },
         },
+      });
+
+      return revalidatePath(path);
+    } catch (error) {
+      console.log(error);
+      getErrorMessage(error);
+    }
+  });
+
+export const updateVenueRequestStatus = authedProcedure
+  .createServerAction()
+  .input(updateRequestStatusSchemaWithPath)
+  .handler(async ({ ctx, input }) => {
+    const { user } = ctx;
+    const { path, requestId, reviewerId, changeType, ...rest } = input;
+
+    try {
+      const result = await db.$transaction(async (prisma) => {
+        const currentVenueRequest = await prisma.venueRequest.findUnique({
+          where: {
+            requestId: requestId,
+          },
+        });
+
+        if (!currentVenueRequest) {
+          throw "VenueRequest or Request not found";
+        }
+
+        const updatedRequest = await prisma.request.update({
+          where: { id: requestId },
+          data: {
+            ...rest,
+            venueRequest: {
+              update: {
+                reviewedBy: reviewerId,
+              },
+            },
+          },
+          include: { venueRequest: true },
+        });
+        const oldValueJson = JSON.parse(JSON.stringify(currentVenueRequest));
+        const newValueJson = JSON.parse(
+          JSON.stringify(updatedRequest.venueRequest)
+        );
+        await prisma.genericAuditLog.create({
+          data: {
+            id: generateId(15),
+            entityId: currentVenueRequest.id,
+            entityType: "VENUE_REQUEST",
+            changeType: changeType,
+            oldValue: oldValueJson,
+            newValue: newValueJson,
+            changedById: user.id,
+          },
+        });
+
+        return updatedRequest;
       });
 
       return revalidatePath(path);

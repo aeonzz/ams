@@ -172,7 +172,7 @@ export const createVenueRequest = authedProcedure
       const requestId = `REQ-${generateId(15)}`;
       const venuRequestId = `VRQ-${generateId(15)}`;
 
-      await db.request.create({
+      const createRequest = await db.request.create({
         data: {
           id: requestId,
           userId: user.id,
@@ -201,6 +201,29 @@ export const createVenueRequest = authedProcedure
               venueId: rest.venueId,
             },
           },
+        },
+        include: {
+          venueRequest: true,
+        },
+      });
+
+      if (!createRequest.venueRequest) {
+        throw "Something went wrong, please try again later.";
+      }
+
+      const newValueJson = JSON.parse(
+        JSON.stringify(createRequest.venueRequest)
+      );
+
+      
+      await db.genericAuditLog.create({
+        data: {
+          id: generateId(15),
+          entityId: createRequest.venueRequest.id,
+          entityType: "VENUE_REQUEST",
+          changeType: "CREATED",
+          newValue: newValueJson,
+          changedById: user.id,
         },
       });
 
