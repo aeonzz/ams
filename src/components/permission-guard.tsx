@@ -7,23 +7,18 @@ interface PermissionGuardProps {
   children: ReactNode;
   currentUser: UserWithRelations;
   allowedRoles: string[];
-  allowedSection?: string;
   allowedDepartment?: string;
 }
 
 export function PermissionGuard({
   children,
   allowedRoles,
-  allowedSection,
   allowedDepartment,
   currentUser,
 }: PermissionGuardProps) {
   const hasAllowedRole = currentUser.userRole.some((role) =>
     allowedRoles.includes(role.role.name)
   );
-
-  const hasAllowedSection =
-    !allowedSection || currentUser.sectionId === allowedSection;
 
   const hasAllowedDepartment =
     !allowedDepartment || currentUser.departmentId === allowedDepartment;
@@ -34,7 +29,7 @@ export function PermissionGuard({
   //   }
   // }
 
-  if (!hasAllowedRole || !hasAllowedSection || !hasAllowedDepartment) {
+  if (!hasAllowedRole || !hasAllowedDepartment) {
     return null;
   }
 

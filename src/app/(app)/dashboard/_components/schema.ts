@@ -9,7 +9,7 @@ export const createjobRequestSchema = z.object({
   jobtype: JobTypeSchema.refine((val) => val !== undefined, {
     message: "Job type is required.",
   }),
-  sectionId: z.string({
+  departmentId: z.string({
     required_error: "Job section is required.",
   }),
   dueDate: z

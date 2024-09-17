@@ -67,7 +67,7 @@ export function UpdateUserSheet({ user, ...props }: UpdateUserSheetProps) {
   const { dirtyFields } = useFormState({ control: form.control });
   const { data, isLoading } = useQuery<Department[]>({
     queryFn: async () => {
-      const res = await axios.get("/api/department");
+      const res = await axios.get("/api/department/get-departments");
       return res.data.data;
     },
     queryKey: ["update-user-sheet-department-input"],

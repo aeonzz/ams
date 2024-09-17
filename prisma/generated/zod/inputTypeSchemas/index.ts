@@ -9,7 +9,6 @@ export { SettingScalarFieldEnumSchema } from './SettingScalarFieldEnumSchema';
 export { RequestScalarFieldEnumSchema } from './RequestScalarFieldEnumSchema';
 export { GenericAuditLogScalarFieldEnumSchema } from './GenericAuditLogScalarFieldEnumSchema';
 export { JobRequestScalarFieldEnumSchema } from './JobRequestScalarFieldEnumSchema';
-export { SectionScalarFieldEnumSchema } from './SectionScalarFieldEnumSchema';
 export { VenueRequestScalarFieldEnumSchema } from './VenueRequestScalarFieldEnumSchema';
 export { VenueScalarFieldEnumSchema } from './VenueScalarFieldEnumSchema';
 export { ReturnableRequestScalarFieldEnumSchema } from './ReturnableRequestScalarFieldEnumSchema';

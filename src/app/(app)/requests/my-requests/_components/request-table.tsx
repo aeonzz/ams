@@ -16,7 +16,7 @@ import {
   RequestTypeSchema,
 } from "prisma/generated/zod";
 import { RequestTableToolbarActions } from "./request-table-toolbar-actions";
-import { getRequests } from "@/lib/actions/requests";
+import { getMyRequests } from "@/lib/actions/requests";
 import {
   getPriorityIcon,
   getRequestTypeIcon,
@@ -27,7 +27,7 @@ import { ModifiedDataTable } from "@/components/data-table/modified-data-table";
 import { Dot } from "lucide-react";
 
 interface RequestTableProps {
-  requestPromise: ReturnType<typeof getRequests>;
+  requestPromise: ReturnType<typeof getMyRequests>;
 }
 
 export function RequestTable({ requestPromise }: RequestTableProps) {

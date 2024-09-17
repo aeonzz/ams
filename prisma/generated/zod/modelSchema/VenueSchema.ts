@@ -1,6 +1,8 @@
 import { z } from 'zod';
 import { VenueStatusSchema } from '../inputTypeSchemas/VenueStatusSchema'
+import type { DepartmentWithRelations } from './DepartmentSchema'
 import type { VenueRequestWithRelations } from './VenueRequestSchema'
+import { DepartmentWithRelationsSchema } from './DepartmentSchema'
 import { VenueRequestWithRelationsSchema } from './VenueRequestSchema'
 
 /////////////////////////////////////////
@@ -16,6 +18,7 @@ export const VenueSchema = z.object({
   imageUrl: z.string(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
+  departmentId: z.string(),
 })
 
 export type Venue = z.infer<typeof VenueSchema>
@@ -25,12 +28,14 @@ export type Venue = z.infer<typeof VenueSchema>
 /////////////////////////////////////////
 
 export type VenueRelations = {
+  department: DepartmentWithRelations;
   requests: VenueRequestWithRelations[];
 };
 
 export type VenueWithRelations = z.infer<typeof VenueSchema> & VenueRelations
 
 export const VenueWithRelationsSchema: z.ZodType<VenueWithRelations> = VenueSchema.merge(z.object({
+  department: z.lazy(() => DepartmentWithRelationsSchema),
   requests: z.lazy(() => VenueRequestWithRelationsSchema).array(),
 }))
 

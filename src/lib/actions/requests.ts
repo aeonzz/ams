@@ -360,7 +360,70 @@ export const getUserReqcount = authedProcedure
     }
   });
 
-export async function getRequests(input: GetRequestsSchema) {
+export async function getManageRequests(input: GetRequestsSchema) {
+  await checkAuth();
+  const user = await currentUser();
+  const { page, per_page, sort, title, status, type, priority, from, to } =
+    input;
+
+  try {
+    const skip = (page - 1) * per_page;
+
+    const [column, order] = (sort?.split(".") ?? ["createdAt", "desc"]) as [
+      keyof Request | undefined,
+      "asc" | "desc" | undefined,
+    ];
+
+    const where: any = {
+      departmentId: user[0]?.departmentId,
+      status: {
+        in: ["PENDING", "REVIEWED"],
+      },
+    };
+
+    if (title) {
+      where.title = { contains: title, mode: "insensitive" };
+    }
+
+    if (status) {
+      where.status = status;
+    }
+
+    if (type) {
+      where.type = { in: type.split(".") };
+    }
+
+    if (priority) {
+      where.priority = priority;
+    }
+
+    if (from && to) {
+      where.createdAt = {
+        gte: new Date(from),
+        lte: new Date(to),
+      };
+    }
+
+    const [data, total] = await db.$transaction([
+      db.request.findMany({
+        where,
+        take: per_page,
+        skip,
+        orderBy: {
+          [column || "createdAt"]: order || "desc",
+        },
+      }),
+      db.request.count({ where }),
+    ]);
+    const pageCount = Math.ceil(total / per_page);
+    return { data, pageCount };
+  } catch (err) {
+    console.error(err);
+    return { data: [], pageCount: 0 };
+  }
+}
+
+export async function getMyRequests(input: GetRequestsSchema) {
   await checkAuth();
   const user = await currentUser();
   const { page, per_page, sort, title, status, type, priority, from, to } =

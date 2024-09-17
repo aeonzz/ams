@@ -37,8 +37,6 @@ model User {
   departmentId             String?
   department               Department?       @relation(fields: [departmentId], references: [id])
   createdAt                DateTime          @default(now())
-  sectionId                String?
-  section                  Section?          @relation(fields: [sectionId], references: [id])
   updatedAt                DateTime          @updatedAt
   sessions                 Session[]
   setting                  Setting?
@@ -78,6 +76,7 @@ model Department {
   id                String              @id
   label             String
   name              String
+  acceptsJobs       Boolean             @default(false)
   createdAt         DateTime            @default(now())
   updatedAt         DateTime            @updatedAt
   isArchived        Boolean             @default(false)
@@ -86,6 +85,7 @@ model Department {
   returnableRequest ReturnableRequest[]
   user              User[]
   request           Request[]
+  venue             Venue[]
 }
 
 model Session {
@@ -161,24 +161,11 @@ model JobRequest {
   progressNotes String?
   requestId     String    @unique
   request       Request   @relation(fields: [requestId], references: [id], onDelete: Cascade)
-  section       Section   @relation(fields: [sectionId], references: [id])
-  sectionId     String
   status        JobStatus @default(PENDING)
   assignedTo    String?
   assignedUser  User?     @relation(fields: [assignedTo], references: [id])
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-}
-
-model Section {
-  id          String       @id
-  name        String       @unique
-  description String?
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  isArchived  Boolean      @default(false)
-  jobRequests JobRequest[]
-  user        User[]
 }
 
 model VenueRequest {
@@ -197,15 +184,17 @@ model VenueRequest {
 }
 
 model Venue {
-  id        String         @id
-  name      String
-  location  String
-  capacity  Int
-  imageUrl  String
-  createdAt DateTime       @default(now())
-  updatedAt DateTime       @updatedAt
-  status    VenueStatus    @default(AVAILABLE)
-  requests  VenueRequest[]
+  id           String         @id
+  name         String
+  location     String
+  capacity     Int
+  imageUrl     String
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  status       VenueStatus    @default(AVAILABLE)
+  departmentId String
+  department   Department     @relation(fields: [departmentId], references: [id])
+  requests     VenueRequest[]
 }
 
 model ReturnableRequest {

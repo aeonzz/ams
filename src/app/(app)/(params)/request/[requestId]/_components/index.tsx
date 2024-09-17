@@ -32,9 +32,7 @@ import JobRequestDetails from "./job-request-details";
 import JobRequestReviewerActions from "./job-request-reviewer-actions";
 import { useSession } from "@/lib/hooks/use-session";
 import { useRequest } from "@/lib/hooks/use-request-store";
-import { PermissionGuard } from "@/components/permission-guard";
 import VenueRequestDetails from "./venue-request-details";
-import VenueRequestApproverActions from "./venue-request-approver-actions";
 import ReturnableResourceDetails from "./returnable-resource-details";
 
 interface RequestDetailsProps {
@@ -275,7 +273,6 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
               entityType="JOB_REQUEST"
               showPersonnels
               allowedRoles={["REQUEST_REVIEWER"]}
-              allowedSection={data.jobRequest?.sectionId}
               allowedApproverRoles={["REQUEST_APPROVER"]}
               requestTypeId={data.jobRequest.id}
             />

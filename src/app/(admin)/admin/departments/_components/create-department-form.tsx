@@ -4,22 +4,24 @@ import React from "react";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { toast } from "sonner";
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
-import { Separator } from "../ui/separator";
-import { DialogFooter } from "../ui/dialog";
-import { SubmitButton } from "../ui/submit-button";
+import { Input } from "../../../../../components/ui/input";
+import { Button } from "../../../../../components/ui/button";
+import { Separator } from "../../../../../components/ui/separator";
+import { DialogFooter } from "../../../../../components/ui/dialog";
+import { SubmitButton } from "../../../../../components/ui/submit-button";
 import { UseMutateAsyncFunction } from "@tanstack/react-query";
 import { UseFormReturn } from "react-hook-form";
 import { usePathname } from "next/navigation";
 import { createDepartment } from "@/lib/actions/department";
 import { CreateDepartmentSchema } from "@/lib/schema/department";
+import { Switch } from "@/components/ui/switch";
 
 interface CreateDepartmentFormProps {
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -101,6 +103,26 @@ export default function CreateDepartmentForm({
                   />
                 </FormControl>
                 <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="acceptsJobs"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                <div className="space-y-0.5">
+                  <FormLabel className="text-sm">Accept Jobs</FormLabel>
+                  <FormDescription className="text-xs">
+                    Receive emails about new products, features, and more.
+                  </FormDescription>
+                </div>
+                <FormControl>
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
               </FormItem>
             )}
           />

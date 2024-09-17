@@ -5,21 +5,20 @@ import { DateRangePicker } from "@/components/date-range-picker";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DataTableSkeleton } from "@/components/data-table/data-table-skeleton";
 import { GetRequestsSchema } from "@/lib/schema";
-import { getMyRequests } from "@/lib/actions/requests";
-import { RequestTable } from "./request-table";
-import LoadingSpinner from "@/components/loaders/loading-spinner";
-interface MyRequestScreenProps {
+import { getManageRequests } from "@/lib/actions/requests";
+import { ManageRequestsTable } from "./manage-requests-table";
+interface ManageRequestScreenProps {
   search: GetRequestsSchema;
 }
 
-export default function MyRequestsScreen({ search }: MyRequestScreenProps) {
-  const tasksPromise = getMyRequests(search);
+export default function ManageRequestScreen({ search }: ManageRequestScreenProps) {
+  const requestPromise = getManageRequests(search);
 
   return (
     <div className="flex h-full w-full">
       <div className="flex-1">
         <div className="flex h-[50px] items-center justify-between border-b px-3">
-          <P className="font-medium">My Requests</P>
+          <P className="font-medium">Pending Requests</P>
           <React.Suspense fallback={<Skeleton className="h-7 w-52" />}>
             <DateRangePicker
               triggerVariant="secondary"
@@ -41,7 +40,7 @@ export default function MyRequestsScreen({ search }: MyRequestScreenProps) {
               />
             }
           >
-            <RequestTable requestPromise={tasksPromise} />
+            <ManageRequestsTable requestPromise={requestPromise} />
           </React.Suspense>
         </div>
       </div>

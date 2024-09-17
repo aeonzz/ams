@@ -4,6 +4,7 @@ import {
   Briefcase,
   Building,
   Calendar,
+  FolderKanban,
   HelpCircle,
   LayoutGrid,
   Mails,
@@ -53,14 +54,20 @@ export function getMenuList({
     ...(hasAllowedRole
       ? [
           {
-            groupLabel: "Manage Requests",
+            groupLabel: "Manage Department Resources",
             menus: [
               {
-                href: "/requests",
+                href: "",
                 label: "Requests",
-                active: pathname.includes("/requests"),
-                icon: LayoutGrid,
-                submenus: [],
+                active: pathname.includes("/requests/manage/pending"),
+                icon: FolderKanban,
+                submenus: [
+                  {
+                    href: "/requests/manage/pending?page=1&per_page=10&sort=createdAt.desc",
+                    label: "Pending Requests",
+                    active: pathname === "/requests/manage/pending",
+                  },
+                ],
               },
             ],
           },
@@ -71,13 +78,13 @@ export function getMenuList({
       menus: [
         {
           href: "/requests",
-          label: "Requests",
+          label: "My Requests",
           active: pathname.includes("/requests"),
           icon: Mails,
           submenus: [
             {
               href: "/requests/my-requests?page=1&per_page=10&sort=createdAt.desc",
-              label: "My Requests",
+              label: "Requests",
               active: pathname === "/requests/my-requests",
             },
             {

@@ -35,13 +35,13 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { CreateJobRequestSchema } from "./schema";
-import { type Section } from "prisma/generated/zod";
+import { type Department } from "prisma/generated/zod";
 
 interface JobSectionFieldProps {
   form: UseFormReturn<CreateJobRequestSchema>;
   name: keyof CreateJobRequestSchema;
   isPending: boolean;
-  data: Section[] | undefined;
+  data: Department[] | undefined;
 }
 
 export default function JobSectionField({
@@ -52,8 +52,8 @@ export default function JobSectionField({
 }: JobSectionFieldProps) {
   const [open, setOpen] = React.useState(false);
 
-  const selectedSection = data?.find(
-    (section) => section.id === form.watch(name)
+  const selectedDepartment = data?.find(
+    (department) => department.id === form.watch(name)
   );
 
   return (
@@ -62,7 +62,7 @@ export default function JobSectionField({
       name={name}
       render={({ field }) => (
         <FormItem className="flex flex-col">
-          <FormLabel className="text-muted-foreground">Job Section</FormLabel>
+          <FormLabel className="text-muted-foreground">Department</FormLabel>
           <Popover open={open} onOpenChange={setOpen} modal>
             <PopoverTrigger asChild>
               <FormControl>
@@ -76,9 +76,9 @@ export default function JobSectionField({
                   )}
                 >
                   {field.value ? (
-                    <span className="truncate">{selectedSection?.name}</span>
+                    <span className="truncate">{selectedDepartment?.name}</span>
                   ) : (
-                    "Select section"
+                    "Select department"
                   )}
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
@@ -86,17 +86,17 @@ export default function JobSectionField({
             </PopoverTrigger>
             <PopoverContent className="p-0" align="start">
               <Command>
-                <CommandInput placeholder="Search sections..." />
+                <CommandInput placeholder="Search departments..." />
                 <CommandList>
-                  <CommandEmpty>No sections found.</CommandEmpty>
+                  <CommandEmpty>No departments found.</CommandEmpty>
                   <CommandGroup>
-                    {data?.map((section) => (
-                      <HoverCard key={section.id} openDelay={300}>
+                    {data?.map((department) => (
+                      <HoverCard key={department.id} openDelay={300}>
                         <HoverCardTrigger asChild>
                           <CommandItem
-                            value={section.id}
+                            value={department.id}
                             onSelect={() => {
-                              form.setValue(name, section.id);
+                              form.setValue(name, department.id);
                               setOpen(false);
                             }}
                             className="flex items-center"
@@ -104,22 +104,22 @@ export default function JobSectionField({
                             <Check
                               className={cn(
                                 "mr-2 h-4 w-4",
-                                section.id === field.value
+                                department.id === field.value
                                   ? "opacity-100"
                                   : "opacity-0"
                               )}
                             />
-                            <P className="truncate">{section.name}</P>
+                            <P className="truncate">{department.name}</P>
                           </CommandItem>
                         </HoverCardTrigger>
                         <HoverCardContent className="w-80" side="right">
                           <div className="space-y-2">
-                            <H3 className="font-semibold">{section.name}</H3>
+                            <H3 className="font-semibold">{department.name}</H3>
                             <div className="scroll-bar max-h-52 overflow-y-auto">
-                              <P className="text-muted-foreground">
+                              {/* <P className="text-muted-foreground">
                                 {section.description ||
                                   "No description available."}
-                              </P>
+                              </P> */}
                             </div>
                           </div>
                         </HoverCardContent>

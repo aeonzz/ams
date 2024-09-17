@@ -33,7 +33,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useFormState } from "react-hook-form";
 import { createDepartmentSchema, CreateDepartmentSchema } from "@/lib/schema/department";
 import { createDepartment } from "@/lib/actions/department";
-import CreateDepartmentForm from "@/components/forms/create-department-form";
+import CreateDepartmentForm from "./create-department-form";
 
 export default function CreateDepartmentDialog() {
   const [open, setOpen] = React.useState(false);

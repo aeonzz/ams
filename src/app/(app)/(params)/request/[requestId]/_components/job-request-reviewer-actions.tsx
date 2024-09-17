@@ -48,7 +48,6 @@ interface JobRequestReviewerActionsProps {
   showPersonnels?: boolean;
   entityType: EntityTypeType;
   allowedRoles: string[];
-  allowedSection?: string;
   allowedDepartment?: string;
   allowedApproverRoles: string[];
   requestTypeId: string;
@@ -59,7 +58,6 @@ export default function JobRequestReviewerActions({
   showPersonnels = false,
   entityType,
   allowedRoles,
-  allowedSection,
   allowedDepartment,
   allowedApproverRoles,
   requestTypeId,
@@ -261,7 +259,6 @@ export default function JobRequestReviewerActions({
       allowedRoles={allowedRoles}
       // allowedRoles={["REQUEST_REVIEWER"]}
       // allowedSection={request.jobRequest?.sectionId}
-      allowedSection={allowedSection}
       allowedDepartment={allowedDepartment}
       currentUser={currentUser}
     >
@@ -349,9 +346,6 @@ export default function JobRequestReviewerActions({
                           request.reviewer.lastName
                         )}
                       </P>
-                      <P className="text-sm text-muted-foreground">
-                        {request.reviewer.section?.name}
-                      </P>
                     </div>
                   </div>
                 </div>
@@ -359,7 +353,6 @@ export default function JobRequestReviewerActions({
               {request.status === "REVIEWED" && (
                 <PermissionGuard
                   allowedRoles={allowedApproverRoles}
-                  allowedSection={allowedSection}
                   allowedDepartment={allowedDepartment}
                   currentUser={currentUser}
                 >

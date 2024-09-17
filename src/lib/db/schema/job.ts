@@ -5,7 +5,7 @@ import { z } from "zod";
 export const createJobRequestSchemaServer = z.object({
   description: z.string(),
   images: z.array(z.string()).optional(),
-  sectionId: z.string(),
+  departmentId: z.string(),
   dueDate: z.date(),
   jobType: JobTypeSchema,
 });

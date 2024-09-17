@@ -9,6 +9,7 @@ export const createDepartmentSchema = z.object({
     .string()
     .min(1, "label is required")
     .max(10, "Cannot be more than 10 characters"),
+  acceptsJobs: z.boolean().default(false).optional(),
 });
 
 export type CreateDepartmentSchema = z.infer<typeof createDepartmentSchema>;

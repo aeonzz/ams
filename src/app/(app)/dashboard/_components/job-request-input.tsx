@@ -75,72 +75,9 @@ import { createJobRequest } from "@/lib/actions/job";
 import { ExtendedJobRequestSchemaServer } from "@/lib/db/schema/job";
 import JobSectionField from "./job-section-field";
 import { type CreateJobRequestSchema } from "./schema";
-import { JobTypeSchema, type Section } from "prisma/generated/zod";
+import { type Department, JobTypeSchema } from "prisma/generated/zod";
 import axios from "axios";
 import JobRequestInputSkeleton from "./job-request-input-skeleton";
-
-const jobs = [
-  {
-    value: "repair",
-    label: "Repair",
-    icon: Wrench,
-  },
-  {
-    value: "maintenance",
-    label: "Maintenance",
-    icon: Construction,
-  },
-  {
-    value: "installation",
-    label: "Installation",
-    icon: PocketKnife,
-  },
-  {
-    value: "troubleshooting",
-    label: "Troubleshooting",
-    icon: FileQuestion,
-  },
-  {
-    value: "cleaning",
-    label: "Cleaning",
-    icon: Paintbrush,
-  },
-  {
-    value: "replacement",
-    label: "Replacement",
-    icon: CircleArrowUp,
-  },
-  {
-    value: "configuration",
-    label: "Configuration",
-    icon: Cog,
-  },
-  {
-    value: "media_production",
-    label: "Media Production",
-    icon: Camera,
-  },
-  {
-    value: "it_support",
-    label: "IT Support",
-    icon: Laptop,
-  },
-  {
-    value: "engineering_support",
-    label: "Engineering Support",
-    icon: PenTool,
-  },
-  {
-    value: "environmental_services",
-    label: "Environmental Services",
-    icon: Leaf,
-  },
-  {
-    value: "event_support",
-    label: "Event Support",
-    icon: CalendarIcon,
-  },
-] as const;
 
 interface JobRequestInputProps {
   mutateAsync: UseMutateAsyncFunction<
@@ -166,15 +103,13 @@ export default function JobRequestInput({
 }: JobRequestInputProps) {
   const queryClient = useQueryClient();
   const pathname = usePathname();
-  const currentUser = useSession();
-  const { department } = currentUser;
 
-  const { data, isLoading } = useQuery<Section[]>({
+  const { data, isLoading } = useQuery<Department[]>({
     queryFn: async () => {
-      const res = await axios.get("/api/job-section/job-sections");
+      const res = await axios.get("/api/department/get-job-departments");
       return res.data.data;
     },
-    queryKey: ["get-input-job-sections"],
+    queryKey: ["get-input-job-departments"],
   });
 
   const { uploadFiles, progresses, isUploading, uploadedFiles } =
@@ -191,8 +126,7 @@ export default function JobRequestInput({
       const data: ExtendedJobRequestSchemaServer = {
         description: values.description,
         type: type,
-        departmentId: department?.id || "f",
-        sectionId: values.sectionId,
+        departmentId: values.departmentId,
         dueDate: values.dueDate,
         jobType: values.jobtype,
         path: pathname,
@@ -234,7 +168,7 @@ export default function JobRequestInput({
             <div className="flex flex-1 flex-col space-y-2">
               <JobSectionField
                 form={form}
-                name="sectionId"
+                name="departmentId"
                 isPending={isPending}
                 data={data}
               />

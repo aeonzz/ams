@@ -15,17 +15,14 @@ export async function GET(req: Request, params: Context) {
   const { requestId } = params.params;
   try {
     await checkAuth();
-    const [data] = await currentUser();
     const result = await db.request.findFirst({
       where: {
         id: requestId,
-        userId: data?.id,
       },
       include: {
         reviewer: {
           include: {
             department: true,
-            section: true,
           },
         },
         user: {
@@ -46,7 +43,6 @@ export async function GET(req: Request, params: Context) {
           include: {
             files: true,
             assignedUser: true,
-            section: true,
           },
         },
         returnableRequest: {

@@ -63,7 +63,7 @@ export default function CreateInventoryForm({
 
   const { data, isLoading } = useQuery<Department[]>({
     queryFn: async () => {
-      const res = await axios.get("/api/department");
+      const res = await axios.get("/api/department/get-departments");
       return res.data.data;
     },
     queryKey: ["create-inventory-department-selection"],

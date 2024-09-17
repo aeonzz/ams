@@ -5,7 +5,6 @@ import { authedProcedure, getErrorMessage } from "./utils";
 
 import { db } from "@/lib/db/index";
 import { type GetJobSectionSchema } from "../schema";
-import { type SectionWithRelations } from "prisma/generated/zod";
 import { revalidatePath } from "next/cache";
 import { generateText } from "ai";
 import { cohere } from "@ai-sdk/cohere";
@@ -22,133 +21,133 @@ import {
   updateRequestStatusSchemaWithPath,
 } from "@/app/(app)/(params)/request/[requestId]/_components/schema";
 
-export async function getJobSections(input: GetJobSectionSchema) {
-  const { page, per_page, sort, name, from, to } = input;
+// export async function getJobSections(input: GetJobSectionSchema) {
+//   const { page, per_page, sort, name, from, to } = input;
 
-  try {
-    const skip = (page - 1) * per_page;
+//   try {
+//     const skip = (page - 1) * per_page;
 
-    const [column, order] = (sort?.split(".") ?? ["createdAt", "desc"]) as [
-      keyof SectionWithRelations | undefined,
-      "asc" | "desc" | undefined,
-    ];
+//     const [column, order] = (sort?.split(".") ?? ["createdAt", "desc"]) as [
+//       keyof SectionWithRelations | undefined,
+//       "asc" | "desc" | undefined,
+//     ];
 
-    const where: any = {
-      isArchived: false,
-    };
+//     const where: any = {
+//       isArchived: false,
+//     };
 
-    if (name) {
-      where.name = { contains: name, mode: "insensitive" };
-    }
+//     if (name) {
+//       where.name = { contains: name, mode: "insensitive" };
+//     }
 
-    if (from && to) {
-      where.createdAt = {
-        gte: new Date(from),
-        lte: new Date(to),
-      };
-    }
+//     if (from && to) {
+//       where.createdAt = {
+//         gte: new Date(from),
+//         lte: new Date(to),
+//       };
+//     }
 
-    const [data, total] = await db.$transaction([
-      db.section.findMany({
-        where,
-        take: per_page,
-        skip,
-        orderBy: {
-          [column || "createdAt"]: order || "desc",
-        },
-        include: {
-          user: {
-            select: {
-              id: true,
-              email: true,
-              firstName: true,
-              middleName: true,
-              lastName: true,
-              department: {
-                select: {
-                  id: true,
-                  name: true,
-                },
-              },
-            },
-          },
-        },
-      }),
-      db.section.count({ where }),
-    ]);
-    const pageCount = Math.ceil(total / per_page);
+//     const [data, total] = await db.$transaction([
+//       db.section.findMany({
+//         where,
+//         take: per_page,
+//         skip,
+//         orderBy: {
+//           [column || "createdAt"]: order || "desc",
+//         },
+//         include: {
+//           user: {
+//             select: {
+//               id: true,
+//               email: true,
+//               firstName: true,
+//               middleName: true,
+//               lastName: true,
+//               department: {
+//                 select: {
+//                   id: true,
+//                   name: true,
+//                 },
+//               },
+//             },
+//           },
+//         },
+//       }),
+//       db.section.count({ where }),
+//     ]);
+//     const pageCount = Math.ceil(total / per_page);
 
-    return { data, pageCount };
-  } catch (err) {
-    console.error(err);
-    return { data: [], pageCount: 0 };
-  }
-}
+//     return { data, pageCount };
+//   } catch (err) {
+//     console.error(err);
+//     return { data: [], pageCount: 0 };
+//   }
+// }
 
-export const creatJobSection = authedProcedure
-  .createServerAction()
-  .input(createJobSectionSchemaWithPath)
-  .handler(async ({ input, ctx }) => {
-    const { path, ...rest } = input;
-    try {
-      const sectionId = generateId(15);
-      await db.section.create({
-        data: {
-          id: sectionId,
-          ...rest,
-        },
-      });
+// export const creatJobSection = authedProcedure
+//   .createServerAction()
+//   .input(createJobSectionSchemaWithPath)
+//   .handler(async ({ input, ctx }) => {
+//     const { path, ...rest } = input;
+//     try {
+//       const sectionId = generateId(15);
+//       await db.section.create({
+//         data: {
+//           id: sectionId,
+//           ...rest,
+//         },
+//       });
 
-      return revalidatePath(path);
-    } catch (error) {
-      getErrorMessage(error);
-    }
-  });
+//       return revalidatePath(path);
+//     } catch (error) {
+//       getErrorMessage(error);
+//     }
+//   });
 
-export const updateJobSection = authedProcedure
-  .createServerAction()
-  .input(updateJobSectionSchemaWithPath)
-  .handler(async ({ ctx, input }) => {
-    const { path, id, ...rest } = input;
-    try {
-      await db.section.update({
-        where: {
-          id: id,
-        },
-        data: {
-          ...rest,
-        },
-      });
-      return revalidatePath(path);
-    } catch (error) {
-      getErrorMessage(error);
-    }
-  });
+// export const updateJobSection = authedProcedure
+//   .createServerAction()
+//   .input(updateJobSectionSchemaWithPath)
+//   .handler(async ({ ctx, input }) => {
+//     const { path, id, ...rest } = input;
+//     try {
+//       await db.section.update({
+//         where: {
+//           id: id,
+//         },
+//         data: {
+//           ...rest,
+//         },
+//       });
+//       return revalidatePath(path);
+//     } catch (error) {
+//       getErrorMessage(error);
+//     }
+//   });
 
-export const deleteJobSections = authedProcedure
-  .createServerAction()
-  .input(deleteJobSectionsSchema)
-  .handler(async ({ input }) => {
-    const { path, ...rest } = input;
+// export const deleteJobSections = authedProcedure
+//   .createServerAction()
+//   .input(deleteJobSectionsSchema)
+//   .handler(async ({ input }) => {
+//     const { path, ...rest } = input;
 
-    try {
-      await db.section.updateMany({
-        where: {
-          id: {
-            in: rest.ids,
-          },
-        },
-        data: {
-          isArchived: true,
-        },
-      });
+//     try {
+//       await db.section.updateMany({
+//         where: {
+//           id: {
+//             in: rest.ids,
+//           },
+//         },
+//         data: {
+//           isArchived: true,
+//         },
+//       });
 
-      return revalidatePath(path);
-    } catch (error) {
-      console.log(error);
-      getErrorMessage(error);
-    }
-  });
+//       return revalidatePath(path);
+//     } catch (error) {
+//       console.log(error);
+//       getErrorMessage(error);
+//     }
+//   });
 
 export const createJobRequest = authedProcedure
   .createServerAction()
@@ -205,7 +204,6 @@ export const createJobRequest = authedProcedure
           jobRequest: {
             create: {
               id: `JRQ-${generateId(15)}`,
-              sectionId: rest.sectionId,
               description: rest.description,
               dueDate: rest.dueDate,
               jobType: rest.jobType,
@@ -358,55 +356,55 @@ export const updateJobRequestStatus = authedProcedure
     }
   });
 
-export const assignSection = authedProcedure
-  .createServerAction()
-  .input(assignUserSchemaWithPath)
-  .handler(async ({ input }) => {
-    const { path, userId, ...rest } = input;
-    try {
-      const user = await db.user.findUnique({
-        where: {
-          id: userId,
-        },
-        select: {
-          sectionId: true,
-        },
-      });
+// export const assignSection = authedProcedure
+//   .createServerAction()
+//   .input(assignUserSchemaWithPath)
+//   .handler(async ({ input }) => {
+//     const { path, userId, ...rest } = input;
+//     try {
+//       const user = await db.user.findUnique({
+//         where: {
+//           id: userId,
+//         },
+//         select: {
+//           sectionId: true,
+//         },
+//       });
 
-      if (user && user.sectionId !== null) {
-        throw "User already assigned to a section";
-      }
+//       if (user && user.sectionId !== null) {
+//         throw "User already assigned to a section";
+//       }
 
-      await db.user.update({
-        where: {
-          id: userId,
-        },
-        data: {
-          ...rest,
-        },
-      });
-      revalidatePath(path);
-    } catch (error) {
-      getErrorMessage(error);
-    }
-  });
+//       await db.user.update({
+//         where: {
+//           id: userId,
+//         },
+//         data: {
+//           ...rest,
+//         },
+//       });
+//       revalidatePath(path);
+//     } catch (error) {
+//       getErrorMessage(error);
+//     }
+//   });
 
-export const unassignSection = authedProcedure
-  .createServerAction()
-  .input(unassignUserWithPath)
-  .handler(async ({ input }) => {
-    const { path, userId } = input;
-    try {
-      await db.user.update({
-        where: {
-          id: userId,
-        },
-        data: {
-          sectionId: null,
-        },
-      });
-      revalidatePath(path);
-    } catch (error) {
-      getErrorMessage(error);
-    }
-  });
+// export const unassignSection = authedProcedure
+//   .createServerAction()
+//   .input(unassignUserWithPath)
+//   .handler(async ({ input }) => {
+//     const { path, userId } = input;
+//     try {
+//       await db.user.update({
+//         where: {
+//           id: userId,
+//         },
+//         data: {
+//           sectionId: null,
+//         },
+//       });
+//       revalidatePath(path);
+//     } catch (error) {
+//       getErrorMessage(error);
+//     }
+//   });
