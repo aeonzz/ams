@@ -161,7 +161,7 @@ export default function VenueDateTimePicker<T extends FieldValues>({
               <FormControl>
                 <PopoverTrigger asChild>
                   <Button
-                    variant="secondary"
+                    variant="outline"
                     disabled={disabled || isLoading}
                     className={cn(
                       "justify-start text-left font-normal",

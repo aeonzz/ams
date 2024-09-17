@@ -50,9 +50,9 @@ export type UserRelations = {
   section?: SectionWithRelations | null;
   sessions: SessionWithRelations[];
   setting?: SettingWithRelations | null;
-  request: RequestWithRelations[];
+  requestAsUser: RequestWithRelations[];
+  requestAsReviewer: RequestWithRelations[];
   userRole: UserRoleWithRelations[];
-  jobRequestsAsReviewer: JobRequestWithRelations[];
   jobRequestsAsAssigned: JobRequestWithRelations[];
   venueRequest: VenueRequestWithRelations[];
   genericAuditLog: GenericAuditLogWithRelations[];
@@ -65,9 +65,9 @@ export const UserWithRelationsSchema: z.ZodType<UserWithRelations> = UserSchema.
   section: z.lazy(() => SectionWithRelationsSchema).nullable(),
   sessions: z.lazy(() => SessionWithRelationsSchema).array(),
   setting: z.lazy(() => SettingWithRelationsSchema).nullable(),
-  request: z.lazy(() => RequestWithRelationsSchema).array(),
+  requestAsUser: z.lazy(() => RequestWithRelationsSchema).array(),
+  requestAsReviewer: z.lazy(() => RequestWithRelationsSchema).array(),
   userRole: z.lazy(() => UserRoleWithRelationsSchema).array(),
-  jobRequestsAsReviewer: z.lazy(() => JobRequestWithRelationsSchema).array(),
   jobRequestsAsAssigned: z.lazy(() => JobRequestWithRelationsSchema).array(),
   venueRequest: z.lazy(() => VenueRequestWithRelationsSchema).array(),
   genericAuditLog: z.lazy(() => GenericAuditLogWithRelationsSchema).array(),

@@ -38,7 +38,8 @@ export const reservedReturnableItemDateAndTime = z.object({
   request: z.object({
     status: RequestStatusTypeSchema,
     title: z.string(),
-    department: z.string(),
+    department: DepartmentSchema,
+    user: UserSchema,
   }),
   item: z.object({
     name: z.string(),

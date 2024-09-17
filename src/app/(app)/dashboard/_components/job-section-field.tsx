@@ -67,7 +67,7 @@ export default function JobSectionField({
             <PopoverTrigger asChild>
               <FormControl>
                 <Button
-                  variant="secondary"
+                  variant="outline"
                   role="combobox"
                   disabled={isPending}
                   className={cn(

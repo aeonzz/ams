@@ -32,6 +32,7 @@ export const RequestSchema = z.object({
   title: z.string(),
   userId: z.string(),
   departmentId: z.string(),
+  reviewedBy: z.string().nullable(),
 })
 
 export type Request = z.infer<typeof RequestSchema>
@@ -43,6 +44,7 @@ export type Request = z.infer<typeof RequestSchema>
 export type RequestRelations = {
   user: UserWithRelations;
   department: DepartmentWithRelations;
+  reviewer?: UserWithRelations | null;
   jobRequest?: JobRequestWithRelations | null;
   venueRequest?: VenueRequestWithRelations | null;
   returnableRequest?: ReturnableRequestWithRelations | null;
@@ -55,6 +57,7 @@ export type RequestWithRelations = z.infer<typeof RequestSchema> & RequestRelati
 export const RequestWithRelationsSchema: z.ZodType<RequestWithRelations> = RequestSchema.merge(z.object({
   user: z.lazy(() => UserWithRelationsSchema),
   department: z.lazy(() => DepartmentWithRelationsSchema),
+  reviewer: z.lazy(() => UserWithRelationsSchema).nullable(),
   jobRequest: z.lazy(() => JobRequestWithRelationsSchema).nullable(),
   venueRequest: z.lazy(() => VenueRequestWithRelationsSchema).nullable(),
   returnableRequest: z.lazy(() => ReturnableRequestWithRelationsSchema).nullable(),

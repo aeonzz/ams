@@ -12,8 +12,24 @@ import {
 } from "lucide-react";
 
 import { Group } from "@/lib/types/menu";
+import { type UserWithRelations } from "prisma/generated/zod";
 
-export function getMenuList(pathname: string): Group[] {
+type MenuListProps = {
+  pathname: string;
+  roles: string[];
+  currentUser: UserWithRelations;
+};
+
+export function getMenuList({
+  pathname,
+  roles,
+  currentUser,
+}: MenuListProps): Group[] {
+  const { userRole } = currentUser;
+  const hasAllowedRole = userRole.some((role) =>
+    roles.includes(role.role.name)
+  );
+
   return [
     {
       groupLabel: "",
@@ -34,6 +50,22 @@ export function getMenuList(pathname: string): Group[] {
         },
       ],
     },
+    ...(hasAllowedRole
+      ? [
+          {
+            groupLabel: "Manage Requests",
+            menus: [
+              {
+                href: "/requests",
+                label: "Requests",
+                active: pathname.includes("/requests"),
+                icon: LayoutGrid,
+                submenus: [],
+              },
+            ],
+          },
+        ]
+      : []),
     {
       groupLabel: "My Requests & Reservations",
       menus: [

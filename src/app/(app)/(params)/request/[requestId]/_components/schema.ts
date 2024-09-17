@@ -1,5 +1,6 @@
 import {
   ChangeTypeSchema,
+  EntityTypeSchema,
   RequestStatusTypeSchema,
 } from "prisma/generated/zod";
 import { z } from "zod";
@@ -24,6 +25,7 @@ export const updateRequestStatusSchema = z.object({
   reviewerId: z.string().optional(),
   status: RequestStatusTypeSchema,
   changeType: ChangeTypeSchema,
+  entityType: EntityTypeSchema,
 });
 
 export type UpdateRequestStatusSchema = z.infer<

@@ -41,13 +41,28 @@ import { formatFullName } from "@/lib/utils";
 import { useSession } from "@/lib/hooks/use-session";
 import JobRequestApproverActions from "./job-request-approver-actions";
 import { PermissionGuard } from "@/components/permission-guard";
+import type { EntityTypeType } from "prisma/generated/zod/inputTypeSchemas/EntityTypeSchema";
 
 interface JobRequestReviewerActionsProps {
   request: RequestWithRelations;
+  showPersonnels?: boolean;
+  entityType: EntityTypeType;
+  allowedRoles: string[];
+  allowedSection?: string;
+  allowedDepartment?: string;
+  allowedApproverRoles: string[];
+  requestTypeId: string;
 }
 
 export default function JobRequestReviewerActions({
   request,
+  showPersonnels = false,
+  entityType,
+  allowedRoles,
+  allowedSection,
+  allowedDepartment,
+  allowedApproverRoles,
+  requestTypeId,
 }: JobRequestReviewerActionsProps) {
   const currentUser = useSession();
   const pathname = usePathname();
@@ -95,6 +110,7 @@ export default function JobRequestReviewerActions({
           : undefined,
         status: action,
         changeType: "REVIEWER_CHANGE",
+        entityType: entityType,
       };
 
       const actionText = action === "REVIEWED" ? "Approving" : "Rejecting";
@@ -109,7 +125,6 @@ export default function JobRequestReviewerActions({
           queryClient.invalidateQueries({
             queryKey: [request.jobRequest?.id],
           });
-          setIsOpen(false);
           return `Request ${successText} successfully.`;
         },
         error: (err) => {
@@ -242,86 +257,136 @@ export default function JobRequestReviewerActions({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button className="w-full" variant="secondary">
-          <FolderKanban className="mr-2 h-4 w-4" />
-          Manage Request
-        </Button>
-      </DialogTrigger>
-      <DialogContent
-        onInteractOutside={(e) => {
-          if (isUpdateStatusPending || isAssignPersonnelPending) {
-            e.preventDefault();
-          }
-        }}
-        className="sm:max-w-[425px]"
-      >
-        <DialogHeader>
-          <DialogTitle>Manage Job Request</DialogTitle>
-          <DialogDescription>
-            Review and take action on this job request.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="scroll-bar flex max-h-[60vh] flex-col gap-3 overflow-y-auto px-4 py-1">
-          <Command className="max-h-[250px]">
-            <CommandInput placeholder="Search personnel..." />
-            <CommandList>
-              <CommandEmpty>No personnel found.</CommandEmpty>
-              {renderPersonnelList()}
-            </CommandList>
-          </Command>
-          {request.status === "PENDING" && (
-            <div className="flex space-x-2">
-              <Button
-                onClick={() => handleReview("REVIEWED")}
-                disabled={
-                  !selectedPerson ||
-                  isUpdateStatusPending ||
-                  isAssignPersonnelPending
-                }
-                className="flex-1"
-              >
-                Approve
-              </Button>
-              <Button
-                onClick={() => handleReview("REJECTED")}
-                variant="destructive"
-                disabled={
-                  !selectedPerson ||
-                  isUpdateStatusPending ||
-                  isAssignPersonnelPending
-                }
-                className="flex-1"
-              >
-                Reject
-              </Button>
-            </div>
-          )}
-          {request.status === "REVIEWED" && (
-            <PermissionGuard
-              allowedRoles={["REQUEST_APPROVER"]}
-              allowedSection={request.jobRequest?.sectionId}
-              currentUser={currentUser}
-            >
-              <JobRequestApproverActions
-                request={request}
-                isPending={isUpdateStatusPending || isAssignPersonnelPending}
-              />
-            </PermissionGuard>
-          )}
-        </div>
-        <Separator className="my-2" />
-        <DialogFooter>
-          <Button
-            variant="secondary"
-            disabled={isAssignPersonnelPending || isUpdateStatusPending}
-            onClick={() => setIsOpen(false)}
-          >
-            Close
+    <PermissionGuard
+      allowedRoles={allowedRoles}
+      // allowedRoles={["REQUEST_REVIEWER"]}
+      // allowedSection={request.jobRequest?.sectionId}
+      allowedSection={allowedSection}
+      allowedDepartment={allowedDepartment}
+      currentUser={currentUser}
+    >
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogTrigger asChild>
+          <Button className="w-full" variant="secondary">
+            <FolderKanban className="mr-2 h-4 w-4" />
+            Manage Request
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </DialogTrigger>
+        <DialogContent
+          onInteractOutside={(e) => {
+            if (isUpdateStatusPending || isAssignPersonnelPending) {
+              e.preventDefault();
+            }
+          }}
+          className="sm:max-w-[425px]"
+        >
+          <DialogHeader>
+            <DialogTitle>Manage Request</DialogTitle>
+            <DialogDescription>
+              Review and take action on this request.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="scroll-bar flex max-h-[60vh] flex-col gap-3 overflow-y-auto px-4 py-1">
+            {showPersonnels && (
+              <Command className="max-h-[250px]">
+                <CommandInput placeholder="Search personnel..." />
+                <CommandList>
+                  <CommandEmpty>No personnel found.</CommandEmpty>
+                  {renderPersonnelList()}
+                </CommandList>
+              </Command>
+            )}
+            {request.status === "PENDING" && (
+              <div className="flex space-x-2">
+                <Button
+                  onClick={() => handleReview("REVIEWED")}
+                  disabled={
+                    (!selectedPerson && showPersonnels) ||
+                    isUpdateStatusPending ||
+                    isAssignPersonnelPending
+                  }
+                  className="flex-1"
+                >
+                  Approve
+                </Button>
+                <Button
+                  onClick={() => handleReview("REJECTED")}
+                  variant="destructive"
+                  disabled={
+                    (!selectedPerson && showPersonnels) ||
+                    isUpdateStatusPending ||
+                    isAssignPersonnelPending
+                  }
+                  className="flex-1"
+                >
+                  Reject
+                </Button>
+              </div>
+            )}
+            <div className="flex flex-col gap-3">
+              {request.reviewer && (
+                <div>
+                  <P className="text-xs text-muted-foreground">Reviewed By:</P>
+                  <div className="flex w-full items-center p-2">
+                    <Avatar className="mr-2 h-8 w-8">
+                      <AvatarImage
+                        src={request.reviewer.profileUrl ?? ""}
+                        alt={formatFullName(
+                          request.reviewer.firstName,
+                          request.reviewer.middleName,
+                          request.reviewer.lastName
+                        )}
+                      />
+                      <AvatarFallback>
+                        {request.reviewer.firstName.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <P className="font-medium">
+                        {formatFullName(
+                          request.reviewer.firstName,
+                          request.reviewer.middleName,
+                          request.reviewer.lastName
+                        )}
+                      </P>
+                      <P className="text-sm text-muted-foreground">
+                        {request.reviewer.section?.name}
+                      </P>
+                    </div>
+                  </div>
+                </div>
+              )}
+              {request.status === "REVIEWED" && (
+                <PermissionGuard
+                  allowedRoles={allowedApproverRoles}
+                  allowedSection={allowedSection}
+                  allowedDepartment={allowedDepartment}
+                  currentUser={currentUser}
+                >
+                  <JobRequestApproverActions
+                    request={request}
+                    isPending={
+                      isUpdateStatusPending || isAssignPersonnelPending
+                    }
+                    entityType={entityType}
+                    requestTypeId={requestTypeId}
+                  />
+                </PermissionGuard>
+              )}
+            </div>
+          </div>
+          <Separator className="my-2" />
+          <DialogFooter>
+            <Button
+              variant="secondary"
+              disabled={isAssignPersonnelPending || isUpdateStatusPending}
+              onClick={() => setIsOpen(false)}
+            >
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </PermissionGuard>
   );
 }

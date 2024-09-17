@@ -17,6 +17,9 @@ import {
   extendedUpdateJobRequestSchema,
   extendedVenueRequestSchema,
 } from "../schema/request";
+import { checkAuth } from "../auth/utils";
+import { currentUser } from "./users";
+import { UserCheck2Icon } from "lucide-react";
 
 const cohere = createCohere({
   apiKey: process.env.COHERE_API_KEY,
@@ -215,7 +218,6 @@ export const createVenueRequest = authedProcedure
         JSON.stringify(createRequest.venueRequest)
       );
 
-      
       await db.genericAuditLog.create({
         data: {
           id: generateId(15),
@@ -359,6 +361,8 @@ export const getUserReqcount = authedProcedure
   });
 
 export async function getRequests(input: GetRequestsSchema) {
+  await checkAuth();
+  const user = await currentUser();
   const { page, per_page, sort, title, status, type, priority, from, to } =
     input;
 
@@ -371,6 +375,7 @@ export async function getRequests(input: GetRequestsSchema) {
     ];
 
     const where: any = {
+      userId: user[0]?.id,
       status: { not: "CANCELLED" },
     };
 

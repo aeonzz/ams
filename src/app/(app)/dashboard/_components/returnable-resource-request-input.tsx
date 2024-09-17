@@ -135,10 +135,16 @@ export default function ReturnableResourceRequestInput({
 
   const disabledTimeRanges = React.useMemo(() => {
     return (
-      reservedDates?.map(({ dateAndTimeNeeded, returnDateAndTime }) => ({
-        start: new Date(dateAndTimeNeeded),
-        end: new Date(returnDateAndTime),
-      })) ?? []
+      reservedDates
+        ?.filter(
+          (reservation) =>
+            reservation.request.status === "APPROVED" ||
+            reservation.request.status === "REVIEWED"
+        )
+        .map(({ dateAndTimeNeeded, returnDateAndTime }) => ({
+          start: new Date(dateAndTimeNeeded),
+          end: new Date(returnDateAndTime),
+        })) ?? []
     );
   }, [reservedDates]);
 
@@ -170,8 +176,8 @@ export default function ReturnableResourceRequestInput({
       ...values,
       priority: "LOW",
       type: type,
-      departmentId: selectedDepartmentId!,
-      department: department,
+      itemDepartmentId: selectedDepartmentId!,
+      departmentId: department?.id || "f",
       path: pathname,
     };
 

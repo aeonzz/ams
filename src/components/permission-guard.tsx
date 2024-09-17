@@ -8,12 +8,14 @@ interface PermissionGuardProps {
   currentUser: UserWithRelations;
   allowedRoles: string[];
   allowedSection?: string;
+  allowedDepartment?: string;
 }
 
 export function PermissionGuard({
   children,
   allowedRoles,
   allowedSection,
+  allowedDepartment,
   currentUser,
 }: PermissionGuardProps) {
   const hasAllowedRole = currentUser.userRole.some((role) =>
@@ -22,7 +24,17 @@ export function PermissionGuard({
 
   const hasAllowedSection =
     !allowedSection || currentUser.sectionId === allowedSection;
-  if (!hasAllowedRole || !hasAllowedSection) {
+
+  const hasAllowedDepartment =
+    !allowedDepartment || currentUser.departmentId === allowedDepartment;
+
+  // if (allowedSection !== undefined) {
+  //   if (hasAllowedRole && allowedSection !== currentUser.sectionId) {
+  //     return null;
+  //   }
+  // }
+
+  if (!hasAllowedRole || !hasAllowedSection || !hasAllowedDepartment) {
     return null;
   }
 

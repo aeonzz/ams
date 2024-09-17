@@ -42,10 +42,10 @@ model User {
   updatedAt                DateTime          @updatedAt
   sessions                 Session[]
   setting                  Setting?
-  request                  Request[]
+  requestAsUser            Request[]         @relation(name: "UserRelation")
+  requestAsReviewer        Request[]         @relation(name: "ReviewerRelation")
   userRole                 UserRole[]
-  jobRequestsAsReviewer    JobRequest[]      @relation(name: "ReviewerRelation")
-  jobRequestsAsAssigned    JobRequest[]      @relation(name: "AssignedUserRelation")
+  jobRequestsAsAssigned    JobRequest[]
   venueRequest             VenueRequest[]
   genericAuditLog          GenericAuditLog[]
 }
@@ -123,9 +123,11 @@ model Request {
   title             String
   status            RequestStatusType  @default(PENDING)
   userId            String
-  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User               @relation(name: "UserRelation", fields: [userId], references: [id], onDelete: Cascade)
   departmentId      String
   department        Department         @relation(fields: [departmentId], references: [id])
+  reviewedBy        String?
+  reviewer          User?              @relation(name: "ReviewerRelation", fields: [reviewedBy], references: [id])
   jobRequest        JobRequest?
   venueRequest      VenueRequest?
   returnableRequest ReturnableRequest?
@@ -162,10 +164,8 @@ model JobRequest {
   section       Section   @relation(fields: [sectionId], references: [id])
   sectionId     String
   status        JobStatus @default(PENDING)
-  reviewedBy    String?
-  reviewer      User?     @relation(name: "ReviewerRelation", fields: [reviewedBy], references: [id])
   assignedTo    String?
-  assignedUser  User?     @relation(name: "AssignedUserRelation", fields: [assignedTo], references: [id])
+  assignedUser  User?     @relation(fields: [assignedTo], references: [id])
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }
@@ -226,9 +226,10 @@ model ReturnableRequest {
 
 model InventorySubItem {
   id                String              @id
-  inventoryId       String
+  imageUrl          String
   subName           String
   serialNumber      String?
+  inventoryId       String
   inventory         InventoryItem       @relation(fields: [inventoryId], references: [id])
   status            ItemStatus          @default(AVAILABLE)
   isArchived        Boolean             @default(false)

@@ -42,9 +42,15 @@ interface ItemsFieldProps {
   onDepartmentIdChange: (departmentId: string) => void;
 }
 
-export default function ItemsField({ form, name, isPending, onDepartmentIdChange }: ItemsFieldProps) {
+export default function ItemsField({
+  form,
+  name,
+  isPending,
+  onDepartmentIdChange,
+}: ItemsFieldProps) {
   const [open, setOpen] = React.useState(false);
-  const [selectedItem, setSelectedItem] = useState<InventoryItemWithRelations | null>(null);
+  const [selectedItem, setSelectedItem] =
+    useState<InventoryItemWithRelations | null>(null);
 
   const { data, isLoading } = useQuery<InventoryItemWithRelations[]>({
     queryFn: async () => {
@@ -75,7 +81,7 @@ export default function ItemsField({ form, name, isPending, onDepartmentIdChange
             <Popover open={open} onOpenChange={setOpen} modal>
               <PopoverTrigger asChild>
                 <Button
-                  variant="secondary"
+                  variant="outline"
                   role="combobox"
                   disabled={isPending || isLoading}
                   className={cn(
@@ -115,37 +121,34 @@ export default function ItemsField({ form, name, isPending, onDepartmentIdChange
                             <ChevronRight className="mr-2 h-4 w-4" />
                             Back to items
                           </CommandItem>
-                          {selectedItem.inventorySubItems
-                            .map((subItem) => {
-                              const { icon: Icon, variant } =
-                                getReturnableItemStatusIcon(subItem.status);
-                              return (
-                                <CommandItem
-                                  key={subItem.id}
-                                  onSelect={() =>
-                                    handleSubItemSelect(subItem.id)
-                                  }
-                                  disabled={
-                                    subItem.status === "MAINTENANCE" ||
-                                    subItem.status === "LOST"
-                                  }
-                                >
-                                  <Check
-                                    className={cn(
-                                      "mr-2 h-4 w-4",
-                                      subItem.id === field.value
-                                        ? "opacity-100"
-                                        : "opacity-0"
-                                    )}
-                                  />
-                                  {selectedItem.name} - SubItem {subItem.id}
-                                  <Badge variant={variant} className="ml-auto">
-                                    <Icon className="mr-1 size-4" />
-                                    {textTransform(subItem.status)}
-                                  </Badge>
-                                </CommandItem>
-                              );
-                            })}
+                          {selectedItem.inventorySubItems.map((subItem) => {
+                            const { icon: Icon, variant } =
+                              getReturnableItemStatusIcon(subItem.status);
+                            return (
+                              <CommandItem
+                                key={subItem.id}
+                                onSelect={() => handleSubItemSelect(subItem.id)}
+                                disabled={
+                                  subItem.status === "MAINTENANCE" ||
+                                  subItem.status === "LOST"
+                                }
+                              >
+                                <Check
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    subItem.id === field.value
+                                      ? "opacity-100"
+                                      : "opacity-0"
+                                  )}
+                                />
+                                {selectedItem.name} - SubItem {subItem.id}
+                                <Badge variant={variant} className="ml-auto">
+                                  <Icon className="mr-1 size-4" />
+                                  {textTransform(subItem.status)}
+                                </Badge>
+                              </CommandItem>
+                            );
+                          })}
                         </>
                       ) : (
                         data?.map((item) => {

@@ -10,24 +10,24 @@ import { UpdateRequestStatusSchemaWithPath } from "./schema";
 import { usePathname } from "next/navigation";
 import { toast } from "sonner";
 import { useSession } from "@/lib/hooks/use-session";
-import { Card, CardHeader } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { formatFullName } from "@/lib/utils";
-import { P } from "@/components/typography/text";
+import { type EntityTypeType } from "prisma/generated/zod/inputTypeSchemas/EntityTypeSchema";
 
 interface JobRequestApproverActionsProps {
   request: RequestWithRelations;
   isPending: boolean;
+  entityType: EntityTypeType;
+  requestTypeId: string;
 }
 
 export default function JobRequestApproverActions({
   request,
   isPending,
+  entityType,
+  requestTypeId,
 }: JobRequestApproverActionsProps) {
   const currentUser = useSession();
   const pathname = usePathname();
   const queryClient = useQueryClient();
-  const { jobRequest } = request;
 
   const { mutateAsync: updateStatusMutate, isPending: isUpdateStatusPending } =
     useServerActionMutation(updateJobRequestStatus);
@@ -39,6 +39,7 @@ export default function JobRequestApproverActions({
         requestId: request.id,
         status: action,
         changeType: action === "APPROVED" ? "APPROVED" : "APPROVER_CHANGE",
+        entityType: entityType,
       };
 
       const actionText =
@@ -52,7 +53,7 @@ export default function JobRequestApproverActions({
             queryKey: [request.id],
           });
           queryClient.invalidateQueries({
-            queryKey: [request.jobRequest?.id],
+            queryKey: [requestTypeId],
           });
           return `Request ${successText} successfully.`;
         },
@@ -66,56 +67,22 @@ export default function JobRequestApproverActions({
   );
 
   return (
-    <div className="flex flex-col gap-3">
-      {jobRequest?.reviewer && (
-        <div>
-          <P className="text-xs text-muted-foreground">Reviewed By:</P>
-          <div className="flex w-full items-center p-2">
-            <Avatar className="mr-2 h-8 w-8">
-              <AvatarImage
-                src={jobRequest?.reviewer.profileUrl ?? ""}
-                alt={formatFullName(
-                  jobRequest?.reviewer.firstName,
-                  jobRequest?.reviewer.middleName,
-                  jobRequest?.reviewer.lastName
-                )}
-              />
-              <AvatarFallback>
-                {jobRequest?.reviewer.firstName.charAt(0).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1">
-              <P className="font-medium">
-                {formatFullName(
-                  jobRequest?.reviewer.firstName,
-                  jobRequest?.reviewer.middleName,
-                  jobRequest?.reviewer.lastName
-                )}
-              </P>
-              <P className="text-sm text-muted-foreground">
-                {jobRequest?.reviewer.section?.name}
-              </P>
-            </div>
-          </div>
-        </div>
-      )}
-      <div className="flex space-x-2">
-        <Button
-          variant="destructive"
-          disabled={isUpdateStatusPending || isPending}
-          onClick={() => handleReview("REJECTED")}
-          className="flex-1"
-        >
-          Reject
-        </Button>
-        <Button
-          disabled={isUpdateStatusPending || isPending}
-          onClick={() => handleReview("APPROVED")}
-          className="flex-1"
-        >
-          Finalize Approval
-        </Button>
-      </div>
+    <div className="flex space-x-2">
+      <Button
+        variant="destructive"
+        disabled={isUpdateStatusPending || isPending}
+        onClick={() => handleReview("REJECTED")}
+        className="flex-1"
+      >
+        Reject
+      </Button>
+      <Button
+        disabled={isUpdateStatusPending || isPending}
+        onClick={() => handleReview("APPROVED")}
+        className="flex-1"
+      >
+        Finalize Approval
+      </Button>
     </div>
   );
 }

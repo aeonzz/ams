@@ -12,9 +12,10 @@ import { ReturnableRequestWithRelationsSchema } from './ReturnableRequestSchema'
 export const InventorySubItemSchema = z.object({
   status: ItemStatusSchema,
   id: z.string(),
-  inventoryId: z.string(),
+  imageUrl: z.string(),
   subName: z.string(),
   serialNumber: z.string().nullable(),
+  inventoryId: z.string(),
   isArchived: z.boolean(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),

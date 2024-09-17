@@ -58,18 +58,18 @@ export const createReturnableResourceRequest = authedProcedure
       const requestId = `REQ-${generateId(15)}`;
       const resourceRequestId = `RRQ-${generateId(15)}`;
 
-      await db.request.create({
+      const createRequest = await db.request.create({
         data: {
           id: requestId,
           userId: user.id,
           priority: rest.priority,
           type: rest.type,
           title: text,
-          department: rest.department,
+          departmentId: rest.departmentId,
           returnableRequest: {
             create: {
               id: resourceRequestId,
-              departmentId: rest.departmentId,
+              departmentId: rest.itemDepartmentId,
               dateAndTimeNeeded: rest.dateAndTimeNeeded,
               returnDateAndTime: rest.returnDateAndTime,
               purpose: rest.purpose.includes("other")
@@ -81,6 +81,28 @@ export const createReturnableResourceRequest = authedProcedure
               itemId: rest.itemId,
             },
           },
+        },
+        include: {
+          returnableRequest: true,
+        },
+      });
+
+      if (!createRequest.returnableRequest) {
+        throw "Something went wrong, please try again later.";
+      }
+
+      const newValueJson = JSON.parse(
+        JSON.stringify(createRequest.returnableRequest)
+      );
+
+      await db.genericAuditLog.create({
+        data: {
+          id: generateId(15),
+          entityId: createRequest.returnableRequest.id,
+          entityType: "RETURNABLE_REQUEST",
+          changeType: "CREATED",
+          newValue: newValueJson,
+          changedById: user.id,
         },
       });
 

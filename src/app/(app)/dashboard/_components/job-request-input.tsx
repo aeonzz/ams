@@ -251,7 +251,7 @@ export default function JobRequestInput({
                         <PopoverTrigger asChild>
                           <FormControl>
                             <Button
-                              variant={"secondary"}
+                              variant="outline"
                               className={cn(
                                 "justify-start px-2 text-left font-normal",
                                 !field.value && "text-muted-foreground"
@@ -312,7 +312,7 @@ export default function JobRequestInput({
                         <PopoverTrigger asChild>
                           <FormControl>
                             <Button
-                              variant="secondary"
+                              variant="outline"
                               disabled={isUploading || isPending}
                               role="combobox"
                               className={cn(

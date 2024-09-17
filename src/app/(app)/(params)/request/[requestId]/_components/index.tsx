@@ -35,6 +35,7 @@ import { useRequest } from "@/lib/hooks/use-request-store";
 import { PermissionGuard } from "@/components/permission-guard";
 import VenueRequestDetails from "./venue-request-details";
 import VenueRequestApproverActions from "./venue-request-approver-actions";
+import ReturnableResourceDetails from "./returnable-resource-details";
 
 interface RequestDetailsProps {
   params: string;
@@ -121,6 +122,9 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
             {data.type === "VENUE" && data.venueRequest && (
               <VenueRequestDetails data={data.venueRequest} />
             )}
+            {data.type === "RESOURCE" && data.returnableRequest && (
+              <ReturnableResourceDetails data={data.returnableRequest} />
+            )}
             {data.type === "RESOURCE" && data.supplyRequest && (
               <div className="space-y-4">
                 <H4 className="font-semibold text-muted-foreground">
@@ -151,49 +155,6 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                     Purpose:
                   </H5>
                   <P>{data.supplyRequest.purpose}</P>
-                </div>
-              </div>
-            )}
-            {data.type === "RESOURCE" && data.returnableRequest && (
-              <div className="space-y-4">
-                <H4 className="font-semibold text-muted-foreground">
-                  Supply Request Details
-                </H4>
-                <div className="flex items-center space-x-2">
-                  <Calendar className="h-5 w-5" />
-                  <P className="underline underline-offset-4">
-                    Needed By:{" "}
-                    {format(
-                      new Date(data.returnableRequest.dateAndTimeNeeded),
-                      "PPP p"
-                    )}
-                  </P>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Calendar className="h-5 w-5" />
-                  <P className="underline underline-offset-4">
-                    Return By:{" "}
-                    {format(
-                      new Date(data.returnableRequest.returnDateAndTime),
-                      "PPP p"
-                    )}
-                  </P>
-                </div>
-                <div>
-                  <H5 className="mb-2 font-semibold text-muted-foreground">
-                    Item:
-                  </H5>
-                  <ul className="list-inside list-disc">
-                    {/* {data.supplyRequest.items.map((item) => (
-                      <ItemCard key={item.id} supplyRequest={item} />
-                    ))} */}
-                  </ul>
-                </div>
-                <div>
-                  <H5 className="mb-2 font-semibold text-muted-foreground">
-                    Purpose:
-                  </H5>
-                  <P>{data.returnableRequest.purpose}</P>
                 </div>
               </div>
             )}
@@ -309,22 +270,36 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
             <RequestActions data={data} params={params} />
           )}
           {data.type === "JOB" && data.jobRequest && (
-            <PermissionGuard
-              allowedRoles={["REQUEST_REVIEWER", "REQUEST_APPROVER"]}
-              allowedSection={data.jobRequest.sectionId}
-              currentUser={currentUser}
-            >
-              <JobRequestReviewerActions request={data} />
-            </PermissionGuard>
+            <JobRequestReviewerActions
+              request={data}
+              entityType="JOB_REQUEST"
+              showPersonnels
+              allowedRoles={["REQUEST_REVIEWER"]}
+              allowedSection={data.jobRequest?.sectionId}
+              allowedApproverRoles={["REQUEST_APPROVER"]}
+              requestTypeId={data.jobRequest.id}
+            />
           )}
-          {data.type === "VENUE" && data.venueRequest && (
-            <PermissionGuard
-              allowedRoles={["REQUEST_APPROVER"]}
-              currentUser={currentUser}
-            >
-              <VenueRequestApproverActions request={data} />
-            </PermissionGuard>
+          {data.type === "RESOURCE" && data.returnableRequest && (
+            <JobRequestReviewerActions
+              request={data}
+              entityType="RETURNABLE_REQUEST"
+              allowedRoles={["REQUEST_REVIEWER", "REQUEST_MANAGER"]}
+              allowedDepartment={data.returnableRequest.departmentId}
+              allowedApproverRoles={["DEPARTMENT_HEAD"]}
+              requestTypeId={data.returnableRequest.id}
+            />
           )}
+          {/* {data.type === "VENUE" && data.venueRequest && (
+            <JobRequestReviewerActions
+              request={data}
+              entityType="RETURNABLE_REQUEST"
+              allowedRoles={["REQUEST_REVIEWER"]}
+              allowedSection={data.venueRequest.sectionId}
+              allowedApproverRoles={["DEPARTMENT_HEAD"]}
+              requestTypeId={data.venueRequest.id}
+            />
+          )} */}
         </div>
       </div>
     </div>

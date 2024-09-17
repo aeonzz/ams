@@ -22,6 +22,12 @@ export async function GET(req: Request, params: Context) {
         userId: data?.id,
       },
       include: {
+        reviewer: {
+          include: {
+            department: true,
+            section: true,
+          },
+        },
         user: {
           include: {
             department: true,
@@ -40,12 +46,6 @@ export async function GET(req: Request, params: Context) {
           include: {
             files: true,
             assignedUser: true,
-            reviewer: {
-              include: {
-                department: true,
-                section: true,
-              },
-            },
             section: true,
           },
         },

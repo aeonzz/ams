@@ -17,6 +17,7 @@ import {
 import CollapseMenuButton from "../../../components/collapse-menu-button";
 import MenuButton from "../../../components/menu-button";
 import UserNav from "../../../components/user-nav";
+import { useSession } from "@/lib/hooks/use-session";
 
 interface MainMenuProps {
   isOpen: boolean | undefined;
@@ -24,7 +25,8 @@ interface MainMenuProps {
 
 export default function MainMenu({ isOpen }: MainMenuProps) {
   const pathname = usePathname();
-  const menuList = getMenuList(pathname);
+  const currentUser = useSession();
+  const menuList = getMenuList({ pathname, roles: ["REQUEST_APPROVER"], currentUser });
   return (
     <>
       <UserNav isOpen={isOpen} />

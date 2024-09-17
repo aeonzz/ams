@@ -6,6 +6,7 @@ import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import { dateFnsLocalizer, Views } from "react-big-calendar";
 import enUS from "date-fns/locale/en-US";
 import { format, getDay, parse, startOfWeek } from "date-fns";
+import JobRequestInputSkeleton from "./job-request-input-skeleton";
 
 const locales = {
   "en-US": enUS,
@@ -30,7 +31,7 @@ export default function EvensCalendar() {
   const handleViewChange = (newView: React.SetStateAction<any>) => {
     setView(newView);
   };
-  
+
   return (
     <div className="">
       <ShadcnBigCalendar
