@@ -1,3 +1,4 @@
+import { DepartmentTypeSchema } from "prisma/generated/zod";
 import { z } from "zod";
 
 export const createDepartmentSchema = z.object({
@@ -5,11 +6,10 @@ export const createDepartmentSchema = z.object({
     .string()
     .min(1, "name is required")
     .max(30, "Cannot be more than 15 characters long"),
-  label: z
-    .string()
-    .min(1, "label is required")
-    .max(10, "Cannot be more than 10 characters"),
+  description: z.string().optional(),
   acceptsJobs: z.boolean().default(false).optional(),
+  responsibilities: z.string().optional(),
+  departmentType: DepartmentTypeSchema,
 });
 
 export type CreateDepartmentSchema = z.infer<typeof createDepartmentSchema>;
@@ -20,7 +20,10 @@ export const extendedCreateDepartmentSchema = createDepartmentSchema.extend({
 
 export const updateDepartmentSchema = z.object({
   name: z.string().optional(),
-  label: z.string().optional(),
+  description: z.string().optional(),
+  acceptsJobs: z.boolean().optional(),
+  responsibilities: z.string().optional(),
+  departmentType: DepartmentTypeSchema.optional(),
 });
 
 export type UpdateDepartmentSchema = z.infer<typeof updateDepartmentSchema>;

@@ -28,7 +28,9 @@ export async function getVenues(input: GetVenuesSchema) {
       "asc" | "desc" | undefined,
     ];
 
-    const where: any = {};
+    const where: any = {
+      isArchived: false,
+    };
 
     if (name) {
       where.name = { contains: name, mode: "insensitive" };
@@ -53,12 +55,22 @@ export async function getVenues(input: GetVenuesSchema) {
         orderBy: {
           [column || "createdAt"]: order || "desc",
         },
+        include: {
+          department: true,
+        },
       }),
       db.venue.count({ where }),
     ]);
     const pageCount = Math.ceil(total / per_page);
 
-    return { data, pageCount };
+    const formattedData = data.map((venue) => {
+      return {
+        ...venue,
+        departmentName: venue.department.name,
+      };
+    });
+
+    return { data: formattedData, pageCount };
   } catch (err) {
     console.error(err);
     return { data: [], pageCount: 0 };
@@ -69,13 +81,14 @@ export const createVenue = authedProcedure
   .createServerAction()
   .input(createVenueSchemaWithPath)
   .handler(async ({ input, ctx }) => {
-    const { path, imageUrl, ...rest } = input;
+    const { path, imageUrl, departmenId, ...rest } = input;
     try {
       const venueId = generateId(15);
       await db.venue.create({
         data: {
           id: venueId,
           imageUrl: imageUrl[0],
+          departmentId: departmenId,
           ...rest,
         },
       });
@@ -90,7 +103,7 @@ export const updateVenue = authedProcedure
   .createServerAction()
   .input(extendedUpdateVenueServerSchema)
   .handler(async ({ ctx, input }) => {
-    const { path, id, imageUrl, ...rest } = input;
+    const { path, id, imageUrl, departmentId, ...rest } = input;
     try {
       await db.venue.update({
         where: {
@@ -98,6 +111,7 @@ export const updateVenue = authedProcedure
         },
         data: {
           imageUrl: imageUrl && imageUrl[0],
+          departmentId: departmentId,
           ...rest,
         },
       });
@@ -138,11 +152,14 @@ export const deleteVenues = authedProcedure
     const { path, ...rest } = input;
 
     try {
-      await db.venue.deleteMany({
+      await db.venue.updateMany({
         where: {
           id: {
             in: rest.ids,
           },
+        },
+        data: {
+          isArchived: true,
         },
       });
 

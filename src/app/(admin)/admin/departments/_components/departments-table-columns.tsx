@@ -23,6 +23,8 @@ import { DeleteDepartmentsDialog } from "./delete-departments-dialog";
 import { ChevronDownIcon, ChevronRightIcon } from "lucide-react";
 import type { DepartmentsTableType } from "./types";
 import { formatDate } from "date-fns";
+import { textTransform } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 
 export function getDepartmentsColumns(): ColumnDef<DepartmentsTableType>[] {
   return [
@@ -81,14 +83,14 @@ export function getDepartmentsColumns(): ColumnDef<DepartmentsTableType>[] {
       },
     },
     {
-      accessorKey: "label",
+      accessorKey: "departmentType",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Label" />
+        <DataTableColumnHeader column={column} title="Type" />
       ),
       cell: ({ row }) => {
         return (
           <div className="flex items-center">
-            <P>{row.original.label}</P>
+            <P>{textTransform(row.original.departmentType)}</P>
           </div>
         );
       },
@@ -97,18 +99,51 @@ export function getDepartmentsColumns(): ColumnDef<DepartmentsTableType>[] {
       },
     },
     {
-      accessorKey: "createdAt",
+      accessorKey: "description",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Date Created" />
+        <DataTableColumnHeader column={column} title="Description" />
       ),
-      cell: ({ cell }) => formatDate(cell.getValue() as Date, "PPP p"),
+      cell: ({ row }) => {
+        return (
+          <div className="flex space-x-2">
+            <P className="truncate font-medium">
+              {row.original.description ? row.original.description : "-"}
+            </P>
+          </div>
+        );
+      },
     },
     {
-      accessorKey: "updatedAt",
+      accessorKey: "acceptsJobs",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Last Modified" />
+        <DataTableColumnHeader column={column} title="Accepts Jobs" />
       ),
-      cell: ({ cell }) => formatDate(cell.getValue() as Date, "PPP p"),
+      cell: ({ row }) => {
+        return (
+          <div className="flex space-x-2">
+            <Badge variant={row.original.acceptsJobs ? "green" : "red"}>
+              {row.original.acceptsJobs ? "Yes" : "No"}
+            </Badge>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "responsibilities",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Responsibilities" />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="flex space-x-2">
+            <P className="truncate font-medium">
+              {row.original.responsibilities
+                ? row.original.responsibilities
+                : "-"}
+            </P>
+          </div>
+        );
+      },
     },
     {
       id: "expander",
@@ -130,6 +165,20 @@ export function getDepartmentsColumns(): ColumnDef<DepartmentsTableType>[] {
         );
       },
       size: 0,
+    },
+    {
+      accessorKey: "createdAt",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Date Created" />
+      ),
+      cell: ({ cell }) => formatDate(cell.getValue() as Date, "PPP p"),
+    },
+    {
+      accessorKey: "updatedAt",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Last Modified" />
+      ),
+      cell: ({ cell }) => formatDate(cell.getValue() as Date, "PPP p"),
     },
     {
       id: "actions",

@@ -42,21 +42,21 @@ export function UsersTable({ usersPromise }: UsersTableProps) {
       value: "email",
       placeholder: "Filter emails...",
     },
-    {
-      label: "First Name",
-      value: "firstName",
-      placeholder: "Filter First Names...",
-    },
-    {
-      label: "Middle Name",
-      value: "middleName",
-      placeholder: "Filter Middle Names...",
-    },
-    {
-      label: "Last Name",
-      value: "lastName",
-      placeholder: "Filter Last Names...",
-    },
+    // {
+    //   label: "First Name",
+    //   value: "firstName",
+    //   placeholder: "Filter First Names...",
+    // },
+    // {
+    //   label: "Middle Name",
+    //   value: "middleName",
+    //   placeholder: "Filter Middle Names...",
+    // },
+    // {
+    //   label: "Last Name",
+    //   value: "lastName",
+    //   placeholder: "Filter Last Names...",
+    // },
   ];
 
   const { table } = useDataTable({

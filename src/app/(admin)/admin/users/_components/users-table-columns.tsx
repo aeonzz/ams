@@ -5,38 +5,23 @@ import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { type ColumnDef } from "@tanstack/react-table";
 import { toast } from "sonner";
 
-// import { getErrorMessage } from "@/lib/handle-error"
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 
 import { P } from "@/components/typography/text";
 import { UpdateUserSheet } from "./update-user-sheet";
-import {
-  useServerActionMutation,
-  useServerActionQuery,
-} from "@/lib/hooks/server-action-hooks";
-import { updateUser } from "@/lib/actions/users";
-import { usePathname } from "next/navigation";
 import { DeleteUsersDialog } from "./delete-users-dialog";
 import { type UserType } from "@/lib/types/user";
 import { ChevronDownIcon, ChevronRightIcon } from "lucide-react";
 import CreateUserRole from "./create-user-role";
-import AddSection from "./add-section";
 import { formatDate } from "date-fns";
 
 export function getUsersColumns(): ColumnDef<UserType>[] {
@@ -147,36 +132,6 @@ export function getUsersColumns(): ColumnDef<UserType>[] {
       },
     },
     {
-      accessorKey: "sectionName",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Section" />
-      ),
-      cell: ({ row }) => {
-        return (
-          <div className="flex items-center">
-            <P>{row.original.sectionName ? row.original.sectionName : "-"}</P>
-          </div>
-        );
-      },
-      filterFn: (row, id, value) => {
-        return Array.isArray(value) && value.includes(row.getValue(id));
-      },
-    },
-    {
-      accessorKey: "createdAt",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Date Created" />
-      ),
-      cell: ({ cell }) => formatDate(cell.getValue() as Date, "PPP p"),
-    },
-    {
-      accessorKey: "updatedAt",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Last Modified" />
-      ),
-      cell: ({ cell }) => formatDate(cell.getValue() as Date, "PPP p"),
-    },
-    {
       id: "expander",
       header: () => <P>User Roles</P>,
       cell: ({ row }) => {
@@ -196,6 +151,20 @@ export function getUsersColumns(): ColumnDef<UserType>[] {
         );
       },
       size: 0,
+    },
+    {
+      accessorKey: "createdAt",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Date Created" />
+      ),
+      cell: ({ cell }) => formatDate(cell.getValue() as Date, "PPP p"),
+    },
+    {
+      accessorKey: "updatedAt",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Last Modified" />
+      ),
+      cell: ({ cell }) => formatDate(cell.getValue() as Date, "PPP p"),
     },
     {
       id: "actions",
@@ -233,7 +202,6 @@ export function getUsersColumns(): ColumnDef<UserType>[] {
                 <DropdownMenuItem onSelect={() => setShowUpdateTaskSheet(true)}>
                   Edit
                 </DropdownMenuItem>
-                <AddSection userId={row.original.id} />
                 <CreateUserRole userId={row.original.id} />
                 <DropdownMenuSeparator />
                 <DropdownMenuItem

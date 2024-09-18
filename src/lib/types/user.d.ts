@@ -16,6 +16,4 @@ export type UserType = User & {
     updatedAt: Date;
   }[];
   department: Department | null;
-  sectionId: string | null;
-  sectionName: string | null;
 };

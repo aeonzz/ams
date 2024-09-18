@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { DepartmentTypeSchema } from '../inputTypeSchemas/DepartmentTypeSchema'
 import type { UserRoleWithRelations } from './UserRoleSchema'
 import type { InventoryItemWithRelations } from './InventoryItemSchema'
 import type { ReturnableRequestWithRelations } from './ReturnableRequestSchema'
@@ -17,12 +18,14 @@ import { VenueWithRelationsSchema } from './VenueSchema'
 /////////////////////////////////////////
 
 export const DepartmentSchema = z.object({
+  departmentType: DepartmentTypeSchema,
   id: z.string(),
-  label: z.string(),
+  description: z.string().nullable(),
   name: z.string(),
   acceptsJobs: z.boolean(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
+  responsibilities: z.string().nullable(),
   isArchived: z.boolean(),
 })
 

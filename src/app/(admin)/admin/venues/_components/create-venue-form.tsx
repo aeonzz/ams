@@ -9,21 +9,39 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { toast } from "sonner";
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
-import { Separator } from "../ui/separator";
-import { DialogFooter } from "../ui/dialog";
-import { SubmitButton } from "../ui/submit-button";
-import { type UseMutateAsyncFunction } from "@tanstack/react-query";
+import { Input } from "../../../../../components/ui/input";
+import { Button } from "../../../../../components/ui/button";
+import { Separator } from "../../../../../components/ui/separator";
+import { DialogFooter } from "../../../../../components/ui/dialog";
+import { SubmitButton } from "../../../../../components/ui/submit-button";
+import { useQuery, type UseMutateAsyncFunction } from "@tanstack/react-query";
 import { type UseFormReturn } from "react-hook-form";
 import { usePathname } from "next/navigation";
 import { createVenue } from "@/lib/actions/venue";
 import { type CreateVenueSchema } from "@/lib/db/schema/venue";
-import { FileUploader } from "../file-uploader";
+import { FileUploader } from "../../../../../components/file-uploader";
 import { DialogState } from "@/lib/hooks/use-dialog-manager";
 import { useUploadFile } from "@/lib/hooks/use-upload-file";
 import { CreateVenueSchemaWithPath } from "@/lib/schema/venue";
+import { type Department } from "prisma/generated/zod";
+import axios from "axios";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { cn } from "@/lib/utils";
+import CreateVenueFormSkeleton from "./create-venue-form-skeleton";
 
 interface CreateVenueFormProps {
   setAlertOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -48,6 +66,15 @@ export default function CreateVenueForm({
   dialogManager,
 }: CreateVenueFormProps) {
   const pathname = usePathname();
+  const [open, setOpen] = React.useState(false);
+
+  const { data, isLoading } = useQuery<Department[]>({
+    queryFn: async () => {
+      const res = await axios.get("/api/department/get-departments");
+      return res.data.data;
+    },
+    queryKey: ["create-venue-department-selection-venue-table"],
+  });
 
   const { uploadFiles, progresses, isUploading } = useUploadFile();
 
@@ -61,6 +88,7 @@ export default function CreateVenueForm({
         name: values.name,
         capacity: values.capacity,
         location: values.location,
+        departmenId: values.departmentId,
         path: pathname,
         imageUrl: uploadedFilesResult.map(
           (result: { filePath: string }) => result.filePath
@@ -84,10 +112,14 @@ export default function CreateVenueForm({
     }
   }
 
+  if (isLoading) {
+    return <CreateVenueFormSkeleton />;
+  }
+
   return (
     <Form {...form}>
       <form autoComplete="off" onSubmit={form.handleSubmit(onSubmit)}>
-      <div className="scroll-bar flex flex-col max-h-[55vh] gap-2 overflow-y-auto px-4 py-1">
+        <div className="scroll-bar flex max-h-[55vh] flex-col gap-2 overflow-y-auto px-4 py-1">
           <FormField
             control={form.control}
             name="name"
@@ -139,6 +171,73 @@ export default function CreateVenueForm({
                     {...field}
                   />
                 </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="departmentId"
+            render={({ field }) => (
+              <FormItem className="flex-1">
+                <FormLabel>Assign Managing Department</FormLabel>
+                <Popover open={open} onOpenChange={setOpen}>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        disabled={isLoading || isPending}
+                        className="w-full justify-between text-muted-foreground"
+                      >
+                        {field.value
+                          ? data?.find(
+                              (department) => department.id === field.value
+                            )?.name
+                          : "Select a department to manage"}
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="p-0">
+                    <Command>
+                      <CommandInput placeholder="Search department..." />
+                      <CommandList>
+                        <CommandEmpty>
+                          {isLoading ? "Loading..." : "No department found."}
+                        </CommandEmpty>
+                        <CommandGroup>
+                          <div className="scroll-bar max-h-40 overflow-y-auto">
+                            {data?.map((department) => (
+                              <CommandItem
+                                value={department.name}
+                                key={department.id}
+                                onSelect={() => {
+                                  field.onChange(
+                                    department.id === field.value
+                                      ? ""
+                                      : department.id
+                                  );
+                                  setOpen(false);
+                                }}
+                              >
+                                <Check
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    field.value === department.id
+                                      ? "opacity-100"
+                                      : "opacity-0"
+                                  )}
+                                />
+                                {department.name}
+                              </CommandItem>
+                            ))}
+                          </div>
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
                 <FormMessage />
               </FormItem>
             )}

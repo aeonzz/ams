@@ -16,6 +16,7 @@ export const VenueSchema = z.object({
   location: z.string(),
   capacity: z.number().int(),
   imageUrl: z.string(),
+  isArchived: z.boolean(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
   departmentId: z.string(),

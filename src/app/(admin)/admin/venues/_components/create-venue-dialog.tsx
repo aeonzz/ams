@@ -29,7 +29,7 @@ import {
   type CreateVenueSchema,
   createVenueSchema,
 } from "@/lib/db/schema/venue";
-import CreateVenueForm from "@/components/forms/create-venue-form";
+import CreateVenueForm from "./create-venue-form";
 import { createVenue } from "@/lib/actions/venue";
 
 export default function CreateVenueDialog() {

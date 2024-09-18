@@ -74,11 +74,13 @@ model Role {
 
 model Department {
   id                String              @id
-  label             String
+  description       String?
   name              String
   acceptsJobs       Boolean             @default(false)
   createdAt         DateTime            @default(now())
   updatedAt         DateTime            @updatedAt
+  responsibilities  String?
+  departmentType    DepartmentType
   isArchived        Boolean             @default(false)
   userRole          UserRole[]
   inventoryItem     InventoryItem[]
@@ -189,6 +191,7 @@ model Venue {
   location     String
   capacity     Int
   imageUrl     String
+  isArchived   Boolean        @default(false)
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
   status       VenueStatus    @default(AVAILABLE)
@@ -394,6 +397,13 @@ enum SupplyItemStatus {
   OUT_OF_STOCK
   ORDERED
   EXPIRED
+}
+
+enum DepartmentType {
+  ACADEMIC
+  ADMINISTRATIVE
+  TECHNICAL
+  SUPPORT
 }
 
 enum VenueStatus {

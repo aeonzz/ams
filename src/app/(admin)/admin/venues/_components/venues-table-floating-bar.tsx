@@ -25,7 +25,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { type Venue } from "prisma/generated/zod";
 import CommandTooltip from "@/components/ui/command-tooltip";
 import { CommandShortcut } from "@/components/ui/command";
 import { P } from "@/components/typography/text";
@@ -51,9 +50,10 @@ import VenueStatusSchema, {
 import { deleteVenues, updateVenueStatuses } from "@/lib/actions/venue";
 import { getVenueStatusIcon, textTransform } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import type { VenueTableType } from "./types";
 
 interface VenuesTableFloatingBarProps {
-  table: Table<Venue>;
+  table: Table<VenueTableType>;
 }
 
 export function VenuesTableFloatingBar({ table }: VenuesTableFloatingBarProps) {

@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -24,7 +25,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 
-import { Department } from "prisma/generated/zod";
+import { Department, DepartmentTypeSchema } from "prisma/generated/zod";
 import { Input } from "@/components/ui/input";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
 import { usePathname } from "next/navigation";
@@ -34,6 +35,23 @@ import {
   UpdateDepartmentSchema,
 } from "@/lib/schema/department";
 import { updateDepartment } from "@/lib/actions/department";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Textarea } from "@/components/ui/text-area";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { cn, textTransform } from "@/lib/utils";
+import { Switch } from "@/components/ui/switch";
 
 interface UpdateDepartmentSheetProps
   extends React.ComponentPropsWithRef<typeof Sheet> {
@@ -45,11 +63,15 @@ export function UpdateDepartmentSheet({
   ...props
 }: UpdateDepartmentSheetProps) {
   const pathname = usePathname();
+  const [open, setOpen] = React.useState(false);
   const form = useForm<UpdateDepartmentSchema>({
     resolver: zodResolver(updateDepartmentSchema),
     defaultValues: {
       name: department.name,
-      label: department.label,
+      acceptsJobs: department.acceptsJobs,
+      departmentType: department.departmentType,
+      description: department.description ?? "",
+      responsibilities: department.responsibilities ?? "",
     },
   });
 
@@ -60,7 +82,10 @@ export function UpdateDepartmentSheet({
   React.useEffect(() => {
     form.reset({
       name: department.name,
-      label: department.label,
+      acceptsJobs: department.acceptsJobs,
+      departmentType: department.departmentType,
+      description: department.description ?? "",
+      responsibilities: department.responsibilities ?? "",
     });
   }, [department, form]);
 
@@ -125,19 +150,124 @@ export function UpdateDepartmentSheet({
               />
               <FormField
                 control={form.control}
-                name="label"
+                name="description"
                 render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormLabel>Label</FormLabel>
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
                     <FormControl>
                       <Input
                         autoComplete="off"
-                        placeholder="IT"
+                        placeholder="Description..."
                         disabled={isPending}
                         {...field}
                       />
                     </FormControl>
                     <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="responsibilities"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Responsibilities</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        rows={1}
+                        maxRows={10}
+                        placeholder="responsibilities..."
+                        className="min-h-[100px] flex-grow resize-none"
+                        disabled={isPending}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="departmentType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Department Type</FormLabel>
+                    <Popover open={open} onOpenChange={setOpen}>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            aria-expanded={open}
+                            className="w-full justify-between"
+                          >
+                            {field.value
+                              ? textTransform(
+                                  DepartmentTypeSchema.options.find(
+                                    (option) => option === field.value
+                                  ) || "Select department type"
+                                )
+                              : "Select department type"}
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="p-0">
+                        <Command>
+                          <CommandInput placeholder="Search department type..." />
+                          <CommandList>
+                            <CommandEmpty>
+                              No department type found.
+                            </CommandEmpty>
+                            <CommandGroup>
+                              {DepartmentTypeSchema.options.map((option) => (
+                                <CommandItem
+                                  key={option}
+                                  onSelect={() => {
+                                    field.onChange(
+                                      option === field.value ? "" : option
+                                    );
+                                    setOpen(false);
+                                  }}
+                                >
+                                  <Check
+                                    className={cn(
+                                      "mr-2 h-4 w-4",
+                                      field.value === option
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                  {textTransform(option)}
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="acceptsJobs"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-sm">Accept Jobs</FormLabel>
+                      <FormDescription className="text-xs">
+                        Indicates whether this department can handle job
+                        requests.
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
                   </FormItem>
                 )}
               />

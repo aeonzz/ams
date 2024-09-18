@@ -4,6 +4,7 @@ import { z } from "zod";
 export const createVenueSchemaServer = z.object({
   name: z.string(),
   location: z.string(),
+  departmenId: z.string(),
   capacity: z.number(),
   imageUrl: z.array(
     z.string({
@@ -23,6 +24,7 @@ export type CreateVenueSchemaWithPath = z.infer<
 export const updateVenueSchemaServer = z.object({
   name: z.string().optional(),
   location: z.string().optional(),
+  departmentId: z.string().optional(),
   capacity: z.number().optional(),
   imageUrl: z.array(z.string()).optional(),
   status: VenueStatusSchema.optional(),
@@ -43,7 +45,9 @@ export const updateVenueStatusesSchema = z.object({
   path: z.string(),
 });
 
-export type UpdateVenueStatusesSchema = z.infer<typeof updateVenueStatusesSchema>;
+export type UpdateVenueStatusesSchema = z.infer<
+  typeof updateVenueStatusesSchema
+>;
 
 export const deleteVenuesSchema = z.object({
   ids: z.string().array(),

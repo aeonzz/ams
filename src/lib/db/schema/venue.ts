@@ -4,6 +4,9 @@ import { z } from "zod";
 export const createVenueSchema = z.object({
   name: z.string().min(1, "Name is required"),
   location: z.string().min(1, "Location is required"),
+  departmentId: z.string({
+    required_error: "Manage by is required",
+  }),
   capacity: z
     .string()
     .transform((val) => parseInt(val, 10))
@@ -18,6 +21,7 @@ export type CreateVenueSchema = z.infer<typeof createVenueSchema>;
 export const updateVenueSchema = z.object({
   name: z.string().optional(),
   location: z.string().optional(),
+  departmentId: z.string().optional(),
   capacity: z.preprocess((val) => Number(val), z.number().optional()),
   imageUrl: z.array(z.instanceof(File)).optional(),
   status: VenueStatusSchema,

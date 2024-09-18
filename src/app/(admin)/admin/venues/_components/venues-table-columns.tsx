@@ -7,7 +7,7 @@ import { getVenueStatusIcon, textTransform } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
 
 import { P } from "@/components/typography/text";
-import { VenueStatusSchema, type Venue } from "prisma/generated/zod";
+import { VenueStatusSchema } from "prisma/generated/zod";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import Image from "next/image";
 import {
@@ -34,8 +34,9 @@ import { type VenueStatusType } from "prisma/generated/zod/inputTypeSchemas/Venu
 import { UpdateVenueSheet } from "./update-venue-sheet";
 import { DeleteVenuesDialog } from "./delete-venues-dialog";
 import { formatDate } from "date-fns";
+import type { VenueTableType } from "./types";
 
-export function getVenuesColumns(): ColumnDef<Venue>[] {
+export function getVenuesColumns(): ColumnDef<VenueTableType>[] {
   return [
     {
       id: "select",
@@ -107,7 +108,7 @@ export function getVenuesColumns(): ColumnDef<Venue>[] {
       ),
       cell: ({ row }) => {
         return (
-          <div className="flex w-[15vw] space-x-2">
+          <div className="flex space-x-2">
             <P className="truncate font-medium">{row.original.name}</P>
           </div>
         );
@@ -157,6 +158,19 @@ export function getVenuesColumns(): ColumnDef<Venue>[] {
       },
       filterFn: (row, id, value) => {
         return Array.isArray(value) && value.includes(row.getValue(id));
+      },
+    },
+    {
+      accessorKey: "departmentId",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Manage By" />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="flex items-center">
+            <P>{row.original.departmentName}</P>
+          </div>
+        );
       },
     },
     {
@@ -248,6 +262,7 @@ export function getVenuesColumns(): ColumnDef<Venue>[] {
                             value={status}
                             className="capitalize"
                             disabled={isPending}
+                            onSelect={(e) => e.preventDefault()}
                           >
                             <Badge variant={variant}>
                               <Icon className="mr-1 size-4" />

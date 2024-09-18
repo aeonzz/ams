@@ -32,6 +32,7 @@ export { JobTypeSchema } from './JobTypeSchema';
 export { ItemStatusSchema } from './ItemStatusSchema';
 export { SupplyItemCategorySchema } from './SupplyItemCategorySchema';
 export { SupplyItemStatusSchema } from './SupplyItemStatusSchema';
+export { DepartmentTypeSchema } from './DepartmentTypeSchema';
 export { VenueStatusSchema } from './VenueStatusSchema';
 export { VehicleStatusSchema } from './VehicleStatusSchema';
 export { RequestTypeSchema } from './RequestTypeSchema';

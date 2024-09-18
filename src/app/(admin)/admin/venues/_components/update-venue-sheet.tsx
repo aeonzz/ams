@@ -23,7 +23,24 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { VenueStatusSchema, type Venue } from "prisma/generated/zod";
+import {
+  type Department,
+  VenueStatusSchema,
+  type Venue,
+} from "prisma/generated/zod";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
 import { usePathname } from "next/navigation";
@@ -44,8 +61,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { getVenueStatusIcon, textTransform } from "@/lib/utils";
+import { cn, getVenueStatusIcon, textTransform } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { UpdateVenueSheetSkeleton } from "./update-venue-sheet-skeleton";
 
 interface UpdateDeparVenueProps
   extends React.ComponentPropsWithRef<typeof Sheet> {
@@ -53,6 +74,7 @@ interface UpdateDeparVenueProps
 }
 
 export function UpdateVenueSheet({ venue, ...props }: UpdateDeparVenueProps) {
+  const [open, setOpen] = React.useState(false);
   const pathname = usePathname();
   const form = useForm<UpdateVenueSchema>({
     resolver: zodResolver(updateVenueSchema),
@@ -61,7 +83,17 @@ export function UpdateVenueSheet({ venue, ...props }: UpdateDeparVenueProps) {
       location: venue.location,
       capacity: venue.capacity,
       status: venue.status,
+      departmentId: venue.departmentId,
+      imageUrl: undefined,
     },
+  });
+
+  const { data, isLoading } = useQuery<Department[]>({
+    queryFn: async () => {
+      const res = await axios.get("/api/department/get-departments");
+      return res.data.data;
+    },
+    queryKey: ["update-venue-department-selection-venue-table"],
   });
 
   const { dirtyFields } = useFormState({ control: form.control });
@@ -75,6 +107,7 @@ export function UpdateVenueSheet({ venue, ...props }: UpdateDeparVenueProps) {
       location: venue.location,
       capacity: venue.capacity,
       status: venue.status,
+      departmentId: venue.departmentId,
       imageUrl: undefined,
     });
   }, [venue, form, props.open]);
@@ -91,6 +124,7 @@ export function UpdateVenueSheet({ venue, ...props }: UpdateDeparVenueProps) {
         id: venue.id,
         path: pathname,
         name: values.name,
+        departmentId: values.departmentId,
         location: values.location,
         capacity: values.capacity,
         status: values.status,
@@ -131,158 +165,232 @@ export function UpdateVenueSheet({ venue, ...props }: UpdateDeparVenueProps) {
             Update the venue details and save the changes
           </SheetDescription>
         </SheetHeader>
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="flex h-screen flex-col justify-between"
-          >
-            <div className="scroll-bar relative max-h-[75vh] space-y-2 overflow-y-auto px-4">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Name</FormLabel>
-                    <FormControl>
-                      <Input
-                        autoComplete="off"
-                        placeholder="Audio Visual Room"
-                        disabled={isPending || isUploading}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="location"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Location</FormLabel>
-                    <FormControl>
-                      <Input
-                        autoComplete="off"
-                        placeholder="Jasaan USTP"
-                        disabled={isPending || isUploading}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="capacity"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Capacity</FormLabel>
-                    <FormControl>
-                      <Input
-                        autoComplete="off"
-                        type="number"
-                        placeholder="24"
-                        disabled={isPending || isUploading}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Status</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
+        {isLoading ? (
+          <UpdateVenueSheetSkeleton />
+        ) : (
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="flex h-screen flex-col justify-between"
+            >
+              <div className="scroll-bar relative max-h-[75vh] space-y-2 overflow-y-auto px-4">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Name</FormLabel>
                       <FormControl>
-                        <SelectTrigger
-                          className="bg-secondary capitalize"
+                        <Input
+                          autoComplete="off"
+                          placeholder="Audio Visual Room"
                           disabled={isPending || isUploading}
-                        >
-                          <SelectValue placeholder="Select a role" />
-                        </SelectTrigger>
+                          {...field}
+                        />
                       </FormControl>
-                      <SelectContent className="bg-secondary">
-                        <SelectGroup>
-                          {VenueStatusSchema.options.map((status) => {
-                            const { icon: Icon, variant } =
-                              getVenueStatusIcon(status);
-                            return (
-                              <SelectItem
-                                key={status}
-                                value={status}
-                                className="capitalize"
-                              >
-                                <Badge variant={variant}>
-                                  <Icon className="mr-1 size-4" />
-                                  {textTransform(status)}
-                                </Badge>
-                              </SelectItem>
-                            );
-                          })}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="imageUrl"
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>Venue image</FormLabel>
-                    <FormControl>
-                      <FileUploader
-                        value={field.value}
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="location"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Location</FormLabel>
+                      <FormControl>
+                        <Input
+                          autoComplete="off"
+                          placeholder="Jasaan USTP"
+                          disabled={isPending || isUploading}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="capacity"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Capacity</FormLabel>
+                      <FormControl>
+                        <Input
+                          autoComplete="off"
+                          type="number"
+                          placeholder="24"
+                          disabled={isPending || isUploading}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="status"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Status</FormLabel>
+                      <Select
                         onValueChange={field.onChange}
-                        maxFiles={1}
-                        maxSize={4 * 1024 * 1024}
-                        progresses={progresses}
-                        disabled={isPending || isUploading}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            <div>
-              <Separator className="my-2" />
-              <SheetFooter className="gap-2 pt-2 sm:space-x-0">
-                <SheetClose asChild>
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger
+                            className="bg-secondary capitalize"
+                            disabled={isPending || isUploading}
+                          >
+                            <SelectValue placeholder="Select a role" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent className="bg-secondary">
+                          <SelectGroup>
+                            {VenueStatusSchema.options.map((status) => {
+                              const { icon: Icon, variant } =
+                                getVenueStatusIcon(status);
+                              return (
+                                <SelectItem
+                                  key={status}
+                                  value={status}
+                                  className="capitalize"
+                                >
+                                  <Badge variant={variant}>
+                                    <Icon className="mr-1 size-4" />
+                                    {textTransform(status)}
+                                  </Badge>
+                                </SelectItem>
+                              );
+                            })}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="departmentId"
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel>Assign Managing Department</FormLabel>
+                      <Popover open={open} onOpenChange={setOpen}>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              disabled={isLoading || isPending}
+                              className="w-full justify-between text-muted-foreground"
+                            >
+                              {field.value
+                                ? data?.find(
+                                    (department) =>
+                                      department.id === field.value
+                                  )?.name
+                                : "Select a department to manage"}
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="p-0">
+                          <Command>
+                            <CommandInput placeholder="Search department..." />
+                            <CommandList>
+                              <CommandEmpty>
+                                {isLoading
+                                  ? "Loading..."
+                                  : "No department found."}
+                              </CommandEmpty>
+                              <CommandGroup>
+                                <div className="scroll-bar max-h-40 overflow-y-auto">
+                                  {data?.map((department) => (
+                                    <CommandItem
+                                      value={department.name}
+                                      key={department.id}
+                                      onSelect={() => {
+                                        field.onChange(
+                                          department.id === field.value
+                                            ? ""
+                                            : department.id
+                                        );
+                                        setOpen(false);
+                                      }}
+                                    >
+                                      <Check
+                                        className={cn(
+                                          "mr-2 h-4 w-4",
+                                          field.value === department.id
+                                            ? "opacity-100"
+                                            : "opacity-0"
+                                        )}
+                                      />
+                                      {department.name}
+                                    </CommandItem>
+                                  ))}
+                                </div>
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="imageUrl"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>Venue image</FormLabel>
+                      <FormControl>
+                        <FileUploader
+                          value={field.value}
+                          onValueChange={field.onChange}
+                          maxFiles={1}
+                          maxSize={4 * 1024 * 1024}
+                          progresses={progresses}
+                          disabled={isPending || isUploading}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div>
+                <Separator className="my-2" />
+                <SheetFooter className="gap-2 pt-2 sm:space-x-0">
+                  <SheetClose asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      disabled={isPending || isUploading}
+                    >
+                      Cancel
+                    </Button>
+                  </SheetClose>
                   <Button
-                    type="button"
-                    variant="outline"
-                    disabled={isPending || isUploading}
+                    disabled={
+                      Object.keys(dirtyFields).length === 0 ||
+                      isPending ||
+                      isUploading
+                    }
+                    type="submit"
+                    className="w-20"
                   >
-                    Cancel
+                    Save
                   </Button>
-                </SheetClose>
-                <Button
-                  disabled={
-                    Object.keys(dirtyFields).length === 0 ||
-                    isPending ||
-                    isUploading
-                  }
-                  type="submit"
-                  className="w-20"
-                >
-                  Save
-                </Button>
-              </SheetFooter>
-            </div>
-          </form>
-        </Form>
+                </SheetFooter>
+              </div>
+            </form>
+          </Form>
+        )}
       </SheetContent>
     </Sheet>
   );

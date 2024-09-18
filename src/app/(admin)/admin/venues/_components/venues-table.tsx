@@ -11,9 +11,10 @@ import { type DataTableFilterField } from "@/lib/types";
 import { VenuesTableToolbarActions } from "./venues-table-toolbar-actions";
 import { getVenueStatusIcon } from "@/lib/utils";
 import { VenuesTableFloatingBar } from "./venues-table-floating-bar";
-import { VenueStatusSchema, type Venue } from "prisma/generated/zod";
+import { VenueStatusSchema } from "prisma/generated/zod";
 import { getVenues } from "@/lib/actions/venue";
 import { getVenuesColumns } from "./venues-table-columns";
+import type { VenueTableType } from "./types";
 
 interface VenuesTableProps {
   venuesPromise: ReturnType<typeof getVenues>;
@@ -36,7 +37,7 @@ export function VenuesTable({ venuesPromise }: VenuesTableProps) {
    * @prop {React.ReactNode} [icon] - An optional icon to display next to the label.
    * @prop {boolean} [withCount] - An optional boolean to display the count of the filter option.
    */
-  const filterFields: DataTableFilterField<Venue>[] = [
+  const filterFields: DataTableFilterField<VenueTableType>[] = [
     {
       label: "Name",
       value: "name",

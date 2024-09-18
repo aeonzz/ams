@@ -11,9 +11,10 @@ import { type Venue } from "prisma/generated/zod";
 import { PlusIcon } from "lucide-react";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import { DeleteVenuesDialog } from "./delete-venues-dialog";
+import type { VenueTableType } from "./types";
 
 interface VenuesTableToolbarActionsProps {
-  table: Table<Venue>;
+  table: Table<VenueTableType>;
 }
 
 export function VenuesTableToolbarActions({

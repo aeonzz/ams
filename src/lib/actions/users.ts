@@ -340,12 +340,6 @@ export async function getUsers(input: GetUsersSchema) {
               },
             },
           },
-          section: {
-            select: {
-              id: true,
-              name: true,
-            },
-          },
         },
       }),
       db.user.count({ where }),
@@ -353,11 +347,9 @@ export async function getUsers(input: GetUsersSchema) {
     const pageCount = Math.ceil(total / per_page);
 
     const data = userData.map((data) => {
-      const { section, ...rest } = data;
+      const { ...rest } = data;
       return {
         ...rest,
-        sectionId: section?.id ?? null,
-        sectionName: section?.name ?? null,
       };
     });
     return { data, pageCount };

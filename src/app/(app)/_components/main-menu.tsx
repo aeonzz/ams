@@ -26,7 +26,7 @@ interface MainMenuProps {
 export default function MainMenu({ isOpen }: MainMenuProps) {
   const pathname = usePathname();
   const currentUser = useSession();
-  const menuList = getMenuList({ pathname, roles: ["REQUEST_APPROVER"], currentUser });
+  const menuList = getMenuList({ pathname, roles: ["REQUEST_APPROVER", "REQUEST_REVIEWER"], currentUser });
   return (
     <>
       <UserNav isOpen={isOpen} />
