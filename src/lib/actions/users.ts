@@ -213,7 +213,7 @@ export const currentUser = authedProcedure
         include: {
           setting: true,
           sessions: true,
-          department: true,
+          userDepartments: true,
           userRole: {
             include: {
               role: true,
@@ -325,7 +325,25 @@ export async function getUsers(input: GetUsersSchema) {
           [column || "createdAt"]: order || "desc",
         },
         include: {
-          department: true,
+          userDepartments: {
+            select: {
+              id: true,
+              department: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+              user: {
+                select: {
+                  id: true,
+                  firstName: true,
+                  middleName: true,
+                  lastName: true,
+                },
+              },
+            },
+          },
           userRole: {
             include: {
               department: {
@@ -429,7 +447,7 @@ export const createUser = authedProcedure
   .createServerAction()
   .input(extendedUserInputSchema)
   .handler(async ({ input }) => {
-    const { confirmPassword, password, path, email, departmentId, ...rest } =
+    const { confirmPassword, password, path, email, departmentIds, ...rest } =
       input;
     try {
       const existingUser = await db.user.findUnique({
@@ -449,8 +467,13 @@ export const createUser = authedProcedure
           email: email,
           hashedPassword: hashedPassword,
           ...rest,
-          department: {
-            connect: { id: departmentId },
+          userDepartments: {
+            createMany: {
+              data: departmentIds.map((departmentId) => ({
+                id: generateId(15),
+                departmentId,
+              })),
+            },
           },
         },
       });

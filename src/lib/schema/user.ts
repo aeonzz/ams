@@ -5,9 +5,11 @@ export const createUserSchemaBase = z.object({
   firstName: z.string().min(1, "First name is required"),
   middleName: z.string().optional(),
   lastName: z.string().min(1, "last name is required"),
-  departmentId: z.string({
-    required_error: "Department is required",
-  }),
+  departmentIds: z
+    .array(z.string(), {
+      required_error: "Department is required",
+    })
+    .min(1, "At least one department is required"),
   password: z
     .string()
     .min(4, { message: "Must be at least 4 characters long" })
@@ -32,7 +34,6 @@ export type ExtendedUserInputSchema = z.infer<typeof extendedUserInputSchema>;
 
 export const updateUserSchemaBase = z.object({
   email: z.string().email("Invalid email").optional(),
-  departmentId: z.string().optional(),
   firstName: z.string().optional(),
   middleName: z.string().optional(),
   lastName: z.string().optional(),

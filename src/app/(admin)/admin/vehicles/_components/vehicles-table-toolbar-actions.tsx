@@ -6,13 +6,13 @@ import { type Table } from "@tanstack/react-table";
 import { exportTableToCSV } from "@/lib/export";
 import { Button } from "@/components/ui/button";
 
-import { type Vehicle } from "prisma/generated/zod";
 import { PlusIcon } from "lucide-react";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import { DeleteVehiclesDialog } from "./delete-vehicles-dialog";
+import type { VehicleTableType } from "./types";
 
 interface VehiclesTableToolbarActionsProps {
-  table: Table<Vehicle>;
+  table: Table<VehicleTableType>;
 }
 
 export function VehiclesTableToolbarActions({

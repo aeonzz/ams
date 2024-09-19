@@ -4,6 +4,7 @@ import { z } from "zod";
 export const createVehicleSchemaServer = z.object({
   name: z.string(),
   type: z.string(),
+  departmentId: z.string(),
   imageUrl: z.array(
     z.string({
       required_error: "Image is required",
@@ -24,6 +25,7 @@ export type CreateVehicleSchemaWithPath = z.infer<
 export const updateVehicleSchemaServer = z.object({
   name: z.string().optional(),
   type: z.string().optional(),
+  departmentId: z.string().optional(),
   imageUrl: z.array(z.string()).optional(),
   capacity: z.number().optional(),
   licensePlate: z.string().optional(),

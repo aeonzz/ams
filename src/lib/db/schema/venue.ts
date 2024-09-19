@@ -5,7 +5,7 @@ export const createVenueSchema = z.object({
   name: z.string().min(1, "Name is required"),
   location: z.string().min(1, "Location is required"),
   departmentId: z.string({
-    required_error: "Manage by is required",
+    required_error: "Department is required",
   }),
   capacity: z
     .string()

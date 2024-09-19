@@ -27,7 +27,9 @@ export async function getVehicles(input: GetVehicleSchema) {
       "asc" | "desc" | undefined,
     ];
 
-    const where: any = {};
+    const where: any = {
+      isArchived: false,
+    };
 
     if (name) {
       where.name = { contains: name, mode: "insensitive" };
@@ -52,12 +54,22 @@ export async function getVehicles(input: GetVehicleSchema) {
         orderBy: {
           [column || "createdAt"]: order || "desc",
         },
+        include: {
+          department: true,
+        },
       }),
       db.vehicle.count({ where }),
     ]);
     const pageCount = Math.ceil(total / per_page);
 
-    return { data, pageCount };
+    const formattedData = data.map((vehicle) => {
+      return {
+        ...vehicle,
+        departmentName: vehicle.department.name,
+      };
+    });
+
+    return { data: formattedData, pageCount };
   } catch (err) {
     console.error(err);
     return { data: [], pageCount: 0 };
@@ -68,13 +80,14 @@ export const createVehicle = authedProcedure
   .createServerAction()
   .input(createVehicleSchemaWithPath)
   .handler(async ({ input, ctx }) => {
-    const { path, imageUrl, ...rest } = input;
+    const { path, imageUrl, departmentId, ...rest } = input;
     try {
       const vehicleId = generateId(15);
       await db.vehicle.create({
         data: {
           id: vehicleId,
           imageUrl: imageUrl[0],
+          departmentId: departmentId,
           ...rest,
         },
       });

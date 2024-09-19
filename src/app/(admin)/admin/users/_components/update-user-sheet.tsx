@@ -15,14 +15,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   Sheet,
   SheetClose,
   SheetContent,
@@ -31,7 +23,6 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-
 import { Department } from "prisma/generated/zod";
 import { updateUserSchema, UpdateUserSchema } from "@/lib/schema/user";
 import { Input } from "@/components/ui/input";
@@ -57,7 +48,6 @@ export function UpdateUserSheet({ user, ...props }: UpdateUserSheetProps) {
     resolver: zodResolver(updateUserSchema),
     defaultValues: {
       email: user.email ?? "",
-      departmentId: user.department?.id,
       firstName: user.firstName,
       middleName: user.middleName ?? "",
       lastName: user.lastName,
@@ -78,7 +68,6 @@ export function UpdateUserSheet({ user, ...props }: UpdateUserSheetProps) {
   React.useEffect(() => {
     form.reset({
       email: user.email ?? "",
-      departmentId: user.department?.id,
       firstName: user.firstName,
       middleName: user.middleName ?? "",
       lastName: user.lastName,
@@ -195,58 +184,6 @@ export function UpdateUserSheet({ user, ...props }: UpdateUserSheetProps) {
                         {...field}
                       />
                     </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="departmentId"
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormLabel>
-                      Department{" "}
-                      <span className="text-xs text-muted-foreground">
-                        (optional)
-                      </span>
-                    </FormLabel>
-                    <Select
-                      disabled={isLoading || isPending}
-                      onValueChange={field.onChange}
-                      value={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="border bg-input text-muted-foreground">
-                          <SelectValue
-                            placeholder={
-                              isLoading ? (
-                                <LoadingSpinner />
-                              ) : (
-                                "Select department"
-                              )
-                            }
-                          />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectGroup>
-                          {data && data.length > 0 ? (
-                            data.map((department) => (
-                              <SelectItem
-                                key={department.id}
-                                value={department.id}
-                              >
-                                {department.name}
-                              </SelectItem>
-                            ))
-                          ) : (
-                            <p className="p-4 text-center text-sm">
-                              No departments available
-                            </p>
-                          )}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}

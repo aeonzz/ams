@@ -47,6 +47,8 @@ import axios from "axios";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import CreateUserDialogSkeleton from "./create-user-dialog-skeleton";
 
 interface CreateUserFormProps {
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -71,13 +73,14 @@ export default function CreateUserForm({
   setAlertOpen,
 }: CreateUserFormProps) {
   const pathname = usePathname();
+  const [open, setOpen] = React.useState(false);
 
   const { data, isLoading } = useQuery<Department[]>({
     queryFn: async () => {
       const res = await axios.get("/api/department/get-departments");
       return res.data.data;
     },
-    queryKey: ["create-user-department-selection"],
+    queryKey: ["create-user-department-selection-users-table"],
   });
 
   async function onSubmit(values: CreateUserSchema) {
@@ -99,10 +102,14 @@ export default function CreateUserForm({
     });
   }
 
+  if (isLoading) {
+    return <CreateUserDialogSkeleton />;
+  }
+
   return (
     <Form {...form}>
       <form autoComplete="off" onSubmit={form.handleSubmit(onSubmit)}>
-        <div className="relative space-y-2 px-4">
+        <div className="scroll-bar flex max-h-[55vh] flex-col gap-2 overflow-y-auto px-4 py-1">
           <FormField
             control={form.control}
             name="email"
@@ -181,24 +188,25 @@ export default function CreateUserForm({
           <div className="flex w-full gap-3">
             <FormField
               control={form.control}
-              name="departmentId"
+              name="departmentIds"
               render={({ field }) => (
                 <FormItem className="flex-1">
-                  <FormLabel>Department</FormLabel>
-                  <Popover>
+                  <FormLabel>Departments</FormLabel>
+                  <Popover open={open} onOpenChange={setOpen}>
                     <PopoverTrigger asChild>
                       <FormControl>
                         <Button
                           variant="outline"
                           role="combobox"
                           disabled={isLoading || isPending}
-                          className="w-full justify-between text-muted-foreground"
+                          className={cn(
+                            "w-full justify-between",
+                            !field.value?.length && "text-muted-foreground"
+                          )}
                         >
-                          {field.value
-                            ? data?.find(
-                                (department) => department.id === field.value
-                              )?.name
-                            : "Select department"}
+                          {field.value?.length > 0
+                            ? `${field.value.length} department${field.value.length > 1 ? "s" : ""} selected`
+                            : "Select departments"}
                           {isLoading ? (
                             <LoadingSpinner />
                           ) : (
@@ -207,9 +215,9 @@ export default function CreateUserForm({
                         </Button>
                       </FormControl>
                     </PopoverTrigger>
-                    <PopoverContent className="p-0">
+                    <PopoverContent className="w-[300px] p-0">
                       <Command>
-                        <CommandInput placeholder="Search department..." />
+                        <CommandInput placeholder="Search departments..." />
                         <CommandList>
                           <CommandEmpty>
                             {isLoading ? "Loading..." : "No department found."}
@@ -221,17 +229,20 @@ export default function CreateUserForm({
                                   value={department.name}
                                   key={department.id}
                                   onSelect={() => {
-                                    field.onChange(
-                                      department.id === field.value
-                                        ? ""
-                                        : department.id
-                                    );
+                                    const updatedValue = field.value?.includes(
+                                      department.id
+                                    )
+                                      ? field.value.filter(
+                                          (id) => id !== department.id
+                                        )
+                                      : [...(field.value || []), department.id];
+                                    field.onChange(updatedValue);
                                   }}
                                 >
                                   <Check
                                     className={cn(
                                       "mr-2 h-4 w-4",
-                                      field.value === department.id
+                                      field.value?.includes(department.id)
                                         ? "opacity-100"
                                         : "opacity-0"
                                     )}
@@ -245,6 +256,34 @@ export default function CreateUserForm({
                       </Command>
                     </PopoverContent>
                   </Popover>
+                  {field.value?.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {field.value.map((departmentId) => {
+                        const department = data?.find(
+                          (d) => d.id === departmentId
+                        );
+                        return department ? (
+                          <Badge key={department.id} variant="outline">
+                            {department.name}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="ml-1 h-auto p-0 text-muted-foreground"
+                              onClick={() => {
+                                field.onChange(
+                                  field.value.filter(
+                                    (id) => id !== department.id
+                                  )
+                                );
+                              }}
+                            >
+                              ×
+                            </Button>
+                          </Badge>
+                        ) : null;
+                      })}
+                    </div>
+                  )}
                   <FormMessage />
                 </FormItem>
               )}

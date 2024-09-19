@@ -65,6 +65,7 @@ export function UsersTable({ usersPromise }: UsersTableProps) {
     pageCount,
     /* optional props */
     filterFields,
+    getRowCanExpand: () => true,
     initialState: {
       sorting: [{ id: "createdAt", desc: true }],
       columnPinning: { right: ["actions"] },

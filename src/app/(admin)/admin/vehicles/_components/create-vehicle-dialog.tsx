@@ -27,7 +27,7 @@ import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
 import { createVehicleSchema, type CreateVehicleSchema } from "@/lib/db/schema/vehicle";
 import { createVehicle } from "@/lib/actions/vehicle";
-import CreateVehicleForm from "@/components/forms/create-vehicle-form";
+import CreateVehicleForm from "./create-vehicle-form";
 
 export default function CreateVehicleDialog() {
   const dialogManager = useDialogManager();

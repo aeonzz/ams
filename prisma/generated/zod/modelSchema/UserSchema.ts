@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import type { DepartmentWithRelations } from './DepartmentSchema'
 import type { SessionWithRelations } from './SessionSchema'
 import type { SettingWithRelations } from './SettingSchema'
 import type { RequestWithRelations } from './RequestSchema'
@@ -7,7 +6,7 @@ import type { UserRoleWithRelations } from './UserRoleSchema'
 import type { JobRequestWithRelations } from './JobRequestSchema'
 import type { VenueRequestWithRelations } from './VenueRequestSchema'
 import type { GenericAuditLogWithRelations } from './GenericAuditLogSchema'
-import { DepartmentWithRelationsSchema } from './DepartmentSchema'
+import type { UserDepartmentWithRelations } from './UserDepartmentSchema'
 import { SessionWithRelationsSchema } from './SessionSchema'
 import { SettingWithRelationsSchema } from './SettingSchema'
 import { RequestWithRelationsSchema } from './RequestSchema'
@@ -15,6 +14,7 @@ import { UserRoleWithRelationsSchema } from './UserRoleSchema'
 import { JobRequestWithRelationsSchema } from './JobRequestSchema'
 import { VenueRequestWithRelationsSchema } from './VenueRequestSchema'
 import { GenericAuditLogWithRelationsSchema } from './GenericAuditLogSchema'
+import { UserDepartmentWithRelationsSchema } from './UserDepartmentSchema'
 
 /////////////////////////////////////////
 // USER SCHEMA
@@ -31,7 +31,6 @@ export const UserSchema = z.object({
   middleName: z.string().nullable(),
   lastName: z.string(),
   isArchived: z.boolean(),
-  departmentId: z.string().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })
@@ -43,7 +42,6 @@ export type User = z.infer<typeof UserSchema>
 /////////////////////////////////////////
 
 export type UserRelations = {
-  department?: DepartmentWithRelations | null;
   sessions: SessionWithRelations[];
   setting?: SettingWithRelations | null;
   requestAsUser: RequestWithRelations[];
@@ -52,12 +50,12 @@ export type UserRelations = {
   jobRequestsAsAssigned: JobRequestWithRelations[];
   venueRequest: VenueRequestWithRelations[];
   genericAuditLog: GenericAuditLogWithRelations[];
+  userDepartments: UserDepartmentWithRelations[];
 };
 
 export type UserWithRelations = z.infer<typeof UserSchema> & UserRelations
 
 export const UserWithRelationsSchema: z.ZodType<UserWithRelations> = UserSchema.merge(z.object({
-  department: z.lazy(() => DepartmentWithRelationsSchema).nullable(),
   sessions: z.lazy(() => SessionWithRelationsSchema).array(),
   setting: z.lazy(() => SettingWithRelationsSchema).nullable(),
   requestAsUser: z.lazy(() => RequestWithRelationsSchema).array(),
@@ -66,6 +64,7 @@ export const UserWithRelationsSchema: z.ZodType<UserWithRelations> = UserSchema.
   jobRequestsAsAssigned: z.lazy(() => JobRequestWithRelationsSchema).array(),
   venueRequest: z.lazy(() => VenueRequestWithRelationsSchema).array(),
   genericAuditLog: z.lazy(() => GenericAuditLogWithRelationsSchema).array(),
+  userDepartments: z.lazy(() => UserDepartmentWithRelationsSchema).array(),
 }))
 
 export default UserSchema;

@@ -161,7 +161,7 @@ export function getVenuesColumns(): ColumnDef<VenueTableType>[] {
       },
     },
     {
-      accessorKey: "departmentId",
+      accessorKey: "departmentName",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Manage By" />
       ),

@@ -48,9 +48,6 @@ export async function getDepartments(input: GetDepartmentsSchema) {
         orderBy: {
           [column || "createdAt"]: order || "desc",
         },
-        include: {
-          user: true,
-        },
       }),
       db.department.count({ where }),
     ]);

@@ -10,10 +10,11 @@ import { useDataTable } from "@/lib/hooks/use-data-table";
 import { type DataTableFilterField } from "@/lib/types";
 import { VehiclesTableToolbarActions } from "./vehicles-table-toolbar-actions";
 import { getVehicleStatusIcon } from "@/lib/utils";
-import { VehicleStatusSchema, type Vehicle } from "prisma/generated/zod";
+import { VehicleStatusSchema } from "prisma/generated/zod";
 import { getVehiclesColumns } from "./vehicles-table-columns";
 import { getVehicles } from "@/lib/actions/vehicle";
 import { VehiclesTableFloatingBar } from "./vehicles-table-floating-bar";
+import type { VehicleTableType } from "./types";
 
 interface VehiclesTableProps {
   vehiclesPromise: ReturnType<typeof getVehicles>;
@@ -36,7 +37,7 @@ export function VehiclesTable({ vehiclesPromise }: VehiclesTableProps) {
    * @prop {React.ReactNode} [icon] - An optional icon to display next to the label.
    * @prop {boolean} [withCount] - An optional boolean to display the count of the filter option.
    */
-  const filterFields: DataTableFilterField<Vehicle>[] = [
+  const filterFields: DataTableFilterField<VehicleTableType>[] = [
     {
       label: "Name",
       value: "name",

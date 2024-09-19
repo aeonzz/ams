@@ -15,14 +15,28 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
-
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { P } from "@/components/typography/text";
 import { UpdateUserSheet } from "./update-user-sheet";
 import { DeleteUsersDialog } from "./delete-users-dialog";
 import { type UserType } from "@/lib/types/user";
-import { ChevronDownIcon, ChevronRightIcon } from "lucide-react";
+import { ChevronDownIcon, ChevronRightIcon, X } from "lucide-react";
 import CreateUserRole from "./create-user-role";
 import { formatDate } from "date-fns";
+import { Badge } from "@/components/ui/badge";
+import Image from "next/image";
+import placeholder from "public/placeholder.svg";
+import AddUserDepartments from "./add-user-departments";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export function getUsersColumns(): ColumnDef<UserType>[] {
   return [
@@ -56,6 +70,40 @@ export function getUsersColumns(): ColumnDef<UserType>[] {
       size: 20,
     },
     {
+      accessorKey: "profileUrl",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Avatar" />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="flex items-center justify-start">
+            <Dialog>
+              <DialogTrigger asChild>
+                <div className="relative size-10 cursor-pointer rounded-full transition-colors hover:brightness-75">
+                  <Image
+                    src={row.original.profileUrl ?? placeholder}
+                    alt={`Image of ${row.original.firstName}`}
+                    fill
+                    className="rounded-full border object-cover"
+                  />
+                </div>
+              </DialogTrigger>
+              <DialogContent className="aspect-square w-[80vw]">
+                <Image
+                  src={row.original.profileUrl ?? placeholder}
+                  alt={`Image of ${row.original.firstName}`}
+                  fill
+                  className="rounded-md border object-cover"
+                />
+              </DialogContent>
+            </Dialog>
+          </div>
+        );
+      },
+      enableSorting: false,
+      size: 0,
+    },
+    {
       accessorKey: "email",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Email" />
@@ -69,17 +117,88 @@ export function getUsersColumns(): ColumnDef<UserType>[] {
       },
     },
     {
-      accessorKey: "department",
+      accessorKey: "userDepartments",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Department" />
+        <DataTableColumnHeader column={column} title="Departments" />
       ),
       cell: ({ row }) => {
+        const [hoveredDepartment, setHoveredDepartment] = React.useState<
+          string | null
+        >(null);
+        const [isAlertOpen, setIsAlertOpen] = React.useState(false);
+        const [departmentToRemove, setDepartmentToRemove] = React.useState<{
+          id: string;
+          name: string;
+        } | null>(null);
+
+        const handleRemoveDepartment = (department: {
+          id: string;
+          name: string;
+        }) => {
+          setDepartmentToRemove(department);
+          setIsAlertOpen(true);
+        };
+
+        const confirmRemoveDepartment = () => {
+          if (departmentToRemove) {
+            // Here you would typically call an API to remove the user from the department
+            console.log(
+              `Removing user ${row.original.id} from department ${departmentToRemove.id}`
+            );
+            // After successful removal, you might want to update the user's departments list
+            // This would depend on how you're managing state in your application
+          }
+          setIsAlertOpen(false);
+        };
+
         return (
-          <div className="flex space-x-2">
-            <P className="truncate font-medium">
-              {row.original.department ? row.original.department.name : "-"}
-            </P>
-          </div>
+          <>
+            <div className="flex max-w-[15vw] flex-wrap gap-2">
+              {row.original.userDepartments.map((userDepartment) => (
+                <Badge
+                  key={userDepartment.department.id}
+                  variant="outline"
+                  className="relative"
+                  onMouseEnter={() =>
+                    setHoveredDepartment(userDepartment.department.id)
+                  }
+                  onMouseLeave={() => setHoveredDepartment(null)}
+                >
+                  {userDepartment.department.name}
+                  {hoveredDepartment === userDepartment.department.id && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="absolute -right-1 -top-1 h-4 w-4 rounded-full p-0"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRemoveDepartment(userDepartment.department);
+                      }}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  )}
+                </Badge>
+              ))}
+            </div>
+            <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action will remove the user from the department{" "}
+                    {departmentToRemove?.name}. This action cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={confirmRemoveDepartment}>
+                    Continue
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </>
         );
       },
     },
@@ -202,6 +321,7 @@ export function getUsersColumns(): ColumnDef<UserType>[] {
                 <DropdownMenuItem onSelect={() => setShowUpdateTaskSheet(true)}>
                   Edit
                 </DropdownMenuItem>
+                <AddUserDepartments userId={row.original.id} />
                 <CreateUserRole userId={row.original.id} />
                 <DropdownMenuSeparator />
                 <DropdownMenuItem

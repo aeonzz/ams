@@ -11,7 +11,6 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 
 import { P } from "@/components/typography/text";
-import { type Vehicle } from "prisma/generated/zod";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import Image from "next/image";
 import {
@@ -40,8 +39,9 @@ import { updateVehicle } from "@/lib/actions/vehicle";
 import { UpdateVehicleSheet } from "./update-vehicle-sheet";
 import { DeleteVehiclesDialog } from "./delete-vehicles-dialog";
 import { formatDate } from "date-fns";
+import type { VehicleTableType } from "./types";
 
-export function getVehiclesColumns(): ColumnDef<Vehicle>[] {
+export function getVehiclesColumns(): ColumnDef<VehicleTableType>[] {
   return [
     {
       id: "select",
@@ -113,7 +113,7 @@ export function getVehiclesColumns(): ColumnDef<Vehicle>[] {
       ),
       cell: ({ row }) => {
         return (
-          <div className="flex w-[15vw] space-x-2">
+          <div className="flex space-x-2">
             <P className="truncate font-medium">{row.original.name}</P>
           </div>
         );
@@ -178,6 +178,19 @@ export function getVehiclesColumns(): ColumnDef<Vehicle>[] {
       },
       filterFn: (row, id, value) => {
         return Array.isArray(value) && value.includes(row.getValue(id));
+      },
+    },
+    {
+      accessorKey: "departmentName",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Manage By" />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="flex items-center">
+            <P>{row.original.departmentName}</P>
+          </div>
+        );
       },
     },
     {
@@ -268,6 +281,7 @@ export function getVehiclesColumns(): ColumnDef<Vehicle>[] {
                             value={status}
                             className="capitalize"
                             disabled={isPending}
+                            onSelect={(e) => e.preventDefault()}
                           >
                             <Badge variant={variant}>
                               <Icon className="mr-1 size-4" />

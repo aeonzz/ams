@@ -34,8 +34,6 @@ model User {
   middleName               String?
   lastName                 String
   isArchived               Boolean           @default(false)
-  departmentId             String?
-  department               Department?       @relation(fields: [departmentId], references: [id])
   createdAt                DateTime          @default(now())
   updatedAt                DateTime          @updatedAt
   sessions                 Session[]
@@ -46,6 +44,38 @@ model User {
   jobRequestsAsAssigned    JobRequest[]
   venueRequest             VenueRequest[]
   genericAuditLog          GenericAuditLog[]
+  userDepartments          UserDepartment[]
+}
+
+model Department {
+  id                String              @id
+  description       String?
+  name              String
+  acceptsJobs       Boolean             @default(false)
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  responsibilities  String?
+  departmentType    DepartmentType
+  isArchived        Boolean             @default(false)
+  userRole          UserRole[]
+  inventoryItem     InventoryItem[]
+  returnableRequest ReturnableRequest[]
+  userDepartments   UserDepartment[]
+  request           Request[]
+  venue             Venue[]
+  vehicle           Vehicle[]
+}
+
+model UserDepartment {
+  id           String     @id 
+  userId       String
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  departmentId String
+  department   Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@unique([userId, departmentId]) 
 }
 
 model UserRole {
@@ -70,24 +100,6 @@ model Role {
   updatedAt   DateTime   @updatedAt
   isArchived  Boolean    @default(false)
   userRoles   UserRole[]
-}
-
-model Department {
-  id                String              @id
-  description       String?
-  name              String
-  acceptsJobs       Boolean             @default(false)
-  createdAt         DateTime            @default(now())
-  updatedAt         DateTime            @updatedAt
-  responsibilities  String?
-  departmentType    DepartmentType
-  isArchived        Boolean             @default(false)
-  userRole          UserRole[]
-  inventoryItem     InventoryItem[]
-  returnableRequest ReturnableRequest[]
-  user              User[]
-  request           Request[]
-  venue             Venue[]
 }
 
 model Session {
@@ -303,9 +315,12 @@ model Vehicle {
   imageUrl          String
   capacity          Int
   licensePlate      String
+  isArchived        Boolean             @default(false)
   createdAt         DateTime            @default(now())
   updatedAt         DateTime            @updatedAt
   status            VehicleStatus       @default(AVAILABLE)
+  departmentId      String
+  department        Department          @relation(fields: [departmentId], references: [id])
   transportRequest  TransportRequest[]
   maintenanceRecord MaintenanceRecord[]
 }

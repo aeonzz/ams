@@ -15,5 +15,17 @@ export type UserType = User & {
     createdAt: Date;
     updatedAt: Date;
   }[];
-  department: Department | null;
+  userDepartments: {
+    id: string;
+    department: {
+      id: string;
+      name: string;
+    };
+    user: {
+      id: string;
+      firstName: string;
+      middleName: string | null;
+      lastName: string;
+    };
+  }[];
 };
