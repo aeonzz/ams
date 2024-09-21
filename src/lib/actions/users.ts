@@ -35,6 +35,7 @@ import {
   updateUsersSchema,
 } from "../schema/user";
 import { User } from "prisma/generated/zod";
+import { removeUserDepartmentSchema } from "@/app/(admin)/admin/users/_components/schema";
 
 interface ActionResult {
   error: string;
@@ -213,7 +214,12 @@ export const currentUser = authedProcedure
         include: {
           setting: true,
           sessions: true,
-          userDepartments: true,
+          userDepartments: {
+            include: {
+              department: true,
+              user: true,
+            },
+          },
           userRole: {
             include: {
               role: true,
@@ -376,6 +382,23 @@ export async function getUsers(input: GetUsersSchema) {
     return { data: [], pageCount: 0 };
   }
 }
+
+export const removeUserDepartment = authedProcedure
+  .createServerAction()
+  .input(removeUserDepartmentSchema)
+  .handler(async ({ ctx, input }) => {
+    const { path, ...rest } = input;
+    try {
+      await db.userDepartment.delete({
+        where: {
+          ...rest,
+        },
+      });
+      return revalidatePath(path);
+    } catch (error) {
+      getErrorMessage(error);
+    }
+  });
 
 export const updateUser = authedProcedure
   .createServerAction()

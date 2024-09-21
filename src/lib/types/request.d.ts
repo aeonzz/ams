@@ -1,10 +1,9 @@
-import { JobRequest, Request } from "prisma/generated/zod";
+import type { JobRequest, Request, User } from "prisma/generated/zod";
 
 export type RequestJoin = Request & {
   jobRequest: JobRequest | null;
 };
 
-export type RequestsFilter = {
-  data: Request[],
-  pageCount: number,
-}
+export type RequestTableType = Request & {
+  user: User;
+};

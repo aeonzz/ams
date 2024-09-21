@@ -14,12 +14,13 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 
-import { Request, RequestSchema } from "prisma/generated/zod";
 import { P } from "@/components/typography/text";
 import { format } from "date-fns";
 import { Dot } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import type { RequestTableType } from "@/lib/types/request";
 
-export function getRequestColumns(): ColumnDef<Request>[] {
+export function getManageRequestsColumns(): ColumnDef<RequestTableType>[] {
   return [
     {
       accessorKey: "type",
@@ -42,15 +43,18 @@ export function getRequestColumns(): ColumnDef<Request>[] {
       filterFn: (row, id, value) => {
         return Array.isArray(value) && value.includes(row.getValue(id));
       },
+      size: 0,
     },
     {
       accessorKey: "title",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Title" />
+        <div className="px-2">
+          <DataTableColumnHeader column={column} title="Title" />
+        </div>
       ),
       cell: ({ row }) => {
         return (
-          <div className="flex w-[30vw] space-x-2">
+          <div className="flex space-x-2">
             <P className="truncate font-medium">{row.original.title}</P>
           </div>
         );
@@ -78,13 +82,22 @@ export function getRequestColumns(): ColumnDef<Request>[] {
     {
       accessorKey: "createdAt",
       header: ({ column }) => null,
-      cell: ({ cell }) => {
+      cell: ({ cell, row }) => {
         return (
-          <P className="text-muted-foreground">
-            {format(cell.getValue() as Date, "PP")}
-          </P>
+          <div className="flex items-center gap-3">
+            <P className="text-muted-foreground">
+              {format(cell.getValue() as Date, "PP")}
+            </P>
+            <Avatar className="size-5 rounded-full">
+              <AvatarImage src={`${row.original.user.profileUrl}` ?? ""} />
+              <AvatarFallback className="rounded-full">
+                {row.original.user.firstName.charAt(0).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+          </div>
         );
       },
+      size: 0,
     },
   ];
 }

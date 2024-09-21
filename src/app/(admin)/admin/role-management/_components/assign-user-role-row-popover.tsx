@@ -35,7 +35,7 @@ export default function AssignUserRoleRowPopover({
     resolver: zodResolver(createUserRoleSchema),
     defaultValues: {
       roleId: roleId,
-      userId: undefined,
+      userIds: undefined,
       departmentId: undefined,
     },
   });

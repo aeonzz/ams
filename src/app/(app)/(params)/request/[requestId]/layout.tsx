@@ -4,7 +4,6 @@ import RequestOption from "@/app/(app)/dashboard/_components/request-option";
 import CommandSearchDialog from "@/components/dialogs/command-search-dialog";
 import ThemeDialog from "@/components/dialogs/theme-dialog";
 import SettingsDialog from "@/components/dialogs/settings-dialog";
-import JobDetailsActionsDialog from "@/components/dialogs/job-details-actions-dialog";
 
 export default function CommandLayout({
   children,

@@ -37,6 +37,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
+import { removeUserDepartment } from "@/lib/actions/users";
+import { RemoveUserDepartmentSchema } from "./schema";
+import { usePathname } from "next/navigation";
+import { useHotkeys } from "react-hotkeys-hook";
+import DataTableExpand from "@/components/data-table/data-table-expand";
 
 export function getUsersColumns(): ColumnDef<UserType>[] {
   return [
@@ -122,6 +128,7 @@ export function getUsersColumns(): ColumnDef<UserType>[] {
         <DataTableColumnHeader column={column} title="Departments" />
       ),
       cell: ({ row }) => {
+        const pathname = usePathname();
         const [hoveredDepartment, setHoveredDepartment] = React.useState<
           string | null
         >(null);
@@ -130,6 +137,8 @@ export function getUsersColumns(): ColumnDef<UserType>[] {
           id: string;
           name: string;
         } | null>(null);
+        const { mutateAsync, isPending } =
+          useServerActionMutation(removeUserDepartment);
 
         const handleRemoveDepartment = (department: {
           id: string;
@@ -141,12 +150,20 @@ export function getUsersColumns(): ColumnDef<UserType>[] {
 
         const confirmRemoveDepartment = () => {
           if (departmentToRemove) {
-            // Here you would typically call an API to remove the user from the department
-            console.log(
-              `Removing user ${row.original.id} from department ${departmentToRemove.id}`
-            );
-            // After successful removal, you might want to update the user's departments list
-            // This would depend on how you're managing state in your application
+            const data: RemoveUserDepartmentSchema = {
+              id: departmentToRemove.id,
+              path: pathname,
+            };
+            toast.promise(mutateAsync(data), {
+              loading: "Removing...",
+              success: () => {
+                setIsAlertOpen(false);
+                return "User department removed successfuly";
+              },
+              error: (err) => {
+                return err.message;
+              },
+            });
           }
           setIsAlertOpen(false);
         };
@@ -172,7 +189,10 @@ export function getUsersColumns(): ColumnDef<UserType>[] {
                       className="absolute -right-1 -top-1 h-4 w-4 rounded-full p-0"
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleRemoveDepartment(userDepartment.department);
+                        handleRemoveDepartment({
+                          id: userDepartment.id,
+                          name: userDepartment.department.name,
+                        });
                       }}
                     >
                       <X className="h-3 w-3" />
@@ -251,24 +271,9 @@ export function getUsersColumns(): ColumnDef<UserType>[] {
       },
     },
     {
-      id: "expander",
+      id: "userRoles",
       header: () => <P>User Roles</P>,
-      cell: ({ row }) => {
-        return (
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => row.toggleExpanded()}
-            aria-label="Toggle row details"
-          >
-            {row.getIsExpanded() ? (
-              <ChevronDownIcon className="h-4 w-4" />
-            ) : (
-              <ChevronRightIcon className="h-4 w-4" />
-            )}
-          </Button>
-        );
-      },
+      cell: ({ row }) => <DataTableExpand<UserType> row={row} />,
       size: 0,
     },
     {

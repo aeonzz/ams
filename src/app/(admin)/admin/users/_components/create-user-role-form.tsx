@@ -16,10 +16,10 @@ import { SubmitButton } from "@/components/ui/submit-button";
 import { type UseMutateAsyncFunction } from "@tanstack/react-query";
 import { type UseFormReturn } from "react-hook-form";
 import { usePathname } from "next/navigation";
-import { createUserRole } from "@/lib/actions/userRole";
+import { createMultipleUserRoleUser } from "@/lib/actions/userRole";
 import {
-  type CreateUserRoleSchemaWithPath,
-  type CreateUserRoleSchema,
+  type CreateSingleUserRoleSchemaWithPath,
+  type CreateSingleUserRoleSchema,
 } from "@/lib/schema/userRole";
 import InputPopover, { Option } from "../../../../../components/input-popover";
 import {
@@ -39,10 +39,10 @@ interface CreateUserRoleFormProps {
   mutateAsync: UseMutateAsyncFunction<
     any,
     Error,
-    Parameters<typeof createUserRole>[0],
+    Parameters<typeof createMultipleUserRoleUser>[0],
     unknown
   >;
-  form: UseFormReturn<CreateUserRoleSchema>;
+  form: UseFormReturn<CreateSingleUserRoleSchema>;
   isPending: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   data: RoleDepartmentData;
@@ -59,12 +59,12 @@ export default function CreateUserRoleForm({
 }: CreateUserRoleFormProps) {
   const pathname = usePathname();
 
-  async function onSubmit(values: CreateUserRoleSchema) {
-    const data: CreateUserRoleSchemaWithPath = {
+  async function onSubmit(values: CreateSingleUserRoleSchema) {
+    const data: CreateSingleUserRoleSchemaWithPath = {
       path: pathname,
       departmentId: values.departmentId,
       userId: userId,
-      roleId: values.roleId,
+      roleIds: values.roleIds,
     };
     toast.promise(mutateAsync(data), {
       loading: "Creating...",
@@ -86,7 +86,7 @@ export default function CreateUserRoleForm({
         <div className="scroll-bar flex max-h-[40vh] flex-col overflow-y-auto">
           <FormField
             control={form.control}
-            name="roleId"
+            name="roleIds"
             render={({ field }) => (
               <FormItem className="flex-1">
                 <FormControl>
@@ -95,24 +95,38 @@ export default function CreateUserRoleForm({
                     <CommandList>
                       <CommandEmpty>No roles found.</CommandEmpty>
                       <CommandGroup>
-                        {roles.map((role) => (
-                          <CommandItem
-                            key={role.id}
-                            onSelect={() => {
-                              form.setValue("roleId", role.id);
-                            }}
-                          >
-                            <Check
-                              className={cn(
-                                "mr-2 h-4 w-4",
-                                field.value === role.id
-                                  ? "opacity-100"
-                                  : "opacity-0"
-                              )}
-                            />
-                            {role.name}
-                          </CommandItem>
-                        ))}
+                        <div className="scroll-bar max-h-40 overflow-y-auto">
+                          {roles?.map((role) => (
+                            <CommandItem
+                              value={role.name}
+                              key={role.id}
+                              onSelect={() => {
+                                const currentValue =
+                                  form.getValues("roleIds") || [];
+                                const updatedValue = currentValue.includes(
+                                  role.id
+                                )
+                                  ? currentValue.filter(
+                                      (id) => id !== role.id
+                                    )
+                                  : [...currentValue, role.id];
+                                form.setValue("roleIds", updatedValue);
+                              }}
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  form
+                                    .getValues("roleIds")
+                                    ?.includes(role.id)
+                                    ? "opacity-100"
+                                    : "opacity-0"
+                                )}
+                              />
+                              {role.name}
+                            </CommandItem>
+                          ))}
+                        </div>
                       </CommandGroup>
                     </CommandList>
                   </Command>

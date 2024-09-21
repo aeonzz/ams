@@ -7,12 +7,17 @@ import { DataTableSkeleton } from "@/components/data-table/data-table-skeleton";
 import { GetRequestsSchema } from "@/lib/schema";
 import { getManageRequests } from "@/lib/actions/requests";
 import { ManageRequestsTable } from "./manage-requests-table";
+
 interface ManageRequestScreenProps {
+  departmentId: string;
   search: GetRequestsSchema;
 }
 
-export default function ManageRequestScreen({ search }: ManageRequestScreenProps) {
-  const requestPromise = getManageRequests(search);
+export default function ManageRequestScreen({
+  departmentId,
+  search,
+}: ManageRequestScreenProps) {
+  const requestPromise = getManageRequests({ ...search, departmentId });
 
   return (
     <div className="flex h-full w-full">
@@ -25,6 +30,7 @@ export default function ManageRequestScreen({ search }: ManageRequestScreenProps
               triggerSize="sm"
               triggerClassName="ml-auto w-56 sm:w-60"
               align="end"
+              placeholder="Created"
             />
           </React.Suspense>
         </div>

@@ -40,7 +40,7 @@ export default function CreateUserRoleDialog() {
     resolver: zodResolver(createUserRoleSchema),
     defaultValues: {
       roleId: undefined,
-      userId: undefined,
+      userIds: undefined,
       departmentId: undefined,
     },
   });

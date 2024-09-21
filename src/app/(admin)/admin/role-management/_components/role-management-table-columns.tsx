@@ -27,6 +27,7 @@ import { DeleteRolesDialog } from "./delete-roles-dialog";
 import AssignUserRoleRowPopover from "./assign-user-role-row-popover";
 import type { RoleTableType } from "./types";
 import { formatDate } from "date-fns";
+import DataTableExpand from "@/components/data-table/data-table-expand";
 
 export function getRoleColumns(): ColumnDef<RoleTableType>[] {
   return [
@@ -103,24 +104,9 @@ export function getRoleColumns(): ColumnDef<RoleTableType>[] {
       size: 0,
     },
     {
-      id: "expander",
+      id: "userRoles",
       header: () => <P>User Roles</P>,
-      cell: ({ row }) => {
-        return (
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => row.toggleExpanded()}
-            aria-label="Toggle row details"
-          >
-            {row.getIsExpanded() ? (
-              <ChevronDownIcon className="h-4 w-4" />
-            ) : (
-              <ChevronRightIcon className="h-4 w-4" />
-            )}
-          </Button>
-        );
-      },
+      cell: ({ row }) => <DataTableExpand<RoleTableType> row={row} />,
       size: 0,
     },
     {

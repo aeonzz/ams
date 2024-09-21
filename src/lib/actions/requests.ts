@@ -360,11 +360,23 @@ export const getUserReqcount = authedProcedure
     }
   });
 
-export async function getManageRequests(input: GetRequestsSchema) {
+export async function getManageRequests(
+  input: GetRequestsSchema & { departmentId: string }
+) {
   await checkAuth();
   const user = await currentUser();
-  const { page, per_page, sort, title, status, type, priority, from, to } =
-    input;
+  const {
+    page,
+    per_page,
+    sort,
+    title,
+    status,
+    type,
+    priority,
+    from,
+    to,
+    departmentId,
+  } = input;
 
   try {
     const skip = (page - 1) * per_page;
@@ -375,7 +387,7 @@ export async function getManageRequests(input: GetRequestsSchema) {
     ];
 
     const where: any = {
-      departmentId: user[0]?.departmentId,
+      departmentId: departmentId,
       status: {
         in: ["PENDING", "REVIEWED"],
       },
@@ -411,6 +423,9 @@ export async function getManageRequests(input: GetRequestsSchema) {
         skip,
         orderBy: {
           [column || "createdAt"]: order || "desc",
+        },
+        include: {
+          user: true,
         },
       }),
       db.request.count({ where }),

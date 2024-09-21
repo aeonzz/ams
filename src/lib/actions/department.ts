@@ -48,11 +48,31 @@ export async function getDepartments(input: GetDepartmentsSchema) {
         orderBy: {
           [column || "createdAt"]: order || "desc",
         },
+        include: {
+          userRole: {
+            include: {
+              user: true,
+              role: true,
+            },
+          },
+        },
       }),
       db.department.count({ where }),
     ]);
     const pageCount = Math.ceil(total / per_page);
-    return { data, pageCount };
+    const formattedData = data.map((department) => {
+      const { userRole, ...rest } = department;
+      return {
+        ...rest,
+        users: userRole.map((userRole) => {
+          return {
+            ...userRole.user,
+            role: userRole.role.name,
+          };
+        }),
+      };
+    });
+    return { data: formattedData, pageCount };
   } catch (err) {
     console.error(err);
     return { data: [], pageCount: 0 };

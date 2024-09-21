@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { DropdownMenuArrow } from "@radix-ui/react-dropdown-menu";
-import { ChevronDown, Dot, LucideIcon } from "lucide-react";
+import { ChevronDown, ChevronRight, Dot, LucideIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -61,7 +61,7 @@ export default function CollapseMenuButton({
           className="w-full"
         >
           <CollapsibleTrigger
-            className="mb-1 [&[data-state=open]>div>div>svg]:rotate-180"
+            className="mb-1 [&[data-state=open]>div>div>svg]:rotate-90"
             asChild
           >
             <Button
@@ -70,7 +70,7 @@ export default function CollapseMenuButton({
                 "h-10 w-full justify-start"
               )}
             >
-              <div className="flex w-full items-center justify-between">
+              <div className="flex w-full items-center gap-1">
                 <div className="flex items-center">
                   <span className="mr-4">
                     <Icon size={18} />
@@ -94,8 +94,8 @@ export default function CollapseMenuButton({
                       : "-translate-x-96 opacity-0"
                   )}
                 >
-                  <ChevronDown
-                    size={18}
+                  <ChevronRight
+                    size={14}
                     className="duration-300 ease-out-expo"
                   />
                 </div>

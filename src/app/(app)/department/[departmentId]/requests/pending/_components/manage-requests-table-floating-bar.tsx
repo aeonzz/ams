@@ -33,9 +33,10 @@ import {
 } from "prisma/generated/zod";
 import { RequestStatusTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestStatusTypeSchema";
 import { PriorityTypeType } from "prisma/generated/zod/inputTypeSchemas/PriorityTypeSchema";
+import type { RequestTableType } from "@/lib/types/request";
 
 interface ManageRequestsTableFloatingBarProps {
-  table: Table<Request>;
+  table: Table<RequestTableType>;
 }
 
 export function ManageRequestsTableFloatingBar({

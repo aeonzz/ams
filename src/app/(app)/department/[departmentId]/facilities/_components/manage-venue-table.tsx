@@ -8,33 +8,23 @@ import { DataTableToolbar } from "@/components/data-table/data-table-toolbar";
 
 import { useDataTable } from "@/lib/hooks/use-data-table";
 import { type DataTableFilterField } from "@/lib/types";
-import {
-  PriorityTypeSchema,
-  Request,
-  RequestStatusTypeSchema,
-  RequestTypeSchema,
-} from "prisma/generated/zod";
-import { getManageRequests } from "@/lib/actions/requests";
-import {
-  getPriorityIcon,
-  getRequestTypeIcon,
-  getStatusColor,
-} from "@/lib/utils";
-import { ModifiedDataTable } from "@/components/data-table/modified-data-table";
-import { Dot } from "lucide-react";
-import { getManageRequestsColumns } from "./manage-request-table-columns";
-import { ManageRequestsTableToolbarActions } from "./manage-requests-table-toolbar-actions";
-import { ManageRequestsTableFloatingBar } from "./manage-requests-table-floating-bar";
+import { VenuesTableToolbarActions } from "./venues-table-toolbar-actions";
+import { getVenueStatusIcon } from "@/lib/utils";
+import { VenuesTableFloatingBar } from "./venues-table-floating-bar";
+import { VenueStatusSchema } from "prisma/generated/zod";
+import { getVenues } from "@/lib/actions/venue";
+import { getVenuesColumns } from "./venues-table-columns";
+import type { VenueTableType } from "./types";
 
-interface ManageRequestsTableProps {
-  requestPromise: ReturnType<typeof getManageRequests>;
+interface ManageVenuesTableProps {
+  venuesPromise: ReturnType<typeof getVenues>;
 }
 
-export function ManageRequestsTable({ requestPromise }: ManageRequestsTableProps) {
-  const { data, pageCount } = React.use(requestPromise);
+export function ManageVenuesTable({ venuesPromise }: ManageVenuesTableProps) {
+  const { data, pageCount } = React.use(venuesPromise);
 
   // Memoize the columns so they don't re-render on every render
-  const columns = React.useMemo(() => getManageRequestsColumns(), []);
+  const columns = React.useMemo(() => getVenuesColumns(), []);
 
   /**
    * This component can render either a faceted filter or a search filter based on the `options` prop.
@@ -47,21 +37,21 @@ export function ManageRequestsTable({ requestPromise }: ManageRequestsTableProps
    * @prop {React.ReactNode} [icon] - An optional icon to display next to the label.
    * @prop {boolean} [withCount] - An optional boolean to display the count of the filter option.
    */
-  const filterFields: DataTableFilterField<Request>[] = [
+  const filterFields: DataTableFilterField<VenueTableType>[] = [
     {
-      label: "Title",
-      value: "title",
-      placeholder: "Filter titles...",
+      label: "Name",
+      value: "name",
+      placeholder: "Filter names...",
     },
     {
-      label: "Type",
-      value: "type",
-      options: RequestTypeSchema.options.map((type) => ({
+      label: "Status",
+      value: "status",
+      options: VenueStatusSchema.options.map((venue) => ({
         label:
-          type.charAt(0).toUpperCase() +
-          type.slice(1).toLowerCase().replace(/_/g, " "),
-        value: type,
-        icon: getRequestTypeIcon(type).icon,
+          venue.charAt(0).toUpperCase() +
+          venue.slice(1).toLowerCase().replace(/_/g, " "),
+        value: venue,
+        icon: getVenueStatusIcon(venue).icon,
         withCount: true,
       })),
     },
@@ -83,15 +73,13 @@ export function ManageRequestsTable({ requestPromise }: ManageRequestsTableProps
   });
 
   return (
-    <ModifiedDataTable
-      showSelectedRows={false}
+    <DataTable
       table={table}
-      route="request"
-      floatingBar={<ManageRequestsTableFloatingBar table={table} />}
+      floatingBar={<VenuesTableFloatingBar table={table} />}
     >
       <DataTableToolbar table={table} filterFields={filterFields}>
-        <ManageRequestsTableToolbarActions table={table} />
+        <VenuesTableToolbarActions table={table} />
       </DataTableToolbar>
-    </ModifiedDataTable>
+    </DataTable>
   );
 }

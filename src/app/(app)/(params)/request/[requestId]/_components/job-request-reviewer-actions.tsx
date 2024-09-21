@@ -23,6 +23,8 @@ import {
 import { FolderKanban, Check, AlertCircle, Loader2 } from "lucide-react";
 import type {
   RequestWithRelations,
+  UserDepartment,
+  UserDepartmentWithRelations,
   UserWithRelations,
 } from "prisma/generated/zod";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
@@ -42,6 +44,8 @@ import { useSession } from "@/lib/hooks/use-session";
 import JobRequestApproverActions from "./job-request-approver-actions";
 import { PermissionGuard } from "@/components/permission-guard";
 import type { EntityTypeType } from "prisma/generated/zod/inputTypeSchemas/EntityTypeSchema";
+import IsError from "@/components/is-error";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface JobRequestReviewerActionsProps {
   request: RequestWithRelations;
@@ -76,9 +80,9 @@ export default function JobRequestReviewerActions({
     isError,
     error,
     refetch,
-  } = useQuery<UserWithRelations[]>({
+  } = useQuery<UserDepartmentWithRelations[]>({
     queryFn: async () => {
-      const res = await axios.get("/api/user/get-personnels");
+      const res = await axios.get(`/api/user/personnel/get-personnels/${request.departmentId}`);
       return res.data.data;
     },
     queryKey: ["get-personnels"],
@@ -168,6 +172,7 @@ export default function JobRequestReviewerActions({
           return "Personnel assigned successfully.";
         },
         error: (err) => {
+          setSelectedPerson(null)
           console.error(err);
           return err.message;
         },
@@ -190,67 +195,72 @@ export default function JobRequestReviewerActions({
   const renderPersonnelList = () => {
     if (isLoading) {
       return (
-        <div className="flex items-center justify-center p-4">
-          <Loader2 className="h-6 w-6 animate-spin" />
-        </div>
+        <Command className="max-h-[250px]">
+          <CommandInput placeholder="Search personnel..." disabled />
+          <CommandList>
+            <CommandGroup>
+              {[...Array(5)].map((_, index) => (
+                <div key={index} className="flex items-center px-2 py-1.5">
+                  <Skeleton className="mr-2 h-8 w-8 rounded-full" />
+                  <div className="flex-1 space-y-1">
+                    <Skeleton className="h-4 w-3/4" />
+                  </div>
+                </div>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
       );
     }
 
     if (isError) {
-      return (
-        <div className="flex flex-col items-center justify-center space-y-2 p-4">
-          <AlertCircle className="h-6 w-6 text-red-500" />
-          <P className="text-sm text-red-500">
-            {error?.message || "An error occurred"}
-          </P>
-          <Button onClick={() => refetch()} variant="outline" size="sm">
-            Retry
-          </Button>
-        </div>
-      );
+      return <IsError error={error} refetch={refetch} />;
     }
 
     return (
-      <CommandGroup>
-        {personnel?.map((item) => (
-          <CommandItem
-            key={item.id}
-            onSelect={() => handleAssignPersonnel(item.id)}
-            disabled={isAssignPersonnelPending}
-          >
-            <div className="flex w-full items-center">
-              <Avatar className="mr-2 h-8 w-8">
-                <AvatarImage
-                  src={item.profileUrl ?? ""}
-                  alt={formatFullName(
-                    item.firstName,
-                    item.middleName,
-                    item.lastName
+      <Command className="max-h-[250px]">
+        <CommandInput placeholder="Search personnel..." />
+        <CommandList>
+          <CommandEmpty>No personnel found.</CommandEmpty>
+          <CommandGroup>
+            {personnel?.map((item) => (
+              <CommandItem
+                key={item.user.id}
+                onSelect={() => handleAssignPersonnel(item.userId)}
+                disabled={isAssignPersonnelPending}
+              >
+                <div className="flex w-full items-center">
+                  <Avatar className="mr-2 h-8 w-8">
+                    <AvatarImage
+                      src={item.user.profileUrl ?? ""}
+                      alt={formatFullName(
+                        item.user.firstName,
+                        item.user.middleName,
+                        item.user.lastName
+                      )}
+                    />
+                    <AvatarFallback>
+                      {item.user.firstName.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1">
+                    <P className="font-medium">
+                      {formatFullName(
+                        item.user.firstName,
+                        item.user.middleName,
+                        item.user.lastName
+                      )}
+                    </P>
+                  </div>
+                  {item.user.id === selectedPerson && (
+                    <Check className="ml-auto h-4 w-4 text-green-500" />
                   )}
-                />
-                <AvatarFallback>
-                  {item.firstName.charAt(0).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1">
-                <P className="font-medium">
-                  {formatFullName(
-                    item.firstName,
-                    item.middleName,
-                    item.lastName
-                  )}
-                </P>
-                <P className="text-sm text-muted-foreground">
-                  {item.department?.name}
-                </P>
-              </div>
-              {item.id === selectedPerson && (
-                <Check className="ml-auto h-4 w-4 text-green-500" />
-              )}
-            </div>
-          </CommandItem>
-        ))}
-      </CommandGroup>
+                </div>
+              </CommandItem>
+            ))}
+          </CommandGroup>
+        </CommandList>
+      </Command>
     );
   };
 
@@ -284,15 +294,7 @@ export default function JobRequestReviewerActions({
             </DialogDescription>
           </DialogHeader>
           <div className="scroll-bar flex max-h-[60vh] flex-col gap-3 overflow-y-auto px-4 py-1">
-            {showPersonnels && (
-              <Command className="max-h-[250px]">
-                <CommandInput placeholder="Search personnel..." />
-                <CommandList>
-                  <CommandEmpty>No personnel found.</CommandEmpty>
-                  {renderPersonnelList()}
-                </CommandList>
-              </Command>
-            )}
+            {showPersonnels && <>{renderPersonnelList()}</>}
             {request.status === "PENDING" && (
               <div className="flex space-x-2">
                 <Button

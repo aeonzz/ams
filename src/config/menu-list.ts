@@ -31,6 +31,28 @@ export function getMenuList({
     roles.includes(role.role.name)
   );
 
+  const departmentLinks = currentUser.userDepartments.map((userDepartment) => ({
+    href: `/department/${userDepartment.departmentId}`,
+    label: userDepartment.department.name,
+    active: pathname.includes(`/department/${userDepartment.departmentId}`),
+    icon: Building,
+    submenus: [
+      {
+        href: `/department/${userDepartment.departmentId}/requests/pending?page=1&per_page=10&sort=createdAt.desc`,
+        label: "Pending Requests",
+        active:
+          pathname ===
+          `/department/${userDepartment.departmentId}/requests/pending`,
+      },
+      {
+        href: `/department/${userDepartment.departmentId}/facilities?page=1&per_page=10&sort=createdAt.desc`,
+        label: "Venue",
+        active:
+          pathname === `/department/${userDepartment.departmentId}/facilities`,
+      },
+    ],
+  }));
+
   return [
     {
       groupLabel: "",
@@ -54,22 +76,8 @@ export function getMenuList({
     ...(hasAllowedRole
       ? [
           {
-            groupLabel: "Manage Department Resources",
-            menus: [
-              {
-                href: "",
-                label: "Requests",
-                active: pathname.includes("/requests/manage/pending"),
-                icon: FolderKanban,
-                submenus: [
-                  {
-                    href: "/requests/manage/pending?page=1&per_page=10&sort=createdAt.desc",
-                    label: "Pending Requests",
-                    active: pathname === "/requests/manage/pending",
-                  },
-                ],
-              },
-            ],
+            groupLabel: "Your Departments",
+            menus: departmentLinks,
           },
         ]
       : []),

@@ -2,21 +2,33 @@ import { NextRequest, NextResponse } from "next/server";
 import { withRoles } from "@/middleware/withRole";
 import { db } from "@/lib/db/index";
 
-export async function GET(request: NextRequest) {
+interface Context {
+  params: {
+    departmentId: string;
+  };
+}
+
+export async function GET(request: NextRequest, params: Context) {
   try {
-    const result = await db.user.findMany({
+    const result = await db.userDepartment.findMany({
       where: {
-        userRole: {
-          some: {
-            role: {
-              name: "PERSONNEL",
+        departmentId: params.params.departmentId,
+        user: {
+          userRole: {
+            some: {
+              role: {
+                name: "PERSONNEL",
+              },
             },
           },
         },
       },
       include: {
-        userRole: true,
-        department: true,
+        user: {
+          include: {
+            userRole: true,
+          },
+        },
       },
     });
 

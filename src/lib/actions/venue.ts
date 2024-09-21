@@ -15,6 +15,7 @@ import { revalidatePath } from "next/cache";
 import { generateId } from "lucia";
 import { Venue } from "prisma/generated/zod";
 import { updateRequestStatusSchemaWithPath } from "@/app/(app)/(params)/request/[requestId]/_components/schema";
+import { currentUser } from "./users";
 
 export async function getVenues(input: GetVenuesSchema) {
   await checkAuth();
@@ -76,6 +77,69 @@ export async function getVenues(input: GetVenuesSchema) {
     return { data: [], pageCount: 0 };
   }
 }
+
+export async function getDepartmentVenues(input: GetVenuesSchema) {
+  await checkAuth();
+  const user = await currentUser()
+  const { page, per_page, sort, name, status, from, to } = input;
+
+  try {
+    const skip = (page - 1) * per_page;
+
+    const [column, order] = (sort?.split(".") ?? ["createdAt", "desc"]) as [
+      keyof Venue | undefined,
+      "asc" | "desc" | undefined,
+    ];
+
+    const where: any = {
+      isArchived: false,
+    };
+
+    if (name) {
+      where.name = { contains: name, mode: "insensitive" };
+    }
+
+    if (status) {
+      where.status = { in: status.split(".") };
+    }
+
+    if (from && to) {
+      where.createdAt = {
+        gte: new Date(from),
+        lte: new Date(to),
+      };
+    }
+
+    const [data, total] = await db.$transaction([
+      db.venue.findMany({
+        where,
+        take: per_page,
+        skip,
+        orderBy: {
+          [column || "createdAt"]: order || "desc",
+        },
+        include: {
+          department: true,
+        },
+      }),
+      db.venue.count({ where }),
+    ]);
+    const pageCount = Math.ceil(total / per_page);
+
+    const formattedData = data.map((venue) => {
+      return {
+        ...venue,
+        departmentName: venue.department.name,
+      };
+    });
+
+    return { data: formattedData, pageCount };
+  } catch (err) {
+    console.error(err);
+    return { data: [], pageCount: 0 };
+  }
+}
+
 
 export const createVenue = authedProcedure
   .createServerAction()

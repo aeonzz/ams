@@ -67,11 +67,7 @@ export function DepartmentsTable({
       table={table}
       floatingBar={<DepartmentsTableFloatingBar table={table} />}
       renderSubComponent={({ row }) => {
-        const formattedUsers = row.original.user.map((role) => ({
-          ...role,
-        }));
-
-        return <DepartmentUsersTable users={formattedUsers} />;
+        return <DepartmentUsersTable data={row.original.users} />;
       }}
     >
       <DataTableToolbar table={table} filterFields={filterFields}>

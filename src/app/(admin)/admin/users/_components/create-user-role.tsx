@@ -6,10 +6,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
 import {
-  createUserRoleSchema,
-  type CreateUserRoleSchema,
+  createSingleUserRoleSchema,
+  type CreateSingleUserRoleSchema,
 } from "@/lib/schema/userRole";
-import { createUserRole } from "@/lib/actions/userRole";
+import { createMultipleUserRoleUser } from "@/lib/actions/userRole";
 import {
   Popover,
   PopoverContent,
@@ -29,16 +29,18 @@ interface CreateUserRoleProps {
 export default function CreateUserRole({ userId }: CreateUserRoleProps) {
   const [open, setOpen] = React.useState(false);
 
-  const form = useForm<CreateUserRoleSchema>({
-    resolver: zodResolver(createUserRoleSchema),
+  const form = useForm<CreateSingleUserRoleSchema>({
+    resolver: zodResolver(createSingleUserRoleSchema),
     defaultValues: {
-      roleId: undefined,
+      roleIds: undefined,
       userId: userId,
       departmentId: undefined,
     },
   });
 
-  const { mutateAsync, isPending } = useServerActionMutation(createUserRole);
+  const { mutateAsync, isPending } = useServerActionMutation(
+    createMultipleUserRoleUser
+  );
 
   const { data, isLoading } = useQuery<RoleDepartmentData>({
     queryFn: async () => {

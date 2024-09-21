@@ -18,12 +18,16 @@ export async function GET(req: Request) {
           firstName: true,
           middleName: true,
           lastName: true,
-          department: {
-            select: {
-              id: true,
-              name: true,
-            },
-          },
+          // userDepartments: {
+          //   select: {
+          //     id: true,
+          //     department: {
+          //       select: {
+
+          //       }
+          //     }
+          //   },
+          // },
         },
       }),
       db.department.findMany({

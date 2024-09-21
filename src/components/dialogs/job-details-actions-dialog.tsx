@@ -142,7 +142,6 @@ export default function JobDetailsActionsDialog() {
                           item.lastName
                         )}
                       </P>
-                      <P className="text-muted-foreground">{item.department?.name}</P>
                     </div>
                   </div>
                   {item.id === selectedUserId && (

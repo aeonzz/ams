@@ -6,9 +6,10 @@ import { Request } from "prisma/generated/zod";
 import { Button } from "@/components/ui/button";
 import { CirclePlus } from "lucide-react";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
+import type { RequestTableType } from "@/lib/types/request";
 
 interface ManageRequestsTableToolbarActionsProps {
-  table: Table<Request>;
+  table: Table<RequestTableType>;
 }
 
 export function ManageRequestsTableToolbarActions({

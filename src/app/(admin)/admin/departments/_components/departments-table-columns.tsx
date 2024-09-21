@@ -25,6 +25,7 @@ import type { DepartmentsTableType } from "./types";
 import { formatDate } from "date-fns";
 import { textTransform } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import DataTableExpand from "@/components/data-table/data-table-expand";
 
 export function getDepartmentsColumns(): ColumnDef<DepartmentsTableType>[] {
   return [
@@ -146,24 +147,9 @@ export function getDepartmentsColumns(): ColumnDef<DepartmentsTableType>[] {
       },
     },
     {
-      id: "expander",
+      id: "users",
       header: () => <P>Users</P>,
-      cell: ({ row }) => {
-        return (
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => row.toggleExpanded()}
-            aria-label="Toggle row details"
-          >
-            {row.getIsExpanded() ? (
-              <ChevronDownIcon className="h-4 w-4" />
-            ) : (
-              <ChevronRightIcon className="h-4 w-4" />
-            )}
-          </Button>
-        );
-      },
+      cell: ({ row }) => <DataTableExpand<DepartmentsTableType> row={row} />,
       size: 0,
     },
     {

@@ -22,3 +22,10 @@ export const addUserDepartmentsSchemaWithPath = addUserDepartmentsSchema.extend(
 export type AddUserDepartmentsSchemaWithPath = z.infer<
   typeof addUserDepartmentsSchemaWithPath
 >;
+
+export const removeUserDepartmentSchema = z.object({
+  id: z.string(),
+  path: z.string(),
+});
+
+export type RemoveUserDepartmentSchema = z.infer<typeof removeUserDepartmentSchema>

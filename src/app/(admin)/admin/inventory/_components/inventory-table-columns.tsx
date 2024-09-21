@@ -34,6 +34,7 @@ import { UpdateInventorySheet } from "./inventory-inventory-sheet";
 import { DeleteInventoryDialog } from "./delete-inventories-dialog";
 import { ChevronDownIcon, ChevronRightIcon } from "lucide-react";
 import { formatDate } from "date-fns";
+import DataTableExpand from "@/components/data-table/data-table-expand";
 
 export function getInventoryColumns(): ColumnDef<InventoryItemType>[] {
   return [
@@ -159,22 +160,7 @@ export function getInventoryColumns(): ColumnDef<InventoryItemType>[] {
     {
       id: "expander",
       header: () => <P>Inventory</P>,
-      cell: ({ row }) => {
-        return (
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => row.toggleExpanded()}
-            aria-label="Toggle row details"
-          >
-            {row.getIsExpanded() ? (
-              <ChevronDownIcon className="h-4 w-4" />
-            ) : (
-              <ChevronRightIcon className="h-4 w-4" />
-            )}
-          </Button>
-        );
-      },
+      cell: ({ row }) => <DataTableExpand<InventoryItemType> row={row} />,
       size: 0,
     },
     {

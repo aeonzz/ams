@@ -74,8 +74,8 @@ export default function CreateUserRoleForm({
     const data: CreateUserRoleSchemaWithPath = {
       path: pathname,
       departmentId: values.departmentId,
-      userId: values.userId,
-      roleId: values.userId,
+      userIds: values.userIds,
+      roleId: values.roleId,
     };
     toast.promise(mutateAsync(data), {
       loading: "Creating...",
@@ -101,7 +101,7 @@ export default function CreateUserRoleForm({
         <div className="scroll-bar flex max-h-[55vh] flex-col gap-2 overflow-y-auto px-4 py-1">
           <FormField
             control={form.control}
-            name="userId"
+            name="userIds"
             render={({ field }) => (
               <FormItem className="flex-1">
                 <FormLabel>User</FormLabel>
@@ -111,28 +111,38 @@ export default function CreateUserRoleForm({
                     <CommandList>
                       <CommandEmpty>No user found.</CommandEmpty>
                       <CommandGroup>
-                        {users.map((user) => (
-                          <CommandItem
-                            key={user.id}
-                            onSelect={() => {
-                              form.setValue("userId", user.id);
-                            }}
-                          >
-                            <Check
-                              className={cn(
-                                "mr-2 h-4 w-4",
-                                field.value === user.id
-                                  ? "opacity-100"
-                                  : "opacity-0"
+                        <div className="scroll-bar max-h-40 overflow-y-auto">
+                          {users?.map((user) => (
+                            <CommandItem
+                              value={user.id}
+                              key={user.id}
+                              onSelect={() => {
+                                const currentValue =
+                                  form.getValues("userIds") || [];
+                                const updatedValue = currentValue.includes(
+                                  user.id
+                                )
+                                  ? currentValue.filter((id) => id !== user.id)
+                                  : [...currentValue, user.id];
+                                form.setValue("userIds", updatedValue);
+                              }}
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  form.getValues("userIds")?.includes(user.id)
+                                    ? "opacity-100"
+                                    : "opacity-0"
+                                )}
+                              />
+                              {formatFullName(
+                                user.firstName,
+                                user.middleName,
+                                user.lastName
                               )}
-                            />
-                            {formatFullName(
-                              user.firstName,
-                              user.middleName,
-                              user.lastName
-                            )}
-                          </CommandItem>
-                        ))}
+                            </CommandItem>
+                          ))}
+                        </div>
                       </CommandGroup>
                     </CommandList>
                   </Command>

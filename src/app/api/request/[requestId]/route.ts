@@ -22,12 +22,20 @@ export async function GET(req: Request, params: Context) {
       include: {
         reviewer: {
           include: {
-            department: true,
+            userDepartments: {
+              include: {
+                department: true,
+              },
+            },
           },
         },
         user: {
           include: {
-            department: true,
+            userDepartments: {
+              include: {
+                department: true,
+              },
+            },
           },
         },
         supplyRequest: {

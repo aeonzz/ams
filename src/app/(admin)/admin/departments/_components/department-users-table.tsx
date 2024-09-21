@@ -26,17 +26,18 @@ import { buttonVariants } from "@/components/ui/button";
 import { P } from "@/components/typography/text";
 import { DataTablePagination } from "@/components/data-table/data-table-pagination";
 import type { User } from "prisma/generated/zod";
+import { type UserWithRole } from "./types";
 
 interface DepartmentUsersTableProps {
-  users: User[];
+  data: UserWithRole[];
 }
 
 export default function DepartmentUsersTable({
-  users,
+  data,
 }: DepartmentUsersTableProps) {
   const [globalFilter, setGlobalFilter] = React.useState("");
 
-  const columns: ColumnDef<User>[] = React.useMemo(
+  const columns: ColumnDef<UserWithRole>[] = React.useMemo(
     () => [
       {
         accessorKey: "email",
@@ -59,6 +60,11 @@ export default function DepartmentUsersTable({
         cell: ({ row }) => <div>{row.getValue("lastName")}</div>,
       },
       {
+        accessorKey: "role",
+        header: "Role",
+        cell: ({ row }) => <div>{row.getValue("role")}</div>,
+      },
+      {
         accessorKey: "createdAt",
         header: "Date Created",
         cell: ({ row }) => formatDate(row.getValue("createdAt"), "PPP p"),
@@ -73,7 +79,7 @@ export default function DepartmentUsersTable({
   );
 
   const table = useReactTable({
-    data: users,
+    data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),

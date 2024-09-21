@@ -59,7 +59,9 @@ export function ModifiedDataTable<TData>({
                     <TableHead
                       key={header.id}
                       colSpan={header.colSpan}
-                      // className={header.index === 0 ? "" : "border-l"}
+                      style={{
+                        ...getCommonPinningStyles({ column: header.column }),
+                      }}
                     >
                       {header.isPlaceholder
                         ? null
@@ -87,7 +89,10 @@ export function ModifiedDataTable<TData>({
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}
-                      // className="border-r"
+                      style={{
+                        ...getCommonPinningStyles({ column: cell.column }),
+                      }}
+                      className="px-1"
                     >
                       {flexRender(
                         cell.column.columnDef.cell,
