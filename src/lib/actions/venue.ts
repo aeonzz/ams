@@ -78,10 +78,12 @@ export async function getVenues(input: GetVenuesSchema) {
   }
 }
 
-export async function getDepartmentVenues(input: GetVenuesSchema) {
+export async function getDepartmentVenues(
+  input: GetVenuesSchema & { departmentId: string }
+) {
   await checkAuth();
-  const user = await currentUser()
-  const { page, per_page, sort, name, status, from, to } = input;
+  const user = await currentUser();
+  const { page, per_page, sort, name, status, from, to, departmentId } = input;
 
   try {
     const skip = (page - 1) * per_page;
@@ -92,6 +94,7 @@ export async function getDepartmentVenues(input: GetVenuesSchema) {
     ];
 
     const where: any = {
+      departmentId: departmentId,
       isArchived: false,
     };
 
@@ -139,7 +142,6 @@ export async function getDepartmentVenues(input: GetVenuesSchema) {
     return { data: [], pageCount: 0 };
   }
 }
-
 
 export const createVenue = authedProcedure
   .createServerAction()

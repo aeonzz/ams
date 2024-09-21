@@ -45,8 +45,8 @@ export function getMenuList({
           `/department/${userDepartment.departmentId}/requests/pending`,
       },
       {
-        href: `/department/${userDepartment.departmentId}/facilities?page=1&per_page=10&sort=createdAt.desc`,
-        label: "Venue",
+        href: `/department/${userDepartment.departmentId}/facilities`,
+        label: "Facilites",
         active:
           pathname === `/department/${userDepartment.departmentId}/facilities`,
       },

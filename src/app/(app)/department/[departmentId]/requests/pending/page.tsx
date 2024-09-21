@@ -12,6 +12,7 @@ export interface ManageRequestPageProps {
   params: { departmentId: string };
   searchParams: SearchParams;
 }
+
 export default async function ManageRequestPage({
   params,
   searchParams,

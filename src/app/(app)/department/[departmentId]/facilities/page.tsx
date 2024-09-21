@@ -6,14 +6,13 @@ import { SearchParams } from "@/lib/types";
 import ManageVenueScreen from "./_components";
 
 export interface ManageVenuePage {
-  searchParams: SearchParams;
+  params: { departmentId: string };
 }
 
-export default function ManageVenuePage({ searchParams }: ManageVenuePage) {
-  const search = venueSearchParamsSchema.parse(searchParams);
+export default function ManageVenuePage({ params }: ManageVenuePage) {
   return (
     <ContentLayout title="Venues">
-      <ManageVenueScreen params={search} />
+      <ManageVenueScreen params={params.departmentId} />
     </ContentLayout>
   );
 }
