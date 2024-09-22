@@ -194,6 +194,55 @@ export function getStatusColor(
     }
   );
 }
+type VenueStatusColorConfig = {
+  color: string;
+  variant: BadgeVariant;
+  stroke: number;
+};
+
+type VenueStatusColorMap = {
+  [key in VenueStatusType]: VenueStatusColorConfig;
+};
+
+export function getVenueStatusColor(
+  status: VenueStatusType
+): VenueStatusColorConfig {
+  const venueStatusColors: VenueStatusColorMap = {
+    AVAILABLE: {
+      color: "#22c55e",
+      variant: "green",
+      stroke: 10,
+    },
+    IN_USE: {
+      color: "#eab308",
+      variant: "yellow",
+      stroke: 10,
+    },
+    UNDER_MAINTENANCE: {
+      color: "#ef4444",
+      variant: "red",
+      stroke: 10,
+    },
+    RESERVED: {
+      color: "#a855f7",
+      variant: "purple",
+      stroke: 10,
+    },
+    CLOSED: {
+      color: "#6b7280",
+      variant: "gray",
+      stroke: 10,
+    },
+  };
+
+  return (
+    venueStatusColors[status] || {
+      color: "#64748b",
+      variant: "gray",
+      stroke: 10,
+    }
+  );
+}
 
 type RequestTypeIconConfig = {
   icon: LucideIcon;

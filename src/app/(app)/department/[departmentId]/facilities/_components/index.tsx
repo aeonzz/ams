@@ -12,7 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   MapPin,
@@ -21,15 +21,24 @@ import {
   Archive,
   Loader2,
   CalendarX,
+  Dot,
+  Search,
+  ExternalLink,
 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import FetchDataError from "@/components/card/fetch-data-error";
-import { P } from "@/components/typography/text";
+import { H4, P } from "@/components/typography/text";
 import { Skeleton } from "@/components/ui/skeleton";
-import ManageVenueSkelton from "./manage-venue-skeleton";
+import DepartmentVenuesSkeleton from "./department-venues-skeleton";
+import { useRouter } from "next/navigation";
+import { cn, getVenueStatusColor, textTransform } from "@/lib/utils";
+import Image from "next/image";
+import { VenueFeaturesType } from "@/lib/types/venue";
+import SearchInput from "@/app/(app)/_components/search-input";
+import Link from "next/link";
 
-interface ManageVenueScreenProps {
-  params: string;
+interface DepartmentVenuesScreenProps {
+  departmentId: string;
 }
 
 const NoDataMessage = ({ message }: { message: string }) => (
@@ -39,18 +48,30 @@ const NoDataMessage = ({ message }: { message: string }) => (
   </div>
 );
 
-export default function ManageVenueScreen({ params }: ManageVenueScreenProps) {
+export default function DepartmentVenuesScreen({
+  departmentId,
+}: DepartmentVenuesScreenProps) {
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
 
   const { data, isLoading, refetch, isError } = useQuery<VenueWithRelations[]>({
     queryFn: async () => {
-      const res = await axios.get(`/api/venue/get-department-venues/${params}`);
-      return res.data.data;
+      try {
+        const res = await axios.get(
+          `/api/venue/get-department-venues/${departmentId}`
+        );
+        return res.data.data;
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          if (error.response?.status === 404) {
+            router.push("/not-found");
+          }
+        }
+        throw error;
+      }
     },
-    queryKey: [params],
+    queryKey: [departmentId],
   });
-
-  console.log(params);
 
   const filteredVenues =
     data?.filter(
@@ -63,77 +84,88 @@ export default function ManageVenueScreen({ params }: ManageVenueScreenProps) {
     <div className="flex h-full w-full flex-col">
       <div className="flex h-[50px] items-center justify-between border-b px-3">
         <P className="font-medium">Facilities</P>
-        <Input
-          type="text"
-          placeholder="Search facilities..."
-          className="h-9 w-[280px] bg-tertiary"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
+        <SearchInput />
       </div>
-      <ScrollArea className="flex-1 p-6">
+      <div className="scroll-bar flex flex-1 justify-center overflow-y-auto p-3">
         {isLoading ? (
-          <ManageVenueSkelton />
+          <DepartmentVenuesSkeleton />
         ) : isError ? (
-          <FetchDataError refetch={refetch} />
-        ) : filteredVenues.length === 0 ? (
-          <NoDataMessage message="No venues found. Try adjusting your search or add new venues." />
+          <div className="flex h-screen w-full items-center justify-center">
+            <FetchDataError refetch={refetch} />
+          </div>
+        ) : data?.length === 0 ? (
+          <NoDataMessage message="No facilities available." />
         ) : (
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {filteredVenues.map((venue) => (
-              <Card key={venue.id} className="overflow-hidden">
-                <img
-                  src={
-                    venue.imageUrl || "/placeholder.svg?height=200&width=300"
-                  }
-                  alt={venue.name}
-                  className="h-48 w-full object-cover"
-                />
-                <CardHeader>
-                  <CardTitle className="flex items-center justify-between">
-                    {venue.name}
-                    <Badge
-                      variant={
-                        venue.status === "AVAILABLE" ? "default" : "destructive"
-                      }
+          <div className="w-[1280px]">
+            <div className="relative mb-3">
+              <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 transform text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Search facilities..."
+                className="h-9 w-[280px] bg-tertiary pl-8"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            {filteredVenues.length === 0 ? (
+              <NoDataMessage message="No facilities found. Try adjusting your search" />
+            ) : (
+              <div className="grid grid-cols-1 gap-3 pb-3 md:grid-cols-2 lg:grid-cols-3">
+                {filteredVenues.map((venue) => {
+                  const status = getVenueStatusColor(venue.status);
+                  return (
+                    <Link
+                      href={`/department/${departmentId}/facilities/${venue.id}`}
                     >
-                      {venue.status}
-                    </Badge>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <div className="flex items-center">
-                      <MapPin className="mr-2 h-4 w-4 text-muted-foreground" />
-                      <span>{venue.location}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <Users className="mr-2 h-4 w-4 text-muted-foreground" />
-                      <span>Capacity: {venue.capacity}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <Calendar className="mr-2 h-4 w-4 text-muted-foreground" />
-                      <span>
-                        Last Updated:{" "}
-                        {new Date(venue.updatedAt).toLocaleDateString()}
-                      </span>
-                    </div>
-                    {venue.isArchived && (
-                      <div className="flex items-center text-yellow-500">
-                        <Archive className="mr-2 h-4 w-4" />
-                        <span>Archived</span>
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button className="w-full">Manage Venue</Button>
-                </CardFooter>
-              </Card>
-            ))}
+                      <Card
+                        key={venue.id}
+                        className="relative cursor-pointer overflow-hidden shadow-md transition-all hover:border-primary"
+                      >
+                        <div className="relative aspect-video h-48 w-full">
+                          <Image
+                            src={venue.imageUrl}
+                            alt={`Image of ${venue.name}`}
+                            fill
+                            priority
+                            className="object-cover"
+                          />
+                        </div>
+                        <CardHeader className="p-3">
+                          <CardTitle className="flex max-w-64 items-center justify-between">
+                            <H4 className="truncate">{venue.name}</H4>
+                          </CardTitle>
+                          <div className="flex items-center justify-between">
+                            <Badge variant={status.variant} className="pr-3.5">
+                              <Dot
+                                className="mr-1 size-3"
+                                strokeWidth={status.stroke}
+                                color={status.color}
+                              />
+                              {textTransform(venue.status)}
+                            </Badge>
+                            <Link
+                              href={`/department/${departmentId}/facilities/${venue.id}`}
+                              className={cn(
+                                buttonVariants({
+                                  variant: "ghost2",
+                                  size: "icon",
+                                })
+                              )}
+                              prefetch
+                            >
+                              <ExternalLink className="size-5" />
+                            </Link>
+                          </div>
+                        </CardHeader>
+                      </Card>
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
           </div>
         )}
-      </ScrollArea>
+      </div>
     </div>
   );
 }

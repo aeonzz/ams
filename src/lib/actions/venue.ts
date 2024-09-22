@@ -181,8 +181,12 @@ export const updateVenue = authedProcedure
   .createServerAction()
   .input(extendedUpdateVenueServerSchema)
   .handler(async ({ ctx, input }) => {
-    const { path, id, imageUrl, departmentId, ...rest } = input;
+    const { path, id, imageUrl, departmentId, features, ...rest } = input;
     try {
+      const featuresWithIds = features?.map((feature) => ({
+        id: generateId(15),
+        name: feature,
+      }));
       await db.venue.update({
         where: {
           id: id,
@@ -190,6 +194,7 @@ export const updateVenue = authedProcedure
         data: {
           imageUrl: imageUrl && imageUrl[0],
           departmentId: departmentId,
+          features: featuresWithIds,
           ...rest,
         },
       });

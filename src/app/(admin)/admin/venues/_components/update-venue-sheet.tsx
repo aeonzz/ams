@@ -27,6 +27,7 @@ import {
   type Department,
   VenueStatusSchema,
   type Venue,
+  VenueTypeSchema,
 } from "prisma/generated/zod";
 import {
   Command,
@@ -67,6 +68,8 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { UpdateVenueSheetSkeleton } from "./update-venue-sheet-skeleton";
+import VenueFeatures from "./venue-features";
+import { VenueFeaturesType } from "@/lib/types/venue";
 
 interface UpdateDeparVenueProps
   extends React.ComponentPropsWithRef<typeof Sheet> {
@@ -75,6 +78,10 @@ interface UpdateDeparVenueProps
 
 export function UpdateVenueSheet({ venue, ...props }: UpdateDeparVenueProps) {
   const [open, setOpen] = React.useState(false);
+  const [venueType, setVenueType] = React.useState(false);
+  const [featuresError, setFeaturesError] = React.useState<string | undefined>(
+    undefined
+  );
   const pathname = usePathname();
   const form = useForm<UpdateVenueSchema>({
     resolver: zodResolver(updateVenueSchema),
@@ -85,6 +92,10 @@ export function UpdateVenueSheet({ venue, ...props }: UpdateDeparVenueProps) {
       status: venue.status,
       departmentId: venue.departmentId,
       imageUrl: undefined,
+      venueType: venue.venueType,
+      features: Array.isArray(venue.features)
+        ? (venue.features as VenueFeaturesType[]).map((feature) => feature.name)
+        : undefined,
     },
   });
 
@@ -109,10 +120,17 @@ export function UpdateVenueSheet({ venue, ...props }: UpdateDeparVenueProps) {
       status: venue.status,
       departmentId: venue.departmentId,
       imageUrl: undefined,
+      venueType: venue.venueType,
+      features: Array.isArray(venue.features)
+        ? (venue.features as VenueFeaturesType[]).map((feature) => feature.name)
+        : undefined,
     });
   }, [venue, form, props.open]);
 
   async function onSubmit(values: UpdateVenueSchema) {
+    if (featuresError) {
+      return;
+    }
     try {
       let uploadedFilesResult: { filePath: string }[] = [];
 
@@ -125,6 +143,8 @@ export function UpdateVenueSheet({ venue, ...props }: UpdateDeparVenueProps) {
         path: pathname,
         name: values.name,
         departmentId: values.departmentId,
+        venueType: values.venueType,
+        features: values.features,
         location: values.location,
         capacity: values.capacity,
         status: values.status,
@@ -241,7 +261,7 @@ export function UpdateVenueSheet({ venue, ...props }: UpdateDeparVenueProps) {
                       >
                         <FormControl>
                           <SelectTrigger
-                            className="bg-secondary capitalize"
+                            className="bg-transparent capitalize"
                             disabled={isPending || isUploading}
                           >
                             <SelectValue placeholder="Select a role" />
@@ -340,6 +360,80 @@ export function UpdateVenueSheet({ venue, ...props }: UpdateDeparVenueProps) {
                       </Popover>
                       <FormMessage />
                     </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="venueType"
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel>Venue type</FormLabel>
+                      <Popover open={venueType} onOpenChange={setVenueType}>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              disabled={isUploading || isPending}
+                              role="combobox"
+                              className="w-full flex-1 justify-between text-muted-foreground"
+                            >
+                              <span className="truncate">
+                                {field.value
+                                  ? textTransform(field.value)
+                                  : "Select venue type"}
+                              </span>
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="p-0">
+                          <Command className="max-h-72">
+                            <CommandInput placeholder="Search type..." />
+                            <CommandList>
+                              <CommandEmpty>No type found.</CommandEmpty>
+                              <CommandGroup>
+                                {VenueTypeSchema.options.map((venue, index) => (
+                                  <CommandItem
+                                    value={venue}
+                                    key={index}
+                                    onSelect={() => {
+                                      field.onChange(
+                                        venue === field.value ? "" : venue
+                                      );
+                                      // form.setValue("venueType", venue);
+                                      setVenueType(false);
+                                    }}
+                                  >
+                                    {textTransform(venue)}
+                                    <Check
+                                      className={cn(
+                                        "ml-auto h-4 w-4",
+                                        venue === field.value
+                                          ? "opacity-100"
+                                          : "opacity-0"
+                                      )}
+                                    />
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="features"
+                  render={({ field }) => (
+                    <VenueFeatures
+                      field={field}
+                      disabled={isPending || isUploading}
+                      error={featuresError}
+                      setError={setFeaturesError}
+                    />
                   )}
                 />
                 <FormField

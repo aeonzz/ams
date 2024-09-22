@@ -28,6 +28,7 @@ export const updateVenueSchemaServer = z.object({
   location: z.string().optional(),
   departmentId: z.string().optional(),
   venueType: VenueTypeSchema.optional(),
+  features: z.array(z.string()).optional(),
   capacity: z.number().optional(),
   imageUrl: z.array(z.string()).optional(),
   status: VenueStatusSchema.optional(),

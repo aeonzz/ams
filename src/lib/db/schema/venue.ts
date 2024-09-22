@@ -25,6 +25,7 @@ export const updateVenueSchema = z.object({
   location: z.string().optional(),
   departmentId: z.string().optional(),
   venueType: VenueTypeSchema.optional(),
+  features: z.array(z.string()).optional(),
   capacity: z.preprocess((val) => Number(val), z.number().optional()),
   imageUrl: z.array(z.instanceof(File)).optional(),
   status: VenueStatusSchema,

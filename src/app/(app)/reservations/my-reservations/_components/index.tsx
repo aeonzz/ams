@@ -50,7 +50,7 @@ export default function MyReservationsScreen() {
         <P className="font-medium">My Reservations</P>
         <SearchInput />
       </div>
-      <div className="scroll-bar flex-1 overflow-y-auto p-6">
+      <div className="scroll-bar flex-1 overflow-y-auto p-3">
         <Tabs defaultValue="all" className="w-full">
           <TabsList className="mb-4">
             <TabsTrigger value="all">All</TabsTrigger>

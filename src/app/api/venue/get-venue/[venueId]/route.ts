@@ -1,23 +1,36 @@
 import { NextRequest, NextResponse } from "next/server";
-import { withRoles } from "@/middleware/withRole";
 import { db } from "@/lib/db/index";
-import { redirect } from "next/navigation";
 
 interface Context {
   params: {
-    departmentId: string;
+    venueId: string;
   };
 }
 
 export async function GET(request: NextRequest, params: Context) {
   try {
-    const result = await db.venue.findMany({
+    const isVenueExist = await db.venue.findUnique({
       where: {
-        isArchived: false,
-        departmentId: params.params.departmentId,
+        id: params.params.venueId,
       },
-      orderBy: {
-        createdAt: "desc",
+    });
+
+    if (!isVenueExist) {
+      return NextResponse.json({ error: "Venue not found" }, { status: 404 });
+    }
+
+    const result = await db.venue.findFirst({
+      where: {
+        id: params.params.venueId,
+        isArchived: false,
+      },
+      include: {
+        department: true,
+        requests: {
+          include: {
+            request: true,
+          },
+        },
       },
     });
 

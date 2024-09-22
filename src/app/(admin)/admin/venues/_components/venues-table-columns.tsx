@@ -87,7 +87,7 @@ export function getVenuesColumns(): ColumnDef<VenueTableType>[] {
                   />
                 </div>
               </DialogTrigger>
-              <DialogContent className="aspect-square min-h-[80vh] max-w-xl">
+              <DialogContent className="aspect-square w-[80vw]">
                 <Image
                   src={row.original.imageUrl}
                   alt={`Image of ${row.original.name}`}
