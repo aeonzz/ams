@@ -30,6 +30,7 @@ export { JobStatusSchema } from './JobStatusSchema';
 export { ChangeTypeSchema } from './ChangeTypeSchema';
 export { EntityTypeSchema } from './EntityTypeSchema';
 export { JobTypeSchema } from './JobTypeSchema';
+export { VenueTypeSchema } from './VenueTypeSchema';
 export { ItemStatusSchema } from './ItemStatusSchema';
 export { SupplyItemCategorySchema } from './SupplyItemCategorySchema';
 export { SupplyItemStatusSchema } from './SupplyItemStatusSchema';

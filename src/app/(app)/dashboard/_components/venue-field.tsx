@@ -56,7 +56,7 @@ export default function VenueField({
       name={name}
       render={({ field }) => (
         <FormItem className="flex flex-col">
-          <FormLabel className="text-muted-foreground">Venue</FormLabel>
+          <FormLabel>Venue</FormLabel>
           <Popover open={open} onOpenChange={setOpen} modal>
             <PopoverTrigger asChild>
               <FormControl>

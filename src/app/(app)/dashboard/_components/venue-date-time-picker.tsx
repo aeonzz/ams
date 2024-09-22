@@ -154,7 +154,7 @@ export default function VenueDateTimePicker<T extends FieldValues>({
         name={name}
         render={({ field }) => (
           <FormItem className="flex flex-col">
-            <FormLabel className="text-left text-muted-foreground">
+            <FormLabel className="text-left">
               {label}
             </FormLabel>
             <Popover modal>
@@ -209,6 +209,7 @@ export default function VenueDateTimePicker<T extends FieldValues>({
                       }
                     }}
                     initialFocus
+                    disabled={isDateInPast}
                   />
                   <div className="flex">
                     <div className="space-y-3 p-3">
@@ -263,7 +264,7 @@ export default function VenueDateTimePicker<T extends FieldValues>({
                         ))}
                       </div>
                     </div>
-                    {reservationsForSelectedDate.length > 0 && (
+                    {/* {reservationsForSelectedDate.length > 0 && (
                       <div className="w-48 p-3">
                         <P className="mb-2 font-semibold">
                           Reservations for{" "}
@@ -309,7 +310,7 @@ export default function VenueDateTimePicker<T extends FieldValues>({
                           )}
                         </div>
                       </div>
-                    )}
+                    )} */}
                   </div>
                 </div>
               </PopoverContent>

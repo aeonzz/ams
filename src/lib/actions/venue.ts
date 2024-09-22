@@ -19,7 +19,7 @@ import { currentUser } from "./users";
 
 export async function getVenues(input: GetVenuesSchema) {
   await checkAuth();
-  const { page, per_page, sort, name, status, from, to } = input;
+  const { page, per_page, sort, name, status, venueType, from, to } = input;
 
   try {
     const skip = (page - 1) * per_page;
@@ -39,6 +39,10 @@ export async function getVenues(input: GetVenuesSchema) {
 
     if (status) {
       where.status = { in: status.split(".") };
+    }
+
+    if (venueType) {
+      where.venueType = { in: venueType.split(".") };
     }
 
     if (from && to) {
@@ -147,14 +151,22 @@ export const createVenue = authedProcedure
   .createServerAction()
   .input(createVenueSchemaWithPath)
   .handler(async ({ input, ctx }) => {
-    const { path, imageUrl, departmenId, ...rest } = input;
+    const { path, imageUrl, departmenId, features, ...rest } = input;
+
     try {
       const venueId = generateId(15);
+
+      const featuresWithIds = features?.map((feature) => ({
+        id: generateId(15),
+        name: feature,
+      }));
+
       await db.venue.create({
         data: {
           id: venueId,
           imageUrl: imageUrl[0],
           departmentId: departmenId,
+          features: featuresWithIds,
           ...rest,
         },
       });

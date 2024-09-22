@@ -1,4 +1,4 @@
-import { VenueStatusSchema } from "prisma/generated/zod";
+import { VenueStatusSchema, VenueTypeSchema } from "prisma/generated/zod";
 import { z } from "zod";
 
 export const createVenueSchemaServer = z.object({
@@ -6,6 +6,8 @@ export const createVenueSchemaServer = z.object({
   location: z.string(),
   departmenId: z.string(),
   capacity: z.number(),
+  venueType: VenueTypeSchema,
+  features: z.array(z.string()).optional(),
   imageUrl: z.array(
     z.string({
       required_error: "Image is required",
@@ -25,6 +27,7 @@ export const updateVenueSchemaServer = z.object({
   name: z.string().optional(),
   location: z.string().optional(),
   departmentId: z.string().optional(),
+  venueType: VenueTypeSchema.optional(),
   capacity: z.number().optional(),
   imageUrl: z.array(z.string()).optional(),
   status: VenueStatusSchema.optional(),

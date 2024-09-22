@@ -35,6 +35,7 @@ import { UpdateVenueSheet } from "./update-venue-sheet";
 import { DeleteVenuesDialog } from "./delete-venues-dialog";
 import { formatDate } from "date-fns";
 import type { VenueTableType } from "./types";
+import { VenueFeaturesType } from "@/lib/types/venue";
 
 export function getVenuesColumns(): ColumnDef<VenueTableType>[] {
   return [
@@ -110,6 +111,44 @@ export function getVenuesColumns(): ColumnDef<VenueTableType>[] {
         return (
           <div className="flex space-x-2">
             <P className="truncate font-medium">{row.original.name}</P>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "venueType",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Type" />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="flex space-x-2">
+            <Badge variant="outline">
+              {textTransform(row.original.venueType)}
+            </Badge>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "features",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Features" />
+      ),
+      cell: ({ row }) => {
+        const features = row.original.features as VenueFeaturesType[];
+        if (!features || features.length === 0) {
+          return <P className="text-muted-foreground">No features</P>;
+        }
+
+        return (
+          <div className="flex flex-wrap">
+            {features.map((feature, index) => (
+              <P>
+                {feature.name}
+                {features.length - 1 !== index && ", "}
+              </P>
+            ))}
           </div>
         );
       },

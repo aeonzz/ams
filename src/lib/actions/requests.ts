@@ -194,12 +194,7 @@ export const createVenueRequest = authedProcedure
                     rest.otherPurpose,
                   ].join(", ")
                 : rest.purpose.join(", "),
-              setupRequirements: rest.setupRequirements.includes("other")
-                ? [
-                    ...rest.setupRequirements.filter((s) => s !== "other"),
-                    rest.otherSetupRequirement,
-                  ].join(", ")
-                : rest.setupRequirements.join(", "),
+              setupRequirements: rest.setupRequirements.join(", "),
               notes: rest.notes,
               venueId: rest.venueId,
             },

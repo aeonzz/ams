@@ -14,7 +14,14 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { MapPin, Users, Calendar, Archive, Loader2, CalendarX } from "lucide-react";
+import {
+  MapPin,
+  Users,
+  Calendar,
+  Archive,
+  Loader2,
+  CalendarX,
+} from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import FetchDataError from "@/components/card/fetch-data-error";
 import { P } from "@/components/typography/text";
@@ -43,7 +50,7 @@ export default function ManageVenueScreen({ params }: ManageVenueScreenProps) {
     queryKey: [params],
   });
 
-  console.log(params)
+  console.log(params);
 
   const filteredVenues =
     data?.filter(
@@ -66,11 +73,7 @@ export default function ManageVenueScreen({ params }: ManageVenueScreenProps) {
       </div>
       <ScrollArea className="flex-1 p-6">
         {isLoading ? (
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {[...Array(6)].map((_, index) => (
-              <ManageVenueSkelton key={index} />
-            ))}
-          </div>
+          <ManageVenueSkelton />
         ) : isError ? (
           <FetchDataError refetch={refetch} />
         ) : filteredVenues.length === 0 ? (

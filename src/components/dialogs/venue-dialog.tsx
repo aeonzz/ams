@@ -47,9 +47,7 @@ export default function VenueDialog() {
       startTime: undefined,
       endTime: undefined,
       otherPurpose: "",
-      otherSetupRequirement: "",
-      purpose: ["Lecture/Forum/Symposium"],
-      setupRequirements: ["Slide Viewing"],
+      purpose: [],
     },
   });
 
@@ -85,7 +83,7 @@ export default function VenueDialog() {
             setAlertOpen(true);
           }
         }}
-        className={cn(venueId ? "max-w-4xl" : "max-w-2xl")}
+        className={cn(venueId ? "max-w-5xl" : "max-w-2xl")}
         isLoading={isPending}
       >
         <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>

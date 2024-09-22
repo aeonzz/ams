@@ -22,6 +22,11 @@ export async function GET(req: Request, params: Context) {
             title: true,
             department: true,
             user: true,
+            venueRequest: {
+              select: {
+                venue: true,
+              }
+            }
           },
         },
       },

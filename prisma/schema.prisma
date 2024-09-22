@@ -67,7 +67,7 @@ model Department {
 }
 
 model UserDepartment {
-  id           String     @id 
+  id           String     @id
   userId       String
   user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   departmentId String
@@ -75,7 +75,7 @@ model UserDepartment {
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 
-  @@unique([userId, departmentId]) 
+  @@unique([userId, departmentId])
 }
 
 model UserRole {
@@ -203,6 +203,8 @@ model Venue {
   location     String
   capacity     Int
   imageUrl     String
+  venueType    VenueType
+  features     Json?
   isArchived   Boolean        @default(false)
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
@@ -377,6 +379,16 @@ enum JobType {
   TRANSPORT_VEHICLE_MAINTENANCE
   SPECIAL_PROJECTS
   RESOURCE_SETUP_BREAKDOWN
+}
+
+enum VenueType {
+  CLASSROOM
+  AUDITORIUM
+  SPORTS_HALL
+  LAB
+  CONFERENCE_ROOM
+  LIBRARY
+  OTHER
 }
 
 model MaintenanceRecord {

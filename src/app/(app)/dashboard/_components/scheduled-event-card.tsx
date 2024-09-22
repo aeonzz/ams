@@ -6,6 +6,7 @@ import { type ReservedDatesAndTimes } from "@/lib/schema/utils";
 import { cn, formatFullName, getStatusColor, textTransform } from "@/lib/utils";
 import { format } from "date-fns";
 import { Dot } from "lucide-react";
+import Image from "next/image";
 import React from "react";
 
 interface ScheduledEventCardProps {
@@ -17,6 +18,14 @@ export default function ScheduledEventCard({ data }: ScheduledEventCardProps) {
   return (
     <Card className="mb-2 bg-secondary">
       <CardHeader>
+        <div className="relative aspect-video h-20">
+          <Image
+            src={data.request.venueRequest.venue.imageUrl}
+            alt={`Image of ${data.request.venueRequest.venue.name}`}
+            fill
+            className="rounded-md border object-cover"
+          />
+        </div>
         <CardTitle className="truncate">{data.request.title}</CardTitle>
         <div className="flex flex-col space-y-2">
           <div className="flex items-center space-x-2 rounded-sm border p-2">

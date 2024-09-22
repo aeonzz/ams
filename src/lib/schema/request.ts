@@ -66,7 +66,6 @@ export const venueRequestSchemaBase = z.object({
     .refine((value) => value.some((item) => item), {
       message: "You have to select at least one item.",
     }),
-  otherSetupRequirement: z.string().optional(),
   notes: z.string().optional(),
 });
 

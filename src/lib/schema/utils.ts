@@ -2,6 +2,7 @@ import {
   DepartmentSchema,
   RequestStatusTypeSchema,
   UserSchema,
+  VenueSchema,
 } from "prisma/generated/zod";
 import { z } from "zod";
 
@@ -14,6 +15,9 @@ export const reservedDateTimeSchema = z.object({
     title: z.string(),
     department: DepartmentSchema,
     user: UserSchema,
+    venueRequest: z.object({
+      venue: VenueSchema,
+    }),
   }),
 });
 

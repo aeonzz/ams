@@ -47,6 +47,7 @@ export const venueSearchParamsSchema = z.object({
   sort: z.string().optional(),
   name: z.string().optional(),
   status: z.string().optional(),
+  venueType: z.string().optional(),
   from: z.string().optional(),
   to: z.string().optional(),
 });

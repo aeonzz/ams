@@ -12,16 +12,6 @@ import {
   Camera,
   Check,
   ChevronsUpDown,
-  CircleArrowUp,
-  Cog,
-  Construction,
-  FileQuestion,
-  Laptop,
-  Leaf,
-  Paintbrush,
-  PenTool,
-  PocketKnife,
-  Wrench,
 } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
 import {

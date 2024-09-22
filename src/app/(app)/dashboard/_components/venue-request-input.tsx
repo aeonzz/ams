@@ -47,6 +47,8 @@ import VenueField from "./venue-field";
 import VenueDateTimePicker from "./venue-date-time-picker";
 import { type Venue } from "prisma/generated/zod";
 import VenueRequestInputSkeleton from "./venue-request-input-skeleton";
+import { VenueFeaturesType } from "@/lib/types/venue";
+import ScheduledEventCardSkeleton from "./scheduled-event-card-skeleton";
 
 const purpose = [
   {
@@ -68,33 +70,6 @@ const purpose = [
   {
     id: "College Meeting/Conference",
     label: "College Meeting/Conference",
-  },
-  {
-    id: "other",
-    label: "Others",
-  },
-] as const;
-
-const setup = [
-  {
-    id: "Slide Viewing",
-    label: "Slide Viewing",
-  },
-  {
-    id: "Overhead Projector",
-    label: "Overhead Projector",
-  },
-  {
-    id: "TV",
-    label: "TV",
-  },
-  {
-    id: "Video Player",
-    label: "Video Player",
-  },
-  {
-    id: "Data Projector (LCD Projector)",
-    label: "Data Projector (LCD Projector)",
   },
   {
     id: "other",
@@ -126,7 +101,6 @@ export default function VenueRequestInput({
 }: VenueRequestInputProps) {
   const pathname = usePathname();
   const currentUser = useSession();
-  const { department } = currentUser;
   const queryClient = useQueryClient();
   const venueId = form.watch("venueId");
 
@@ -150,6 +124,10 @@ export default function VenueRequestInput({
     enabled: !!venueId,
     refetchOnWindowFocus: false,
   });
+
+  const selectedVenue = React.useMemo(() => {
+    return venueData?.find((venue) => venue.id === venueId);
+  }, [venueData, venueId]);
 
   React.useEffect(() => {
     if (venueId) {
@@ -194,13 +172,17 @@ export default function VenueRequestInput({
 
   async function onSubmit(values: VenueRequestSchema) {
     const { startTime, endTime } = values;
-    
+
     const startDate = new Date(startTime);
     const endDate = new Date(endTime);
-    
-    if (startDate.getTime() === endDate.getTime() && 
-        startDate.toDateString() === endDate.toDateString()) {
-      toast.error("Start time and end time cannot be the same on the same day.");
+
+    if (
+      startDate.getTime() === endDate.getTime() &&
+      startDate.toDateString() === endDate.toDateString()
+    ) {
+      toast.error(
+        "Start time and end time cannot be the same on the same day."
+      );
       return;
     }
 
@@ -221,11 +203,20 @@ export default function VenueRequestInput({
       return;
     }
 
+    const selectedVenue = venueData?.find(
+      (venue) => venue.id === values.venueId
+    );
+
+    if (!selectedVenue) {
+      toast.error("Selected venue not found.");
+      return;
+    }
+
     const data: ExtendedVenueRequestSchema = {
       ...values,
       priority: "LOW",
       type: type,
-      departmentId: department?.id || "f",
+      departmentId: selectedVenue.departmentId,
       path: pathname,
     };
 
@@ -282,7 +273,7 @@ export default function VenueRequestInput({
                 name="notes"
                 render={({ field }) => (
                   <FormItem className="flex flex-grow flex-col">
-                    <FormLabel className="text-left text-muted-foreground">
+                    <FormLabel className="text-left">
                       Notes
                     </FormLabel>
                     <FormControl>
@@ -300,13 +291,13 @@ export default function VenueRequestInput({
                 )}
               />
             </div>
-            <div className="flex flex-1 flex-col space-y-6">
+            <div className="flex flex-1 flex-col space-y-6 overflow-hidden">
               <FormField
                 control={form.control}
                 name="purpose"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-muted-foreground">
+                    <FormLabel>
                       Purpose
                     </FormLabel>
                     <div className="space-y-4">
@@ -339,7 +330,7 @@ export default function VenueRequestInput({
                                     }}
                                   />
                                 </FormControl>
-                                <FormLabel className="font-normal">
+                                <FormLabel className="truncate font-normal">
                                   {item.label}
                                 </FormLabel>
                               </FormItem>
@@ -376,90 +367,70 @@ export default function VenueRequestInput({
                 name="setupRequirements"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-muted-foreground">
-                      Equipment needed
+                    <FormLabel>
+                      Venue Features
                     </FormLabel>
                     <div className="space-y-4">
-                      {setup.map((item) => (
-                        <FormField
-                          key={item.id}
-                          control={form.control}
-                          name="setupRequirements"
-                          render={({ field }) => {
-                            return (
-                              <FormItem
-                                key={item.id}
-                                className="flex flex-row items-start space-x-3 space-y-0"
-                              >
-                                <FormControl>
-                                  <Checkbox
-                                    disabled={isPending}
-                                    checked={field.value?.includes(item.id)}
-                                    onCheckedChange={(checked) => {
-                                      return checked
-                                        ? field.onChange([
-                                            ...field.value,
-                                            item.id,
-                                          ])
-                                        : field.onChange(
-                                            field.value?.filter(
-                                              (value) => value !== item.id
-                                            )
-                                          );
-                                    }}
-                                  />
-                                </FormControl>
-                                <FormLabel className="font-normal">
-                                  {item.label}
-                                </FormLabel>
-                              </FormItem>
-                            );
-                          }}
-                        />
-                      ))}
+                      {selectedVenue?.features &&
+                        (selectedVenue.features as VenueFeaturesType[]).map(
+                          (feature) => (
+                            <FormItem
+                              key={feature.id}
+                              className="flex flex-row items-start space-x-3 space-y-0"
+                            >
+                              <FormControl>
+                                <Checkbox
+                                  disabled={isPending}
+                                  checked={field.value?.includes(feature.name)}
+                                  onCheckedChange={(checked) => {
+                                    const updatedValue = checked
+                                      ? [...(field.value || []), feature.name]
+                                      : (field.value || []).filter(
+                                          (value) => value !== feature.name
+                                        );
+                                    field.onChange(updatedValue);
+                                  }}
+                                />
+                              </FormControl>
+                              <FormLabel className="truncate break-all font-normal">
+                                {feature.name}
+                              </FormLabel>
+                            </FormItem>
+                          )
+                        )}
                     </div>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              {form.watch("setupRequirements").includes("other") && (
-                <FormField
-                  control={form.control}
-                  name="otherSetupRequirement"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Other Equipment</FormLabel>
-                      <FormControl>
-                        <Input
-                          disabled={isPending}
-                          {...field}
-                          placeholder="Specify other equipment"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
             </div>
             {venueId && (
               <div
-                className={cn("scroll-bar max-h-[60vh] w-72 overflow-y-auto")}
+                className={cn("scroll-bar max-h-[60vh] flex-1 overflow-y-auto")}
               >
                 <P className="mb-2 font-semibold">Schedules</P>
                 {isLoading || isRefetching ? (
-                  <div className="grid h-32 w-full place-items-center">
-                    <LoadingSpinner />
-                  </div>
+                  <ScheduledEventCardSkeleton />
                 ) : !data || data.length === 0 ? (
                   <div className="grid h-32 w-full place-items-center">
                     <P>No reserved schedules</P>
                   </div>
                 ) : (
                   <>
-                    {data.map((item, index) => (
-                      <ScheduledEventCard key={index} data={item} />
-                    ))}
+                    {(() => {
+                      const filteredData = data.filter(
+                        (item) => item.request.venueRequest.venue.id === venueId
+                      );
+                      return filteredData.length === 0 ? (
+                        <div className="grid h-32 w-full place-items-center">
+                          <P>No reserved schedules</P>
+                        </div>
+                      ) : (
+                        filteredData.map((item, index) => (
+                          <ScheduledEventCard key={index} data={item} />
+                        ))
+                      );
+                    })()}
                   </>
                 )}
               </div>
