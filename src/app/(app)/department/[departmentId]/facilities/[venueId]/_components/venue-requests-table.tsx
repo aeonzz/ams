@@ -36,7 +36,6 @@ interface VenueRequestsTableProps {
 export default function VenueRequestsTable({
   requests,
 }: VenueRequestsTableProps) {
-  console.log(requests);
   const [globalFilter, setGlobalFilter] = React.useState("");
 
   const columns: ColumnDef<VenueRequestsTableType>[] = React.useMemo(

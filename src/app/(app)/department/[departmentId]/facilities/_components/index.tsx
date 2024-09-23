@@ -38,6 +38,7 @@ import { VenueFeaturesType } from "@/lib/types/venue";
 import SearchInput from "@/app/(app)/_components/search-input";
 import Link from "next/link";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
+import NotFound from "@/app/not-found";
 
 interface DepartmentVenuesScreenProps {
   departmentId: string;
@@ -57,23 +58,16 @@ export default function DepartmentVenuesScreen({
   const dialogManager = useDialogManager();
   const [searchTerm, setSearchTerm] = useState("");
 
-  const { data, isLoading, refetch, isError } = useQuery<VenueWithRelations[]>({
+  const { data, isLoading, refetch, isError, error } = useQuery<
+    VenueWithRelations[]
+  >({
     queryFn: async () => {
-      try {
-        const res = await axios.get(
-          `/api/venue/get-department-venues/${departmentId}`
-        );
-        return res.data.data;
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          if (error.response?.status === 404) {
-            router.push("/not-found");
-          }
-        }
-        throw error;
-      }
+      const res = await axios.get(
+        `/api/venue/get-department-venues/${departmentId}`
+      );
+      return res.data.data;
     },
-    queryKey: [departmentId],
+    queryKey: ["department-venues", departmentId],
   });
 
   const filteredVenues =
@@ -82,6 +76,10 @@ export default function DepartmentVenuesScreen({
         venue.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         venue.location.toLowerCase().includes(searchTerm.toLowerCase())
     ) || [];
+
+  if (isError && axios.isAxiosError(error) && error.response?.status === 404) {
+    return <NotFound />;
+  }
 
   return (
     <div className="flex h-full w-full flex-col">

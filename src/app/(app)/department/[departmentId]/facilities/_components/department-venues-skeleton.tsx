@@ -26,7 +26,7 @@ export default function DepartmentVenuesSkeleton() {
                 <Skeleton className="h-5 w-20" />
               </div>
             </CardHeader>
-            <CardContent>
+            {/* <CardContent>
               <div className="space-y-4">
                 {[...Array(3)].map((_, i) => (
                   <div key={i} className="flex items-center space-x-2">
@@ -35,7 +35,7 @@ export default function DepartmentVenuesSkeleton() {
                   </div>
                 ))}
               </div>
-            </CardContent>
+            </CardContent> */}
             <CardFooter>
               <Skeleton className="h-9 w-full" />
             </CardFooter>

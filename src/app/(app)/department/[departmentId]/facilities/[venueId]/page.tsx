@@ -9,11 +9,9 @@ export interface ManageVenuePage {
 }
 
 export default function ManageVenuePage({ params }: ManageVenuePage) {
-  const { departmentId, venueId } = params;
-
   return (
     <ContentLayout title="Venues">
-      <ManageVenueScreen venueId={venueId} />
+      <ManageVenueScreen params={params} />
     </ContentLayout>
   );
 }

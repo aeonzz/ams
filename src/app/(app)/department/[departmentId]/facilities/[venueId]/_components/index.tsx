@@ -13,6 +13,7 @@ import {
   CalendarX,
   Dot,
   Search,
+  ChevronLeft,
 } from "lucide-react";
 import { H1, H4, H5, P } from "@/components/typography/text";
 import SearchInput from "@/app/(app)/_components/search-input";
@@ -20,30 +21,45 @@ import FetchDataError from "@/components/card/fetch-data-error";
 import NotFound from "@/app/not-found";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
-import { getVenueStatusColor, textTransform } from "@/lib/utils";
+import { cn, getVenueStatusColor, textTransform } from "@/lib/utils";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { VenueFeaturesType } from "@/lib/types/venue";
 import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
 import VenueRequestsTable from "./venue-requests-table";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { UpdateVenueSheet } from "@/app/(admin)/admin/venues/_components/update-venue-sheet";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import ManageVenueSkeleton from "./manage-venue-skeleton";
+import { useSession } from "@/lib/hooks/use-session";
+import { PermissionGuard } from "@/components/permission-guard";
 
 interface ManageVenueScreenProps {
-  venueId: string;
+  params: {
+    departmentId: string;
+    venueId: string;
+  };
 }
 
-export default function ManageVenueScreen({ venueId }: ManageVenueScreenProps) {
+export default function ManageVenueScreen({ params }: ManageVenueScreenProps) {
+  const currentUser = useSession();
+  const router = useRouter();
+  const { departmentId, venueId } = params;
   const [showUpdateVenueSheet, setShowUpdateVenueSheet] = React.useState(false);
-  const { data, isLoading, refetch, isError } = useQuery<VenueWithRelations>({
-    queryFn: async () => {
-      const res = await axios.get(`/api/venue/get-venue/${venueId}`);
-      return res.data.data;
-    },
-    queryKey: [venueId],
-  });
+  const { data, isLoading, refetch, isError, error } =
+    useQuery<VenueWithRelations>({
+      queryFn: async () => {
+        const res = await axios.get(`/api/venue/get-venue/${venueId}`);
+        return res.data.data;
+      },
+      queryKey: ["venue-details", venueId],
+    });
 
-  if (isLoading) return <h1>Loading...</h1>;
+  if (isLoading) return <ManageVenueSkeleton />;
+  if (isError && axios.isAxiosError(error) && error.response?.status === 404) {
+    return <NotFound />;
+  }
   if (isError)
     return (
       <div className="flex h-screen w-full items-center justify-center">
@@ -66,7 +82,12 @@ export default function ManageVenueScreen({ venueId }: ManageVenueScreenProps) {
   return (
     <div className="flex h-full w-full flex-col">
       <div className="flex h-[50px] items-center justify-between border-b px-3">
-        <H5 className="truncate font-semibold">{data.name}</H5>
+        <div className="flex items-center gap-1">
+          <Button variant="ghost2" size="icon" onClick={() => router.back()}>
+            <ChevronLeft className="size-4" />
+          </Button>
+          <H5 className="truncate font-semibold">{data.name}</H5>
+        </div>
         <SearchInput />
       </div>
       <div className="scroll-bar container flex h-full overflow-y-auto p-0">
@@ -109,20 +130,32 @@ export default function ManageVenueScreen({ venueId }: ManageVenueScreenProps) {
                 <UpdateVenueSheet
                   open={showUpdateVenueSheet}
                   onOpenChange={setShowUpdateVenueSheet}
-                  queryKey={venueId}
+                  queryKey={["venue-details", venueId]}
                   removeField
                   //@ts-ignore
                   venue={data}
                 />
-                <Button
-                  className="flex-1"
-                  onClick={() => setShowUpdateVenueSheet(true)}
+                <PermissionGuard
+                  allowedRoles={["DEPARTMENT_HEAD", "VENUE_MANAGER"]}
+                  allowedDepartment={departmentId}
+                  currentUser={currentUser}
                 >
-                  Edit
-                </Button>
-                <Button className="flex-1" variant="secondary">
-                  Logs
-                </Button>
+                  <Button
+                    className="flex-1"
+                    onClick={() => setShowUpdateVenueSheet(true)}
+                  >
+                    Edit
+                  </Button>
+                  <Link
+                    href={`/department/${departmentId}/facilities/${venueId}/logs`}
+                    className={cn(
+                      buttonVariants({ variant: "secondary" }),
+                      "flex-1"
+                    )}
+                  >
+                    <P>Logs</P>
+                  </Link>
+                </PermissionGuard>
               </div>
             </div>
             <div className="w-full">
@@ -156,12 +189,9 @@ export default function ManageVenueScreen({ venueId }: ManageVenueScreenProps) {
               <div className="flex items-center justify-between">
                 <P className="font-semibold text-muted-foreground">Features</P>
                 {data.features && (
-                  <div className="flex flex-wrap items-center gap-1 max-w-64">
+                  <div className="flex max-w-64 flex-wrap items-center gap-1">
                     {(data.features as VenueFeaturesType[]).map((value) => (
-                      <Badge
-                        key={value.id}
-                        variant="teal"
-                      >
+                      <Badge key={value.id} variant="teal">
                         {value.name}
                       </Badge>
                     ))}

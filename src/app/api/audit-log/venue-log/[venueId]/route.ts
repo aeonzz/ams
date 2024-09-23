@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { db } from "@/lib/db/index";
 import { checkAuth } from "@/lib/auth/utils";
 
@@ -8,39 +8,36 @@ interface Context {
   };
 }
 
-export async function GET(request: NextRequest, params: Context) {
+export async function GET(req: Request, params: Context) {
   await checkAuth();
+  const { venueId } = params.params;
   try {
-    const isVenueExist = await db.venue.findUnique({
+    const venueExist = await db.venue.findUnique({
       where: {
         id: params.params.venueId,
       },
     });
 
-    if (!isVenueExist) {
+    if (!venueExist) {
       return NextResponse.json({ error: "Venue not found" }, { status: 404 });
     }
-
-    const result = await db.venue.findFirst({
+    const result = await db.genericAuditLog.findMany({
       where: {
-        id: params.params.venueId,
-        isArchived: false,
+        entityId: venueId,
       },
       include: {
-        department: true,
-        requests: {
-          include: {
-            request: true,
-          },
-        },
+        changedBy: true,
+      },
+      orderBy: {
+        timestamp: "desc",
       },
     });
 
     return NextResponse.json({ data: result }, { status: 200 });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return NextResponse.json(
-      { error: "Something went wrong! try again later" },
+      { error: "Failed to fetch reserved dates" },
       { status: 500 }
     );
   }

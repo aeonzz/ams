@@ -1,21 +1,22 @@
 "use client";
 
+import NotFound from "@/app/not-found";
 import { UserWithRelations } from "prisma/generated/zod";
 import { ReactNode } from "react";
 
-interface PermissionGuardProps {
+interface PageGuardProps {
   children: ReactNode;
   currentUser: UserWithRelations;
   allowedRoles: string[];
   allowedDepartment?: string;
 }
 
-export function PermissionGuard({
+export function PageGuard({
   children,
   allowedRoles,
   allowedDepartment,
   currentUser,
-}: PermissionGuardProps) {
+}: PageGuardProps) {
   const hasAllowedRole = currentUser.userRole.some((role) =>
     allowedRoles.includes(role.role.name)
   );
@@ -27,7 +28,7 @@ export function PermissionGuard({
     );
 
   if (!hasAllowedRole || !hasAllowedDepartment) {
-    return null;
+    return <NotFound />;
   }
 
   return <>{children}</>;

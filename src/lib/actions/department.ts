@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { db } from "@/lib/db/index";
-import { GetDepartmentsSchema } from "../schema";
+import { GetDepartmentsSchema, GetUsersSchema } from "../schema";
 import { checkAuth } from "../auth/utils";
 import { authedProcedure, getErrorMessage } from "./utils";
 import {
@@ -12,6 +12,7 @@ import {
 } from "../schema/department";
 import { revalidatePath } from "next/cache";
 import { generateId } from "lucia";
+import { User } from "prisma/generated/zod";
 
 export async function getDepartments(input: GetDepartmentsSchema) {
   await checkAuth();
@@ -146,3 +147,140 @@ export const deleteDepartments = authedProcedure
       getErrorMessage(error);
     }
   });
+
+export async function getDepartmentUsers(
+  input: GetUsersSchema & { departmentId: string }
+) {
+  await checkAuth();
+  const {
+    page,
+    per_page,
+    sort,
+    department,
+    email,
+    role,
+    firstName,
+    middleName,
+    lastName,
+    departmentId,
+    from,
+    to,
+  } = input;
+
+  try {
+    const skip = (page - 1) * per_page;
+
+    const [column, order] = (sort?.split(".") ?? ["createdAt", "desc"]) as [
+      keyof User | undefined,
+      "asc" | "desc" | undefined,
+    ];
+
+    const where: any = {
+      isArchived: false,
+      userDepartments: {
+        some: {
+          departmentId: departmentId,
+        },
+      },
+    };
+
+    if (email) {
+      where.email = { contains: email, mode: "insensitive" };
+    }
+
+    if (department) {
+      where.department = { contains: department, mode: "insensitive" };
+    }
+
+    if (firstName) {
+      where.firstName = { contains: firstName, mode: "insensitive" };
+    }
+
+    if (middleName) {
+      where.firstName = { contains: firstName, mode: "insensitive" };
+    }
+
+    if (lastName) {
+      where.firstName = { contains: firstName, mode: "insensitive" };
+    }
+
+    if (role) {
+      where.userRole = {
+        some: {
+          role: {
+            name: { in: role.split(".") },
+          },
+        },
+      };
+    }
+
+    if (from && to) {
+      where.createdAt = {
+        gte: new Date(from),
+        lte: new Date(to),
+      };
+    }
+
+    const [userData, total] = await db.$transaction([
+      db.user.findMany({
+        where,
+        take: per_page,
+        skip,
+        orderBy: {
+          [column || "createdAt"]: order || "desc",
+        },
+        include: {
+          userDepartments: {
+            select: {
+              id: true,
+              department: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+              user: {
+                select: {
+                  id: true,
+                  firstName: true,
+                  middleName: true,
+                  lastName: true,
+                },
+              },
+            },
+          },
+          userRole: {
+            where: {
+              departmentId: departmentId,
+            },
+            include: {
+              department: {
+                select: {
+                  name: true,
+                },
+              },
+              role: {
+                select: {
+                  name: true,
+                },
+              },
+            },
+          },
+        },
+      }),
+      db.user.count({ where }),
+    ]);
+    const pageCount = Math.ceil(total / per_page);
+
+    const data = userData.map((data) => {
+      const { ...rest } = data;
+      return {
+        ...rest,
+      };
+    });
+    return { data, pageCount };
+  } catch (err) {
+    console.error(err);
+    return { data: [], pageCount: 0 };
+  }
+}

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { withRoles } from "@/middleware/withRole";
 import { db } from "@/lib/db/index";
 import { redirect } from "next/navigation";
+import { checkAuth } from "@/lib/auth/utils";
 
 interface Context {
   params: {
@@ -10,7 +11,20 @@ interface Context {
 }
 
 export async function GET(request: NextRequest, params: Context) {
+  await checkAuth();
   try {
+    const departmentExist = await db.department.findUnique({
+      where: {
+        id: params.params.departmentId,
+      },
+    });
+
+    if (!departmentExist) {
+      return NextResponse.json(
+        { error: "Department not found" },
+        { status: 404 }
+      );
+    }
     const result = await db.venue.findMany({
       where: {
         isArchived: false,

@@ -40,15 +40,23 @@ export function getMenuList({
       {
         href: `/department/${userDepartment.departmentId}/requests/pending?page=1&per_page=10&sort=createdAt.desc`,
         label: "Pending Requests",
-        active:
-          pathname ===
-          `/department/${userDepartment.departmentId}/requests/pending`,
+        active: pathname.includes(
+          `/department/${userDepartment.departmentId}/requests/pending`
+        ),
       },
       {
         href: `/department/${userDepartment.departmentId}/facilities`,
-        label: "Facilites",
-        active:
-          pathname === `/department/${userDepartment.departmentId}/facilities`,
+        label: "Facilities",
+        active: pathname.includes(
+          `/department/${userDepartment.departmentId}/facilities`
+        ),
+      },
+      {
+        href: `/department/${userDepartment.departmentId}/users`,
+        label: "Users",
+        active: pathname.includes(
+          `/department/${userDepartment.departmentId}/users`
+        ),
       },
     ],
   }));

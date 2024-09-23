@@ -77,7 +77,7 @@ import ChangeTypeSchema, {
 interface UpdateDeparVenueProps
   extends React.ComponentPropsWithRef<typeof Sheet> {
   venue: Venue;
-  queryKey?: string;
+  queryKey?: string[];
   removeField?: boolean;
 }
 
@@ -187,7 +187,7 @@ export function UpdateVenueSheet({
         loading: "Updating...",
         success: () => {
           queryClient.invalidateQueries({
-            queryKey: [queryKey],
+            queryKey: queryKey,
           });
           props.onOpenChange?.(false);
           return "Venue updated succesfully.";

@@ -33,7 +33,7 @@ import CreateVenueForm from "./create-venue-form";
 import { createVenue } from "@/lib/actions/venue";
 
 interface CreateVenueDialogProps {
-  queryKey?: string;
+  queryKey?: string[];
 }
 
 export default function CreateVenueDialog({

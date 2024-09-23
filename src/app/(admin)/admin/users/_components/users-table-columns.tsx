@@ -44,8 +44,12 @@ import { usePathname } from "next/navigation";
 import { useHotkeys } from "react-hotkeys-hook";
 import DataTableExpand from "@/components/data-table/data-table-expand";
 
-export function getUsersColumns(): ColumnDef<UserType>[] {
-  return [
+export function getUsersColumns({
+  isDepartmentScreen = false
+}: {
+  isDepartmentScreen?: boolean;
+}): ColumnDef<UserType>[] {
+  const columns: ColumnDef<UserType>[] = [
     {
       id: "select",
       header: ({ table }) => (
@@ -122,106 +126,106 @@ export function getUsersColumns(): ColumnDef<UserType>[] {
         );
       },
     },
-    {
-      accessorKey: "userDepartments",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Departments" />
-      ),
-      cell: ({ row }) => {
-        const pathname = usePathname();
-        const [hoveredDepartment, setHoveredDepartment] = React.useState<
-          string | null
-        >(null);
-        const [isAlertOpen, setIsAlertOpen] = React.useState(false);
-        const [departmentToRemove, setDepartmentToRemove] = React.useState<{
-          id: string;
-          name: string;
-        } | null>(null);
-        const { mutateAsync, isPending } =
-          useServerActionMutation(removeUserDepartment);
+    // {
+    //   accessorKey: "userDepartments",
+    //   header: ({ column }) => (
+    //     <DataTableColumnHeader column={column} title="Departments" />
+    //   ),
+    //   cell: ({ row }) => {
+    //     const pathname = usePathname();
+    //     const [hoveredDepartment, setHoveredDepartment] = React.useState<
+    //       string | null
+    //     >(null);
+    //     const [isAlertOpen, setIsAlertOpen] = React.useState(false);
+    //     const [departmentToRemove, setDepartmentToRemove] = React.useState<{
+    //       id: string;
+    //       name: string;
+    //     } | null>(null);
+    //     const { mutateAsync, isPending } =
+    //       useServerActionMutation(removeUserDepartment);
 
-        const handleRemoveDepartment = (department: {
-          id: string;
-          name: string;
-        }) => {
-          setDepartmentToRemove(department);
-          setIsAlertOpen(true);
-        };
+    //     const handleRemoveDepartment = (department: {
+    //       id: string;
+    //       name: string;
+    //     }) => {
+    //       setDepartmentToRemove(department);
+    //       setIsAlertOpen(true);
+    //     };
 
-        const confirmRemoveDepartment = () => {
-          if (departmentToRemove) {
-            const data: RemoveUserDepartmentSchema = {
-              id: departmentToRemove.id,
-              path: pathname,
-            };
-            toast.promise(mutateAsync(data), {
-              loading: "Removing...",
-              success: () => {
-                setIsAlertOpen(false);
-                return "User department removed successfuly";
-              },
-              error: (err) => {
-                return err.message;
-              },
-            });
-          }
-          setIsAlertOpen(false);
-        };
+    //     const confirmRemoveDepartment = () => {
+    //       if (departmentToRemove) {
+    //         const data: RemoveUserDepartmentSchema = {
+    //           id: departmentToRemove.id,
+    //           path: pathname,
+    //         };
+    //         toast.promise(mutateAsync(data), {
+    //           loading: "Removing...",
+    //           success: () => {
+    //             setIsAlertOpen(false);
+    //             return "User department removed successfuly";
+    //           },
+    //           error: (err) => {
+    //             return err.message;
+    //           },
+    //         });
+    //       }
+    //       setIsAlertOpen(false);
+    //     };
 
-        return (
-          <>
-            <div className="flex max-w-[15vw] flex-wrap gap-2">
-              {row.original.userDepartments.map((userDepartment) => (
-                <Badge
-                  key={userDepartment.department.id}
-                  variant="outline"
-                  className="relative"
-                  onMouseEnter={() =>
-                    setHoveredDepartment(userDepartment.department.id)
-                  }
-                  onMouseLeave={() => setHoveredDepartment(null)}
-                >
-                  {userDepartment.department.name}
-                  {hoveredDepartment === userDepartment.department.id && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="absolute -right-1 -top-1 h-4 w-4 rounded-full p-0"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleRemoveDepartment({
-                          id: userDepartment.id,
-                          name: userDepartment.department.name,
-                        });
-                      }}
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
-                  )}
-                </Badge>
-              ))}
-            </div>
-            <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This action will remove the user from the department{" "}
-                    {departmentToRemove?.name}. This action cannot be undone.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={confirmRemoveDepartment}>
-                    Continue
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </>
-        );
-      },
-    },
+    //     return (
+    //       <>
+    //         <div className="flex max-w-[15vw] flex-wrap gap-2">
+    //           {row.original.userDepartments.map((userDepartment) => (
+    //             <Badge
+    //               key={userDepartment.department.id}
+    //               variant="outline"
+    //               className="relative"
+    //               onMouseEnter={() =>
+    //                 setHoveredDepartment(userDepartment.department.id)
+    //               }
+    //               onMouseLeave={() => setHoveredDepartment(null)}
+    //             >
+    //               {userDepartment.department.name}
+    //               {hoveredDepartment === userDepartment.department.id && (
+    //                 <Button
+    //                   variant="ghost"
+    //                   size="sm"
+    //                   className="absolute -right-1 -top-1 h-4 w-4 rounded-full p-0"
+    //                   onClick={(e) => {
+    //                     e.stopPropagation();
+    //                     handleRemoveDepartment({
+    //                       id: userDepartment.id,
+    //                       name: userDepartment.department.name,
+    //                     });
+    //                   }}
+    //                 >
+    //                   <X className="h-3 w-3" />
+    //                 </Button>
+    //               )}
+    //             </Badge>
+    //           ))}
+    //         </div>
+    //         <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
+    //           <AlertDialogContent>
+    //             <AlertDialogHeader>
+    //               <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+    //               <AlertDialogDescription>
+    //                 This action will remove the user from the department{" "}
+    //                 {departmentToRemove?.name}. This action cannot be undone.
+    //               </AlertDialogDescription>
+    //             </AlertDialogHeader>
+    //             <AlertDialogFooter>
+    //               <AlertDialogCancel>Cancel</AlertDialogCancel>
+    //               <AlertDialogAction onClick={confirmRemoveDepartment}>
+    //                 Continue
+    //               </AlertDialogAction>
+    //             </AlertDialogFooter>
+    //           </AlertDialogContent>
+    //         </AlertDialog>
+    //       </>
+    //     );
+    //   },
+    // },
     {
       accessorKey: "firstName",
       header: ({ column }) => (
@@ -343,4 +347,109 @@ export function getUsersColumns(): ColumnDef<UserType>[] {
       size: 40,
     },
   ];
+
+  if (!isDepartmentScreen) {
+    columns.splice(3, 0, {
+      accessorKey: "userDepartments",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Departments" />
+      ),
+      cell: ({ row }) => {
+        const pathname = usePathname();
+        const [hoveredDepartment, setHoveredDepartment] = React.useState<
+          string | null
+        >(null);
+        const [isAlertOpen, setIsAlertOpen] = React.useState(false);
+        const [departmentToRemove, setDepartmentToRemove] = React.useState<{
+          id: string;
+          name: string;
+        } | null>(null);
+        const { mutateAsync, isPending } =
+          useServerActionMutation(removeUserDepartment);
+
+        const handleRemoveDepartment = (department: {
+          id: string;
+          name: string;
+        }) => {
+          setDepartmentToRemove(department);
+          setIsAlertOpen(true);
+        };
+
+        const confirmRemoveDepartment = () => {
+          if (departmentToRemove) {
+            const data: RemoveUserDepartmentSchema = {
+              id: departmentToRemove.id,
+              path: pathname,
+            };
+            toast.promise(mutateAsync(data), {
+              loading: "Removing...",
+              success: () => {
+                setIsAlertOpen(false);
+                return "User department removed successfuly";
+              },
+              error: (err) => {
+                return err.message;
+              },
+            });
+          }
+          setIsAlertOpen(false);
+        };
+
+        return (
+          <>
+            <div className="flex max-w-[15vw] flex-wrap gap-2">
+              {row.original.userDepartments.map((userDepartment) => (
+                <Badge
+                  key={userDepartment.department.id}
+                  variant="outline"
+                  className="relative"
+                  onMouseEnter={() =>
+                    setHoveredDepartment(userDepartment.department.id)
+                  }
+                  onMouseLeave={() => setHoveredDepartment(null)}
+                >
+                  {userDepartment.department.name}
+                  {hoveredDepartment === userDepartment.department.id && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="absolute -right-1 -top-1 h-4 w-4 rounded-full p-0"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRemoveDepartment({
+                          id: userDepartment.id,
+                          name: userDepartment.department.name,
+                        });
+                      }}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  )}
+                </Badge>
+              ))}
+            </div>
+            <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action will remove the user from the department{" "}
+                    {departmentToRemove?.name}. This action cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={confirmRemoveDepartment}>
+                    Continue
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </>
+        );
+      },
+    });
+  }
+
+  return columns;
 }

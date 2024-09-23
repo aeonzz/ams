@@ -19,11 +19,6 @@ export default async function ManageRequestPage({
 }: ManageRequestPageProps) {
   const search = requestSearchParamsSchema.parse(searchParams);
   const { departmentId } = params;
-
-  if (!departmentId) {
-    return <NotFound />;
-  }
-
   return (
     <RoleGuard allowedRoles={["REQUEST_REVIEWER", "REQUEST_MANAGER"]}>
       <ContentLayout title="Requests">

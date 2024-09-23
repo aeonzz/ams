@@ -62,7 +62,7 @@ interface CreateVenueFormProps {
   isPending: boolean;
   isFieldsDirty: boolean;
   dialogManager: DialogState;
-  queryKey?: string;
+  queryKey?: string[];
 }
 
 export default function CreateVenueForm({
@@ -113,12 +113,11 @@ export default function CreateVenueForm({
           (result: { filePath: string }) => result.filePath
         ),
       };
-
       toast.promise(mutateAsync(data), {
         loading: "Submitting...",
         success: () => {
           queryClient.invalidateQueries({
-            queryKey: [queryKey],
+            queryKey: queryKey,
           });
           dialogManager.setActiveDialog(null);
           return "Venue created successfuly";
