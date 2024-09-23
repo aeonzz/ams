@@ -26,12 +26,15 @@ import { VenueFeaturesType } from "@/lib/types/venue";
 import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
 import VenueRequestsTable from "./venue-requests-table";
+import { Button } from "@/components/ui/button";
+import { UpdateVenueSheet } from "@/app/(admin)/admin/venues/_components/update-venue-sheet";
 
 interface ManageVenueScreenProps {
   venueId: string;
 }
 
 export default function ManageVenueScreen({ venueId }: ManageVenueScreenProps) {
+  const [showUpdateVenueSheet, setShowUpdateVenueSheet] = React.useState(false);
   const { data, isLoading, refetch, isError } = useQuery<VenueWithRelations>({
     queryFn: async () => {
       const res = await axios.get(`/api/venue/get-venue/${venueId}`);
@@ -66,7 +69,7 @@ export default function ManageVenueScreen({ venueId }: ManageVenueScreenProps) {
         <H5 className="truncate font-semibold">{data.name}</H5>
         <SearchInput />
       </div>
-      <div className="scroll-bar container flex overflow-y-auto p-0">
+      <div className="scroll-bar container flex h-full overflow-y-auto p-0">
         <div className="flex flex-col gap-3 p-6 pr-0">
           <Dialog>
             <DialogTrigger asChild>
@@ -90,16 +93,37 @@ export default function ManageVenueScreen({ venueId }: ManageVenueScreenProps) {
             </DialogContent>
           </Dialog>
           <div className="flex h-full flex-col gap-3">
-            <div className="space-y-1">
-              <H1 className="w-[380px] text-3xl font-bold">{data.name}</H1>
-              <Badge variant={status.variant} className="pr-3.5">
-                <Dot
-                  className="mr-1 size-3"
-                  strokeWidth={status.stroke}
-                  color={status.color}
+            <div className="space-y-3">
+              <div className="space-y-1">
+                <H1 className="w-[380px] text-3xl font-bold">{data.name}</H1>
+                <Badge variant={status.variant} className="pr-3.5">
+                  <Dot
+                    className="mr-1 size-3"
+                    strokeWidth={status.stroke}
+                    color={status.color}
+                  />
+                  {textTransform(data.status)}
+                </Badge>
+              </div>
+              <div className="flex gap-3">
+                <UpdateVenueSheet
+                  open={showUpdateVenueSheet}
+                  onOpenChange={setShowUpdateVenueSheet}
+                  queryKey={venueId}
+                  removeField
+                  //@ts-ignore
+                  venue={data}
                 />
-                {textTransform(data.status)}
-              </Badge>
+                <Button
+                  className="flex-1"
+                  onClick={() => setShowUpdateVenueSheet(true)}
+                >
+                  Edit
+                </Button>
+                <Button className="flex-1" variant="secondary">
+                  Logs
+                </Button>
+              </div>
             </div>
             <div className="w-full">
               <div className="flex items-center justify-between">
@@ -132,11 +156,10 @@ export default function ManageVenueScreen({ venueId }: ManageVenueScreenProps) {
               <div className="flex items-center justify-between">
                 <P className="font-semibold text-muted-foreground">Features</P>
                 {data.features && (
-                  <div className="flex flex-wrap items-center">
+                  <div className="flex flex-wrap items-center gap-1 max-w-64">
                     {(data.features as VenueFeaturesType[]).map((value) => (
                       <Badge
                         key={value.id}
-                        className="mr-2 mt-1"
                         variant="teal"
                       >
                         {value.name}

@@ -24,6 +24,7 @@ import {
   Dot,
   Search,
   ExternalLink,
+  PlusIcon,
 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import FetchDataError from "@/components/card/fetch-data-error";
@@ -36,6 +37,7 @@ import Image from "next/image";
 import { VenueFeaturesType } from "@/lib/types/venue";
 import SearchInput from "@/app/(app)/_components/search-input";
 import Link from "next/link";
+import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 
 interface DepartmentVenuesScreenProps {
   departmentId: string;
@@ -52,6 +54,7 @@ export default function DepartmentVenuesScreen({
   departmentId,
 }: DepartmentVenuesScreenProps) {
   const router = useRouter();
+  const dialogManager = useDialogManager();
   const [searchTerm, setSearchTerm] = useState("");
 
   const { data, isLoading, refetch, isError } = useQuery<VenueWithRelations[]>({
@@ -97,15 +100,26 @@ export default function DepartmentVenuesScreen({
           <NoDataMessage message="No facilities available." />
         ) : (
           <div className="w-[1280px]">
-            <div className="relative mb-3">
-              <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 transform text-muted-foreground" />
-              <Input
-                type="text"
-                placeholder="Search facilities..."
-                className="h-9 w-[280px] bg-tertiary pl-8"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
+            <div className="mb-3 flex w-full justify-between">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 transform text-muted-foreground" />
+                <Input
+                  type="text"
+                  placeholder="Search facilities..."
+                  className="h-9 w-[280px] bg-tertiary pl-8"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              <Button
+                variant="default"
+                onClick={() =>
+                  dialogManager.setActiveDialog("adminCreateVenueDialog")
+                }
+              >
+                <PlusIcon className="mr-1 size-4" aria-hidden="true" />
+                <P className="font-semibold">Add</P>
+              </Button>
             </div>
             {filteredVenues.length === 0 ? (
               <NoDataMessage message="No facilities found. Try adjusting your search" />

@@ -116,7 +116,7 @@ export default function VenueRequestsTable({
   });
 
   return (
-    <div className="m-4 space-y-3">
+    <div className="space-y-3 m-6 ml-0">
       <div className="flex items-center justify-between">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 transform text-muted-foreground" />
@@ -128,7 +128,7 @@ export default function VenueRequestsTable({
           />
         </div>
       </div>
-      <div className="scroll-bar h-[70vh] overflow-y-auto">
+      <div className="scroll-bar h-[72vh] overflow-y-auto">
         <Table className="border-none">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

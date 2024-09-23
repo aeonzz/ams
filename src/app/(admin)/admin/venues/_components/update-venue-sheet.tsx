@@ -64,25 +64,36 @@ import {
 } from "@/components/ui/select";
 import { cn, getVenueStatusIcon, textTransform } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { UpdateVenueSheetSkeleton } from "./update-venue-sheet-skeleton";
 import VenueFeatures from "./venue-features";
 import { VenueFeaturesType } from "@/lib/types/venue";
+import ChangeTypeSchema, {
+  ChangeTypeType,
+} from "prisma/generated/zod/inputTypeSchemas/ChangeTypeSchema";
 
 interface UpdateDeparVenueProps
   extends React.ComponentPropsWithRef<typeof Sheet> {
   venue: Venue;
+  queryKey?: string;
+  removeField?: boolean;
 }
 
-export function UpdateVenueSheet({ venue, ...props }: UpdateDeparVenueProps) {
+export function UpdateVenueSheet({
+  venue,
+  queryKey,
+  removeField = false,
+  ...props
+}: UpdateDeparVenueProps) {
   const [open, setOpen] = React.useState(false);
   const [venueType, setVenueType] = React.useState(false);
   const [featuresError, setFeaturesError] = React.useState<string | undefined>(
     undefined
   );
   const pathname = usePathname();
+  const queryClient = useQueryClient();
   const form = useForm<UpdateVenueSchema>({
     resolver: zodResolver(updateVenueSchema),
     defaultValues: {
@@ -138,6 +149,24 @@ export function UpdateVenueSheet({ venue, ...props }: UpdateDeparVenueProps) {
         uploadedFilesResult = await uploadFiles(values.imageUrl);
       }
 
+      let changeType: ChangeTypeType = ChangeTypeSchema.enum.OTHER;
+
+      if (dirtyFields.status) {
+        changeType = ChangeTypeSchema.enum.STATUS_CHANGE;
+      } else if (
+        dirtyFields.name ||
+        dirtyFields.capacity ||
+        dirtyFields.venueType
+      ) {
+        changeType = ChangeTypeSchema.enum.FIELD_UPDATE;
+      } else if (dirtyFields.location) {
+        changeType = ChangeTypeSchema.enum.LOCATION_UPDATE;
+      } else if (dirtyFields.departmentId) {
+        changeType = ChangeTypeSchema.enum.ASSIGNMENT_CHANGE;
+      } else if (dirtyFields.imageUrl) {
+        changeType = ChangeTypeSchema.enum.VENUE_CHANGE;
+      }
+
       const data: ExtendedUpdateVenueServerSchema = {
         id: venue.id,
         path: pathname,
@@ -148,6 +177,7 @@ export function UpdateVenueSheet({ venue, ...props }: UpdateDeparVenueProps) {
         location: values.location,
         capacity: values.capacity,
         status: values.status,
+        changeType: changeType,
         imageUrl: uploadedFilesResult.map(
           (result: { filePath: string }) => result.filePath
         ),
@@ -156,6 +186,9 @@ export function UpdateVenueSheet({ venue, ...props }: UpdateDeparVenueProps) {
       toast.promise(mutateAsync(data), {
         loading: "Updating...",
         success: () => {
+          queryClient.invalidateQueries({
+            queryKey: [queryKey],
+          });
           props.onOpenChange?.(false);
           return "Venue updated succesfully.";
         },
@@ -292,76 +325,78 @@ export function UpdateVenueSheet({ venue, ...props }: UpdateDeparVenueProps) {
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="departmentId"
-                  render={({ field }) => (
-                    <FormItem className="flex-1">
-                      <FormLabel>Assign Managing Department</FormLabel>
-                      <Popover open={open} onOpenChange={setOpen}>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant="outline"
-                              role="combobox"
-                              disabled={isLoading || isPending}
-                              className="w-full justify-between text-muted-foreground"
-                            >
-                              {field.value
-                                ? data?.find(
-                                    (department) =>
-                                      department.id === field.value
-                                  )?.name
-                                : "Select a department to manage"}
-                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="p-0">
-                          <Command>
-                            <CommandInput placeholder="Search department..." />
-                            <CommandList>
-                              <CommandEmpty>
-                                {isLoading
-                                  ? "Loading..."
-                                  : "No department found."}
-                              </CommandEmpty>
-                              <CommandGroup>
-                                <div className="scroll-bar max-h-40 overflow-y-auto">
-                                  {data?.map((department) => (
-                                    <CommandItem
-                                      value={department.name}
-                                      key={department.id}
-                                      onSelect={() => {
-                                        field.onChange(
-                                          department.id === field.value
-                                            ? ""
-                                            : department.id
-                                        );
-                                        setOpen(false);
-                                      }}
-                                    >
-                                      <Check
-                                        className={cn(
-                                          "mr-2 h-4 w-4",
-                                          field.value === department.id
-                                            ? "opacity-100"
-                                            : "opacity-0"
-                                        )}
-                                      />
-                                      {department.name}
-                                    </CommandItem>
-                                  ))}
-                                </div>
-                              </CommandGroup>
-                            </CommandList>
-                          </Command>
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {!removeField && (
+                  <FormField
+                    control={form.control}
+                    name="departmentId"
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormLabel>Assign Managing Department</FormLabel>
+                        <Popover open={open} onOpenChange={setOpen}>
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                variant="outline"
+                                role="combobox"
+                                disabled={isLoading || isPending}
+                                className="w-full justify-between text-muted-foreground"
+                              >
+                                {field.value
+                                  ? data?.find(
+                                      (department) =>
+                                        department.id === field.value
+                                    )?.name
+                                  : "Select a department to manage"}
+                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+                          <PopoverContent className="p-0">
+                            <Command>
+                              <CommandInput placeholder="Search department..." />
+                              <CommandList>
+                                <CommandEmpty>
+                                  {isLoading
+                                    ? "Loading..."
+                                    : "No department found."}
+                                </CommandEmpty>
+                                <CommandGroup>
+                                  <div className="scroll-bar max-h-40 overflow-y-auto">
+                                    {data?.map((department) => (
+                                      <CommandItem
+                                        value={department.name}
+                                        key={department.id}
+                                        onSelect={() => {
+                                          field.onChange(
+                                            department.id === field.value
+                                              ? ""
+                                              : department.id
+                                          );
+                                          setOpen(false);
+                                        }}
+                                      >
+                                        <Check
+                                          className={cn(
+                                            "mr-2 h-4 w-4",
+                                            field.value === department.id
+                                              ? "opacity-100"
+                                              : "opacity-0"
+                                          )}
+                                        />
+                                        {department.name}
+                                      </CommandItem>
+                                    ))}
+                                  </div>
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
                 <FormField
                   control={form.control}
                   name="venueType"

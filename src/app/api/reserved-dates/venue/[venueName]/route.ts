@@ -13,23 +13,6 @@ export async function GET(req: Request, params: Context) {
   const today = new Date();
   try {
     const reservedDatesAndTimes = await db.venueRequest.findMany({
-      select: {
-        startTime: true,
-        endTime: true,
-        request: {
-          select: {
-            status: true,
-            title: true,
-            department: true,
-            user: true,
-            venueRequest: {
-              select: {
-                venue: true,
-              }
-            }
-          },
-        },
-      },
       where: {
         venueId: venueId,
         startTime: {
@@ -47,6 +30,23 @@ export async function GET(req: Request, params: Context) {
               status: "REVIEWED",
             },
           ],
+        },
+      },
+      select: {
+        startTime: true,
+        endTime: true,
+        request: {
+          select: {
+            status: true,
+            title: true,
+            department: true,
+            user: true,
+            venueRequest: {
+              select: {
+                venue: true,
+              },
+            },
+          },
         },
       },
       orderBy: {

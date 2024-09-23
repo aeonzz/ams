@@ -28,7 +28,11 @@ import { Button } from "../../../../../components/ui/button";
 import { Separator } from "../../../../../components/ui/separator";
 import { DialogFooter } from "../../../../../components/ui/dialog";
 import { SubmitButton } from "../../../../../components/ui/submit-button";
-import { useQuery, type UseMutateAsyncFunction } from "@tanstack/react-query";
+import {
+  useQuery,
+  useQueryClient,
+  type UseMutateAsyncFunction,
+} from "@tanstack/react-query";
 import { type UseFormReturn } from "react-hook-form";
 import { usePathname } from "next/navigation";
 import { createVenue } from "@/lib/actions/venue";
@@ -58,6 +62,7 @@ interface CreateVenueFormProps {
   isPending: boolean;
   isFieldsDirty: boolean;
   dialogManager: DialogState;
+  queryKey?: string;
 }
 
 export default function CreateVenueForm({
@@ -67,8 +72,10 @@ export default function CreateVenueForm({
   isFieldsDirty,
   setAlertOpen,
   dialogManager,
+  queryKey,
 }: CreateVenueFormProps) {
   const pathname = usePathname();
+  const queryClient = useQueryClient();
   const [open, setOpen] = React.useState(false);
   const [featuresError, setFeaturesError] = React.useState<string | undefined>(
     undefined
@@ -110,6 +117,9 @@ export default function CreateVenueForm({
       toast.promise(mutateAsync(data), {
         loading: "Submitting...",
         success: () => {
+          queryClient.invalidateQueries({
+            queryKey: [queryKey],
+          });
           dialogManager.setActiveDialog(null);
           return "Venue created successfuly";
         },

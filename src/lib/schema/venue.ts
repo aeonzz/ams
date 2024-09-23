@@ -1,4 +1,8 @@
-import { VenueStatusSchema, VenueTypeSchema } from "prisma/generated/zod";
+import {
+  ChangeTypeSchema,
+  VenueStatusSchema,
+  VenueTypeSchema,
+} from "prisma/generated/zod";
 import { z } from "zod";
 
 export const createVenueSchemaServer = z.object({
@@ -35,6 +39,7 @@ export const updateVenueSchemaServer = z.object({
 });
 
 export const extendedUpdateVenueServerSchema = updateVenueSchemaServer.extend({
+  changeType: ChangeTypeSchema,
   path: z.string(),
   id: z.string().optional(),
 });

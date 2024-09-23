@@ -32,7 +32,13 @@ import {
 import CreateVenueForm from "./create-venue-form";
 import { createVenue } from "@/lib/actions/venue";
 
-export default function CreateVenueDialog() {
+interface CreateVenueDialogProps {
+  queryKey?: string;
+}
+
+export default function CreateVenueDialog({
+  queryKey,
+}: CreateVenueDialogProps) {
   const dialogManager = useDialogManager();
   const [alertOpen, setAlertOpen] = React.useState(false);
 
@@ -43,8 +49,7 @@ export default function CreateVenueDialog() {
   const { dirtyFields } = useFormState({ control: form.control });
   const isFieldsDirty = Object.keys(dirtyFields).length > 0;
 
-  const { mutateAsync, isPending } =
-    useServerActionMutation(createVenue);
+  const { mutateAsync, isPending } = useServerActionMutation(createVenue);
 
   const handleOpenChange = (open: boolean) => {
     if (!open) {
@@ -110,6 +115,7 @@ export default function CreateVenueDialog() {
           </DialogDescription>
         </DialogHeader>
         <CreateVenueForm
+          queryKey={queryKey}
           mutateAsync={mutateAsync}
           isPending={isPending}
           setAlertOpen={setAlertOpen}

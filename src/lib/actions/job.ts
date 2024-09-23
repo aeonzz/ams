@@ -259,7 +259,7 @@ export const assignPersonnel = authedProcedure
         });
 
         if (!currentJobRequest) {
-          throw new Error("JobRequest not found");
+          throw "JobRequest not found";
         }
 
         const updatedJobRequest = await prisma.jobRequest.update({
