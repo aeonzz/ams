@@ -36,7 +36,10 @@ export default function DepartmentUsersScreen({
         </div>
         <div className="grid min-h-[calc(100vh_-_100px)] place-items-center items-center py-3">
           <React.Suspense fallback={<LoadingSpinner />}>
-            <DepartmentUsersTable usersPromise={usersPromise} />
+            <DepartmentUsersTable
+              usersPromise={usersPromise}
+              departmentId={departmentId}
+            />
           </React.Suspense>
         </div>
       </div>

@@ -89,7 +89,6 @@ export function ManageRequestsTable({
     <ModifiedDataTable
       showSelectedRows={false}
       table={table}
-      route="request"
       floatingBar={<ManageRequestsTableFloatingBar table={table} />}
     >
       <DataTableToolbar table={table} filterFields={filterFields}>

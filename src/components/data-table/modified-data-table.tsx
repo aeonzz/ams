@@ -12,8 +12,6 @@ import {
 } from "@/components/ui/table";
 import { DataTablePagination } from "@/components/data-table/data-table-pagination";
 import { getCommonPinningStyles } from "@/lib/data-table";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 
 interface ModifiedDataTableProps<TData>
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -32,7 +30,6 @@ interface ModifiedDataTableProps<TData>
   floatingBar?: React.ReactNode | null;
 
   showSelectedRows?: boolean;
-  route?: string;
 }
 
 export function ModifiedDataTable<TData>({
@@ -42,7 +39,6 @@ export function ModifiedDataTable<TData>({
   className,
   ...props
 }: ModifiedDataTableProps<TData>) {
-  const router = useRouter();
   return (
     <div
       className={cn("w-full space-y-2.5 overflow-auto", className)}
@@ -62,6 +58,7 @@ export function ModifiedDataTable<TData>({
                       style={{
                         ...getCommonPinningStyles({ column: header.column }),
                       }}
+                      className="px-0"
                     >
                       {header.isPlaceholder
                         ? null
@@ -81,10 +78,6 @@ export function ModifiedDataTable<TData>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  onClick={() =>
-                    router.push(`/${props.route}/${(row.original as any).id}`)
-                  }
-                  className="cursor-pointer"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
@@ -92,7 +85,7 @@ export function ModifiedDataTable<TData>({
                       style={{
                         ...getCommonPinningStyles({ column: cell.column }),
                       }}
-                      className="px-1"
+                      className="px-0 py-2"
                     >
                       {flexRender(
                         cell.column.columnDef.cell,

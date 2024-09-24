@@ -3,29 +3,30 @@
 
 import * as React from "react";
 
-import { DataTable } from "@/components/data-table/data-table";
 import { DataTableToolbar } from "@/components/data-table/data-table-toolbar";
 
 import { useDataTable } from "@/lib/hooks/use-data-table";
 import { type DataTableFilterField } from "@/lib/types";
 import { getDepartmentUsers } from "@/lib/actions/department";
-import { getUsersColumns } from "@/app/(admin)/admin/users/_components/users-table-columns";
 import type { UserType } from "@/lib/types/user";
-import { UsersTableFloatingBar } from "@/app/(admin)/admin/users/_components/users-table-floating-bar";
-import UserUserRolesTable from "@/app/(admin)/admin/users/_components/user-user-roles-table";
-import { UsersTableToolbarActions } from "@/app/(admin)/admin/users/_components/users-table-toolbar-actions";
+import { ModifiedDataTable } from "@/components/data-table/modified-data-table";
+import { getDepartmentUsersColumns } from "./department-users-columns";
+import { DepartmentUsersTableToolbarActions } from "./department-users-table-toolbar-actions";
+import { DepartmentUsersTableFloatingBar } from "./department-users-table-floating-bar";
 
 interface DepartmentUsersTableProps {
   usersPromise: ReturnType<typeof getDepartmentUsers>;
+  departmentId: string;
 }
 
 export function DepartmentUsersTable({
   usersPromise,
+  departmentId,
 }: DepartmentUsersTableProps) {
   const { data, pageCount } = React.use(usersPromise);
 
   const columns = React.useMemo(
-    () => getUsersColumns({ isDepartmentScreen: true }),
+    () => getDepartmentUsersColumns({ departmentId }),
     []
   );
 
@@ -50,23 +51,19 @@ export function DepartmentUsersTable({
   });
 
   return (
-    <DataTable
+    <ModifiedDataTable
       table={table}
-      floatingBar={<UsersTableFloatingBar table={table} />}
-      renderSubComponent={({ row }) => {
-        const formattedUserRoles = row.original.userRole.map((role) => ({
-          departmentName: role.department.name,
-          roleName: role.role.name,
-          createdAt: role.createdAt,
-          updatedAt: role.updatedAt,
-        }));
-
-        return <UserUserRolesTable userRoles={formattedUserRoles} />;
-      }}
+      showSelectedRows={false}
+      floatingBar={
+        <DepartmentUsersTableFloatingBar
+          table={table}
+          departmentId={departmentId}
+        />
+      }
     >
       <DataTableToolbar table={table} filterFields={filterFields}>
-        <UsersTableToolbarActions table={table} />
+        <DepartmentUsersTableToolbarActions table={table} />
       </DataTableToolbar>
-    </DataTable>
+    </ModifiedDataTable>
   );
 }

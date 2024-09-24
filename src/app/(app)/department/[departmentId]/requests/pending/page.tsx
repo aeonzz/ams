@@ -20,7 +20,7 @@ export default async function ManageRequestPage({
   const search = requestSearchParamsSchema.parse(searchParams);
   const { departmentId } = params;
   return (
-    <RoleGuard allowedRoles={["REQUEST_REVIEWER", "REQUEST_MANAGER"]}>
+    <RoleGuard allowedRoles={["REQUEST_REVIEWER", "REQUEST_MANAGER", "DEPARTMENT_HEAD"]}>
       <ContentLayout title="Requests">
         <ManageRequestScreen search={search} departmentId={departmentId} />
       </ContentLayout>

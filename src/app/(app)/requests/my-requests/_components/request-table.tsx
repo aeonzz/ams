@@ -100,7 +100,6 @@ export function RequestTable({ requestPromise }: RequestTableProps) {
     <ModifiedDataTable
       showSelectedRows={false}
       table={table}
-      route="request"
       floatingBar={<RequestTableFloatingBar table={table} />}
     >
       <DataTableToolbar table={table} filterFields={filterFields}>

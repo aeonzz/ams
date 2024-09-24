@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import ContentLayout from "@/components/layouts/content-layout";
-import { requestSearchParamsSchema } from "@/lib/schema";
+import { userSearchParamsSchema } from "@/lib/schema";
 import { SearchParams } from "@/lib/types";
 import DepartmentUsersScreen from "./_components/department-users-screen";
 
@@ -15,7 +15,7 @@ export default async function DepartmentUsersPage({
   params,
   searchParams,
 }: DepartmentUsersPageProps) {
-  const search = requestSearchParamsSchema.parse(searchParams);
+  const search = userSearchParamsSchema.parse(searchParams);
   const { departmentId } = params;
 
   return (

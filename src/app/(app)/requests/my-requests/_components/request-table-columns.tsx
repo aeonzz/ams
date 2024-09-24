@@ -18,6 +18,8 @@ import { Request, RequestSchema } from "prisma/generated/zod";
 import { P } from "@/components/typography/text";
 import { format } from "date-fns";
 import { Dot } from "lucide-react";
+import Link from "next/link";
+import { buttonVariants } from "@/components/ui/button";
 
 export function getRequestColumns(): ColumnDef<Request>[] {
   return [
@@ -51,7 +53,15 @@ export function getRequestColumns(): ColumnDef<Request>[] {
       cell: ({ row }) => {
         return (
           <div className="flex w-[30vw] space-x-2">
-            <P className="truncate font-medium">{row.original.title}</P>
+            <Link
+              href={`/request/${row.original.id}`}
+              className={cn(
+                buttonVariants({ variant: "link" }),
+                "p-0 text-foreground"
+              )}
+            >
+              <P className="truncate font-medium">{row.original.title}</P>
+            </Link>
           </div>
         );
       },

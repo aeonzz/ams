@@ -19,6 +19,8 @@ import { format } from "date-fns";
 import { Dot } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { RequestTableType } from "@/lib/types/request";
+import Link from "next/link";
+import { buttonVariants } from "@/components/ui/button";
 
 export function getManageRequestsColumns(): ColumnDef<RequestTableType>[] {
   return [
@@ -55,7 +57,15 @@ export function getManageRequestsColumns(): ColumnDef<RequestTableType>[] {
       cell: ({ row }) => {
         return (
           <div className="flex space-x-2">
-            <P className="truncate font-medium">{row.original.title}</P>
+            <Link
+              href={`/request/${row.original.id}`}
+              className={cn(
+                buttonVariants({ variant: "link" }),
+                "p-0 text-foreground"
+              )}
+            >
+              <P className="truncate font-medium">{row.original.title}</P>
+            </Link>
           </div>
         );
       },

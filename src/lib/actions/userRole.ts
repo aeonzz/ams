@@ -4,7 +4,12 @@ import { generateId } from "lucia";
 import { authedProcedure, getErrorMessage } from "./utils";
 
 import { db } from "@/lib/db/index";
-import { createSingleUserRoleSchemaWithPath, createUserRoleSchemaWithPath } from "../schema/userRole";
+import {
+  addUserRoleSchema,
+  createSingleUserRoleSchemaWithPath,
+  createUserRoleSchemaWithPath,
+  removeUserRoleSchema,
+} from "../schema/userRole";
 import { revalidatePath } from "next/cache";
 import { formatFullName, textTransform } from "../utils";
 
@@ -58,14 +63,13 @@ export const createUserRole = authedProcedure
         });
       }
 
-      revalidatePath(path);
+      return revalidatePath(path);
     } catch (error) {
       getErrorMessage(error);
     }
   });
 
-
-  export const createMultipleUserRoleUser = authedProcedure
+export const createMultipleUserRoleUser = authedProcedure
   .createServerAction()
   .input(createSingleUserRoleSchemaWithPath)
   .handler(async ({ input }) => {
@@ -115,7 +119,24 @@ export const createUserRole = authedProcedure
         });
       }
 
-      revalidatePath(path);
+      return revalidatePath(path);
+    } catch (error) {
+      getErrorMessage(error);
+    }
+  });
+
+export const removeUserRole = authedProcedure
+  .createServerAction()
+  .input(removeUserRoleSchema)
+  .handler(async ({ input }) => {
+    const { path, userRoleId } = input;
+    try {
+      await db.userRole.delete({
+        where: {
+          id: userRoleId,
+        },
+      });
+      return revalidatePath(path);
     } catch (error) {
       getErrorMessage(error);
     }

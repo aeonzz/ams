@@ -50,3 +50,18 @@ export const createSingleUserRoleSchemaWithPath =
 export type CreateSingleUserRoleSchemaWithPath = z.infer<
   typeof createSingleUserRoleSchemaWithPath
 >;
+
+export const removeUserRoleSchema = z.object({
+  userRoleId: z.string({ required_error: "User role id is required" }),
+  path: z.string(),
+});
+
+export type RemoveUserRoleSchema = z.infer<typeof removeUserRoleSchema>;
+
+export const addUserRoleSchema = z.object({
+  userId: z.string({ required_error: "user id is required" }),
+  roleId: z.string({ required_error: "Role id is required" }),
+  path: z.string(),
+});
+
+export type AddUserRoleSchema = z.infer<typeof addUserRoleSchema>;
