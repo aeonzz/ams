@@ -261,6 +261,7 @@ export function getVehiclesColumns(): ColumnDef<VehicleTableType>[] {
                             id: row.original.id,
                             status: value as VehicleStatusType,
                             path: pathname,
+                            changeType: "STATUS_CHANGE",
                           }),
                           {
                             loading: "Updating status...",

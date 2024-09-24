@@ -21,6 +21,7 @@ export default function CommandLayout({ children, params }: Props) {
         <SettingsDialog />
         <CreateVehicleDialog
           queryKey={["department-vehicles", params.departmentId]}
+          departmentId={params.departmentId}
         />
       </CommandSearchDialog>
       <RequestOption />

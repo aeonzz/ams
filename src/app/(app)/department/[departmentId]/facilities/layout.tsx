@@ -21,6 +21,7 @@ export default function CommandLayout({ children, params }: Props) {
         <SettingsDialog />
         <CreateVenueDialog
           queryKey={["department-venues", params.departmentId]}
+          departmentId={params.departmentId}
         />
       </CommandSearchDialog>
       <RequestOption />

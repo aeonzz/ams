@@ -34,16 +34,21 @@ import { createVenue } from "@/lib/actions/venue";
 
 interface CreateVenueDialogProps {
   queryKey?: string[];
+  departmentId?: string;
 }
 
 export default function CreateVenueDialog({
   queryKey,
+  departmentId,
 }: CreateVenueDialogProps) {
   const dialogManager = useDialogManager();
   const [alertOpen, setAlertOpen] = React.useState(false);
 
   const form = useForm<CreateVenueSchema>({
     resolver: zodResolver(createVenueSchema),
+    defaultValues: {
+      departmentId: departmentId ? departmentId : undefined,
+    },
   });
 
   const { dirtyFields } = useFormState({ control: form.control });

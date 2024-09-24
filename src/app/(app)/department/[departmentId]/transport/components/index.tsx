@@ -23,6 +23,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { cn, getVehicleStatusColor, textTransform } from "@/lib/utils";
+import VehicleLoadingSkeleton from "./department-vehicle-screen-skeleton";
 
 interface DepartmentVehicleScreen {
   departmentId: string;
@@ -68,9 +69,30 @@ export default function DepartmentVehicleScreen({
         <P className="font-medium">Vehicles</P>
         <SearchInput />
       </div>
+      <div className="flex w-full justify-between p-3 pb-0">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 transform text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder="Search vehicles..."
+            className="h-9 w-[280px] bg-tertiary pl-8"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        <Button
+          variant="default"
+          onClick={() =>
+            dialogManager.setActiveDialog("adminCreateVehicleDialog")
+          }
+        >
+          <PlusIcon className="mr-1 size-4" aria-hidden="true" />
+          <P className="font-semibold">Add</P>
+        </Button>
+      </div>
       <div className="scroll-bar flex flex-1 justify-center overflow-y-auto p-3">
         {isLoading ? (
-          <p>Loading...</p>
+          <VehicleLoadingSkeleton />
         ) : isError ? (
           <div className="flex h-screen w-full items-center justify-center">
             <FetchDataError refetch={refetch} />
@@ -79,27 +101,6 @@ export default function DepartmentVehicleScreen({
           <NoDataMessage message="No vehicles available." />
         ) : (
           <div className="w-[1280px]">
-            <div className="mb-3 flex w-full justify-between">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 transform text-muted-foreground" />
-                <Input
-                  type="text"
-                  placeholder="Search vehicles..."
-                  className="h-9 w-[280px] bg-tertiary pl-8"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-              <Button
-                variant="default"
-                onClick={() =>
-                  dialogManager.setActiveDialog("adminCreateVehicleDialog")
-                }
-              >
-                <PlusIcon className="mr-1 size-4" aria-hidden="true" />
-                <P className="font-semibold">Add</P>
-              </Button>
-            </div>
             {filteredVehicles.length === 0 ? (
               <NoDataMessage message="No vehicles found. Try adjusting your search" />
             ) : (
@@ -108,7 +109,7 @@ export default function DepartmentVehicleScreen({
                   const status = getVehicleStatusColor(vehicle.status);
                   return (
                     <Link
-                      href={`/department/${departmentId}/facilities/${vehicle.id}`}
+                      href={`/department/${departmentId}/transport/${vehicle.id}`}
                     >
                       <Card
                         key={vehicle.id}
@@ -137,7 +138,7 @@ export default function DepartmentVehicleScreen({
                               {textTransform(vehicle.status)}
                             </Badge>
                             <Link
-                              href={`/department/${departmentId}/facilities/${vehicle.id}`}
+                              href={`/department/${departmentId}/transport/${vehicle.id}`}
                               className={cn(
                                 buttonVariants({
                                   variant: "ghost2",

@@ -34,16 +34,21 @@ import CreateVehicleForm from "./create-vehicle-form";
 
 interface CreateVehicleDialogProps {
   queryKey?: string[];
+  departmentId?: string;
 }
 
 export default function CreateVehicleDialog({
   queryKey,
+  departmentId,
 }: CreateVehicleDialogProps) {
   const dialogManager = useDialogManager();
   const [alertOpen, setAlertOpen] = React.useState(false);
 
   const form = useForm<CreateVehicleSchema>({
     resolver: zodResolver(createVehicleSchema),
+    defaultValues: {
+      departmentId: departmentId ? departmentId : undefined,
+    },
   });
 
   const { dirtyFields } = useFormState({ control: form.control });

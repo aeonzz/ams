@@ -81,15 +81,31 @@ export const createVehicle = authedProcedure
   .input(createVehicleSchemaWithPath)
   .handler(async ({ input, ctx }) => {
     const { path, imageUrl, departmentId, ...rest } = input;
+    const { user } = ctx;
     try {
-      const vehicleId = generateId(15);
-      await db.vehicle.create({
-        data: {
-          id: vehicleId,
-          imageUrl: imageUrl[0],
-          departmentId: departmentId,
-          ...rest,
-        },
+      const result = await db.$transaction(async (prisma) => {
+        const vehicleId = generateId(15);
+
+        const createVehicle = await prisma.vehicle.create({
+          data: {
+            id: vehicleId,
+            imageUrl: imageUrl[0],
+            departmentId: departmentId,
+            ...rest,
+          },
+        });
+
+        const newValueJson = JSON.parse(JSON.stringify(createVehicle));
+        await prisma.genericAuditLog.create({
+          data: {
+            id: generateId(15),
+            entityId: createVehicle.id,
+            entityType: "VENUE",
+            changeType: "CREATED",
+            newValue: newValueJson,
+            changedById: user.id,
+          },
+        });
       });
 
       return revalidatePath(path);
@@ -102,16 +118,42 @@ export const updateVehicle = authedProcedure
   .createServerAction()
   .input(extendedUpdateVehicleServerSchema)
   .handler(async ({ ctx, input }) => {
-    const { path, id, imageUrl, ...rest } = input;
+    const { path, id, imageUrl, changeType, ...rest } = input;
+    const { user } = ctx;
     try {
-      await db.vehicle.update({
-        where: {
-          id: id,
-        },
-        data: {
-          imageUrl: imageUrl && imageUrl[0],
-          ...rest,
-        },
+      const result = await db.$transaction(async (prisma) => {
+        const currentVehicle = await prisma.vehicle.findUnique({
+          where: { id },
+        });
+
+        if (!currentVehicle) {
+          throw "Vehicle not found";
+        }
+
+        const updateVehicle = await db.vehicle.update({
+          where: {
+            id: id,
+          },
+          data: {
+            imageUrl: imageUrl && imageUrl[0],
+            ...rest,
+          },
+        });
+
+        const oldValueJson = JSON.parse(JSON.stringify(currentVehicle));
+        const newValueJson = JSON.parse(JSON.stringify(updateVehicle));
+
+        await prisma.genericAuditLog.create({
+          data: {
+            id: generateId(15),
+            entityId: updateVehicle.id,
+            changeType: changeType,
+            entityType: "VENUE",
+            oldValue: oldValueJson,
+            newValue: newValueJson,
+            changedById: user.id,
+          },
+        });
       });
 
       return revalidatePath(path);
@@ -123,18 +165,49 @@ export const updateVehicle = authedProcedure
 export const updateVehicleStatuses = authedProcedure
   .createServerAction()
   .input(updateVehicleStatusesSchema)
-  .handler(async ({ input }) => {
-    const { path, ...rest } = input;
+  .handler(async ({ input, ctx }) => {
+    const { path, ids, ...rest } = input;
+    const { user } = ctx;
     try {
-      await db.vehicle.updateMany({
-        where: {
-          id: {
-            in: rest.ids,
+      const result = await db.$transaction(async (prisma) => {
+        const currentVehicles = await prisma.vehicle.findMany({
+          where: { id: { in: ids } },
+        });
+
+        if (!currentVehicles || currentVehicles.length === 0) {
+          throw "Vehicle not found";
+        }
+        await db.vehicle.updateMany({
+          where: {
+            id: {
+              in: ids,
+            },
           },
-        },
-        data: {
-          ...(rest.status !== undefined && { status: rest.status }),
-        },
+          data: {
+            ...(rest.status !== undefined && { status: rest.status }),
+          },
+        });
+
+        const updatedVehicles = await prisma.vehicle.findMany({
+          where: { id: { in: ids } },
+        });
+
+        for (let i = 0; i < ids.length; i++) {
+          const oldValueJson = JSON.stringify(currentVehicles[i]);
+          const newValueJson = JSON.stringify(updatedVehicles[i]);
+
+          await prisma.genericAuditLog.create({
+            data: {
+              id: generateId(15),
+              entityId: currentVehicles[i].id,
+              changeType: "STATUS_CHANGE",
+              entityType: "VENUE",
+              oldValue: oldValueJson,
+              newValue: newValueJson,
+              changedById: user.id,
+            },
+          });
+        }
       });
 
       return revalidatePath(path);
