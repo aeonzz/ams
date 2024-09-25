@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import ContentLayout from "@/components/layouts/content-layout";
 import { userSearchParamsSchema } from "@/lib/schema";
 import { SearchParams } from "@/lib/types";
-import DepartmentUsersScreen from "./_components/department-users-screen";
+import DepartmentUsersScreen from "./_components";
 
 export interface DepartmentUsersPageProps {
   params: { departmentId: string };

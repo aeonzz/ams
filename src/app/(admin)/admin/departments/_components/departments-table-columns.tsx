@@ -20,7 +20,13 @@ import { P } from "@/components/typography/text";
 import { usePathname } from "next/navigation";
 import { UpdateDepartmentSheet } from "./update-department-sheet";
 import { DeleteDepartmentsDialog } from "./delete-departments-dialog";
-import { ChevronDownIcon, ChevronRightIcon } from "lucide-react";
+import {
+  ChevronDownIcon,
+  ChevronRightIcon,
+  Circle,
+  CircleCheck,
+  CircleX,
+} from "lucide-react";
 import type { DepartmentsTableType } from "./types";
 import { formatDate } from "date-fns";
 import { textTransform } from "@/lib/utils";
@@ -121,10 +127,29 @@ export function getDepartmentsColumns(): ColumnDef<DepartmentsTableType>[] {
       ),
       cell: ({ row }) => {
         return (
-          <div className="flex space-x-2">
-            <Badge variant={row.original.acceptsJobs ? "green" : "red"}>
-              {row.original.acceptsJobs ? "Yes" : "No"}
-            </Badge>
+          <div className="flex justify-center space-x-2">
+            {row.original.acceptsJobs ? (
+              <CircleCheck className="size-5 text-green-500" />
+            ) : (
+              <CircleX className="size-5 text-red-500" />
+            )}
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "acceptsTransport",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Transport Services" />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="flex justify-center space-x-2">
+            {row.original.acceptsTransport ? (
+              <CircleCheck className="size-5 text-green-500" />
+            ) : (
+              <CircleX className="size-5 text-red-500" />
+            )}
           </div>
         );
       },

@@ -100,7 +100,7 @@ export function UpdateDepartmentSheet({
       loading: "Saving...",
       success: () => {
         props.onOpenChange?.(false);
-        return "User updated successfully";
+        return "Department updated successfully";
       },
       error: (err) => {
         console.log(err);
@@ -260,6 +260,29 @@ export function UpdateDepartmentSheet({
                       <FormDescription className="text-xs">
                         Indicates whether this department can handle job
                         requests.
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="acceptsTransport"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-sm">
+                        Transport Services
+                      </FormLabel>
+                      <FormDescription className="text-xs">
+                        Indicates whether this department offers or manages
+                        transport services.
                       </FormDescription>
                     </div>
                     <FormControl>

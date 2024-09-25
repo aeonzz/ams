@@ -56,7 +56,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { cn, getVehicleStatusIcon, textTransform } from "@/lib/utils";
+import { cn, getVehicleStatusColor, textTransform } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import {
   updateVehicleSchema,
@@ -65,7 +65,7 @@ import {
 import { ExtendedUpdateVehicleServerSchema } from "@/lib/schema/vehicle";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Check, ChevronsUpDown, Dot } from "lucide-react";
 import { UpdateVehicleSheetSkeleton } from "./update-vehicle-sheet-skeleton";
 
 interface UpdateVehicleProps extends React.ComponentPropsWithRef<typeof Sheet> {
@@ -269,18 +269,24 @@ export function UpdateVehicleSheet({ vehicle, ...props }: UpdateVehicleProps) {
                         </FormControl>
                         <SelectContent className="bg-secondary">
                           <SelectGroup>
-                            {VehicleStatusSchema.options.map((status) => {
-                              const { icon: Icon, variant } =
-                                getVehicleStatusIcon(status);
+                            {VehicleStatusSchema.options.map((option) => {
+                              const status = getVehicleStatusColor(option);
                               return (
                                 <SelectItem
-                                  key={status}
-                                  value={status}
+                                  key={option}
+                                  value={option}
                                   className="capitalize"
                                 >
-                                  <Badge variant={variant}>
-                                    <Icon className="mr-1 size-4" />
-                                    {textTransform(status)}
+                                  <Badge
+                                    variant={status.variant}
+                                    className="pr-3.5"
+                                  >
+                                    <Dot
+                                      className="mr-1 size-3"
+                                      strokeWidth={status.stroke}
+                                      color={status.color}
+                                    />
+                                    {textTransform(option)}
                                   </Badge>
                                 </SelectItem>
                               );

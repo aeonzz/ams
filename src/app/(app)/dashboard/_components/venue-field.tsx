@@ -24,10 +24,10 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Check, ChevronsUpDown, Dot } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Path, UseFormReturn } from "react-hook-form";
-import { cn, getVenueStatusIcon, textTransform } from "@/lib/utils";
+import { cn, getVenueStatusColor, textTransform } from "@/lib/utils";
 import { type Venue } from "prisma/generated/zod";
 import { type VenueRequestSchema } from "@/lib/schema/request";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
@@ -87,9 +87,7 @@ export default function VenueField({
                   <CommandEmpty>No venues found.</CommandEmpty>
                   <CommandGroup>
                     {data?.map((venue) => {
-                      const { icon: Icon, variant } = getVenueStatusIcon(
-                        venue.status
-                      );
+                      const status = getVenueStatusColor(venue.status);
                       return (
                         <CommandItem
                           value={venue.id}
@@ -111,8 +109,15 @@ export default function VenueField({
                             <div className="flex flex-grow flex-col justify-between">
                               <div className="space-y-1 truncate">
                                 <P className="truncate">{venue.name}</P>
-                                <Badge variant={variant} className="ml-auto">
-                                  <Icon className="mr-1 size-4" />
+                                <Badge
+                                  variant={status.variant}
+                                  className="pr-3.5"
+                                >
+                                  <Dot
+                                    className="mr-1 size-3"
+                                    strokeWidth={status.stroke}
+                                    color={status.color}
+                                  />
                                   {textTransform(venue.status)}
                                 </Badge>
                               </div>

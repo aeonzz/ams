@@ -25,11 +25,20 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { X } from "lucide-react";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
-import { createVehicleSchema, type CreateVehicleSchema } from "@/lib/db/schema/vehicle";
+import {
+  createVehicleSchema,
+  type CreateVehicleSchema,
+} from "@/lib/db/schema/vehicle";
 import { createVehicle } from "@/lib/actions/vehicle";
 import CreateVehicleForm from "./create-vehicle-form";
 
-export default function CreateVehicleDialog() {
+interface CreateVehicleDialogProps {
+  queryKey?: string[];
+}
+
+export default function CreateVehicleDialog({
+  queryKey,
+}: CreateVehicleDialogProps) {
   const dialogManager = useDialogManager();
   const [alertOpen, setAlertOpen] = React.useState(false);
 
@@ -40,8 +49,7 @@ export default function CreateVehicleDialog() {
   const { dirtyFields } = useFormState({ control: form.control });
   const isFieldsDirty = Object.keys(dirtyFields).length > 0;
 
-  const { mutateAsync, isPending } =
-    useServerActionMutation(createVehicle);
+  const { mutateAsync, isPending } = useServerActionMutation(createVehicle);
 
   const handleOpenChange = (open: boolean) => {
     if (!open) {
@@ -107,6 +115,7 @@ export default function CreateVehicleDialog() {
           </DialogDescription>
         </DialogHeader>
         <CreateVehicleForm
+          queryKey={queryKey}
           mutateAsync={mutateAsync}
           isPending={isPending}
           setAlertOpen={setAlertOpen}

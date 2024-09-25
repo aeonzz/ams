@@ -5,7 +5,7 @@ import { type ColumnDef } from "@tanstack/react-table";
 
 import {
   getPriorityIcon,
-  getVehicleStatusIcon,
+  getVehicleStatusColor,
   textTransform,
 } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -40,6 +40,7 @@ import { UpdateVehicleSheet } from "./update-vehicle-sheet";
 import { DeleteVehiclesDialog } from "./delete-vehicles-dialog";
 import { formatDate } from "date-fns";
 import type { VehicleTableType } from "./types";
+import { Dot } from "lucide-react";
 
 export function getVehiclesColumns(): ColumnDef<VehicleTableType>[] {
   return [
@@ -164,13 +165,15 @@ export function getVehiclesColumns(): ColumnDef<VehicleTableType>[] {
         <DataTableColumnHeader column={column} title="status" />
       ),
       cell: ({ row }) => {
-        const { icon: Icon, variant } = getVehicleStatusIcon(
-          row.original.status
-        );
+        const status = getVehicleStatusColor(row.original.status);
         return (
           <div className="flex items-center">
-            <Badge variant={variant}>
-              <Icon className="mr-1 size-4" />
+            <Badge variant={status.variant} className="pr-3.5">
+              <Dot
+                className="mr-1 size-3"
+                strokeWidth={status.stroke}
+                color={status.color}
+              />
               {textTransform(row.original.status)}
             </Badge>
           </div>
@@ -272,20 +275,23 @@ export function getVehiclesColumns(): ColumnDef<VehicleTableType>[] {
                         );
                       }}
                     >
-                      {VehicleStatusSchema.options.map((status) => {
-                        const { icon: Icon, variant } =
-                          getVehicleStatusIcon(status);
+                      {VehicleStatusSchema.options.map((option) => {
+                        const status = getVehicleStatusColor(option);
                         return (
                           <DropdownMenuRadioItem
-                            key={status}
-                            value={status}
+                            key={option}
+                            value={option}
                             className="capitalize"
                             disabled={isPending}
                             onSelect={(e) => e.preventDefault()}
                           >
-                            <Badge variant={variant}>
-                              <Icon className="mr-1 size-4" />
-                              {textTransform(status)}
+                            <Badge variant={status.variant} className="pr-3.5">
+                              <Dot
+                                className="mr-1 size-3"
+                                strokeWidth={status.stroke}
+                                color={status.color}
+                              />
+                              {textTransform(option)}
                             </Badge>
                           </DropdownMenuRadioItem>
                         );

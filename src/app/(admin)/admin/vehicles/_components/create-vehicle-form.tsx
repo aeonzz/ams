@@ -28,7 +28,11 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { DialogFooter } from "@/components/ui/dialog";
 import { SubmitButton } from "@/components/ui/submit-button";
-import { useQuery, type UseMutateAsyncFunction } from "@tanstack/react-query";
+import {
+  useQuery,
+  useQueryClient,
+  type UseMutateAsyncFunction,
+} from "@tanstack/react-query";
 import { type UseFormReturn } from "react-hook-form";
 import { usePathname } from "next/navigation";
 import { DialogState } from "@/lib/hooks/use-dialog-manager";
@@ -56,6 +60,7 @@ interface CreateVenueFehiclerops {
   isPending: boolean;
   isFieldsDirty: boolean;
   dialogManager: DialogState;
+  queryKey?: string[];
 }
 
 export default function CreateVehicleForm({
@@ -65,9 +70,11 @@ export default function CreateVehicleForm({
   isFieldsDirty,
   setAlertOpen,
   dialogManager,
+  queryKey,
 }: CreateVenueFehiclerops) {
   const [open, setOpen] = React.useState(false);
   const pathname = usePathname();
+  const queryClient = useQueryClient();
 
   const { data, isLoading } = useQuery<Department[]>({
     queryFn: async () => {
@@ -100,6 +107,9 @@ export default function CreateVehicleForm({
       toast.promise(mutateAsync(data), {
         loading: "Creating...",
         success: () => {
+          queryClient.invalidateQueries({
+            queryKey: queryKey,
+          });
           dialogManager.setActiveDialog(null);
           return "Vehicle created successfully";
         },
@@ -195,73 +205,75 @@ export default function CreateVehicleForm({
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="departmentId"
-            render={({ field }) => (
-              <FormItem className="flex-1">
-                <FormLabel>Assign Managing Department</FormLabel>
-                <Popover open={open} onOpenChange={setOpen}>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant="outline"
-                        role="combobox"
-                        disabled={isLoading || isPending}
-                        className="w-full justify-between text-muted-foreground"
-                      >
-                        {field.value
-                          ? data?.find(
-                              (department) => department.id === field.value
-                            )?.name
-                          : "Select a department to manage"}
-                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="p-0">
-                    <Command>
-                      <CommandInput placeholder="Search department..." />
-                      <CommandList>
-                        <CommandEmpty>
-                          {isLoading ? "Loading..." : "No department found."}
-                        </CommandEmpty>
-                        <CommandGroup>
-                          <div className="scroll-bar max-h-40 overflow-y-auto">
-                            {data?.map((department) => (
-                              <CommandItem
-                                value={department.name}
-                                key={department.id}
-                                onSelect={() => {
-                                  field.onChange(
-                                    department.id === field.value
-                                      ? ""
-                                      : department.id
-                                  );
-                                  setOpen(false);
-                                }}
-                              >
-                                <Check
-                                  className={cn(
-                                    "mr-2 h-4 w-4",
-                                    field.value === department.id
-                                      ? "opacity-100"
-                                      : "opacity-0"
-                                  )}
-                                />
-                                {department.name}
-                              </CommandItem>
-                            ))}
-                          </div>
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          {!queryKey && (
+            <FormField
+              control={form.control}
+              name="departmentId"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel>Assign Managing Department</FormLabel>
+                  <Popover open={open} onOpenChange={setOpen}>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          disabled={isLoading || isPending}
+                          className="w-full justify-between text-muted-foreground"
+                        >
+                          {field.value
+                            ? data?.find(
+                                (department) => department.id === field.value
+                              )?.name
+                            : "Select a department to manage"}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="p-0">
+                      <Command>
+                        <CommandInput placeholder="Search department..." />
+                        <CommandList>
+                          <CommandEmpty>
+                            {isLoading ? "Loading..." : "No department found."}
+                          </CommandEmpty>
+                          <CommandGroup>
+                            <div className="scroll-bar max-h-40 overflow-y-auto">
+                              {data?.map((department) => (
+                                <CommandItem
+                                  value={department.name}
+                                  key={department.id}
+                                  onSelect={() => {
+                                    field.onChange(
+                                      department.id === field.value
+                                        ? ""
+                                        : department.id
+                                    );
+                                    setOpen(false);
+                                  }}
+                                >
+                                  <Check
+                                    className={cn(
+                                      "mr-2 h-4 w-4",
+                                      field.value === department.id
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                  {department.name}
+                                </CommandItem>
+                              ))}
+                            </div>
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
           <FormField
             control={form.control}
             name="imageUrl"

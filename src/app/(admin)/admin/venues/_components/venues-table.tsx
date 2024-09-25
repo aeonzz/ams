@@ -9,7 +9,6 @@ import { DataTableToolbar } from "@/components/data-table/data-table-toolbar";
 import { useDataTable } from "@/lib/hooks/use-data-table";
 import { type DataTableFilterField } from "@/lib/types";
 import { VenuesTableToolbarActions } from "./venues-table-toolbar-actions";
-import { getVenueStatusIcon } from "@/lib/utils";
 import { VenuesTableFloatingBar } from "./venues-table-floating-bar";
 import { VenueStatusSchema, VenueTypeSchema } from "prisma/generated/zod";
 import { getVenues } from "@/lib/actions/venue";
@@ -51,7 +50,6 @@ export function VenuesTable({ venuesPromise }: VenuesTableProps) {
           venue.charAt(0).toUpperCase() +
           venue.slice(1).toLowerCase().replace(/_/g, " "),
         value: venue,
-        icon: getVenueStatusIcon(venue).icon,
         withCount: true,
       })),
     },

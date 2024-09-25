@@ -31,35 +31,45 @@ export function getMenuList({
     roles.includes(role.role.name)
   );
 
-  const departmentLinks = currentUser.userDepartments.map((userDepartment) => ({
-    href: `/department/${userDepartment.departmentId}`,
-    label: userDepartment.department.name,
-    active: pathname.includes(`/department/${userDepartment.departmentId}`),
-    icon: Building,
-    submenus: [
+  const departmentLinks = currentUser.userDepartments.map((userDepartment) => {
+    const baseSubmenus = [
       {
         href: `/department/${userDepartment.departmentId}/requests/pending?page=1&per_page=10&sort=createdAt.desc`,
         label: "Pending Requests",
-        active: pathname.includes(
-          `/department/${userDepartment.departmentId}/requests/pending`
-        ),
+        active:
+          pathname ===
+          `/department/${userDepartment.departmentId}/requests/pending`,
       },
       {
         href: `/department/${userDepartment.departmentId}/facilities`,
         label: "Facilities",
-        active: pathname.includes(
-          `/department/${userDepartment.departmentId}/facilities`
-        ),
+        active:
+          pathname === `/department/${userDepartment.departmentId}/facilities`,
       },
       {
         href: `/department/${userDepartment.departmentId}/users`,
         label: "Users",
-        active: pathname.includes(
-          `/department/${userDepartment.departmentId}/users`
-        ),
+        active: pathname === `/department/${userDepartment.departmentId}/users`,
       },
-    ],
-  }));
+    ];
+
+    if (userDepartment.department.acceptsTransport) {
+      baseSubmenus.push({
+        href: `/department/${userDepartment.departmentId}/transport`,
+        label: "Transport Service",
+        active:
+          pathname === `/department/${userDepartment.departmentId}/transport`,
+      });
+    }
+
+    return {
+      href: `/department/${userDepartment.departmentId}`,
+      label: userDepartment.department.name,
+      active: pathname.includes(`/department/${userDepartment.departmentId}`),
+      icon: Building,
+      submenus: baseSubmenus,
+    };
+  });
 
   return [
     {

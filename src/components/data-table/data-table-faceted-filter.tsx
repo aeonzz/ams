@@ -2,7 +2,7 @@ import type { Option } from "@/lib/types";
 import { CheckIcon, PlusCircledIcon } from "@radix-ui/react-icons";
 import type { Column } from "@tanstack/react-table";
 
-import { cn, getVenueStatusIcon, textTransform } from "@/lib/utils";
+import { cn, textTransform } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {

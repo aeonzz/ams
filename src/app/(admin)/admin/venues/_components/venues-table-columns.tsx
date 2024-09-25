@@ -3,7 +3,7 @@
 import * as React from "react";
 import { type ColumnDef } from "@tanstack/react-table";
 
-import { getVenueStatusIcon, textTransform } from "@/lib/utils";
+import { getVenueStatusColor, textTransform } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
 
 import { P } from "@/components/typography/text";
@@ -36,6 +36,7 @@ import { DeleteVenuesDialog } from "./delete-venues-dialog";
 import { formatDate } from "date-fns";
 import type { VenueTableType } from "./types";
 import { VenueFeaturesType } from "@/lib/types/venue";
+import { Dot } from "lucide-react";
 
 export function getVenuesColumns(): ColumnDef<VenueTableType>[] {
   return [
@@ -185,11 +186,15 @@ export function getVenuesColumns(): ColumnDef<VenueTableType>[] {
         <DataTableColumnHeader column={column} title="Status" />
       ),
       cell: ({ row }) => {
-        const { icon: Icon, variant } = getVenueStatusIcon(row.original.status);
+        const status = getVenueStatusColor(row.original.status);
         return (
           <div className="flex items-center">
-            <Badge variant={variant}>
-              <Icon className="mr-1 size-4" />
+            <Badge variant={status.variant} className="pr-3.5">
+              <Dot
+                className="mr-1 size-3"
+                strokeWidth={status.stroke}
+                color={status.color}
+              />
               {textTransform(row.original.status)}
             </Badge>
           </div>
@@ -278,6 +283,7 @@ export function getVenuesColumns(): ColumnDef<VenueTableType>[] {
                             id: row.original.id,
                             status: value as VenueStatusType,
                             path: pathname,
+                            changeType: "STATUS_CHANGE",
                           }),
                           {
                             loading: "Updating status...",
@@ -293,8 +299,7 @@ export function getVenuesColumns(): ColumnDef<VenueTableType>[] {
                       }}
                     >
                       {VenueStatusSchema.options.map((status) => {
-                        const { icon: Icon, variant } =
-                          getVenueStatusIcon(status);
+                        const value = getVenueStatusColor(status);
                         return (
                           <DropdownMenuRadioItem
                             key={status}
@@ -303,8 +308,12 @@ export function getVenuesColumns(): ColumnDef<VenueTableType>[] {
                             disabled={isPending}
                             onSelect={(e) => e.preventDefault()}
                           >
-                            <Badge variant={variant}>
-                              <Icon className="mr-1 size-4" />
+                            <Badge variant={value.variant} className="pr-3.5">
+                              <Dot
+                                className="mr-1 size-3"
+                                strokeWidth={value.stroke}
+                                color={value.color}
+                              />
                               {textTransform(status)}
                             </Badge>
                           </DropdownMenuRadioItem>

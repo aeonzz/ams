@@ -194,6 +194,7 @@ export function getStatusColor(
     }
   );
 }
+
 type VenueStatusColorConfig = {
   color: string;
   variant: BadgeVariant;
@@ -244,6 +245,51 @@ export function getVenueStatusColor(
   );
 }
 
+type VehicleStatusColorConfig = {
+  color: string;
+  variant: BadgeVariant;
+  stroke: number;
+};
+
+type VehicleStatusColorMap = {
+  [key in VehicleStatusType]: VehicleStatusColorConfig;
+};
+
+export function getVehicleStatusColor(
+  status: VehicleStatusType
+): VehicleStatusColorConfig {
+  const vehicleStatusColors: VehicleStatusColorMap = {
+    AVAILABLE: {
+      color: "#22c55e",
+      variant: "green",
+      stroke: 10,
+    },
+    IN_USE: {
+      color: "#eab308",
+      variant: "yellow",
+      stroke: 10,
+    },
+    UNDER_MAINTENANCE: {
+      color: "#ef4444",
+      variant: "red",
+      stroke: 10,
+    },
+    RESERVED: {
+      color: "#a855f7",
+      variant: "purple",
+      stroke: 10,
+    },
+  };
+
+  return (
+    vehicleStatusColors[status] || {
+      color: "#64748b",
+      variant: "gray",
+      stroke: 10,
+    }
+  );
+}
+
 type RequestTypeIconConfig = {
   icon: LucideIcon;
   variant: BadgeVariant;
@@ -278,76 +324,6 @@ export function getRequestTypeIcon(
   return (
     requestTypeIcons[requestType] || { icon: CircleIcon, variant: "default" }
   );
-}
-
-type VehicleStatusIconConfig = {
-  icon: LucideIcon;
-  variant: BadgeVariant;
-};
-
-type VehicleStatusIconMap = {
-  [key in VehicleStatusType]: VehicleStatusIconConfig;
-};
-
-export function getVehicleStatusIcon(
-  status: VehicleStatusType
-): VehicleStatusIconConfig {
-  const VehicleStatusIcons: VehicleStatusIconMap = {
-    AVAILABLE: {
-      icon: CheckCircle,
-      variant: "green",
-    },
-    IN_USE: {
-      icon: Truck,
-      variant: "blue",
-    },
-    UNDER_MAINTENANCE: {
-      icon: PenTool,
-      variant: "orange",
-    },
-    RESERVED: {
-      icon: BookMarked,
-      variant: "yellow",
-    },
-  };
-  return VehicleStatusIcons[status] || { icon: CircleIcon, variant: "default" };
-}
-
-type VenueStatusIconConfig = {
-  icon: LucideIcon;
-  variant: BadgeVariant;
-};
-
-type VenueStatusIconMap = {
-  [key in VenueStatusType]: VenueStatusIconConfig;
-};
-
-export function getVenueStatusIcon(
-  status: VenueStatusType
-): VenueStatusIconConfig {
-  const VenueStatusIcons: VenueStatusIconMap = {
-    AVAILABLE: {
-      icon: CheckCircle,
-      variant: "green",
-    },
-    IN_USE: {
-      icon: Truck,
-      variant: "blue",
-    },
-    UNDER_MAINTENANCE: {
-      icon: PenTool,
-      variant: "orange",
-    },
-    RESERVED: {
-      icon: BookMarked,
-      variant: "yellow",
-    },
-    CLOSED: {
-      icon: CircleX,
-      variant: "red",
-    },
-  };
-  return VenueStatusIcons[status] || { icon: CircleIcon, variant: "default" };
 }
 
 type ReturnableItemStatusIconConfig = {

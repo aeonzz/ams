@@ -62,11 +62,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { cn, getVenueStatusIcon, textTransform } from "@/lib/utils";
+import { cn, getVenueStatusColor, textTransform } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Check, ChevronsUpDown, Dot } from "lucide-react";
 import { UpdateVenueSheetSkeleton } from "./update-venue-sheet-skeleton";
 import VenueFeatures from "./venue-features";
 import { VenueFeaturesType } from "@/lib/types/venue";
@@ -302,18 +302,24 @@ export function UpdateVenueSheet({
                         </FormControl>
                         <SelectContent className="bg-secondary">
                           <SelectGroup>
-                            {VenueStatusSchema.options.map((status) => {
-                              const { icon: Icon, variant } =
-                                getVenueStatusIcon(status);
+                            {VenueStatusSchema.options.map((option) => {
+                              const status = getVenueStatusColor(option);
                               return (
                                 <SelectItem
-                                  key={status}
-                                  value={status}
+                                  key={option}
+                                  value={option}
                                   className="capitalize"
                                 >
-                                  <Badge variant={variant}>
-                                    <Icon className="mr-1 size-4" />
-                                    {textTransform(status)}
+                                  <Badge
+                                    variant={status.variant}
+                                    className="pr-3.5"
+                                  >
+                                    <Dot
+                                      className="mr-1 size-3"
+                                      strokeWidth={status.stroke}
+                                      color={status.color}
+                                    />
+                                    {textTransform(option)}
                                   </Badge>
                                 </SelectItem>
                               );

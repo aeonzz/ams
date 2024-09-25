@@ -1,9 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
+import NotFound from "@/app/not-found";
+import FetchDataError from "@/components/card/fetch-data-error";
+import { H4, P } from "@/components/typography/text";
+import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { type VenueWithRelations } from "prisma/generated/zod";
+import { CalendarX, Dot, ExternalLink, PlusIcon, Search } from "lucide-react";
+import type { VehicleWithRelations } from "prisma/generated/zod";
+import React from "react";
 import {
   Card,
   CardContent,
@@ -11,36 +16,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button, buttonVariants } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  MapPin,
-  Users,
-  Calendar,
-  Archive,
-  Loader2,
-  CalendarX,
-  Dot,
-  Search,
-  ExternalLink,
-  PlusIcon,
-} from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import FetchDataError from "@/components/card/fetch-data-error";
-import { H4, P } from "@/components/typography/text";
-import { Skeleton } from "@/components/ui/skeleton";
-import DepartmentVenuesSkeleton from "./department-venues-skeleton";
-import { useRouter } from "next/navigation";
-import { cn, getVenueStatusColor, textTransform } from "@/lib/utils";
-import Image from "next/image";
-import { VenueFeaturesType } from "@/lib/types/venue";
 import SearchInput from "@/app/(app)/_components/search-input";
+import { Input } from "@/components/ui/input";
+import { Button, buttonVariants } from "@/components/ui/button";
 import Link from "next/link";
-import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
-import NotFound from "@/app/not-found";
+import Image from "next/image";
+import { Badge } from "@/components/ui/badge";
+import { cn, getVehicleStatusColor, textTransform } from "@/lib/utils";
 
-interface DepartmentVenuesScreenProps {
+interface DepartmentVehicleScreen {
   departmentId: string;
 }
 
@@ -51,28 +35,27 @@ const NoDataMessage = ({ message }: { message: string }) => (
   </div>
 );
 
-export default function DepartmentVenuesScreen({
+export default function DepartmentVehicleScreen({
   departmentId,
-}: DepartmentVenuesScreenProps) {
-  const router = useRouter();
+}: DepartmentVehicleScreen) {
   const dialogManager = useDialogManager();
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = React.useState("");
 
   const { data, isLoading, refetch, isError, error } = useQuery<
-    VenueWithRelations[]
+    VehicleWithRelations[]
   >({
     queryFn: async () => {
       const res = await axios.get(
-        `/api/venue/get-department-venues/${departmentId}`
+        `/api/vehicle/get-department-vehicles/${departmentId}`
       );
       return res.data.data;
     },
-    queryKey: ["department-venues", departmentId],
+    queryKey: ["department-vehicles", departmentId],
   });
 
-  const filteredVenues =
-    data?.filter((venue) =>
-      venue.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredVehicles =
+    data?.filter((vehicle) =>
+      vehicle.name.toLowerCase().includes(searchTerm.toLowerCase())
     ) || [];
 
   if (isError && axios.isAxiosError(error) && error.response?.status === 404) {
@@ -82,18 +65,18 @@ export default function DepartmentVenuesScreen({
   return (
     <div className="flex h-full w-full flex-col">
       <div className="flex h-[50px] items-center justify-between border-b px-3">
-        <P className="font-medium">Facilities</P>
+        <P className="font-medium">Vehicles</P>
         <SearchInput />
       </div>
       <div className="scroll-bar flex flex-1 justify-center overflow-y-auto p-3">
         {isLoading ? (
-          <DepartmentVenuesSkeleton />
+          <p>Loading...</p>
         ) : isError ? (
           <div className="flex h-screen w-full items-center justify-center">
             <FetchDataError refetch={refetch} />
           </div>
         ) : data?.length === 0 ? (
-          <NoDataMessage message="No facilities available." />
+          <NoDataMessage message="No vehicles available." />
         ) : (
           <div className="w-[1280px]">
             <div className="mb-3 flex w-full justify-between">
@@ -101,7 +84,7 @@ export default function DepartmentVenuesScreen({
                 <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 transform text-muted-foreground" />
                 <Input
                   type="text"
-                  placeholder="Search facilities..."
+                  placeholder="Search vehicles..."
                   className="h-9 w-[280px] bg-tertiary pl-8"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -110,31 +93,31 @@ export default function DepartmentVenuesScreen({
               <Button
                 variant="default"
                 onClick={() =>
-                  dialogManager.setActiveDialog("adminCreateVenueDialog")
+                  dialogManager.setActiveDialog("adminCreateVehicleDialog")
                 }
               >
                 <PlusIcon className="mr-1 size-4" aria-hidden="true" />
                 <P className="font-semibold">Add</P>
               </Button>
             </div>
-            {filteredVenues.length === 0 ? (
-              <NoDataMessage message="No facilities found. Try adjusting your search" />
+            {filteredVehicles.length === 0 ? (
+              <NoDataMessage message="No vehicles found. Try adjusting your search" />
             ) : (
               <div className="grid grid-cols-1 gap-3 pb-3 md:grid-cols-2 lg:grid-cols-3">
-                {filteredVenues.map((venue) => {
-                  const status = getVenueStatusColor(venue.status);
+                {filteredVehicles.map((vehicle) => {
+                  const status = getVehicleStatusColor(vehicle.status);
                   return (
                     <Link
-                      href={`/department/${departmentId}/facilities/${venue.id}`}
+                      href={`/department/${departmentId}/facilities/${vehicle.id}`}
                     >
                       <Card
-                        key={venue.id}
+                        key={vehicle.id}
                         className="relative cursor-pointer overflow-hidden shadow-md transition-all hover:border-primary"
                       >
                         <div className="relative aspect-video h-48 w-full">
                           <Image
-                            src={venue.imageUrl}
-                            alt={`Image of ${venue.name}`}
+                            src={vehicle.imageUrl}
+                            alt={`Image of ${vehicle.name}`}
                             fill
                             priority
                             className="object-cover"
@@ -142,7 +125,7 @@ export default function DepartmentVenuesScreen({
                         </div>
                         <CardHeader className="p-3">
                           <CardTitle className="flex max-w-64 items-center justify-between">
-                            <H4 className="truncate">{venue.name}</H4>
+                            <H4 className="truncate">{vehicle.name}</H4>
                           </CardTitle>
                           <div className="flex items-center justify-between">
                             <Badge variant={status.variant} className="pr-3.5">
@@ -151,10 +134,10 @@ export default function DepartmentVenuesScreen({
                                 strokeWidth={status.stroke}
                                 color={status.color}
                               />
-                              {textTransform(venue.status)}
+                              {textTransform(vehicle.status)}
                             </Badge>
                             <Link
-                              href={`/department/${departmentId}/facilities/${venue.id}`}
+                              href={`/department/${departmentId}/facilities/${vehicle.id}`}
                               className={cn(
                                 buttonVariants({
                                   variant: "ghost2",

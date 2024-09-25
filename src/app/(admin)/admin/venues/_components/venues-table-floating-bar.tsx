@@ -28,7 +28,7 @@ import {
 import CommandTooltip from "@/components/ui/command-tooltip";
 import { CommandShortcut } from "@/components/ui/command";
 import { P } from "@/components/typography/text";
-import { Activity, User2 } from "lucide-react";
+import { Activity, Dot, User2 } from "lucide-react";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
 import { deleteUsers } from "@/lib/actions/users";
 import { usePathname } from "next/navigation";
@@ -48,7 +48,7 @@ import VenueStatusSchema, {
   type VenueStatusType,
 } from "prisma/generated/zod/inputTypeSchemas/VenueStatusSchema";
 import { deleteVenues, updateVenueStatuses } from "@/lib/actions/venue";
-import { getVenueStatusIcon, textTransform } from "@/lib/utils";
+import { getVenueStatusColor, textTransform } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import type { VenueTableType } from "./types";
 
@@ -158,17 +158,21 @@ export function VenuesTableFloatingBar({ table }: VenuesTableFloatingBarProps) {
               </Tooltip>
               <SelectContent align="center">
                 <SelectGroup>
-                  {VenueStatusSchema.options.map((status) => {
-                    const { icon: Icon, variant } = getVenueStatusIcon(status);
+                  {VenueStatusSchema.options.map((option) => {
+                    const status = getVenueStatusColor(option);
                     return (
                       <SelectItem
-                        key={status}
-                        value={status}
+                        key={option}
+                        value={option}
                         className="capitalize"
                       >
-                        <Badge variant={variant}>
-                          <Icon className="mr-1 size-4" />
-                          {textTransform(status)}
+                        <Badge variant={status.variant} className="pr-3.5">
+                          <Dot
+                            className="mr-1 size-3"
+                            strokeWidth={status.stroke}
+                            color={status.color}
+                          />
+                          {textTransform(option)}
                         </Badge>
                       </SelectItem>
                     );

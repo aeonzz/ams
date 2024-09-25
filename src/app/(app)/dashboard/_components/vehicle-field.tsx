@@ -24,10 +24,10 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Check, ChevronsUpDown, Dot } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FieldValues, Path, UseFormReturn } from "react-hook-form";
-import { cn, getVehicleStatusIcon, textTransform } from "@/lib/utils";
+import { cn, getVehicleStatusColor, textTransform } from "@/lib/utils";
 import { Vehicle } from "prisma/generated/zod";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
@@ -99,9 +99,7 @@ export default function VehicleField({
                   <CommandEmpty>No vehicles found.</CommandEmpty>
                   <CommandGroup>
                     {data?.map((vehicle) => {
-                      const { icon: Icon, variant } = getVehicleStatusIcon(
-                        vehicle.status
-                      );
+                      const status = getVehicleStatusColor(vehicle.status);
                       return (
                         <CommandItem
                           value={vehicle.id}
@@ -112,19 +110,23 @@ export default function VehicleField({
                           }}
                         >
                           <div className="self-start pt-1">
-                          <Check
-                            className={cn(
-                              "mr-2 h-4 w-4",
-                              vehicle.id === field.value
-                                ? "opacity-100"
-                                : "opacity-0"
-                            )}
-                          />
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                vehicle.id === field.value
+                                  ? "opacity-100"
+                                  : "opacity-0"
+                              )}
+                            />
                           </div>
                           <div className="space-y-1 truncate">
                             <P className="truncate">{vehicle.name}</P>
-                            <Badge variant={variant} className="ml-auto">
-                              <Icon className="mr-1 size-4" />
+                            <Badge variant={status.variant} className="pr-3.5">
+                              <Dot
+                                className="mr-1 size-3"
+                                strokeWidth={status.stroke}
+                                color={status.color}
+                              />
                               {textTransform(vehicle.status)}
                             </Badge>
                           </div>

@@ -9,7 +9,6 @@ import { DataTableToolbar } from "@/components/data-table/data-table-toolbar";
 import { useDataTable } from "@/lib/hooks/use-data-table";
 import { type DataTableFilterField } from "@/lib/types";
 import { VehiclesTableToolbarActions } from "./vehicles-table-toolbar-actions";
-import { getVehicleStatusIcon } from "@/lib/utils";
 import { VehicleStatusSchema } from "prisma/generated/zod";
 import { getVehiclesColumns } from "./vehicles-table-columns";
 import { getVehicles } from "@/lib/actions/vehicle";
@@ -51,7 +50,6 @@ export function VehiclesTable({ vehiclesPromise }: VehiclesTableProps) {
           vehicle.charAt(0).toUpperCase() +
           vehicle.slice(1).toLowerCase().replace(/_/g, " "),
         value: vehicle,
-        icon: getVehicleStatusIcon(vehicle).icon,
         withCount: true,
       })),
     },
