@@ -53,7 +53,6 @@ export function DepartmentUsersTable({
   return (
     <ModifiedDataTable
       table={table}
-      showSelectedRows={false}
       floatingBar={
         <DepartmentUsersTableFloatingBar
           table={table}

@@ -28,7 +28,7 @@ import {
 import CommandTooltip from "@/components/ui/command-tooltip";
 import { CommandShortcut } from "@/components/ui/command";
 import { P } from "@/components/typography/text";
-import { User2 } from "lucide-react";
+import { User2, UserRound } from "lucide-react";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
 import { deleteUsers } from "@/lib/actions/users";
 import { usePathname } from "next/navigation";
@@ -136,12 +136,12 @@ export function DepartmentUsersTableFloatingBar({
                   {isPending && method === "add-role" ? (
                     <LoadingSpinner />
                   ) : (
-                    <TrashIcon className="size-5" aria-hidden="true" />
+                    <UserRound className="size-5" aria-hidden="true" />
                   )}
                 </Button>
               </TooltipTrigger>
               <TooltipContent className="border bg-accent font-semibold text-foreground dark:bg-zinc-900">
-                <P>Delete users</P>
+                <P>Add roles</P>
               </TooltipContent>
             </Tooltip>
           </div>

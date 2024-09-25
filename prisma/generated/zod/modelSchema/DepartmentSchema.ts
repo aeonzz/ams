@@ -25,6 +25,7 @@ export const DepartmentSchema = z.object({
   description: z.string().nullable(),
   name: z.string(),
   acceptsJobs: z.boolean(),
+  acceptsTransport: z.boolean(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
   responsibilities: z.string().nullable(),

@@ -52,6 +52,7 @@ model Department {
   description       String?
   name              String
   acceptsJobs       Boolean             @default(false)
+  acceptsTransport  Boolean             @default(false)
   createdAt         DateTime            @default(now())
   updatedAt         DateTime            @updatedAt
   responsibilities  String?

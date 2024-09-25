@@ -86,23 +86,25 @@ export function UserRolesDialog({ user, open, setOpen }: UserRolesDialogProps) {
       <CommandDialog open={open} onOpenChange={setOpen}>
         <CommandInput placeholder="User roles..." />
         <CommandList>
-          <CommandEmpty>No results found.</CommandEmpty>
           <CommandGroup heading="User roles">
-            {user.userRole.map((role) => (
-              <CommandItem
-                key={role.id}
-                onSelect={() => handleRoleSelect(role.id)}
-                className="justify-between"
-              >
-                <div className="flex items-center gap-2">
-                  <User2Icon className="h-4 w-4" />
-                  <P className="font-semibold">{role.role.name}</P>
-                </div>
-                <span className="text-sm text-muted-foreground">
-                  {new Date(role.createdAt).toLocaleDateString()}
-                </span>
-              </CommandItem>
-            ))}
+            <CommandEmpty>No results found.</CommandEmpty>
+            {user.userRole
+              .filter((role) => role.role.name !== "DEPARTMENT_HEAD")
+              .map((role) => (
+                <CommandItem
+                  key={role.id}
+                  onSelect={() => handleRoleSelect(role.id)}
+                  className="justify-between"
+                >
+                  <div className="flex items-center gap-2">
+                    <User2Icon className="h-4 w-4" />
+                    <P className="font-semibold">{role.role.name}</P>
+                  </div>
+                  <span className="text-sm text-muted-foreground">
+                    {new Date(role.createdAt).toLocaleDateString()}
+                  </span>
+                </CommandItem>
+              ))}
           </CommandGroup>
         </CommandList>
       </CommandDialog>

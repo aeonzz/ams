@@ -26,8 +26,22 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
-import { Trash, User, User2Icon, UserRound, UserRoundPlus } from "lucide-react";
+import {
+  SquareUser,
+  Trash,
+  User,
+  User2Icon,
+  UserRound,
+  UserRoundPlus,
+} from "lucide-react";
 import { UserRolesDialog } from "./user-roles-dialog";
 import { RolesDialog } from "./roles-dialog";
 import { useQuery } from "@tanstack/react-query";
@@ -112,8 +126,22 @@ export function getDepartmentUsersColumns({
       ),
       cell: ({ row }) => {
         return (
-          <div className="flex space-x-2">
+          <div className="flex items-center space-x-1">
             <P className="truncate font-medium">{row.getValue("email")}</P>
+            <TooltipProvider delayDuration={100}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  {row.original.userRole.find(
+                    (role) => role.role.name === "DEPARTMENT_HEAD"
+                  ) && (
+                    <SquareUser className="size-5 cursor-pointer text-yellow-500" />
+                  )}
+                </TooltipTrigger>
+                <TooltipContent>
+                  <P>Department Head</P>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         );
       },
@@ -217,14 +245,6 @@ export function getDepartmentUsersColumns({
                 >
                   <UserRoundPlus className="mr-2 size-4" />
                   Add role
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onSelect={() => {}}
-                  className="focus:bg-destructive focus:text-destructive-foreground"
-                >
-                  <Trash className="mr-2 size-4" />
-                  <p className="truncate">Remove from dept.</p>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
