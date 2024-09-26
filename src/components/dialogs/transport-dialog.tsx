@@ -5,6 +5,8 @@ import React from "react";
 import {
   Dialog,
   DialogContent,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import {
   AlertDialog,
@@ -40,7 +42,7 @@ export default function TransportDialog() {
       vehicleId: undefined,
       description: "",
       destination: undefined,
-      dateAndTimeNeeded: undefined
+      dateAndTimeNeeded: undefined,
     },
   });
 
@@ -48,8 +50,9 @@ export default function TransportDialog() {
   const { dirtyFields } = useFormState({ control: form.control });
   const isFieldsDirty = Object.keys(dirtyFields).length > 0;
 
-  const { mutateAsync, isPending } =
-    useServerActionMutation(createTransportRequest);
+  const { mutateAsync, isPending } = useServerActionMutation(
+    createTransportRequest
+  );
 
   const handleOpenChange = (open: boolean) => {
     if (!open) {
@@ -109,6 +112,9 @@ export default function TransportDialog() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+        <DialogHeader>
+          <DialogTitle>Transport Request</DialogTitle>
+        </DialogHeader>
         <TransportRequestInput
           mutateAsync={mutateAsync}
           isPending={isPending}

@@ -100,7 +100,6 @@ export default function VenueRequestInput({
   isFieldsDirty,
 }: VenueRequestInputProps) {
   const pathname = usePathname();
-  const currentUser = useSession();
   const queryClient = useQueryClient();
   const venueId = form.watch("venueId");
 
@@ -396,7 +395,7 @@ export default function VenueRequestInput({
                                 {feature.name}
                               </FormLabel>
                             </FormItem>
-                          )
+                          ) 
                         )}
                     </div>
                     <FormMessage />

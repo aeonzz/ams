@@ -50,6 +50,7 @@ interface DateTimePickerProps<T extends FieldValues> {
 }
 
 const timePresets = [
+  { label: "4:00 AM", hours: 4, minutes: 0 },
   { label: "4:30 AM", hours: 4, minutes: 30 },
   { label: "5:30 AM", hours: 5, minutes: 30 },
   { label: "6:00 AM", hours: 6, minutes: 0 },
@@ -146,7 +147,7 @@ export default function DateTimePicker<T extends FieldValues>({
               <FormControl>
                 <PopoverTrigger asChild>
                   <Button
-                    variant="secondary"
+                    variant="outline"
                     disabled={disabled || isLoading}
                     className={cn(
                       "justify-start text-left font-normal",
@@ -179,10 +180,11 @@ export default function DateTimePicker<T extends FieldValues>({
                     selected={field.value}
                     onSelect={(date) => {
                       setSelectedDate(date || null);
+                      setSelectedTime(timePresets[0].label);
                       if (date) {
                         const newDate = field.value
                           ? new Date(field.value)
-                          : new Date(new Date().setHours(9, 0, 0, 0));
+                          : new Date(new Date().setHours(4, 0, 0, 0));
                         newDate.setFullYear(
                           date.getFullYear(),
                           date.getMonth(),
@@ -194,6 +196,7 @@ export default function DateTimePicker<T extends FieldValues>({
                       }
                     }}
                     initialFocus
+                    disabled={isDateInPast}
                   />
                   <div className="space-y-3 overflow-y-auto p-3">
                     <Select

@@ -12,7 +12,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 export default function VehicleLoadingSkeleton() {
   return (
     <div className="w-[1280px]">
-      <div className="mb-3 h-9 w-[280px] bg-tertiary rounded-md"></div>
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
         {[...Array(6)].map((_, index) => (
           <div

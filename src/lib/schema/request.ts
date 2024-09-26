@@ -104,10 +104,13 @@ export const transportRequestSchema = z.object({
   destination: z.string().min(1, "Please add a destination"),
   dateAndTimeNeeded: z
     .date({
-      required_error: "Start time is required",
+      required_error: "Date time is required",
     })
     .min(new Date(), {
       message: "Date needed must be in the future",
+    })
+    .refine((date) => date.getHours() !== 0 || date.getMinutes() !== 0, {
+      message: "Time cannot be exactly midnight (00:00)",
     }),
 });
 

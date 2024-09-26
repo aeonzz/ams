@@ -13,16 +13,6 @@ export async function GET(req: Request, params: Context) {
   const today = new Date();
   try {
     const reservedDatesAndTimes = await db.transportRequest.findMany({
-      select: {
-        dateAndTimeNeeded: true,
-        request: {
-          select: {
-            status: true,
-            title: true,
-            department: true,
-          },
-        },
-      },
       where: {
         vehicleId: vehicleId,
         dateAndTimeNeeded: {
@@ -36,7 +26,26 @@ export async function GET(req: Request, params: Context) {
             {
               status: "APPROVED",
             },
+            {
+              status: "REVIEWED",
+            },
           ],
+        },
+      },
+      select: {
+        dateAndTimeNeeded: true,
+        request: {
+          select: {
+            status: true,
+            title: true,
+            department: true,
+            user: true,
+            transportRequest: {
+              select: {
+                vehicle: true,
+              }
+            }
+          },
         },
       },
       orderBy: {

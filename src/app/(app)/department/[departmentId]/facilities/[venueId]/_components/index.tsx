@@ -14,7 +14,18 @@ import {
   Dot,
   Search,
   ChevronLeft,
+  Ellipsis,
+  EllipsisVertical,
+  Pencil,
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { H1, H4, H5, P } from "@/components/typography/text";
 import SearchInput from "@/app/(app)/_components/search-input";
 import FetchDataError from "@/components/card/fetch-data-error";
@@ -116,7 +127,34 @@ export default function ManageVenueScreen({ params }: ManageVenueScreenProps) {
           <div className="flex h-full flex-col gap-3">
             <div className="space-y-3">
               <div className="space-y-1">
-                <H1 className="w-[380px] text-3xl font-bold">{data.name}</H1>
+                <div className="flex justify-between">
+                  <UpdateVenueSheet
+                    open={showUpdateVenueSheet}
+                    onOpenChange={setShowUpdateVenueSheet}
+                    queryKey={["venue-details", venueId]}
+                    removeField
+                    //@ts-ignore
+                    venue={data}
+                  />
+                  <H1 className="max-w-[320px] break-all text-3xl font-bold">
+                    {data.name}
+                  </H1>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost2" size="icon">
+                        <EllipsisVertical className="size-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem
+                        onSelect={() => setShowUpdateVenueSheet(true)}
+                      >
+                        <Pencil className="mr-2 size-4" />
+                        Edit
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
                 <Badge variant={status.variant} className="pr-3.5">
                   <Dot
                     className="mr-1 size-3"
@@ -127,14 +165,6 @@ export default function ManageVenueScreen({ params }: ManageVenueScreenProps) {
                 </Badge>
               </div>
               <div className="flex gap-3">
-                <UpdateVenueSheet
-                  open={showUpdateVenueSheet}
-                  onOpenChange={setShowUpdateVenueSheet}
-                  queryKey={["venue-details", venueId]}
-                  removeField
-                  //@ts-ignore
-                  venue={data}
-                />
                 <PermissionGuard
                   allowedRoles={["DEPARTMENT_HEAD", "VENUE_MANAGER"]}
                   allowedDepartment={departmentId}

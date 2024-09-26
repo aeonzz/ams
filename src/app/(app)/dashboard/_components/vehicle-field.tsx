@@ -35,28 +35,22 @@ import { TransportRequestSchema } from "@/lib/schema/request";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
 import { H3, H5, P } from "@/components/typography/text";
 import { Badge } from "@/components/ui/badge";
+import Image from "next/image";
 
 interface VehicleFieldProps {
   form: UseFormReturn<TransportRequestSchema>;
   name: Path<TransportRequestSchema>;
   isPending: boolean;
+  data: Vehicle[] | undefined;
 }
 
 export default function VehicleField({
   form,
   name,
   isPending,
+  data,
 }: VehicleFieldProps) {
   const [open, setOpen] = React.useState(false);
-
-  const { data, isLoading } = useQuery<Vehicle[]>({
-    queryFn: async () => {
-      const res = await axios.get("/api/input-data/vehicles");
-      return res.data.data;
-    },
-    queryKey: ["get-input-vehicles"],
-    refetchOnWindowFocus: false,
-  });
 
   return (
     <FormField
@@ -69,9 +63,9 @@ export default function VehicleField({
             <PopoverTrigger asChild>
               <FormControl>
                 <Button
-                  variant="secondary"
+                  variant="outline"
                   role="combobox"
-                  disabled={isPending || isLoading}
+                  disabled={isPending}
                   className={cn(
                     "justify-start",
                     !field.value && "text-muted-foreground"
@@ -84,11 +78,7 @@ export default function VehicleField({
                   ) : (
                     "Select vehicle"
                   )}
-                  {isLoading ? (
-                    <LoadingSpinner className="ml-auto" />
-                  ) : (
-                    <ChevronsUpDown className="ml-auto h-4 w-4 shrink-0 opacity-50" />
-                  )}
+                  <ChevronsUpDown className="ml-auto h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </FormControl>
             </PopoverTrigger>
@@ -109,6 +99,32 @@ export default function VehicleField({
                             setOpen(false);
                           }}
                         >
+                          <div className="flex w-full space-x-3">
+                            <div className="relative aspect-square h-16 cursor-pointer transition-colors hover:brightness-75">
+                              <Image
+                                src={vehicle.imageUrl}
+                                alt={`Image of ${vehicle.name}`}
+                                fill
+                                className="rounded-md border object-cover"
+                              />
+                            </div>
+                            <div className="flex flex-grow flex-col justify-between">
+                              <div className="space-y-1 truncate">
+                                <P className="truncate">{vehicle.name}</P>
+                                <Badge
+                                  variant={status.variant}
+                                  className="pr-3.5"
+                                >
+                                  <Dot
+                                    className="mr-1 size-3"
+                                    strokeWidth={status.stroke}
+                                    color={status.color}
+                                  />
+                                  {textTransform(vehicle.status)}
+                                </Badge>
+                              </div>
+                            </div>
+                          </div>
                           <div className="self-start pt-1">
                             <Check
                               className={cn(
@@ -118,17 +134,6 @@ export default function VehicleField({
                                   : "opacity-0"
                               )}
                             />
-                          </div>
-                          <div className="space-y-1 truncate">
-                            <P className="truncate">{vehicle.name}</P>
-                            <Badge variant={status.variant} className="pr-3.5">
-                              <Dot
-                                className="mr-1 size-3"
-                                strokeWidth={status.stroke}
-                                color={status.color}
-                              />
-                              {textTransform(vehicle.status)}
-                            </Badge>
                           </div>
                         </CommandItem>
                       );

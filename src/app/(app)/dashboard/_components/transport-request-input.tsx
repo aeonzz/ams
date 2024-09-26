@@ -43,6 +43,9 @@ import LoadingSpinner from "@/components/loaders/loading-spinner";
 import { P } from "@/components/typography/text";
 import { cn } from "@/lib/utils";
 import VehicleScheduleCard from "./vehicle-schedule-card";
+import { Vehicle } from "prisma/generated/zod";
+import TransportRequestInputSkeleton from "./transport-request-input-skeleton";
+import ScheduledEventCardSkeleton from "./scheduled-event-card-skeleton";
 
 interface VenueRequestInputProps {
   mutateAsync: UseMutateAsyncFunction<
@@ -67,8 +70,6 @@ export default function TransportRequestInput({
   isFieldsDirty,
 }: VenueRequestInputProps) {
   const pathname = usePathname();
-  const currentUser = useSession();
-  const { department } = currentUser;
   const queryClient = useQueryClient();
   const vehicleId = form.watch("vehicleId");
 
@@ -85,6 +86,17 @@ export default function TransportRequestInput({
     refetchOnWindowFocus: false,
   });
 
+  const { data: vehicleData, isLoading: isLoadingVehicleData } = useQuery<
+    Vehicle[]
+  >({
+    queryFn: async () => {
+      const res = await axios.get("/api/input-data/vehicles");
+      return res.data.data;
+    },
+    queryKey: ["get-input-vehicles"],
+    refetchOnWindowFocus: false,
+  });
+
   React.useEffect(() => {
     if (vehicleId) {
       refetch();
@@ -97,18 +109,29 @@ export default function TransportRequestInput({
   }, [data]);
 
   async function onSubmit(values: TransportRequestSchema) {
+    const selectedVehicle = vehicleData?.find(
+      (vehicle) => vehicle.id === values.vehicleId
+    );
+
+    if (!selectedVehicle) {
+      toast.error("Selected vehicle not found.");
+      return;
+    }
+
     const data: ExtendedTransportRequestSchema = {
       ...values,
       priority: "LOW",
       type: type,
-      department: department,
+      departmentId: selectedVehicle.departmentId,
       path: pathname,
     };
 
     toast.promise(mutateAsync(data), {
       loading: "Submitting...",
       success: () => {
-        queryClient.invalidateQueries({ queryKey: ["user-dashboard-overview"] });
+        queryClient.invalidateQueries({
+          queryKey: ["user-dashboard-overview"],
+        });
         handleOpenChange(false);
         return "Your request has been submitted and is awaiting approval.";
       },
@@ -119,11 +142,10 @@ export default function TransportRequestInput({
     });
   }
 
+  if (isLoadingVehicleData) return <TransportRequestInputSkeleton />;
+
   return (
     <>
-      <DialogHeader>
-        <DialogTitle>Transport Request</DialogTitle>
-      </DialogHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="scroll-bar flex max-h-[60vh] gap-6 overflow-y-auto px-4 py-1">
@@ -132,6 +154,7 @@ export default function TransportRequestInput({
                 form={form}
                 name="vehicleId"
                 isPending={isPending}
+                data={vehicleData}
               />
               <DateTimePicker
                 form={form}
@@ -189,18 +212,31 @@ export default function TransportRequestInput({
               >
                 <P className="mb-2 font-semibold">Schedules</P>
                 {isLoading || isRefetching ? (
-                  <div className="grid h-32 w-full place-items-center">
-                    <LoadingSpinner />
-                  </div>
+                  <ScheduledEventCardSkeleton />
                 ) : !data || data.length === 0 ? (
                   <div className="grid h-32 w-full place-items-center">
                     <P>No schedules</P>
                   </div>
                 ) : (
                   <>
-                    {data.map((item, index) => (
+                    {(() => {
+                      const filteredData = data.filter(
+                        (item) =>
+                          item.request.transportRequest.vehicle.id === vehicleId
+                      );
+                      return filteredData.length === 0 ? (
+                        <div className="grid h-32 w-full place-items-center">
+                          <P>No reserved schedules</P>
+                        </div>
+                      ) : (
+                        filteredData.map((item, index) => (
+                          <VehicleScheduleCard key={index} data={item} />
+                        ))
+                      );
+                    })()}
+                    {/* {data.map((item, index) => (
                       <VehicleScheduleCard key={index} data={item} />
-                    ))}
+                    ))} */}
                   </>
                 )}
               </div>
