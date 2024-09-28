@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { format } from "date-fns";
 import {
   Calendar,
@@ -34,6 +35,7 @@ import { useSession } from "@/lib/hooks/use-session";
 import { useRequest } from "@/lib/hooks/use-request-store";
 import VenueRequestDetails from "./venue-request-details";
 import ReturnableResourceDetails from "./returnable-resource-details";
+import AddEstimatedTime from "./add-estimated-time";
 
 interface RequestDetailsProps {
   params: string;
@@ -48,7 +50,6 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
   if (isError) return <FetchDataError refetch={refetch} />;
   if (!data) return <NotFound />;
 
-  const PrioIcon = getPriorityIcon(data.priority);
   const statusColor = getStatusColor(data.status);
   const RequestTypeIcon = getRequestTypeIcon(data.type);
 
@@ -77,10 +78,6 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                     color={statusColor.color}
                   />
                   {textTransform(data.status)}
-                </Badge>
-                <Badge variant="outline">
-                  <PrioIcon className="mr-1 h-4 w-4" />
-                  {textTransform(data.priority)}
                 </Badge>
               </div>
               <P className="mb-2 text-muted-foreground">
@@ -212,13 +209,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                 {textTransform(data.status)}
               </Badge>
             </div>
-            <div>
-              <P className="mb-1 text-sm">Priority</P>
-              <Badge variant="outline">
-                <PrioIcon className="mr-2 h-4 w-4" />
-                {textTransform(data.priority)}
-              </Badge>
-            </div>
+            {data.type === "JOB" && <AddEstimatedTime data={data} />}
             <div>
               <P className="mb-1 text-sm">Requested by</P>
               <div className="flex items-center space-x-2 p-1">
@@ -276,7 +267,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
               entityType="JOB_REQUEST"
               showPersonnels
               allowedRoles={["REQUEST_REVIEWER"]}
-              allowedApproverRoles={["REQUEST_APPROVER"]}
+              allowedApproverRoles={["DEPARTMENT_HEAD"]}
               requestTypeId={data.jobRequest.id}
             />
           )}

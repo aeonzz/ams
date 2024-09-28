@@ -28,7 +28,7 @@ export default function MainMenu({ isOpen }: MainMenuProps) {
   const currentUser = useSession();
   const menuList = getMenuList({
     pathname,
-    roles: ["REQUEST_APPROVER", "REQUEST_REVIEWER", "DEPARTMENT_HEAD"],
+    roles: ["DEPARTMENT_HEAD", "REQUEST_REVIEWER", "DEPARTMENT_HEAD"],
     currentUser,
   });
 

@@ -59,7 +59,6 @@ export default function VenueRequestDetails({
           </ul>
         </div>
         <Separator className="my-6" />
-
         <div className="space-y-4 pb-20">
           <H4 className="font-semibold">Activity</H4>
           {isLoading ? (

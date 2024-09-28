@@ -10,79 +10,14 @@ import { generateText } from "ai";
 import { cohere } from "@ai-sdk/cohere";
 import { extendedJobRequestSchemaServer } from "../db/schema/job";
 import {
-  assignUserSchemaWithPath,
   createJobSectionSchemaWithPath,
   deleteJobSectionsSchema,
-  unassignUserWithPath,
   updateJobSectionSchemaWithPath,
 } from "@/app/(admin)/admin/job-sections/_components/schema";
 import {
   assignPersonnelSchemaWithPath,
   updateRequestStatusSchemaWithPath,
 } from "@/app/(app)/(params)/request/[requestId]/_components/schema";
-
-export async function getJobSections(input: GetJobSectionSchema) {
-  const { page, per_page, sort, name, from, to } = input;
-
-  try {
-    const skip = (page - 1) * per_page;
-
-    const [column, order] = (sort?.split(".") ?? ["createdAt", "desc"]) as [
-      keyof SectionWithRelations | undefined,
-      "asc" | "desc" | undefined,
-    ];
-
-    const where: any = {
-      isArchived: false,
-    };
-
-    if (name) {
-      where.name = { contains: name, mode: "insensitive" };
-    }
-
-    if (from && to) {
-      where.createdAt = {
-        gte: new Date(from),
-        lte: new Date(to),
-      };
-    }
-
-    const [data, total] = await db.$transaction([
-      db.section.findMany({
-        where,
-        take: per_page,
-        skip,
-        orderBy: {
-          [column || "createdAt"]: order || "desc",
-        },
-        include: {
-          user: {
-            select: {
-              id: true,
-              email: true,
-              firstName: true,
-              middleName: true,
-              lastName: true,
-              department: {
-                select: {
-                  id: true,
-                  name: true,
-                },
-              },
-            },
-          },
-        },
-      }),
-      db.section.count({ where }),
-    ]);
-    const pageCount = Math.ceil(total / per_page);
-
-    return { data, pageCount };
-  } catch (err) {
-    console.error(err);
-    return { data: [], pageCount: 0 };
-  }
-}
 
 // export const creatJobSection = authedProcedure
 //   .createServerAction()
@@ -355,6 +290,8 @@ export const updateJobRequestStatus = authedProcedure
       getErrorMessage(error);
     }
   });
+
+  
 
 // export const assignSection = authedProcedure
 //   .createServerAction()

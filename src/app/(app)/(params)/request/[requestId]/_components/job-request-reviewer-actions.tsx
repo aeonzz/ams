@@ -82,7 +82,9 @@ export default function JobRequestReviewerActions({
     refetch,
   } = useQuery<UserDepartmentWithRelations[]>({
     queryFn: async () => {
-      const res = await axios.get(`/api/user/personnel/get-personnels/${request.departmentId}`);
+      const res = await axios.get(
+        `/api/user/personnel/get-personnels/${request.departmentId}`
+      );
       return res.data.data;
     },
     queryKey: ["get-personnels"],
@@ -148,7 +150,6 @@ export default function JobRequestReviewerActions({
   const handleAssignPersonnel = React.useCallback(
     async (id: string) => {
       if (id === selectedPerson) {
-        toast.info("No changes made. The selected user is already assigned.");
         return;
       }
 
@@ -172,7 +173,7 @@ export default function JobRequestReviewerActions({
           return "Personnel assigned successfully.";
         },
         error: (err) => {
-          setSelectedPerson(null)
+          setSelectedPerson(null);
           console.error(err);
           return err.message;
         },

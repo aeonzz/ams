@@ -12,7 +12,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { format } from "date-fns";
-import { Calendar, Dot, FileText, User } from "lucide-react";
+import { Calendar, Clock, Dot, FileText, Timer, User } from "lucide-react";
 import Image from "next/image";
 import {
   GenericAuditLog,
@@ -41,7 +41,7 @@ export default function JobRequestDetails({ data }: JobRequestDetailsProps) {
         </H4>
         <div className="flex items-center space-x-2">
           <FileText className="h-5 w-5" />
-          <P>Job Type: {textTransform(data.jobType)}</P>
+          <P>Job type: {textTransform(data.jobType)}</P>
         </div>
         <div className="flex items-center space-x-2">
           <User className="h-5 w-5" />
@@ -58,7 +58,21 @@ export default function JobRequestDetails({ data }: JobRequestDetailsProps) {
         </div>
         <div className="flex items-center space-x-2">
           <Calendar className="h-5 w-5" />
-          <P>Due Date: {format(new Date(data.dueDate), "PPP p")}</P>
+          <P>Due date: {format(new Date(data.dueDate), "PPP p")}</P>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Clock className="h-5 w-5" />
+          <P>
+            Start date/time:{" "}
+            {data.startDate ? format(new Date(data.startDate), "PPP p") : "-"}
+          </P>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Clock className="h-5 w-5" />
+          <P>
+            End date/time:{" "}
+            {data.endDate ? format(new Date(data.endDate), "PPP p") : "-"}
+          </P>
         </div>
         <div>
           <H5 className="mb-2 font-semibold text-muted-foreground">

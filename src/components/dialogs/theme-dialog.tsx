@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { Check, Moon, Smile, Sun, SunMoon } from "lucide-react";
 
 import {
@@ -32,6 +33,27 @@ export default function ThemeDialog() {
     }
   };
 
+  const handleThemeChange = React.useCallback(
+    (themeValue: string) => {
+      setTheme(themeValue);
+      dialogManager.setActiveDialog(null);
+    },
+    [setTheme, dialogManager]
+  );
+
+  themes.forEach((themeItem, index) => {
+    useHotkeys(
+      `${index + 1}`,
+      () => {
+        if (dialogManager.activeDialog === "themeCommand") {
+          handleThemeChange(themeItem.value);
+        }
+      },
+      { enableOnFormTags: true },
+      [dialogManager.activeDialog, handleThemeChange]
+    );
+  });
+
   return (
     <CommandDialog
       open={dialogManager.activeDialog === "themeCommand"}
@@ -41,7 +63,7 @@ export default function ThemeDialog() {
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
         <CommandGroup heading="Themes">
-          {themes.map((item) => (
+          {themes.map((item, index) => (
             <CommandItem
               key={item.value}
               onSelect={() => {
@@ -51,7 +73,10 @@ export default function ThemeDialog() {
             >
               <item.icon className="mr-2 h-4 w-4" />
               <span>{item.name}</span>
-              {item.value === theme && <Check className="ml-auto" />}
+              <div className="ml-auto flex items-center gap-1">
+                {item.value === theme && <Check />}
+                <CommandShortcut>{index + 1}</CommandShortcut>
+              </div>
             </CommandItem>
           ))}
         </CommandGroup>

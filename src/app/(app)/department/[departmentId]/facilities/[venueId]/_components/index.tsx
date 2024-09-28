@@ -17,15 +17,8 @@ import {
   Ellipsis,
   EllipsisVertical,
   Pencil,
+  FileClock,
 } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { H1, H4, H5, P } from "@/components/typography/text";
 import SearchInput from "@/app/(app)/_components/search-input";
 import FetchDataError from "@/components/card/fetch-data-error";
@@ -45,6 +38,10 @@ import { useRouter } from "next/navigation";
 import ManageVenueSkeleton from "./manage-venue-skeleton";
 import { useSession } from "@/lib/hooks/use-session";
 import { PermissionGuard } from "@/components/permission-guard";
+import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
+import { useGetVenue } from "@/lib/hooks/use-get-venue-hook";
+import { useHotkeys } from "react-hotkeys-hook";
+import ManageVenueActions from "./manage-venue-actions";
 
 interface ManageVenueScreenProps {
   params: {
@@ -56,16 +53,9 @@ interface ManageVenueScreenProps {
 export default function ManageVenueScreen({ params }: ManageVenueScreenProps) {
   const currentUser = useSession();
   const router = useRouter();
+  const dialogManager = useDialogManager();
   const { departmentId, venueId } = params;
-  const [showUpdateVenueSheet, setShowUpdateVenueSheet] = React.useState(false);
-  const { data, isLoading, refetch, isError, error } =
-    useQuery<VenueWithRelations>({
-      queryFn: async () => {
-        const res = await axios.get(`/api/venue/get-venue/${venueId}`);
-        return res.data.data;
-      },
-      queryKey: ["venue-details", venueId],
-    });
+  const { data, isLoading, isError, error, refetch } = useGetVenue(venueId);
 
   if (isLoading) return <ManageVenueSkeleton />;
   if (isError && axios.isAxiosError(error) && error.response?.status === 404) {
@@ -128,41 +118,15 @@ export default function ManageVenueScreen({ params }: ManageVenueScreenProps) {
             <div className="space-y-3">
               <div className="space-y-1">
                 <div className="flex justify-between">
-                  <UpdateVenueSheet
-                    open={showUpdateVenueSheet}
-                    onOpenChange={setShowUpdateVenueSheet}
-                    queryKey={["venue-details", venueId]}
-                    removeField
-                    //@ts-ignore
-                    venue={data}
-                  />
                   <H1 className="max-w-[320px] break-all text-3xl font-bold">
                     {data.name}
                   </H1>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost2" size="icon">
-                        <EllipsisVertical className="size-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <DropdownMenuItem
-                        onSelect={() => setShowUpdateVenueSheet(true)}
-                      >
-                        <Pencil className="mr-2 size-4" />
-                        Edit
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-                <Badge variant={status.variant} className="pr-3.5">
-                  <Dot
-                    className="mr-1 size-3"
-                    strokeWidth={status.stroke}
-                    color={status.color}
+                  <ManageVenueActions
+                    venueId={venueId}
+                    departmentId={departmentId}
+                    data={data}
                   />
-                  {textTransform(data.status)}
-                </Badge>
+                </div>
               </div>
               <div className="flex gap-3">
                 <PermissionGuard
@@ -172,11 +136,19 @@ export default function ManageVenueScreen({ params }: ManageVenueScreenProps) {
                 >
                   <Button
                     className="flex-1"
-                    onClick={() => setShowUpdateVenueSheet(true)}
+                    variant="outline"
+                    onClick={() =>
+                      dialogManager.setActiveDialog("updateVenueStatusCommand")
+                    }
                   >
-                    Edit
+                    <Dot
+                      className="mr-1 size-3"
+                      strokeWidth={status.stroke}
+                      color={status.color}
+                    />
+                    {textTransform(data.status)}
                   </Button>
-                  <Link
+                  {/* <Link
                     href={`/department/${departmentId}/facilities/${venueId}/logs`}
                     className={cn(
                       buttonVariants({ variant: "secondary" }),
@@ -184,7 +156,7 @@ export default function ManageVenueScreen({ params }: ManageVenueScreenProps) {
                     )}
                   >
                     <P>Logs</P>
-                  </Link>
+                  </Link> */}
                 </PermissionGuard>
               </div>
             </div>

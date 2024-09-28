@@ -9,6 +9,7 @@ export type DialogType =
   | "resourceDialog"
   | "returnableResourceDialog"
   | "supplyResourceDialog"
+  | "updateVenueStatusCommand"
   | "transportDialog"
   | "settingsDialog"
   | "jobDetailsDialog"
