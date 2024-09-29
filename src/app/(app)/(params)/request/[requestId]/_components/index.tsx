@@ -209,7 +209,9 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                 {textTransform(data.status)}
               </Badge>
             </div>
-            {data.type === "JOB" && <AddEstimatedTime data={data} />}
+            {data.type === "JOB" && (
+              <AddEstimatedTime data={data} params={params} />
+            )}
             <div>
               <P className="mb-1 text-sm">Requested by</P>
               <div className="flex items-center space-x-2 p-1">

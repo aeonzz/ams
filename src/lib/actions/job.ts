@@ -16,6 +16,7 @@ import {
 } from "@/app/(admin)/admin/job-sections/_components/schema";
 import {
   assignPersonnelSchemaWithPath,
+  updateJobRequestSchemaWithPath,
   updateRequestStatusSchemaWithPath,
 } from "@/app/(app)/(params)/request/[requestId]/_components/schema";
 
@@ -291,7 +292,59 @@ export const updateJobRequestStatus = authedProcedure
     }
   });
 
-  
+export const updateJobRequest = authedProcedure
+  .createServerAction()
+  .input(updateJobRequestSchemaWithPath)
+  .handler(async ({ ctx, input }) => {
+    const { user } = ctx;
+    const { path, requestId, ...rest } = input;
+
+    try {
+      const result = await db.$transaction(async (prisma) => {
+        const currentRequest = await prisma.request.findUnique({
+          where: {
+            id: requestId,
+          },
+          include: {
+            jobRequest: true,
+          },
+        });
+
+        if (!currentRequest) {
+          throw "Request not found";
+        }
+
+        const updatedRequest = await prisma.jobRequest.update({
+          where: {
+            requestId: requestId,
+          },
+          data: {
+            ...rest,
+          },
+        });
+        const oldValueJson = JSON.parse(JSON.stringify(currentRequest));
+        const newValueJson = JSON.parse(JSON.stringify(updatedRequest));
+        await prisma.genericAuditLog.create({
+          data: {
+            id: generateId(15),
+            entityId: currentRequest.id,
+            entityType: "JOB_REQUEST",
+            changeType: "FIELD_UPDATE",
+            oldValue: oldValueJson,
+            newValue: newValueJson,
+            changedById: user.id,
+          },
+        });
+
+        return updatedRequest;
+      });
+
+      return revalidatePath(path);
+    } catch (error) {
+      console.log(error);
+      getErrorMessage(error);
+    }
+  });
 
 // export const assignSection = authedProcedure
 //   .createServerAction()

@@ -39,7 +39,6 @@ export default function JobDialog() {
     defaultValues: {
       description: "",
       images: undefined,
-      sectionId: undefined,
     },
   });
 
