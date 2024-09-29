@@ -161,11 +161,11 @@ export const createJobRequest = authedProcedure
         throw "Something went wrong, please try again later.";
       }
 
-      const newValueJson = JSON.parse(JSON.stringify(createRequest.jobRequest));
+      const newValueJson = JSON.parse(JSON.stringify(createRequest));
       await db.genericAuditLog.create({
         data: {
           id: generateId(15),
-          entityId: createRequest.jobRequest.id,
+          entityId: createRequest.id,
           entityType: "JOB_REQUEST",
           changeType: "CREATED",
           newValue: newValueJson,
@@ -188,32 +188,42 @@ export const assignPersonnel = authedProcedure
 
     try {
       const result = await db.$transaction(async (prisma) => {
-        const currentJobRequest = await prisma.jobRequest.findUnique({
+        const currentRequest = await prisma.request.findUnique({
           where: {
             id: requestId,
           },
+          include: {
+            jobRequest: true,
+          },
         });
 
-        if (!currentJobRequest) {
-          throw "JobRequest not found";
+        if (!currentRequest) {
+          throw "Request not found";
         }
 
-        const updatedJobRequest = await prisma.jobRequest.update({
+        const updatedRequest = await prisma.request.update({
           where: {
             id: requestId,
           },
           data: {
-            assignedTo: rest.personnelId,
+            jobRequest: {
+              update: {
+                assignedTo: rest.personnelId,
+              },
+            },
+          },
+          include: {
+            jobRequest: true,
           },
         });
 
-        const oldValueJson = JSON.parse(JSON.stringify(currentJobRequest));
-        const newValueJson = JSON.parse(JSON.stringify(updatedJobRequest));
+        const oldValueJson = JSON.parse(JSON.stringify(currentRequest));
+        const newValueJson = JSON.parse(JSON.stringify(updatedRequest));
 
         await prisma.genericAuditLog.create({
           data: {
             id: generateId(15),
-            entityId: updatedJobRequest.id,
+            entityId: requestId,
             changeType: "ASSIGNMENT_CHANGE",
             entityType: "JOB_REQUEST",
             oldValue: oldValueJson,
@@ -222,7 +232,7 @@ export const assignPersonnel = authedProcedure
           },
         });
 
-        return updatedJobRequest;
+        return updatedRequest;
       });
 
       return revalidatePath(path);
@@ -248,9 +258,6 @@ export const updateJobRequestStatus = authedProcedure
           },
           include: {
             jobRequest: true,
-            returnableRequest: true,
-            supplyRequest: true,
-            venueRequest: true,
           },
         });
 
@@ -273,7 +280,7 @@ export const updateJobRequestStatus = authedProcedure
         await prisma.genericAuditLog.create({
           data: {
             id: generateId(15),
-            entityId: currentRequest.id,
+            entityId: requestId,
             entityType: entityType,
             changeType: changeType,
             oldValue: oldValueJson,
@@ -314,12 +321,19 @@ export const updateJobRequest = authedProcedure
           throw "Request not found";
         }
 
-        const updatedRequest = await prisma.jobRequest.update({
+        const updatedRequest = await prisma.request.update({
           where: {
-            requestId: requestId,
+            id: requestId,
           },
           data: {
-            ...rest,
+            jobRequest: {
+              update: {
+                ...rest,
+              },
+            },
+          },
+          include: {
+            jobRequest: true,
           },
         });
         const oldValueJson = JSON.parse(JSON.stringify(currentRequest));
@@ -327,7 +341,7 @@ export const updateJobRequest = authedProcedure
         await prisma.genericAuditLog.create({
           data: {
             id: generateId(15),
-            entityId: currentRequest.id,
+            entityId: requestId,
             entityType: "JOB_REQUEST",
             changeType: "FIELD_UPDATE",
             oldValue: oldValueJson,

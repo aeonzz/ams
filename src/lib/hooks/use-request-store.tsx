@@ -23,7 +23,7 @@ export function useRequest(
   const query = useQuery<RequestWithRelations, Error>({
     queryKey: [id],
     queryFn: async () => {
-      const res = await axios.get(`/api/request/${id}`);
+      const res = await axios.get(`/api/request/get-request/${id}`);
       const data = res.data.data;
       setRequest(data);
       return data;

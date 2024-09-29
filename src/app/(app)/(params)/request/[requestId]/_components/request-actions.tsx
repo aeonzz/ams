@@ -18,9 +18,18 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { updateRequest } from "@/lib/actions/requests";
 import { type ExtendedUpdateJobRequestSchema } from "@/lib/schema/request";
 import { type RequestWithRelations } from "prisma/generated/zod";
+import { CommandShortcut } from "@/components/ui/command";
+import { P } from "@/components/typography/text";
+import { useHotkeys } from "react-hotkeys-hook";
 
 interface RequestActionsProps {
   data: RequestWithRelations;
@@ -54,6 +63,9 @@ export default function RequestActions({ data, params }: RequestActionsProps) {
           queryKey: [params],
         });
         queryClient.invalidateQueries({
+          queryKey: ["activity", data.id],
+        });
+        queryClient.invalidateQueries({
           queryKey: ["user-dashboard-overview"],
         });
         setIsDialogOpen(false);
@@ -68,36 +80,58 @@ export default function RequestActions({ data, params }: RequestActionsProps) {
     });
   }
 
+  useHotkeys(
+    "ctrl+c",
+    (event) => {
+      event.preventDefault();
+      setIsDialogOpen(true);
+    },
+    { enableOnFormTags: false }
+  );
+
   if (data.status !== "PENDING" || isPending) {
     return null;
   }
 
   return (
-    <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-      <AlertDialogTrigger asChild>
-        <Button variant="secondary" className="w-full">
-          Cancel Request
-        </Button>
-      </AlertDialogTrigger>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Confirm Request Cancellation</AlertDialogTitle>
-          <AlertDialogDescription>
-            This action cannot be undone. Canceling this request will
-            permanently stop any ongoing processes, and it will no longer be
-            tracked or acted upon.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction
-            className="bg-destructive hover:bg-destructive/90"
-            onClick={handleCancellation}
-          >
-            Continue
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+    <TooltipProvider>
+      <Tooltip>
+        <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <AlertDialogTrigger asChild>
+            <TooltipTrigger asChild>
+              <Button variant="secondary" className="w-full">
+                Cancel Request
+              </Button>
+            </TooltipTrigger>
+          </AlertDialogTrigger>
+          <AlertDialogContent onCloseAutoFocus={(e) => e.preventDefault()}>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Confirm Request Cancellation</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. Canceling this request will
+                permanently stop any ongoing processes, and it will no longer be
+                tracked or acted upon.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                className="bg-destructive hover:bg-destructive/90"
+                onClick={handleCancellation}
+              >
+                Continue
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+        <TooltipContent className="flex items-center gap-3" side="bottom">
+          <P>Cancel request</P>
+          <div className="space-x-1">
+            <CommandShortcut>Ctrl</CommandShortcut>
+            <CommandShortcut>C</CommandShortcut>
+          </div>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }

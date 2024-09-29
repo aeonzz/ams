@@ -47,7 +47,8 @@ import { type VehicleStatusType } from "prisma/generated/zod/inputTypeSchemas/Ve
 import { type VenueStatusType } from "prisma/generated/zod/inputTypeSchemas/VenueStatusSchema";
 import { type ItemStatusType } from "prisma/generated/zod/inputTypeSchemas/ItemStatusSchema";
 import { ChangeTypeType } from "prisma/generated/zod/inputTypeSchemas/ChangeTypeSchema";
-import { User as UserType } from "prisma/generated/zod";
+import { User as UserType, type UserWithRelations } from "prisma/generated/zod";
+import { JobStatusType } from "prisma/generated/zod/inputTypeSchemas/JobStatusSchema";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -127,6 +128,22 @@ export function formatDate(
 //   };
 //   return RoleIcons[role] || { icon: CircleIcon, variant: "default" };
 // }
+
+type PermissionGuard = {
+  currentUser: UserWithRelations;
+  allowedRoles: string[];
+};
+
+export function permissionGuard({
+  allowedRoles,
+  currentUser,
+}: PermissionGuard) {
+  const hasAllowedRole = currentUser.userRole.some((role) =>
+    allowedRoles.includes(role.role.name)
+  );
+
+  return hasAllowedRole;
+}
 
 export function getPriorityIcon(priority: PriorityTypeType) {
   const priorityIcons = {
@@ -238,6 +255,54 @@ export function getVenueStatusColor(
 
   return (
     venueStatusColors[status] || {
+      color: "#64748b",
+      variant: "gray",
+      stroke: 10,
+    }
+  );
+}
+
+type JobStatusColorConfig = {
+  color: string;
+  variant: BadgeVariant;
+  stroke: number;
+};
+
+type JobStatusColorMap = {
+  [key in JobStatusType]: JobStatusColorConfig;
+};
+
+export function getJobStatusColor(status: JobStatusType): JobStatusColorConfig {
+  const jobStatusColors: JobStatusColorMap = {
+    PENDING: {
+      color: "#eab308",
+      variant: "yellow",
+      stroke: 10,
+    },
+    IN_PROGRESS: {
+      color: "#3a40e8",
+      variant: "info",
+      stroke: 10,
+    },
+    COMPLETED: {
+      color: "#22c55e",
+      variant: "green",
+      stroke: 10,
+    },
+    CANCELLED: {
+      color: "#6b7280",
+      variant: "gray",
+      stroke: 10,
+    },
+    ON_HOLD: {
+      color: "#a855f7",
+      variant: "purple",
+      stroke: 10,
+    },
+  };
+
+  return (
+    jobStatusColors[status] || {
       color: "#64748b",
       variant: "gray",
       stroke: 10,

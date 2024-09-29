@@ -53,7 +53,7 @@ export default function JobRequestApproverActions({
             queryKey: [request.id],
           });
           queryClient.invalidateQueries({
-            queryKey: [requestTypeId],
+            queryKey: ["activity", request.id],
           });
           return `Request ${successText} successfully.`;
         },

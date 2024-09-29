@@ -22,15 +22,19 @@ import React from "react";
 
 interface JobRequestDetailsProps {
   data: JobRequestWithRelations;
+  requestId: string;
 }
 
-export default function JobRequestDetails({ data }: JobRequestDetailsProps) {
+export default function JobRequestDetails({
+  data,
+  requestId,
+}: JobRequestDetailsProps) {
   const { data: logs, isLoading } = useQuery<GenericAuditLog[]>({
     queryFn: async () => {
-      const res = await axios.get(`/api/audit-log/request-log/${data.id}`);
+      const res = await axios.get(`/api/audit-log/request-log/${requestId}`);
       return res.data.data;
     },
-    queryKey: [data.id],
+    queryKey: ["activity", requestId],
   });
 
   return (
@@ -59,6 +63,13 @@ export default function JobRequestDetails({ data }: JobRequestDetailsProps) {
         <div className="flex items-center space-x-2">
           <Calendar className="h-5 w-5" />
           <P>Due date: {format(new Date(data.dueDate), "PPP p")}</P>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Timer className="h-5 w-5" />
+          <P>
+            Estimated time:{" "}
+            {data.estimatedTime ? `${data.estimatedTime} hours` : "-"}
+          </P>
         </div>
         <div className="flex items-center space-x-2">
           <Clock className="h-5 w-5" />

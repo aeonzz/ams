@@ -115,7 +115,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
             </div>
             <Separator className="my-6" />
             {data.type === "JOB" && data.jobRequest && (
-              <JobRequestDetails data={data.jobRequest} />
+              <JobRequestDetails data={data.jobRequest} requestId={data.id} />
             )}
             {data.type === "VENUE" && data.venueRequest && (
               <VenueRequestDetails data={data.venueRequest} />
@@ -187,9 +187,13 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
         </div>
       </div>
       <Separator orientation="vertical" className="h-full" />
-      <div className="w-[320px] space-y-6 p-6">
+      <div className="w-[320px] p-6 pt-0">
+        <div className="py-2.5">
+          <H4 className="font-semibold text-muted-foreground">
+            Request Summary
+          </H4>
+        </div>
         <div>
-          <H4 className="mb-2 font-semibold">Request Summary</H4>
           <div className="space-y-4">
             <div>
               <P className="mb-1 text-sm">Request</P>
@@ -209,8 +213,8 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                 {textTransform(data.status)}
               </Badge>
             </div>
-            {data.type === "JOB" && (
-              <AddEstimatedTime data={data} params={params} />
+            {data.type === "JOB" && data.status !== "CANCELLED" && (
+              <AddEstimatedTime data={data} />
             )}
             <div>
               <P className="mb-1 text-sm">Requested by</P>
@@ -258,7 +262,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
             )}
           </div>
         </div>
-        <Separator />
+        <Separator className="my-6" />
         <div className="flex flex-col gap-3">
           {currentUser.id === data.userId && (
             <RequestActions data={data} params={params} />

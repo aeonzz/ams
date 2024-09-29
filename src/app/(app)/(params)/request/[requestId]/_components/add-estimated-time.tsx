@@ -24,7 +24,7 @@ import {
 import { useSession } from "@/lib/hooks/use-session";
 import { CommandList, CommandShortcut } from "@/components/ui/command";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn, permissionGuard } from "@/lib/utils";
 import { Check, Clock, Plus } from "lucide-react";
 import type { RequestWithRelations } from "prisma/generated/zod";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -48,15 +48,11 @@ import { Separator } from "@/components/ui/separator";
 
 interface AddEstimatedTimeProps {
   data: RequestWithRelations;
-  params: string;
 }
 
 const predefinedHours = [1, 2, 4, 8, 12, 20, 24];
 
-export default function AddEstimatedTime({
-  data,
-  params,
-}: AddEstimatedTimeProps) {
+export default function AddEstimatedTime({ data }: AddEstimatedTimeProps) {
   const currentUser = useSession();
   const pathname = usePathname();
   const queryClient = useQueryClient();
@@ -90,42 +86,52 @@ export default function AddEstimatedTime({
     }
   };
 
+  const canEdit = permissionGuard({
+    allowedRoles: ["DEPARTMENT_HEAD"],
+    currentUser,
+  });
+
   useHotkeys(
     "t",
     (event) => {
       event.preventDefault();
       setPopoverOpen(true);
     },
-    { enableOnFormTags: false }
+    {
+      enableOnFormTags: false,
+      enabled: canEdit,
+    }
   );
 
   useHotkeys(
     "a",
     (event) => {
-      if (popoverOpen) {
-        event.preventDefault();
-        setShowCustomInput(true);
-      }
+      event.preventDefault();
+      setShowCustomInput(true);
     },
-    { enableOnFormTags: true }
+    {
+      enableOnFormTags: true,
+      enabled: popoverOpen,
+    }
   );
 
   predefinedHours.forEach((hours, index) => {
     useHotkeys(
       `${index + 1}`,
       (event) => {
-        if (popoverOpen) {
-          if (
-            !showCustomInput ||
-            document.activeElement !== customInputRef.current
-          ) {
-            event.preventDefault();
-            form.setValue("estimatedTime", hours);
-            form.handleSubmit(onSubmit)();
-          }
+        if (
+          !showCustomInput ||
+          document.activeElement !== customInputRef.current
+        ) {
+          event.preventDefault();
+          form.setValue("estimatedTime", hours);
+          form.handleSubmit(onSubmit)();
         }
       },
-      { enableOnFormTags: true }
+      {
+        enableOnFormTags: true,
+        enabled: popoverOpen,
+      }
     );
   });
 
@@ -144,13 +150,16 @@ export default function AddEstimatedTime({
       mutateAsync({
         ...formData,
         path: pathname,
-        requestId: params,
+        requestId: data.id,
       }),
       {
         loading: "Updating estimated time...",
         success: () => {
           queryClient.invalidateQueries({
-            queryKey: [params],
+            queryKey: [data.id],
+          });
+          queryClient.invalidateQueries({
+            queryKey: ["activity", data.id],
           });
           return "Estimated time updated successfully";
         },
@@ -174,12 +183,9 @@ export default function AddEstimatedTime({
   };
 
   return (
-    <PermissionGuard
-      allowedRoles={["DEPARTMENT_HEAD"]}
-      currentUser={currentUser}
-    >
-      <div>
-        <P className="mb-1 text-sm">Estimated time</P>
+    <div>
+      <P className="mb-1 text-sm">Estimated time</P>
+      {canEdit ? (
         <TooltipProvider>
           <Tooltip open={tooltipOpen} onOpenChange={handleTooltipOpenChange}>
             <Popover
@@ -193,7 +199,7 @@ export default function AddEstimatedTime({
                     variant="ghost2"
                     size="sm"
                     className={cn(
-                      "w-full justify-start",
+                      "w-full justify-start px-2",
                       popoverOpen && "bg-secondary-accent"
                     )}
                   >
@@ -312,7 +318,23 @@ export default function AddEstimatedTime({
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
-      </div>
-    </PermissionGuard>
+      ) : (
+        <Button
+          variant="ghost2"
+          size="sm"
+          className={cn(
+            "w-full justify-start px-2",
+            popoverOpen && "bg-secondary-accent"
+          )}
+        >
+          <Clock className="mr-2 size-4" />
+          {data.jobRequest?.estimatedTime ? (
+            `${data.jobRequest.estimatedTime} hours`
+          ) : (
+            <P className="text-muted-foreground">Add</P>
+          )}
+        </Button>
+      )}
+    </div>
   );
 }

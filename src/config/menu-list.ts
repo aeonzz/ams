@@ -5,6 +5,7 @@ import {
   Building,
   Calendar,
   FolderKanban,
+  Hammer,
   HelpCircle,
   LayoutGrid,
   Mails,
@@ -30,9 +31,16 @@ export function getMenuList({
   const hasAllowedRole = userRole.some((role) =>
     roles.includes(role.role.name)
   );
+  const isPersonnel = userRole.some((role) => role.role.name === "PERSONNEL");
 
   const departmentLinks = currentUser.userDepartments.map((userDepartment) => {
     const baseSubmenus = [
+      {
+        href: `/department/${userDepartment.departmentId}/overview`,
+        label: "Overview",
+        active:
+          pathname === `/department/${userDepartment.departmentId}/overview`,
+      },
       {
         href: `/department/${userDepartment.departmentId}/requests/pending?page=1&per_page=10&sort=createdAt.desc`,
         label: "Pending Requests",
@@ -89,6 +97,17 @@ export function getMenuList({
           icon: Bell,
           submenus: [],
         },
+        ...(isPersonnel
+          ? [
+              {
+                href: "/job-requests",
+                label: "My Job Requests",
+                active: pathname.includes("/job-request"),
+                icon: Hammer,
+                submenus: [],
+              },
+            ]
+          : []),
       ],
     },
     ...(hasAllowedRole
