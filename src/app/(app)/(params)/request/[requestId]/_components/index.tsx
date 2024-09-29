@@ -36,6 +36,7 @@ import { useRequest } from "@/lib/hooks/use-request-store";
 import VenueRequestDetails from "./venue-request-details";
 import ReturnableResourceDetails from "./returnable-resource-details";
 import AddEstimatedTime from "./add-estimated-time";
+import UpdateJobStatus from "./update-job-status";
 
 interface RequestDetailsProps {
   params: string;
@@ -197,14 +198,14 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
           <div className="space-y-4">
             <div>
               <P className="mb-1 text-sm">Request</P>
-              <Badge variant={RequestTypeIcon.variant}>
+              <Badge variant={RequestTypeIcon.variant} className="mx-2 mt-1">
                 <RequestTypeIcon.icon className="mr-2 h-4 w-4" />
                 {textTransform(data.type)}
               </Badge>
             </div>
             <div>
               <P className="mb-1 text-sm">Status</P>
-              <Badge variant={statusColor.variant} className="pr-3.5">
+              <Badge variant={statusColor.variant} className="pr-3.5 mx-2 mt-1">
                 <Dot
                   className="mr-1 size-3"
                   strokeWidth={statusColor.stroke}
@@ -216,6 +217,9 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
             {data.type === "JOB" && data.status !== "CANCELLED" && (
               <AddEstimatedTime data={data} />
             )}
+            {data.type === "JOB" &&
+              data.status === "APPROVED" &&
+              data.jobRequest && <UpdateJobStatus data={data.jobRequest} requestId={params} />}
             <div>
               <P className="mb-1 text-sm">Requested by</P>
               <div className="flex items-center space-x-2 p-1">

@@ -1,6 +1,7 @@
 import {
   ChangeTypeSchema,
   EntityTypeSchema,
+  JobStatusSchema,
   JobTypeSchema,
   RequestStatusTypeSchema,
 } from "prisma/generated/zod";
@@ -46,6 +47,7 @@ export const updateJobRequestSchema = z.object({
   description: z.string().optional(),
   dueDate: z.date().optional(),
   estimatedTime: z.number().optional(),
+  status: JobStatusSchema.optional(),
   startDate: z.date().optional(),
   endDate: z.string().optional(),
   jobType: JobTypeSchema.optional(),

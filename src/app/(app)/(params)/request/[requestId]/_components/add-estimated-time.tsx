@@ -2,7 +2,7 @@
 
 import { PermissionGuard } from "@/components/permission-guard";
 import { P } from "@/components/typography/text";
-import React, { useState, useRef, useEffect } from "react";
+import React from "react";
 import {
   Tooltip,
   TooltipContent,
@@ -56,11 +56,11 @@ export default function AddEstimatedTime({ data }: AddEstimatedTimeProps) {
   const currentUser = useSession();
   const pathname = usePathname();
   const queryClient = useQueryClient();
-  const [popoverOpen, setPopoverOpen] = useState(false);
-  const [tooltipOpen, setTooltipOpen] = useState(false);
-  const [showCustomInput, setShowCustomInput] = useState(false);
-  const [customHours, setCustomHours] = useState("");
-  const customInputRef = useRef<HTMLInputElement>(null);
+  const [popoverOpen, setPopoverOpen] = React.useState(false);
+  const [tooltipOpen, setTooltipOpen] = React.useState(false);
+  const [showCustomInput, setShowCustomInput] = React.useState(false);
+  const [customHours, setCustomHours] = React.useState("");
+  const customInputRef = React.useRef<HTMLInputElement>(null);
   const form = useForm<UpdateJobRequestSchema>({
     resolver: zodResolver(updateJobRequestSchema),
     defaultValues: {
@@ -135,7 +135,7 @@ export default function AddEstimatedTime({ data }: AddEstimatedTimeProps) {
     );
   });
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (showCustomInput && customInputRef.current) {
       customInputRef.current.focus();
     }
