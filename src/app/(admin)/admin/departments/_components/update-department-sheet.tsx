@@ -72,6 +72,7 @@ export function UpdateDepartmentSheet({
       departmentType: department.departmentType,
       description: department.description ?? "",
       responsibilities: department.responsibilities ?? "",
+      acceptsTransport: department.acceptsTransport,
     },
   });
 
@@ -86,6 +87,7 @@ export function UpdateDepartmentSheet({
       departmentType: department.departmentType,
       description: department.description ?? "",
       responsibilities: department.responsibilities ?? "",
+      acceptsTransport: department.acceptsTransport,
     });
   }, [department, form]);
 

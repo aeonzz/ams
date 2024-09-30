@@ -19,6 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import {
   cn,
   formatFullName,
+  getJobStatusColor,
   getPriorityIcon,
   getRequestTypeIcon,
   getStatusColor,
@@ -36,7 +37,7 @@ import { useRequest } from "@/lib/hooks/use-request-store";
 import VenueRequestDetails from "./venue-request-details";
 import ReturnableResourceDetails from "./returnable-resource-details";
 import AddEstimatedTime from "./add-estimated-time";
-import UpdateJobStatus from "./update-job-status";
+import PersonnelActions from "./personnel-actions";
 
 interface RequestDetailsProps {
   params: string;
@@ -198,14 +199,14 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
           <div className="space-y-4">
             <div>
               <P className="mb-1 text-sm">Request</P>
-              <Badge variant={RequestTypeIcon.variant} className="mx-2 mt-1">
+              <Badge variant={RequestTypeIcon.variant}>
                 <RequestTypeIcon.icon className="mr-2 h-4 w-4" />
                 {textTransform(data.type)}
               </Badge>
             </div>
             <div>
               <P className="mb-1 text-sm">Status</P>
-              <Badge variant={statusColor.variant} className="pr-3.5 mx-2 mt-1">
+              <Badge variant={statusColor.variant} className="pr-3.5">
                 <Dot
                   className="mr-1 size-3"
                   strokeWidth={statusColor.stroke}
@@ -219,7 +220,29 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
             )}
             {data.type === "JOB" &&
               data.status === "APPROVED" &&
-              data.jobRequest && <UpdateJobStatus data={data.jobRequest} requestId={params} />}
+              data.jobRequest && (
+                <div>
+                  <P className="mb-1 text-sm">Job Status</P>
+                  {(() => {
+                    const JobStatusColor = getJobStatusColor(
+                      data.jobRequest.status
+                    );
+                    return (
+                      <Badge
+                        variant={JobStatusColor.variant}
+                        className="pr-3.5"
+                      >
+                        <Dot
+                          className="mr-1 size-3"
+                          strokeWidth={JobStatusColor.stroke}
+                          color={JobStatusColor.color}
+                        />
+                        {textTransform(data.jobRequest.status)}
+                      </Badge>
+                    );
+                  })()}
+                </div>
+              )}
             <div>
               <P className="mb-1 text-sm">Requested by</P>
               <div className="flex items-center space-x-2 p-1">
@@ -279,6 +302,14 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
               allowedRoles={["REQUEST_REVIEWER"]}
               allowedApproverRoles={["DEPARTMENT_HEAD"]}
               requestTypeId={data.jobRequest.id}
+            />
+          )}
+          {data.type === "JOB" && data.jobRequest && (
+            <PersonnelActions
+              requestId={params}
+              allowedDepartment={data.departmentId}
+              allowedRoles={["PERSONNEL"]}
+              data={data.jobRequest}
             />
           )}
           {data.type === "RESOURCE" && data.returnableRequest && (

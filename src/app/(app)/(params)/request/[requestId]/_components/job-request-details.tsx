@@ -1,18 +1,28 @@
 "use client";
 
 import { H4, H5, P } from "@/components/typography/text";
+import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   cn,
   formatFullName,
   getChangeTypeInfo,
+  getJobStatusColor,
   textTransform,
 } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { format } from "date-fns";
-import { Calendar, Clock, Dot, FileText, Timer, User } from "lucide-react";
+import {
+  Calendar,
+  Circle,
+  Clock,
+  Dot,
+  FileText,
+  Timer,
+  User,
+} from "lucide-react";
 import Image from "next/image";
 import {
   GenericAuditLog,
@@ -36,6 +46,8 @@ export default function JobRequestDetails({
     },
     queryKey: ["activity", requestId],
   });
+
+  const JobStatusColor = getJobStatusColor(data.status);
 
   return (
     <>
@@ -69,6 +81,20 @@ export default function JobRequestDetails({
           <P>
             Estimated time:{" "}
             {data.estimatedTime ? `${data.estimatedTime} hours` : "-"}
+          </P>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Circle className="h-5 w-5" />
+          <P className="inline-flex gap-3">
+            Job status:{" "}
+            <Badge variant={JobStatusColor.variant} className="pr-3.5">
+              <Dot
+                className="mr-1 size-3"
+                strokeWidth={JobStatusColor.stroke}
+                color={JobStatusColor.color}
+              />
+              {textTransform(data.status)}
+            </Badge>
           </P>
         </div>
         <div className="flex items-center space-x-2">

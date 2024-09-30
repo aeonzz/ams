@@ -165,7 +165,7 @@ export default function AddEstimatedTime({ data }: AddEstimatedTimeProps) {
         },
         error: (err) => {
           console.error(err);
-          return "Failed to update estimated time";
+          return err.message;
         },
       }
     );

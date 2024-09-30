@@ -23,7 +23,7 @@ import { Input } from "@/components/ui/input";
 import { cn, getJobStatusColor, textTransform } from "@/lib/utils";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
-import { P } from "@/components/typography/text";
+import { H2, H4, P } from "@/components/typography/text";
 import { DataTablePagination } from "@/components/data-table/data-table-pagination";
 import type { JobRequestsTableType } from "./type";
 import { Badge } from "@/components/ui/badge";
@@ -34,8 +34,6 @@ interface JobRequestsTableProps {
 }
 
 export default function JobRequestsTable({ data }: JobRequestsTableProps) {
-  const [globalFilter, setGlobalFilter] = React.useState("");
-
   const columns: ColumnDef<JobRequestsTableType>[] = React.useMemo(
     () => [
       {
@@ -65,7 +63,7 @@ export default function JobRequestsTable({ data }: JobRequestsTableProps) {
       {
         accessorKey: "dueDate",
         header: "Due Date",
-        cell: ({ row }) => formatDate(row.original.dueDate, "PP p"),
+        cell: ({ row }) => formatDate(row.original.dueDate, "PP"),
       },
       {
         accessorKey: "estimatedTime",
@@ -107,32 +105,12 @@ export default function JobRequestsTable({ data }: JobRequestsTableProps) {
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    state: {
-      globalFilter,
-    },
-    onGlobalFilterChange: setGlobalFilter,
-    globalFilterFn: (row, columnId, filterValue) => {
-      const value = row.getValue(columnId) as string;
-      return value?.toLowerCase().includes(filterValue.toLowerCase()) ?? false;
-    },
   });
 
-  const filteredRoles = table.getFilteredRowModel().rows;
-
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between p-4 pb-0">
-        <Input
-          placeholder="Search"
-          value={globalFilter}
-          onChange={(e) => setGlobalFilter(e.target.value)}
-          className="max-w-xs"
-        />
-        <div className="flex items-center space-x-3">
-          <P className="text-xs text-muted-foreground">
-            Total: {filteredRoles.length} Requests
-          </P>
-        </div>
+    <div className="m-4">
+      <div className="flex items-center justify-between pb-1">
+        <H4 className="font-semibold">New Job Requests</H4>
       </div>
       <div className="scroll-bar overflow-y-auto">
         <Table>
@@ -140,7 +118,7 @@ export default function JobRequestsTable({ data }: JobRequestsTableProps) {
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className="border-r px-5">
+                  <TableHead key={header.id} className="px-5 bg-transparent">
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -160,7 +138,7 @@ export default function JobRequestsTable({ data }: JobRequestsTableProps) {
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="border-r">
+                    <TableCell key={cell.id} className="">
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
@@ -182,7 +160,7 @@ export default function JobRequestsTable({ data }: JobRequestsTableProps) {
           </TableBody>
         </Table>
       </div>
-      <div className="p-4 pt-0">
+      <div className="px-4 py-2">
         <DataTablePagination table={table} showSelectedRows={false} />
       </div>
     </div>

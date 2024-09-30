@@ -11,6 +11,8 @@ import ScheduleCalendar from "./schedule-calendar";
 import JobRequestsTable from "./job-requests-table";
 import type { JobRequestsTableType } from "./type";
 import type { JobRequestWithRelations } from "prisma/generated/zod";
+import { Separator } from "@/components/ui/separator";
+import { MyJobRequestsSkeleton } from "./my-job-requests-screen-skeleton";
 
 interface MyJobRequestsScreenProps {}
 
@@ -50,15 +52,21 @@ export default function MyJobRequestsScreen({}: MyJobRequestsScreenProps) {
       </div>
       <div className="scroll-bar flex flex-1 justify-center overflow-y-auto">
         {isLoading ? (
-          <h1>Loading...</h1>
+          <MyJobRequestsSkeleton />
         ) : isError || !data ? (
           <div className="flex h-screen w-full items-center justify-center">
             <FetchDataError refetch={refetch} />
           </div>
         ) : (
-          <div className="w-full">
-            <ScheduleCalendar />
-            <JobRequestsTable data={formattedData} />
+          <div className="h-fit w-full">
+            <ScheduleCalendar data={formattedData} />
+            <JobRequestsTable
+              data={formattedData.filter(
+                (request) =>
+                  request.jobStatus === "PENDING" ||
+                  request.jobStatus === "IN_PROGRESS"
+              )}
+            />
           </div>
         )}
       </div>

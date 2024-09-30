@@ -6,6 +6,8 @@ import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import { dateFnsLocalizer, Views } from "react-big-calendar";
 import enUS from "date-fns/locale/en-US";
 import { format, getDay, parse, startOfWeek } from "date-fns";
+import type { JobRequestsTableType } from "./type";
+import { CustomCalendarEvent } from "./custom-calendar-event";
 
 const locales = {
   "en-US": enUS,
@@ -19,7 +21,11 @@ const localizer = dateFnsLocalizer({
 });
 const DnDCalendar = withDragAndDrop(ShadcnBigCalendar);
 
-export default function ScheduleCalendar() {
+interface ScheduleCalendarProps {
+  data: JobRequestsTableType[];
+}
+
+export default function ScheduleCalendar({ data }: ScheduleCalendarProps) {
   const [view, setView] = React.useState(Views.MONTH);
   const [date, setDate] = React.useState(new Date());
 
@@ -31,12 +37,21 @@ export default function ScheduleCalendar() {
     setView(newView);
   };
 
+  const events = data.map((item) => ({
+    title: item.title,
+    start: new Date(item.dueDate),
+    end: new Date(item.dueDate),
+    allDay: true,
+    resource: item,
+  }));
+
   return (
     <div className="mt-1">
       <ShadcnBigCalendar
         localizer={localizer}
+        events={events}
         style={{
-          height: 400,
+          height: 550,
           width: "100%",
         }}
         selectable
@@ -44,6 +59,10 @@ export default function ScheduleCalendar() {
         onNavigate={handleNavigate}
         view={view}
         onView={handleViewChange}
+        components={{
+          event: CustomCalendarEvent,
+        }}
+        tooltipAccessor={null}
       />
     </div>
   );

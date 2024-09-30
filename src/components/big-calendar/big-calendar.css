@@ -93,7 +93,7 @@ button.rbc-input::-moz-focus-inner {
   -ms-user-select: none;
   user-select: none;
   -webkit-user-select: none;
-  z-index: 4;
+  /* z-index: 4; */
 }
 .rbc-today {
   background-color: hsl(var(--accent));
@@ -157,9 +157,10 @@ button.rbc-input::-moz-focus-inner {
   margin-left: 10px;
 }
 .rbc-event {
-  background-color: hsl(var(--primary));
-  color: hsl(var(--primary-foreground));
-  padding: 5px;
+  background-color: hsl(var(--tertiary));
+  color: hsl(var(--tertiary-foreground));
+  /* padding: 5px; */
+  margin: 1px 5px;
   border-radius: var(--radius);
   cursor: pointer;
 }
@@ -215,7 +216,11 @@ button.rbc-input::-moz-focus-inner {
   background-color: rgba(0, 0, 0, 0.1);
 }
 .rbc-show-more {
-  background-color: rgba(255, 255, 255, 0.3);
+  background-color: hsl(var(--secondary));
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius);
+  margin: 0 5px;
+  padding: 5px;
   z-index: 4;
   font-weight: bold;
   font-size: 85%;
@@ -380,6 +385,7 @@ button.rbc-input::-moz-focus-inner {
 .rbc-agenda-date-cell,
 .rbc-agenda-time-cell {
   white-space: nowrap;
+  font-size: 14px;
 }
 .rbc-agenda-event-cell {
   width: 100%;
@@ -653,7 +659,7 @@ button.rbc-input::-moz-focus-inner {
   border: none;
 }
 .rbc-event:hover {
-  background-color: hsl(var(--ring));
+  background-color: hsl(var(--secondary-accent));
 }
 .event-component {
   background-color: hsl(var(--primary));

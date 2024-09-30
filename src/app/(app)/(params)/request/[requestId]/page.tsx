@@ -9,7 +9,6 @@ export interface MyRequestPageParams {
 }
 
 export default function MyRequestPageParams({ params }: MyRequestPageParams) {
-  console.log(params)
   return (
     <ContentLayout title="Requests">
       <MyRequestScreenParams params={params.requestId} />
