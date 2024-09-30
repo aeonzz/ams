@@ -16,8 +16,8 @@ export const createjobRequestSchema = z.object({
     .date({
       required_error: "Due date is required.",
     })
-    .min(new Date(), {
-      message: "Due date must be in the future",
+    .min(new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), {
+      message: "Due date must be at least 3 days in the future",
     }),
   images: z.array(z.instanceof(File)).optional(),
 });

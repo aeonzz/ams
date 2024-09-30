@@ -298,20 +298,21 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
             <JobRequestReviewerActions
               request={data}
               entityType="JOB_REQUEST"
-              showPersonnels
               allowedRoles={["REQUEST_REVIEWER"]}
               allowedApproverRoles={["DEPARTMENT_HEAD"]}
               requestTypeId={data.jobRequest.id}
             />
           )}
-          {data.type === "JOB" && data.jobRequest && (
-            <PersonnelActions
-              requestId={params}
-              allowedDepartment={data.departmentId}
-              allowedRoles={["PERSONNEL"]}
-              data={data.jobRequest}
-            />
-          )}
+          {data.type === "JOB" &&
+            data.jobRequest &&
+            data.status === "APPROVED" && (
+              <PersonnelActions
+                requestId={params}
+                allowedDepartment={data.departmentId}
+                allowedRoles={["PERSONNEL"]}
+                data={data.jobRequest}
+              />
+            )}
           {data.type === "RESOURCE" && data.returnableRequest && (
             <JobRequestReviewerActions
               request={data}

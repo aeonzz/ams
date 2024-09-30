@@ -40,6 +40,17 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { usePathname } from "next/navigation";
 import { toast } from "sonner";
 import axios from "axios";
@@ -57,7 +68,6 @@ import { useHotkeys } from "react-hotkeys-hook";
 
 interface JobRequestReviewerActionsProps {
   request: RequestWithRelations;
-  showPersonnels?: boolean;
   entityType: EntityTypeType;
   allowedRoles: string[];
   allowedDepartment?: string;
@@ -67,7 +77,6 @@ interface JobRequestReviewerActionsProps {
 
 export default function JobRequestReviewerActions({
   request,
-  showPersonnels = false,
   entityType,
   allowedRoles,
   allowedDepartment,
@@ -81,6 +90,7 @@ export default function JobRequestReviewerActions({
   const [selectedPerson, setSelectedPerson] = React.useState<
     string | undefined | null
   >(request.jobRequest?.assignedTo);
+  const [isAlertOpen, setIsAlertOpen] = React.useState(false);
 
   const {
     data: personnel,
@@ -120,7 +130,7 @@ export default function JobRequestReviewerActions({
   }, [request.jobRequest?.assignedTo]);
 
   const handleReview = React.useCallback(
-    (action: "REVIEWED" | "REJECTED") => {
+    (action: "REVIEWED" | "REJECTED" | "COMPLETED") => {
       const data: UpdateRequestStatusSchemaWithPath = {
         path: pathname,
         requestId: request.id,
@@ -134,8 +144,18 @@ export default function JobRequestReviewerActions({
         entityType: entityType,
       };
 
-      const actionText = action === "REVIEWED" ? "Approving" : "Rejecting";
-      const successText = action === "REVIEWED" ? "approved" : "rejected";
+      const actionText =
+        action === "REVIEWED"
+          ? "Approving"
+          : action === "REJECTED"
+            ? "Rejecting"
+            : "Completing";
+      const successText =
+        action === "REVIEWED"
+          ? "approved"
+          : action === "REJECTED"
+            ? "rejected"
+            : "completed";
 
       toast.promise(updateStatusMutate(data), {
         loading: `${actionText} request...`,
@@ -161,6 +181,7 @@ export default function JobRequestReviewerActions({
       queryClient,
       currentUser.id,
       currentUser.userRole,
+      entityType,
     ]
   );
 
@@ -206,7 +227,7 @@ export default function JobRequestReviewerActions({
     ]
   );
 
-  if (request.status !== "PENDING" && request.status !== "REVIEWED") {
+  if (request.status === "COMPLETED") {
     return null;
   }
 
@@ -317,13 +338,13 @@ export default function JobRequestReviewerActions({
                 </DialogDescription>
               </DialogHeader>
               <div className="scroll-bar flex max-h-[60vh] flex-col gap-3 overflow-y-auto px-4 py-1">
-                {showPersonnels && <>{renderPersonnelList()}</>}
+                {request.status !== "APPROVED" && <>{renderPersonnelList()}</>}
                 {request.status === "PENDING" && (
                   <div className="flex space-x-2">
                     <Button
                       onClick={() => handleReview("REVIEWED")}
                       disabled={
-                        (!selectedPerson && showPersonnels) ||
+                        !selectedPerson ||
                         isUpdateStatusPending ||
                         isAssignPersonnelPending
                       }
@@ -335,7 +356,7 @@ export default function JobRequestReviewerActions({
                       onClick={() => handleReview("REJECTED")}
                       variant="destructive"
                       disabled={
-                        (!selectedPerson && showPersonnels) ||
+                        !selectedPerson ||
                         isUpdateStatusPending ||
                         isAssignPersonnelPending
                       }
@@ -376,6 +397,79 @@ export default function JobRequestReviewerActions({
                         </div>
                       </div>
                     </div>
+                  )}
+                  {request.jobRequest?.assignedUser && (
+                    <div>
+                      <P className="text-xs text-muted-foreground">
+                        Assigned Personnel:
+                      </P>
+                      <div className="flex w-full items-center p-2">
+                        <Avatar className="mr-2 h-8 w-8">
+                          <AvatarImage
+                            src={
+                              request.jobRequest.assignedUser.profileUrl ?? ""
+                            }
+                            alt={formatFullName(
+                              request.jobRequest.assignedUser.firstName,
+                              request.jobRequest.assignedUser.middleName,
+                              request.jobRequest.assignedUser.lastName
+                            )}
+                          />
+                          <AvatarFallback>
+                            {request.jobRequest.assignedUser.firstName
+                              .charAt(0)
+                              .toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1">
+                          <P className="font-medium">
+                            {formatFullName(
+                              request.jobRequest.assignedUser.firstName,
+                              request.jobRequest.assignedUser.middleName,
+                              request.jobRequest.assignedUser.lastName
+                            )}
+                          </P>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  {request.jobRequest?.status === "COMPLETED" && (
+                    <>
+                      <AlertDialog
+                        open={isAlertOpen}
+                        onOpenChange={setIsAlertOpen}
+                      >
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            className="w-full"
+                            disabled={
+                              isUpdateStatusPending || isAssignPersonnelPending
+                            }
+                          >
+                            Complete Request
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>
+                              Complete Request
+                            </AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to mark this request as
+                              completed? This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleReview("COMPLETED")}
+                            >
+                              Complete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </>
                   )}
                   {request.status === "REVIEWED" && (
                     <PermissionGuard

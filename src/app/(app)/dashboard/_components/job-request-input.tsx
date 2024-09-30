@@ -7,12 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  CalendarIcon,
-  Camera,
-  Check,
-  ChevronsUpDown,
-} from "lucide-react";
+import { CalendarIcon, Camera, Check, ChevronsUpDown } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
 import {
   Form,
@@ -203,9 +198,8 @@ export default function JobRequestInput({
                               <SelectValue placeholder="Select" />
                             </SelectTrigger>
                             <SelectContent position="popper">
-                              <SelectItem value="0">Today</SelectItem>
-                              <SelectItem value="1">Tomorrow</SelectItem>
                               <SelectItem value="3">In 3 days</SelectItem>
+                              <SelectItem value="5">In 5 days</SelectItem>
                               <SelectItem value="7">In a week</SelectItem>
                               <SelectItem value="30">In a month</SelectItem>
                             </SelectContent>
