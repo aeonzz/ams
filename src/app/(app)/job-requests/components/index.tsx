@@ -13,6 +13,12 @@ import type { JobRequestsTableType } from "./type";
 import type { JobRequestWithRelations } from "prisma/generated/zod";
 import { Separator } from "@/components/ui/separator";
 import { MyJobRequestsSkeleton } from "./my-job-requests-screen-skeleton";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { cn, getJobStatusColor, textTransform } from "@/lib/utils";
+import { BarChart, Dot } from "lucide-react";
+import Link from "next/link";
+import { buttonVariants } from "@/components/ui/button";
 
 interface MyJobRequestsScreenProps {}
 
@@ -44,11 +50,37 @@ export default function MyJobRequestsScreen({}: MyJobRequestsScreenProps) {
     }));
   }
 
+  const activeJobs = formattedData.filter(
+    (job) => job.jobStatus === "IN_PROGRESS"
+  );
+
   return (
     <div className="flex h-full w-full flex-col">
       <div className="flex h-[50px] items-center justify-between border-b px-3">
         <P className="font-medium">My Job Requests</P>
-        <SearchInput />
+        <div className="flex items-center gap-2">
+          <div className="flex">
+            <Link
+              href=""
+              className={cn(
+                buttonVariants({ variant: "ghost2", size: "sm" }),
+                "px-3 text-xs"
+              )}
+            >
+              Requests
+            </Link>
+            <Link
+              href={`/job-requests/${currentUser.id}`}
+              className={cn(
+                buttonVariants({ variant: "ghost2", size: "sm" }),
+                "px-3 text-xs"
+              )}
+            >
+              Reports
+            </Link>
+          </div>
+          <SearchInput />
+        </div>
       </div>
       <div className="scroll-bar flex flex-1 justify-center overflow-y-auto">
         {isLoading ? (
@@ -59,12 +91,54 @@ export default function MyJobRequestsScreen({}: MyJobRequestsScreenProps) {
           </div>
         ) : (
           <div className="h-fit w-full">
-            <ScheduleCalendar data={formattedData} />
+            <div className="flex w-full flex-col">
+              <ScheduleCalendar data={formattedData} />
+              {activeJobs.length > 0 && (
+                <div className="w-full space-y-2">
+                  <P className="p-3 pb-0 font-semibold">Active Jobs</P>
+                  <div className="grid grid-cols-3 gap-3 px-3">
+                    {activeJobs.map((job) => {
+                      const { color, stroke, variant } = getJobStatusColor(
+                        job.jobStatus
+                      );
+                      return (
+                        <Link href={`/request/${job.id}`}>
+                          <Card
+                            key={job.id}
+                            className="transition-colors hover:bg-secondary-accent"
+                          >
+                            <CardHeader className="p-3 pt-2">
+                              <P className="truncate text-sm font-medium">
+                                {job.title}
+                              </P>
+                              <div className="flex flex-wrap gap-2">
+                                <Badge
+                                  variant={variant}
+                                  className="w-fit pr-3.5"
+                                >
+                                  <Dot
+                                    className="mr-1 size-3"
+                                    strokeWidth={stroke}
+                                    color={color}
+                                  />
+                                  {textTransform(job.jobStatus)}
+                                </Badge>
+                                <Badge variant="outline">
+                                  {job.department}
+                                </Badge>
+                              </div>
+                            </CardHeader>
+                          </Card>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
             <JobRequestsTable
               data={formattedData.filter(
-                (request) =>
-                  request.jobStatus === "PENDING" ||
-                  request.jobStatus === "IN_PROGRESS"
+                (request) => request.jobStatus === "PENDING"
               )}
             />
           </div>

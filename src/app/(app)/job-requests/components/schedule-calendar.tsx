@@ -46,7 +46,7 @@ export default function ScheduleCalendar({ data }: ScheduleCalendarProps) {
   }));
 
   return (
-    <div className="mt-1">
+    <div className="mt-1 w-full">
       <ShadcnBigCalendar
         localizer={localizer}
         events={events}

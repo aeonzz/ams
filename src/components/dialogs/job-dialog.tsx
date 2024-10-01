@@ -19,52 +19,21 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  CommandShortcut,
-} from "@/components/ui/command";
 import JobRequestInput from "@/app/(app)/dashboard/_components/job-request-input";
 import { useForm, useFormState } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Check, ChevronsUpDown, X } from "lucide-react";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
-import {
-  jobRequestSchema,
-  type JobRequestSchema,
-} from "@/lib/db/schema/request";
 import { createJobRequest } from "@/lib/actions/job";
 import {
   createjobRequestSchema,
   type CreateJobRequestSchema,
 } from "@/app/(app)/dashboard/_components/schema";
-import { useSession } from "@/lib/hooks/use-session";
-import { Button } from "../ui/button";
-import { cn } from "@/lib/utils";
-import { P } from "../typography/text";
+import { X } from "lucide-react";
 
 export default function JobDialog() {
   const dialogManager = useDialogManager();
   const [alertOpen, setAlertOpen] = React.useState(false);
-  const [popoverOpen, setPopoverOpen] = React.useState(false);
-  const [value, setValue] = React.useState("");
-  const currentUser = useSession();
 
   const form = useForm<CreateJobRequestSchema>({
     resolver: zodResolver(createjobRequestSchema),
@@ -137,77 +106,7 @@ export default function JobDialog() {
           </AlertDialogContent>
         </AlertDialog>
         <DialogHeader>
-          <div className="flex items-center gap-3">
-            <DialogTitle>Job Request</DialogTitle>
-            <TooltipProvider>
-              <Tooltip>
-                <Popover open={popoverOpen} onOpenChange={setPopoverOpen} modal>
-                  <PopoverTrigger asChild>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost2"
-                        size="sm"
-                        className={cn(
-                          "w-fit justify-start px-2 text-muted-foreground",
-                          popoverOpen && "bg-secondary-accent"
-                        )}
-                      >
-                        {value
-                          ? currentUser.userDepartments.find(
-                              (department) => department.departmentId === value
-                            )?.department.name
-                          : "Select department..."}
-                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                      </Button>
-                    </TooltipTrigger>
-                  </PopoverTrigger>
-                  <PopoverContent
-                    className="w-[300px] p-0"
-                    onCloseAutoFocus={(e) => e.preventDefault()}
-                    align="start"
-                  >
-                    <Command>
-                      <CommandInput placeholder="Search department..." />
-                      <CommandList>
-                        <CommandEmpty>No department found.</CommandEmpty>
-                        <CommandGroup>
-                          {currentUser.userDepartments.map((department) => (
-                            <CommandItem
-                              key={department.departmentId}
-                              value={department.departmentId}
-                              onSelect={(currentValue) => {
-                                setValue(
-                                  currentValue === value ? "" : currentValue
-                                );
-                                setPopoverOpen(false);
-                              }}
-                            >
-                              <Check
-                                className={cn(
-                                  "mr-2 h-4 w-4",
-                                  value === department.departmentId
-                                    ? "opacity-100"
-                                    : "opacity-0"
-                                )}
-                              />
-                              {department.department.name}
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-                <TooltipContent
-                  className="flex items-center gap-3"
-                  side="bottom"
-                >
-                  <P>Add time</P>
-                  <CommandShortcut>T</CommandShortcut>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
+          <DialogTitle>Job Request</DialogTitle>
         </DialogHeader>
         <JobRequestInput
           form={form}

@@ -76,7 +76,7 @@ export function getManageRequestsColumns(): ColumnDef<RequestTableType>[] {
       cell: ({ row }) => {
         const { color, stroke, variant } = getStatusColor(row.original.status);
         return (
-          <div className="flex items-center justify-end">
+          <div className="flex items-center">
             <Badge variant={variant} className="pr-3.5">
               <Dot className="mr-1 size-3" strokeWidth={stroke} color={color} />
               {textTransform(row.original.status)}
