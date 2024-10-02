@@ -172,8 +172,8 @@ export function getStatusColor(
 ): StatusColorConfig {
   const statusColors: StatusColorMap = {
     APPROVED: {
-      color: "#22c55e",
-      variant: "green",
+      color: "#84cc16",
+      variant: "lime",
       stroke: 10,
     },
     PENDING: {

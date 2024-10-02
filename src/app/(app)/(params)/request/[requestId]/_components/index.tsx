@@ -38,6 +38,9 @@ import VenueRequestDetails from "./venue-request-details";
 import ReturnableResourceDetails from "./returnable-resource-details";
 import AddEstimatedTime from "./add-estimated-time";
 import PersonnelActions from "./personnel-actions";
+import JobRequestEvaluationDialog from "./job-request-evaluation-dialog";
+import { Button } from "@/components/ui/button";
+import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 
 interface RequestDetailsProps {
   params: string;
@@ -45,6 +48,7 @@ interface RequestDetailsProps {
 
 export default function RequestDetails({ params }: RequestDetailsProps) {
   const currentUser = useSession();
+  const dialogManager = useDialogManager();
   const { data, isLoading, isError, refetch, globalRequest } =
     useRequest(params);
 
@@ -106,13 +110,6 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
               <div className="flex items-center space-x-2">
                 <Calendar className="h-5 w-5" />
                 <P>Created: {format(new Date(data.createdAt), "PPP p")}</P>
-              </div>
-              <div className="flex items-center space-x-2">
-                <AlertTriangle className="h-5 w-5" />
-                <P>Department:</P>
-                {data.user.userDepartments.map((department) => (
-                  <P key={department.id}>{department.department.name}</P>
-                ))}
               </div>
             </div>
             <Separator className="my-6" />
@@ -294,6 +291,19 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
           {currentUser.id === data.userId && (
             <RequestActions data={data} params={params} />
           )}
+          {data.type === "JOB" &&
+            data.status === "COMPLETED" &&
+            currentUser.id === data.userId && (
+              <JobRequestEvaluationDialog>
+                <Button
+                  onClick={() =>
+                    dialogManager.setActiveDialog("jobRequestEvaluationDialog")
+                  }
+                >
+                  Evaluation
+                </Button>
+              </JobRequestEvaluationDialog>
+            )}
           {data.type === "JOB" && data.jobRequest && (
             <JobRequestReviewerActions
               request={data}

@@ -10,6 +10,7 @@ import { UserJobReportData } from "./types";
 import UserDetails from "./user-details";
 import { Separator } from "@/components/ui/separator";
 import ReportOverView from "./report-overview";
+import UserJobReportScreenSkeleton from "./user-job-report-screen-skeleton";
 
 interface UserJobReportScreenProps {
   userId: string;
@@ -29,6 +30,8 @@ export default function UserJobReportScreen({
     queryKey: ["user-job-report", userId],
   });
 
+  
+
   return (
     <div className="flex h-full w-full flex-col">
       <div className="flex h-[50px] items-center justify-between border-b px-3">
@@ -37,7 +40,7 @@ export default function UserJobReportScreen({
       </div>
       <div className="scroll-bar container flex flex-1 justify-center overflow-y-auto p-0">
         {isLoading ? (
-          <h1>...isLoading</h1>
+          <UserJobReportScreenSkeleton />
         ) : isError || !data ? (
           <div className="flex h-screen w-full items-center justify-center">
             {axios.isAxiosError(error) && error.response?.status === 404 ? (
@@ -49,7 +52,7 @@ export default function UserJobReportScreen({
         ) : (
           <div className="h-fit w-full">
             <UserDetails user={data.user} />
-            <Separator className="my-2" />
+            <Separator />
             <ReportOverView data={data} />
           </div>
         )}

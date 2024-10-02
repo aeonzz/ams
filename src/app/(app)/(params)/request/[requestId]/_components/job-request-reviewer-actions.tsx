@@ -144,6 +144,10 @@ export default function JobRequestReviewerActions({
         entityType: entityType,
       };
 
+      if (!request.jobRequest?.estimatedTime) {
+        return toast.error("Please add job estimated time");
+      }
+
       const actionText =
         action === "REVIEWED"
           ? "Approving"
@@ -182,6 +186,7 @@ export default function JobRequestReviewerActions({
       currentUser.id,
       currentUser.userRole,
       entityType,
+      request.jobRequest?.estimatedTime,
     ]
   );
 

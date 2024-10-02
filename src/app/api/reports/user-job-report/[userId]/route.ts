@@ -35,6 +35,14 @@ export async function GET(req: Request, context: Context) {
       },
       include: {
         assignedUser: true,
+        request: {
+          include: {
+            department: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
       },
     });
 

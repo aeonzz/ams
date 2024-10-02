@@ -9,6 +9,7 @@ export * from './SettingSchema';
 export * from './RequestSchema';
 export * from './GenericAuditLogSchema';
 export * from './JobRequestSchema';
+export * from './JobRequestEvaluationSchema';
 export * from './VenueRequestSchema';
 export * from './VenueSchema';
 export * from './ReturnableRequestSchema';

@@ -1,5 +1,5 @@
 import { TrendingUp } from "lucide-react";
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { format, parseISO } from "date-fns";
 
 import {
@@ -72,6 +72,12 @@ export default function UserPerformanceAreaChart({
     return `${startDate} - ${endDate}`;
   };
 
+  const getYAxisDomain = () => {
+    const maxJobs = Math.max(...chartData.map((data) => data.jobsCompleted));
+    const buffer = Math.ceil(maxJobs * 0.2); 
+    return [0, maxJobs + buffer];
+  };
+
   return (
     <Card className="w-full bg-transparent">
       <CardHeader>
@@ -84,7 +90,7 @@ export default function UserPerformanceAreaChart({
             accessibilityLayer
             data={chartData}
             margin={{
-              left: 12,
+              left: -28,
               right: 12,
             }}
           >
@@ -96,9 +102,18 @@ export default function UserPerformanceAreaChart({
               tickMargin={8}
               tickFormatter={(value) => format(parseISO(value), "MMM")}
             />
+            <YAxis
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
+              tickCount={5}
+              domain={getYAxisDomain()}
+            />
             <ChartTooltip
               cursor={false}
-              content={<ChartTooltipContent indicator="line" />}
+              content={
+                <ChartTooltipContent indicator="line" className="min-w-36" />
+              }
             />
             <defs>
               <linearGradient

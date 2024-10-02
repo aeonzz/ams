@@ -68,11 +68,15 @@ export function getRequestColumns(): ColumnDef<Request>[] {
     },
     {
       accessorKey: "status",
-      header: ({ column }) => null,
+      header: ({ column }) => (
+        <div className="flex justify-center px-2">
+          <DataTableColumnHeader column={column} title="Status" />
+        </div>
+      ),
       cell: ({ row }) => {
         const { color, stroke, variant } = getStatusColor(row.original.status);
         return (
-          <div className="flex items-center justify-end">
+          <div className="flex items-center justify-center">
             <Badge variant={variant} className="pr-3.5">
               <Dot className="mr-1 size-3" strokeWidth={stroke} color={color} />
               {textTransform(row.original.status)}
@@ -87,12 +91,18 @@ export function getRequestColumns(): ColumnDef<Request>[] {
     },
     {
       accessorKey: "createdAt",
-      header: ({ column }) => null,
+      header: ({ column }) => (
+        <div className="flex justify-center px-2">
+          <DataTableColumnHeader column={column} title="Created" />
+        </div>
+      ),
       cell: ({ cell }) => {
         return (
-          <P className="text-muted-foreground">
-            {format(cell.getValue() as Date, "PP")}
-          </P>
+          <div className="flex items-center justify-center">
+            <P className="text-muted-foreground">
+              {format(cell.getValue() as Date, "PP")}
+            </P>
+          </div>
         );
       },
     },

@@ -61,15 +61,6 @@ export default function MyJobRequestsScreen({}: MyJobRequestsScreenProps) {
         <div className="flex items-center gap-2">
           <div className="flex">
             <Link
-              href=""
-              className={cn(
-                buttonVariants({ variant: "ghost2", size: "sm" }),
-                "px-3 text-xs"
-              )}
-            >
-              Requests
-            </Link>
-            <Link
               href={`/job-requests/${currentUser.id}`}
               className={cn(
                 buttonVariants({ variant: "ghost2", size: "sm" }),

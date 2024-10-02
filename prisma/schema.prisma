@@ -183,6 +183,22 @@ model JobRequest {
   updatedAt     DateTime  @updatedAt
 }
 
+model JobRequestEvaluation {
+  id                String   @id @default(cuid())
+  clientType        String
+  position          String
+  sex               String
+  age               Int
+  regionOfResidence String
+  awarenessLevel    String
+  visibility        String?
+  helpfulness       String?
+  surveyResponses   Json
+  suggestions       String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
 model VenueRequest {
   id                String   @id
   notes             String?
@@ -410,6 +426,12 @@ model MaintenanceRecord {
   details   String
   vehicleId String
   vehicle   Vehicle  @relation(fields: [vehicleId], references: [id])
+}
+
+enum ClientType {
+  CITIZEN
+  BUSINESS
+  GOVERNMENT
 }
 
 enum ItemStatus {

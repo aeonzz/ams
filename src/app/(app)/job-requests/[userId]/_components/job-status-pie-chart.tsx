@@ -82,7 +82,7 @@ export default function JobStatusChart({ data }: JobStatusChartProps) {
   }, [chartData]);
 
   return (
-    <Card className="flex w-fit flex-col bg-transparent">
+    <Card className="flex w-[50%] flex-col bg-transparent">
       <CardHeader className="items-center pb-0">
         <CardTitle>Job Status Distribution</CardTitle>
         <CardDescription>Assigned Job Requests</CardDescription>
@@ -90,7 +90,7 @@ export default function JobStatusChart({ data }: JobStatusChartProps) {
       <CardContent className="flex-1 pb-0">
         <ChartContainer
           config={chartConfig}
-          className="mx-auto aspect-square max-h-[250px]"
+          className="mx-auto aspect-square max-h-64"
         >
           <PieChart>
             <ChartTooltip
@@ -141,7 +141,7 @@ export default function JobStatusChart({ data }: JobStatusChartProps) {
         <div className="flex items-center gap-2 font-medium leading-none">
           {chartData[2].count} completed jobs <TrendingUp className="h-4 w-4" />
         </div>
-        <div className="leading-none text-muted-foreground">
+        <div className="text-center leading-none text-muted-foreground">
           Showing total job requests and their current statuses
         </div>
       </CardFooter>
