@@ -41,6 +41,8 @@ import { ClientTypeSchema } from "prisma/generated/zod";
 import { ClientTypeType } from "prisma/generated/zod/inputTypeSchemas/ClientTypeSchema";
 import { P } from "../typography/text";
 import { Info } from "lucide-react";
+import { toast } from "sonner";
+import { usePathname } from "next/navigation";
 
 const surveyQuestions = [
   "SQ0: I am satisfied with the service that I availed.",
@@ -66,13 +68,14 @@ export const questionKeys = [
   "SQ8",
 ] as const;
 
-const emojiRatings = ["😡", "😠", "😐", "🙂", "😃"] as const;
+const emojiRatings = ["😡", "😠", "😐", "🙂", "😃", "N/A"] as const;
 const emojiMeanings = [
   "Strongly disagree",
   "Disagree",
   "Neither agree nor disagree",
   "Agree",
   "Strongly agree",
+  "Not Applicable",
 ];
 
 interface JobRequestEvaluationFormProps {
@@ -95,13 +98,27 @@ export default function JobRequestEvaluationForm({
   handleOpenChange,
   isFieldsDirty,
 }: JobRequestEvaluationFormProps) {
-  const onSubmit = async (data: CreateJobEvaluationSchema) => {
+  const pathname = usePathname();
+  const onSubmit = async (values: CreateJobEvaluationSchema) => {
     try {
-      console.log(data);
-      // await mutateAsync(data);
-      // handleOpenChange(false);
+      const data = {
+        ...values,
+        path: pathname,
+      };
+      toast.promise(mutateAsync(data), {
+        loading: "Submitting your evaluation...",
+        success: () => {
+          handleOpenChange(false);
+          return "Thank you! Your evaluation has been successfully submitted.";
+        },
+        error: (err) => {
+          console.log(err);
+          return err.message;
+        },
+      });
     } catch (error) {
-      console.error("Error submitting evaluation:", error);
+      console.error("Error during submission:", error);
+      toast.error("An error occurred during submission. Please try again.");
     }
   };
 
@@ -113,7 +130,26 @@ export default function JobRequestEvaluationForm({
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <div className="scroll-bar flex max-h-[60vh] gap-6 overflow-y-auto py-1">
           <div className="flex flex-1 flex-col">
-            <div className="flex flex-col px-4">
+            <div className="flex flex-col space-y-6 px-4">
+              <div className="flex">
+                <div className="mr-2 w-fit pt-[2px]">
+                  <Info className="size-4 text-primary" />
+                </div>
+                <P className="text-muted-foreground">
+                  This{" "}
+                  <span className="font-semibold text-primary">
+                    Client Satisfaction Measurement (CSM)
+                  </span>{" "}
+                  tracks the customer experience of government offices. Your
+                  feedback on your{" "}
+                  <span className="underline">
+                    recently concluded transaction
+                  </span>{" "}
+                  will help this office provide a better service. Personal
+                  information shared will be kept confidential and you always
+                  have option to not answer this form.
+                </P>
+              </div>
               <div className="flex flex-col">
                 <FormField
                   control={form.control}
@@ -157,7 +193,7 @@ export default function JobRequestEvaluationForm({
                   render={({ field }) => (
                     <FormItem>
                       <div className="flex space-x-3">
-                        <FormLabel className="w-28">I am a:</FormLabel>
+                        <FormLabel className="w-20">I am a:</FormLabel>
                         <FormControl>
                           <RadioGroup
                             onValueChange={field.onChange}
@@ -196,7 +232,7 @@ export default function JobRequestEvaluationForm({
                     control={form.control}
                     name="otherPosition"
                     render={({ field }) => (
-                      <FormItem>
+                      <FormItem className="mt-3">
                         <FormLabel>Please specify</FormLabel>
                         <FormControl>
                           <Input {...field} />
@@ -492,7 +528,7 @@ export default function JobRequestEvaluationForm({
                   </div>
                   {surveyQuestions.map((question, questionIndex) => (
                     <React.Fragment key={questionKeys[questionIndex]}>
-                      <P className="flex h-10 items-center">{question}</P>
+                      <P className="flex h-16 items-center">{question}</P>
                       <div className="flex justify-between space-x-4">
                         {emojiMeanings.map((meaning, emojiIndex) => (
                           <FormField

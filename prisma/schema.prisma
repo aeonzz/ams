@@ -163,24 +163,25 @@ model GenericAuditLog {
 }
 
 model JobRequest {
-  id            String    @id
-  description   String
-  dueDate       DateTime
-  estimatedTime Int?
-  startDate     DateTime?
-  endDate       DateTime?
-  costEstimate  Float?
-  actualCost    Float?
-  jobType       JobType
-  files         File[]
-  progressNotes String?
-  requestId     String    @unique
-  request       Request   @relation(fields: [requestId], references: [id], onDelete: Cascade)
-  status        JobStatus @default(PENDING)
-  assignedTo    String?
-  assignedUser  User?     @relation(fields: [assignedTo], references: [id])
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id                   String                @id
+  description          String
+  dueDate              DateTime
+  estimatedTime        Int?
+  startDate            DateTime?
+  endDate              DateTime?
+  costEstimate         Float?
+  actualCost           Float?
+  jobType              JobType
+  files                File[]
+  progressNotes        String?
+  requestId            String                @unique
+  request              Request               @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  status               JobStatus             @default(PENDING)
+  assignedTo           String?
+  assignedUser         User?                 @relation(fields: [assignedTo], references: [id])
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  jobRequestEvaluation JobRequestEvaluation?
 }
 
 model JobRequestEvaluation {
@@ -195,6 +196,8 @@ model JobRequestEvaluation {
   helpfulness       String?
   surveyResponses   Json
   suggestions       String?
+  jobRequestId      String     @unique
+  jobRequest        JobRequest @relation(fields: [jobRequestId], references: [id], onDelete: Cascade)
   createdAt         DateTime   @default(now())
   updatedAt         DateTime   @updatedAt
 }

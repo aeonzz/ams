@@ -14,7 +14,7 @@ const surveyResponseSchema = z.object({
 });
 
 export const createJobEvaluationSchema = z.object({
-  clientType: ClientTypeSchema.nullable(),
+  clientType: ClientTypeSchema,
   position: z.string().min(1, "Postition is required"),
   otherPosition: z.string().optional(),
   sex: z.string().min(1, "Sex is required"),

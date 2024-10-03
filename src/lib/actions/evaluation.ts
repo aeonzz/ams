@@ -11,12 +11,13 @@ export const createJobRequestEvaluation = authedProcedure
   .createServerAction()
   .input(createJobEvaluationSchemaWithPath)
   .handler(async ({ input, ctx }) => {
-    const { path, surveyResponses, ...rest } = input;
+    const { path, surveyResponses, position, otherPosition, ...rest } = input;
     try {
       await db.jobRequestEvaluation.create({
         data: {
           id: generateId(15),
           surveyResponses: surveyResponses,
+          position: position === "Others" && otherPosition ? otherPosition : position,
           ...rest,
         },
       });
