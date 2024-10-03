@@ -1,13 +1,14 @@
 import { z } from 'zod';
 import { JsonValueSchema } from '../inputTypeSchemas/JsonValueSchema'
+import { ClientTypeSchema } from '../inputTypeSchemas/ClientTypeSchema'
 
 /////////////////////////////////////////
 // JOB REQUEST EVALUATION SCHEMA
 /////////////////////////////////////////
 
 export const JobRequestEvaluationSchema = z.object({
-  id: z.string().cuid(),
-  clientType: z.string(),
+  clientType: ClientTypeSchema,
+  id: z.string(),
   position: z.string(),
   sex: z.string(),
   age: z.number().int(),

@@ -184,8 +184,8 @@ model JobRequest {
 }
 
 model JobRequestEvaluation {
-  id                String   @id @default(cuid())
-  clientType        String
+  id                String     @id
+  clientType        ClientType
   position          String
   sex               String
   age               Int
@@ -195,8 +195,8 @@ model JobRequestEvaluation {
   helpfulness       String?
   surveyResponses   Json
   suggestions       String?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
 }
 
 model VenueRequest {

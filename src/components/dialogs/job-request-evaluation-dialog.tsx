@@ -19,18 +19,25 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import JobRequestInput from "@/app/(app)/dashboard/_components/job-request-input";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 import { useForm, useFormState } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
-import { createJobRequest } from "@/lib/actions/job";
+import { CircleHelp, Info, X } from "lucide-react";
+import JobRequestEvaluationForm, {
+  questionKeys,
+} from "@/components/forms/job-request-evaluation-form";
 import {
-  createjobRequestSchema,
-  type CreateJobRequestSchema,
-} from "@/app/(app)/dashboard/_components/schema";
-import { X } from "lucide-react";
-import JobRequestEvaluationForm from "@/components/forms/job-request-evaluation-form";
+  createJobEvaluationSchema,
+  CreateJobEvaluationSchema,
+} from "@/lib/schema/evaluation/job";
+import { createJobRequestEvaluation } from "@/lib/actions/evaluation";
+import { P } from "../typography/text";
 
 interface JobRequestEvaluationDialogProps {
   children: React.ReactNode;
@@ -42,18 +49,29 @@ export default function JobRequestEvaluationDialog({
   const dialogManager = useDialogManager();
   const [alertOpen, setAlertOpen] = React.useState(false);
 
-  const form = useForm<CreateJobRequestSchema>({
-    resolver: zodResolver(createjobRequestSchema),
+  const form = useForm<CreateJobEvaluationSchema>({
+    resolver: zodResolver(createJobEvaluationSchema),
     defaultValues: {
-      description: "",
-      images: undefined,
+      clientType: undefined,
+      age: undefined,
+      regionOfResidence: "",
+      position: "",
+      otherPosition: "",
+      sex: "",
+      awarenessLevel: "",
+      visibility: "",
+      helpfulness: "",
+      suggestions: "",
+      surveyResponses: Object.fromEntries(questionKeys.map((key) => [key, ""])),
     },
   });
 
   const { dirtyFields } = useFormState({ control: form.control });
   const isFieldsDirty = Object.keys(dirtyFields).length > 0;
 
-  const { mutateAsync, isPending } = useServerActionMutation(createJobRequest);
+  const { mutateAsync, isPending } = useServerActionMutation(
+    createJobRequestEvaluation
+  );
 
   const handleOpenChange = (open: boolean) => {
     if (!open) {
@@ -82,6 +100,7 @@ export default function JobRequestEvaluationDialog({
             }
           }}
           isLoading={isPending}
+          className="max-w-4xl"
         >
           <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
             {isFieldsDirty && !isPending && (
@@ -113,18 +132,42 @@ export default function JobRequestEvaluationDialog({
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
-          <DialogHeader>
-            <DialogTitle>Job Request</DialogTitle>
+          <DialogHeader className="flex-row items-center gap-2 space-y-0">
+            <DialogTitle>Job Evaluation</DialogTitle>
+            <HoverCard openDelay={100} closeDelay={0}>
+              <HoverCardTrigger asChild>
+                <CircleHelp className="size-4 cursor-pointer text-muted-foreground transition-colors hover:text-foreground" />
+              </HoverCardTrigger>
+              <HoverCardContent className="w-[555px]">
+                <div className="flex">
+                  <div className="mr-2 w-fit">
+                    <Info className="size-4 text-primary" />
+                  </div>
+                  <P className="text-muted-foreground">
+                    This{" "}
+                    <span className="font-semibold text-primary">
+                      Client Satisfaction Measurement (CSM)
+                    </span>{" "}
+                    tracks the customer experience of government offices. Your
+                    feedback on your{" "}
+                    <span className="underline">
+                      recently concluded transaction
+                    </span>{" "}
+                    will help this office provide a better service. Personal
+                    information shared will be kept confidential and you always
+                    have option to not answer this form.
+                  </P>
+                </div>
+              </HoverCardContent>
+            </HoverCard>
           </DialogHeader>
-          <JobRequestEvaluationForm />
-          {/* <JobRequestInput
-          form={form}
-          isPending={isPending}
-          mutateAsync={mutateAsync}
-          type="JOB"
-          handleOpenChange={handleOpenChange}
-          isFieldsDirty={isFieldsDirty}
-        /> */}
+          <JobRequestEvaluationForm
+            form={form}
+            isPending={isPending}
+            mutateAsync={mutateAsync}
+            handleOpenChange={handleOpenChange}
+            isFieldsDirty={isFieldsDirty}
+          />
         </DialogContent>
       </Dialog>
       {children}

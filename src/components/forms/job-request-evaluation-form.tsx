@@ -1,16 +1,17 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
+import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Select,
@@ -19,318 +20,550 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/text-area";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { type UseMutateAsyncFunction } from "@tanstack/react-query";
+import { createJobRequestEvaluation } from "@/lib/actions/evaluation";
+import { UseFormReturn } from "react-hook-form";
+import { type CreateJobEvaluationSchema } from "@/lib/schema/evaluation/job";
+import { Separator } from "../ui/separator";
+import { DialogFooter } from "../ui/dialog";
+import { SubmitButton } from "../ui/submit-button";
+import { ClientTypeSchema } from "prisma/generated/zod";
+import { ClientTypeType } from "prisma/generated/zod/inputTypeSchemas/ClientTypeSchema";
+import { P } from "../typography/text";
+import { Info } from "lucide-react";
 
 const surveyQuestions = [
-  "SQ01: The staff was responsive and attentive to my needs.",
-  "SQ02: The service delivered met the transaction's requirements and expectations.",
-  "SQ03: The service was delivered in a timely manner.",
-  "SQ04: I easily found the office that I needed to transact with.",
-  "SQ05: The fees were reasonable for my transaction.",
-  "SQ06: I paid the correct fees/amount for my transaction.",
-  "SQ07: I was treated courteously by the staff.",
-  "Overall: How satisfied are you with the service provided?",
+  "SQ0: I am satisfied with the service that I availed.",
+  "SQ1: I spent a reasonable amount of time on my transaction.",
+  "SQ2: The office followed the transaction's requirements and steps based on the information provided.",
+  "SQ3: The steps (including payment) I needed to do for my transaction were easy and simple.",
+  "SQ4: I easily found information about my transaction from the office or its website.",
+  "SQ5: I paid a reasonable amount of fees for my transaction.",
+  `SQ6: I feel the office was fair to everyone, or "walang palakasan", during my transaction.`,
+  "SQ7: I was treated courteously by the staff and (if asked for help) the staff was helpful.",
+  "SQ8: I got what I needed from the government office, or (if denied) denial of the request was successfully explained to me.",
 ] as const;
 
-const emojiRatings = ["😞", "🙁", "😐", "🙂", "😃"] as const;
+export const questionKeys = [
+  "SQ0",
+  "SQ1",
+  "SQ2",
+  "SQ3",
+  "SQ4",
+  "SQ5",
+  "SQ6",
+  "SQ7",
+  "SQ8",
+] as const;
 
-type SurveyQuestion = (typeof surveyQuestions)[number];
-type ClientType = "individual" | "business" | "government";
-type Sex = "male" | "female" | "other";
-type AwarenessLevel =
-  | "aware_and_saw"
-  | "aware_but_not_saw"
-  | "learned_when_saw"
-  | "not_aware";
-type Visibility = "easy" | "somewhat_easy" | "difficult" | "not_visible";
-type Helpfulness = "very_helpful" | "somewhat_helpful" | "not_helpful";
+const emojiRatings = ["😡", "😠", "😐", "🙂", "😃"] as const;
+const emojiMeanings = [
+  "Strongly disagree",
+  "Disagree",
+  "Neither agree nor disagree",
+  "Agree",
+  "Strongly agree",
+];
 
-interface FormData {
-  clientType: ClientType | "";
-  position: string;
-  sex: Sex | "";
-  age: string;
-  regionOfResidence: string;
-  awarenessLevel: AwarenessLevel | "";
-  visibility: Visibility | "";
-  helpfulness: Helpfulness | "";
-  surveyResponses: Partial<Record<SurveyQuestion, number>>;
-  suggestions: string;
+interface JobRequestEvaluationFormProps {
+  mutateAsync: UseMutateAsyncFunction<
+    any,
+    Error,
+    Parameters<typeof createJobRequestEvaluation>[0],
+    unknown
+  >;
+  isPending: boolean;
+  form: UseFormReturn<CreateJobEvaluationSchema>;
+  handleOpenChange: (open: boolean) => void;
+  isFieldsDirty: boolean;
 }
 
-export default function JobRequestEvaluationForm() {
-  const [formData, setFormData] = useState<FormData>({
-    clientType: "",
-    position: "",
-    sex: "",
-    age: "",
-    regionOfResidence: "",
-    awarenessLevel: "",
-    visibility: "",
-    helpfulness: "",
-    surveyResponses: {},
-    suggestions: "",
-  });
-
-  const handleInputChange = <K extends keyof FormData>(
-    field: K,
-    value: FormData[K]
-  ) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const handleSurveyResponse = (question: SurveyQuestion, rating: number) => {
-    setFormData((prev) => ({
-      ...prev,
-      surveyResponses: { ...prev.surveyResponses, [question]: rating },
-    }));
-  };
-
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
+export default function JobRequestEvaluationForm({
+  mutateAsync,
+  isPending,
+  form,
+  handleOpenChange,
+  isFieldsDirty,
+}: JobRequestEvaluationFormProps) {
+  const onSubmit = async (data: CreateJobEvaluationSchema) => {
     try {
-      const response = await fetch("/api/job-request-evaluation", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-      if (response.ok) {
-        console.log("Evaluation submitted successfully");
-        // Reset form or show success message
-      } else {
-        console.error("Failed to submit evaluation");
-      }
+      console.log(data);
+      // await mutateAsync(data);
+      // handleOpenChange(false);
     } catch (error) {
       console.error("Error submitting evaluation:", error);
     }
   };
 
+  const awarenessLevel = form.watch("awarenessLevel");
+  const showAdditionalQuestions = awarenessLevel !== "not_aware";
+
   return (
-    <Card className="mx-auto w-full max-w-4xl">
-      <CardHeader>
-        <CardTitle>Job Request Evaluation</CardTitle>
-        <CardDescription>
-          Please fill out this form to evaluate your job request experience.
-        </CardDescription>
-      </CardHeader>
-      <form onSubmit={handleSubmit}>
-        <CardContent className="space-y-6">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="clientType">Client Type</Label>
-              <Select
-                onValueChange={(value: ClientType) =>
-                  handleInputChange("clientType", value)
-                }
-              >
-                <SelectTrigger id="clientType">
-                  <SelectValue placeholder="Select client type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="individual">Individual</SelectItem>
-                  <SelectItem value="business">Business</SelectItem>
-                  <SelectItem value="government">Government</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="position">Position</Label>
-              <Input
-                id="position"
-                onChange={(e) => handleInputChange("position", e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="sex">Sex</Label>
-              <Select
-                onValueChange={(value: Sex) => handleInputChange("sex", value)}
-              >
-                <SelectTrigger id="sex">
-                  <SelectValue placeholder="Select sex" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="male">Male</SelectItem>
-                  <SelectItem value="female">Female</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="age">Age</Label>
-              <Input
-                id="age"
-                type="number"
-                onChange={(e) => handleInputChange("age", e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="region">Region of Residence</Label>
-              <Input
-                id="region"
-                onChange={(e) =>
-                  handleInputChange("regionOfResidence", e.target.value)
-                }
-              />
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <Label>Citizen's Charter Awareness</Label>
-            <RadioGroup
-              onValueChange={(value: AwarenessLevel) =>
-                handleInputChange("awarenessLevel", value)
-              }
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="aware_and_saw" id="aware_and_saw" />
-                <Label htmlFor="aware_and_saw">
-                  I know what a CC is and I saw this office's CC.
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem
-                  value="aware_but_not_saw"
-                  id="aware_but_not_saw"
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
+        <div className="scroll-bar flex max-h-[60vh] gap-6 overflow-y-auto py-1">
+          <div className="flex flex-1 flex-col">
+            <div className="flex flex-col px-4">
+              <div className="flex flex-col">
+                <FormField
+                  control={form.control}
+                  name="clientType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex space-x-3">
+                        <FormLabel className="w-20">Client Type:</FormLabel>
+                        <FormControl>
+                          <RadioGroup
+                            onValueChange={field.onChange}
+                            value={field.value || ""}
+                            className="flex space-x-3"
+                          >
+                            {(ClientTypeSchema.options as ClientTypeType[]).map(
+                              (type) => (
+                                <FormItem
+                                  key={type}
+                                  className="flex items-center space-x-2 space-y-0"
+                                >
+                                  <FormControl>
+                                    <RadioGroupItem value={type} />
+                                  </FormControl>
+                                  <FormLabel className="font-normal capitalize">
+                                    {type.toLowerCase()}
+                                  </FormLabel>
+                                </FormItem>
+                              )
+                            )}
+                          </RadioGroup>
+                        </FormControl>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-                <Label htmlFor="aware_but_not_saw">
-                  I know what a CC is but I did NOT see this office's CC.
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem
-                  value="learned_when_saw"
-                  id="learned_when_saw"
+                <Separator className="my-4" />
+                <FormField
+                  control={form.control}
+                  name="position"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex space-x-3">
+                        <FormLabel className="w-28">I am a:</FormLabel>
+                        <FormControl>
+                          <RadioGroup
+                            onValueChange={field.onChange}
+                            value={field.value}
+                            className="flex flex-wrap gap-3"
+                          >
+                            {[
+                              "Faculty",
+                              "Non-Teaching Staff",
+                              "Student",
+                              "Alumna",
+                              "Guardian/Parent of Student",
+                              "Others",
+                            ].map((position) => (
+                              <FormItem
+                                key={position}
+                                className="flex items-center space-x-2 space-y-0"
+                              >
+                                <FormControl>
+                                  <RadioGroupItem value={position} />
+                                </FormControl>
+                                <FormLabel className="font-normal">
+                                  {position}
+                                </FormLabel>
+                              </FormItem>
+                            ))}
+                          </RadioGroup>
+                        </FormControl>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-                <Label htmlFor="learned_when_saw">
-                  I learned of the CC only when I saw this office's CC.
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="not_aware" id="not_aware" />
-                <Label htmlFor="not_aware">
-                  I do not know what a CC is and I did not see one in this
-                  office.
-                </Label>
-              </div>
-            </RadioGroup>
-          </div>
-
-          <div className="space-y-4">
-            <Label>Citizen's Charter Visibility</Label>
-            <RadioGroup
-              onValueChange={(value: Visibility) =>
-                handleInputChange("visibility", value)
-              }
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="easy" id="visibility_easy" />
-                <Label htmlFor="visibility_easy">Easy to see</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem
-                  value="somewhat_easy"
-                  id="visibility_somewhat_easy"
+                {form.watch("position") === "Others" && (
+                  <FormField
+                    control={form.control}
+                    name="otherPosition"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Please specify</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+                <Separator className="my-4" />
+                <FormField
+                  control={form.control}
+                  name="sex"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex space-x-3">
+                        <FormLabel className="w-20">Sex:</FormLabel>
+                        <FormControl>
+                          <RadioGroup
+                            onValueChange={field.onChange}
+                            value={field.value}
+                            className="flex flex-wrap gap-3"
+                          >
+                            {["male", "female"].map((sex) => (
+                              <FormItem
+                                key={sex}
+                                className="flex items-center space-x-2 space-y-0"
+                              >
+                                <FormControl>
+                                  <RadioGroupItem value={sex} />
+                                </FormControl>
+                                <FormLabel className="font-normal capitalize">
+                                  {sex}
+                                </FormLabel>
+                              </FormItem>
+                            ))}
+                          </RadioGroup>
+                        </FormControl>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-                <Label htmlFor="visibility_somewhat_easy">
-                  Somewhat easy to see
-                </Label>
+                <Separator className="my-4" />
+                <div className="flex gap-3">
+                  <FormField
+                    control={form.control}
+                    name="age"
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormLabel>Age</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            placeholder="Your Age"
+                            {...field}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              if (
+                                value === "" ||
+                                (parseInt(value, 10) >= 0 &&
+                                  parseInt(value, 10) <= 99) ||
+                                parseInt(value, 10) <= 0
+                              ) {
+                                field.onChange(parseInt(e.target.value, 10));
+                              }
+                            }}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="regionOfResidence"
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormLabel>Region of Residence</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Residence"
+                            autoComplete="off"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="difficult" id="visibility_difficult" />
-                <Label htmlFor="visibility_difficult">Difficult to see</Label>
+            </div>
+            <Separator className="my-4" />
+            <div className="flex flex-col space-y-6 px-4">
+              <div className="flex">
+                <div className="mr-2 w-fit pt-[2px]">
+                  <Info className="size-4 text-primary" />
+                </div>
+                <P className="text-muted-foreground">
+                  Check mark your answer to the Citizen&apos;s Charter (CC)
+                  questions. The Citizen&apos;s is an official document that
+                  reflects the services of a government agency/office including
+                  its requirements, fees, and processing times among others.
+                </P>
               </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem
-                  value="not_visible"
-                  id="visibility_not_visible"
+              <div className="space-y-9">
+                <FormField
+                  control={form.control}
+                  name="awarenessLevel"
+                  render={({ field }) => (
+                    <FormItem className="space-y-3">
+                      <FormLabel>
+                        CC1 Which of the following best describes your awareness
+                        of a CC?
+                      </FormLabel>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={field.onChange}
+                          value={field.value}
+                          className="flex flex-col space-y-1"
+                        >
+                          <FormItem className="flex items-center space-x-3 space-y-0">
+                            <FormControl>
+                              <RadioGroupItem value="aware_and_saw" />
+                            </FormControl>
+                            <FormLabel className="font-normal">
+                              I know what a CC is and I saw this office's CC.
+                            </FormLabel>
+                          </FormItem>
+                          <FormItem className="flex items-center space-x-3 space-y-0">
+                            <FormControl>
+                              <RadioGroupItem value="aware_but_not_saw" />
+                            </FormControl>
+                            <FormLabel className="font-normal">
+                              I know what a CC is but I did NOT see this
+                              office's CC.
+                            </FormLabel>
+                          </FormItem>
+                          <FormItem className="flex items-center space-x-3 space-y-0">
+                            <FormControl>
+                              <RadioGroupItem value="learned_when_saw" />
+                            </FormControl>
+                            <FormLabel className="font-normal">
+                              I learned of the CC only when I saw this office's
+                              CC.
+                            </FormLabel>
+                          </FormItem>
+                          <FormItem className="flex items-center space-x-3 space-y-0">
+                            <FormControl>
+                              <RadioGroupItem value="not_aware" />
+                            </FormControl>
+                            <FormLabel className="font-normal">
+                              I do not know what a CC is and I did not see one
+                              in this office.
+                            </FormLabel>
+                          </FormItem>
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-                <Label htmlFor="visibility_not_visible">
-                  Not visible at all
-                </Label>
+                {showAdditionalQuestions && (
+                  <>
+                    <FormField
+                      control={form.control}
+                      name="visibility"
+                      render={({ field }) => (
+                        <FormItem className="space-y-3">
+                          <FormLabel>
+                            CC2 if aware of CC, would you say that the CC of
+                            this office was...?
+                          </FormLabel>
+                          <FormControl>
+                            <RadioGroup
+                              onValueChange={field.onChange}
+                              value={field.value}
+                              className="flex flex-col space-y-1"
+                            >
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                  <RadioGroupItem value="easy" />
+                                </FormControl>
+                                <FormLabel className="font-normal">
+                                  Easy to see
+                                </FormLabel>
+                              </FormItem>
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                  <RadioGroupItem value="somewhat_easy" />
+                                </FormControl>
+                                <FormLabel className="font-normal">
+                                  Somewhat easy to see
+                                </FormLabel>
+                              </FormItem>
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                  <RadioGroupItem value="difficult" />
+                                </FormControl>
+                                <FormLabel className="font-normal">
+                                  Difficult to see
+                                </FormLabel>
+                              </FormItem>
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                  <RadioGroupItem value="not_visible" />
+                                </FormControl>
+                                <FormLabel className="font-normal">
+                                  Not visible at all
+                                </FormLabel>
+                              </FormItem>
+                            </RadioGroup>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="helpfulness"
+                      render={({ field }) => (
+                        <FormItem className="space-y-3">
+                          <FormLabel>
+                            CC3 if aware of CC, how much did the CC help you in
+                            your transaction?
+                          </FormLabel>
+                          <FormControl>
+                            <RadioGroup
+                              onValueChange={field.onChange}
+                              value={field.value}
+                              className="flex flex-col space-y-1"
+                            >
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                  <RadioGroupItem value="very_helpful" />
+                                </FormControl>
+                                <FormLabel className="font-normal">
+                                  Helped very much
+                                </FormLabel>
+                              </FormItem>
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                  <RadioGroupItem value="somewhat_helpful" />
+                                </FormControl>
+                                <FormLabel className="font-normal">
+                                  Somewhat helped
+                                </FormLabel>
+                              </FormItem>
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                  <RadioGroupItem value="not_helpful" />
+                                </FormControl>
+                                <FormLabel className="font-normal">
+                                  Did not help
+                                </FormLabel>
+                              </FormItem>
+                            </RadioGroup>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </>
+                )}
               </div>
-            </RadioGroup>
-          </div>
-
-          <div className="space-y-4">
-            <Label>Citizen's Charter Helpfulness</Label>
-            <RadioGroup
-              onValueChange={(value: Helpfulness) =>
-                handleInputChange("helpfulness", value)
-              }
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="very_helpful" id="helpfulness_very" />
-                <Label htmlFor="helpfulness_very">Helped very much</Label>
+            </div>
+            <Separator className="my-4" />
+            <div className="space-y-6 px-4">
+              <div className="flex">
+                <div className="mr-2 w-fit pt-[2px]">
+                  <Info className="size-4 text-primary" />
+                </div>
+                <P className="text-muted-foreground">
+                  For SQD 0-8, please put a check mark on the column that best
+                  corresponds to your answer
+                </P>
               </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem
-                  value="somewhat_helpful"
-                  id="helpfulness_somewhat"
-                />
-                <Label htmlFor="helpfulness_somewhat">Somewhat helped</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="not_helpful" id="helpfulness_not" />
-                <Label htmlFor="helpfulness_not">Did not help</Label>
-              </div>
-            </RadioGroup>
-          </div>
-
-          <div className="space-y-6">
-            <Label className="text-lg font-semibold">
-              Service Quality Dimensions
-            </Label>
-            <div className="grid grid-cols-[1fr,auto] gap-4">
-              <div></div>
-              <div className="flex justify-between space-x-4">
-                {emojiRatings.map((emoji, index) => (
-                  <div key={index} className="text-2xl">
-                    {emoji}
+              <div className="space-y-6">
+                <div className="grid grid-cols-[1fr,auto] gap-4">
+                  <div className="flex items-center justify-center">
+                    <FormLabel className="text-lg font-semibold">
+                      Service Quality Dimensions
+                    </FormLabel>
                   </div>
-                ))}
-              </div>
-              {surveyQuestions.map((question, questionIndex) => (
-                <React.Fragment key={questionIndex}>
-                  <div className="flex items-center">{question}</div>
                   <div className="flex justify-between space-x-4">
-                    {emojiRatings.map((_, emojiIndex) => (
-                      <Checkbox
-                        key={emojiIndex}
-                        checked={
-                          formData.surveyResponses[question] === emojiIndex + 1
-                        }
-                        onCheckedChange={() =>
-                          handleSurveyResponse(question, emojiIndex + 1)
-                        }
-                      />
+                    {emojiRatings.map((emoji, index) => (
+                      <div key={index} className="flex-1 text-center">
+                        <div className="text-2xl">{emoji}</div>
+                        <div className="text-xs">{emojiMeanings[index]}</div>
+                      </div>
                     ))}
                   </div>
-                </React.Fragment>
-              ))}
+                  {surveyQuestions.map((question, questionIndex) => (
+                    <React.Fragment key={questionKeys[questionIndex]}>
+                      <P className="flex h-10 items-center">{question}</P>
+                      <div className="flex justify-between space-x-4">
+                        {emojiMeanings.map((meaning, emojiIndex) => (
+                          <FormField
+                            key={emojiIndex}
+                            control={form.control}
+                            name={`surveyResponses.${questionKeys[questionIndex]}`}
+                            render={({ field }) => (
+                              <FormItem className="flex flex-1 items-center justify-center">
+                                <FormControl>
+                                  <Checkbox
+                                    checked={field.value === meaning}
+                                    onCheckedChange={(checked) => {
+                                      field.onChange(checked ? meaning : "");
+                                    }}
+                                  />
+                                </FormControl>
+                              </FormItem>
+                            )}
+                          />
+                        ))}
+                      </div>
+                      <FormMessage />
+                    </React.Fragment>
+                  ))}
+                </div>
+              </div>
             </div>
+            <Separator className="my-4" />
+            <FormField
+              control={form.control}
+              name="suggestions"
+              render={({ field }) => (
+                <FormItem className="px-4 pb-1">
+                  <FormLabel>
+                    Suggestions on how we can further improve our services
+                    (optional):
+                  </FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Enter your suggestions here"
+                      className="h-24 resize-none"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="suggestions">
-              Suggestions on how we can further improve our services (optional):
-            </Label>
-            <textarea
-              id="suggestions"
-              className="h-24 w-full rounded-md border p-2"
-              placeholder="Enter your suggestions here"
-              onChange={(e) => handleInputChange("suggestions", e.target.value)}
-            ></textarea>
-          </div>
-        </CardContent>
-        <CardFooter>
-          <Button type="submit" className="w-full">
-            Submit Evaluation
-          </Button>
-        </CardFooter>
+        </div>
+        <Separator className="my-4" />
+        <DialogFooter>
+          {isFieldsDirty ? (
+            <Button
+              onClick={(e) => {
+                e.preventDefault();
+                form.reset();
+              }}
+              variant="destructive"
+              disabled={isPending}
+            >
+              Reset form
+            </Button>
+          ) : (
+            <div></div>
+          )}
+          <SubmitButton disabled={isPending} type="submit" className="w-28">
+            Submit
+          </SubmitButton>
+        </DialogFooter>
       </form>
-    </Card>
+    </Form>
   );
 }

@@ -38,9 +38,9 @@ import VenueRequestDetails from "./venue-request-details";
 import ReturnableResourceDetails from "./returnable-resource-details";
 import AddEstimatedTime from "./add-estimated-time";
 import PersonnelActions from "./personnel-actions";
-import JobRequestEvaluationDialog from "./job-request-evaluation-dialog";
 import { Button } from "@/components/ui/button";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
+import JobRequestEvaluationDialog from "@/components/dialogs/job-request-evaluation-dialog";
 
 interface RequestDetailsProps {
   params: string;
