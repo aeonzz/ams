@@ -94,44 +94,42 @@ export default function RequestActions({ data, params }: RequestActionsProps) {
   }
 
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <AlertDialogTrigger asChild>
-            <TooltipTrigger asChild>
-              <Button variant="secondary" className="w-full">
-                Cancel Request
-              </Button>
-            </TooltipTrigger>
-          </AlertDialogTrigger>
-          <AlertDialogContent onCloseAutoFocus={(e) => e.preventDefault()}>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Confirm Request Cancellation</AlertDialogTitle>
-              <AlertDialogDescription>
-                This action cannot be undone. Canceling this request will
-                permanently stop any ongoing processes, and it will no longer be
-                tracked or acted upon.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction
-                className="bg-destructive hover:bg-destructive/90"
-                onClick={handleCancellation}
-              >
-                Continue
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-        <TooltipContent className="flex items-center gap-3" side="bottom">
-          <P>Cancel request</P>
-          <div className="space-x-1">
-            <CommandShortcut>Ctrl</CommandShortcut>
-            <CommandShortcut>C</CommandShortcut>
-          </div>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <Tooltip>
+      <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <AlertDialogTrigger asChild>
+          <TooltipTrigger asChild>
+            <Button variant="secondary" className="w-full">
+              Cancel Request
+            </Button>
+          </TooltipTrigger>
+        </AlertDialogTrigger>
+        <AlertDialogContent onCloseAutoFocus={(e) => e.preventDefault()}>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Request Cancellation</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. Canceling this request will
+              permanently stop any ongoing processes, and it will no longer be
+              tracked or acted upon.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive hover:bg-destructive/90"
+              onClick={handleCancellation}
+            >
+              Continue
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      <TooltipContent className="flex items-center gap-3" side="bottom">
+        <P>Cancel request</P>
+        <div className="space-x-1">
+          <CommandShortcut>Ctrl</CommandShortcut>
+          <CommandShortcut>C</CommandShortcut>
+        </div>
+      </TooltipContent>
+    </Tooltip>
   );
 }

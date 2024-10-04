@@ -316,202 +316,196 @@ export default function JobRequestReviewerActions({
       allowedDepartment={allowedDepartment}
       currentUser={currentUser}
     >
-      <TooltipProvider>
-        <Tooltip>
-          <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogTrigger asChild>
-              <TooltipTrigger asChild>
-                <Button className="w-full" variant="secondary">
-                  <FolderKanban className="mr-2 h-4 w-4" />
-                  Manage Request
-                </Button>
-              </TooltipTrigger>
-            </DialogTrigger>
-            <DialogContent
-              onInteractOutside={(e) => {
-                if (isUpdateStatusPending || isAssignPersonnelPending) {
-                  e.preventDefault();
-                }
-              }}
-              onCloseAutoFocus={(e) => e.preventDefault()}
-              className="sm:max-w-[425px]"
-            >
-              <DialogHeader>
-                <DialogTitle>Manage Request</DialogTitle>
-                <DialogDescription>
-                  Review and take action on this request.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="scroll-bar flex max-h-[60vh] flex-col gap-3 overflow-y-auto px-4 py-1">
-                {request.status !== "APPROVED" && <>{renderPersonnelList()}</>}
-                {request.status === "PENDING" && (
-                  <div className="flex space-x-2">
-                    <Button
-                      onClick={() => handleReview("REVIEWED")}
-                      disabled={
-                        !selectedPerson ||
-                        isUpdateStatusPending ||
-                        isAssignPersonnelPending
-                      }
-                      className="flex-1"
-                    >
-                      Approve
-                    </Button>
-                    <Button
-                      onClick={() => handleReview("REJECTED")}
-                      variant="destructive"
-                      disabled={
-                        !selectedPerson ||
-                        isUpdateStatusPending ||
-                        isAssignPersonnelPending
-                      }
-                      className="flex-1"
-                    >
-                      Reject
-                    </Button>
+      <Tooltip>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+          <DialogTrigger asChild>
+            <TooltipTrigger asChild>
+              <Button className="w-full" variant="secondary">
+                <FolderKanban className="mr-2 h-4 w-4" />
+                Manage Request
+              </Button>
+            </TooltipTrigger>
+          </DialogTrigger>
+          <DialogContent
+            onInteractOutside={(e) => {
+              if (isUpdateStatusPending || isAssignPersonnelPending) {
+                e.preventDefault();
+              }
+            }}
+            onCloseAutoFocus={(e) => e.preventDefault()}
+            className="sm:max-w-[425px]"
+          >
+            <DialogHeader>
+              <DialogTitle>Manage Request</DialogTitle>
+              <DialogDescription>
+                Review and take action on this request.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="scroll-bar flex max-h-[60vh] flex-col gap-3 overflow-y-auto px-4 py-1">
+              {request.status !== "APPROVED" && <>{renderPersonnelList()}</>}
+              {request.status === "PENDING" && (
+                <div className="flex space-x-2">
+                  <Button
+                    onClick={() => handleReview("REVIEWED")}
+                    disabled={
+                      !selectedPerson ||
+                      isUpdateStatusPending ||
+                      isAssignPersonnelPending
+                    }
+                    className="flex-1"
+                  >
+                    Approve
+                  </Button>
+                  <Button
+                    onClick={() => handleReview("REJECTED")}
+                    variant="destructive"
+                    disabled={
+                      !selectedPerson ||
+                      isUpdateStatusPending ||
+                      isAssignPersonnelPending
+                    }
+                    className="flex-1"
+                  >
+                    Reject
+                  </Button>
+                </div>
+              )}
+              <div className="flex flex-col gap-3">
+                {request.reviewer && (
+                  <div>
+                    <P className="text-xs text-muted-foreground">
+                      Reviewed By:
+                    </P>
+                    <div className="flex w-full items-center p-2">
+                      <Avatar className="mr-2 h-8 w-8">
+                        <AvatarImage
+                          src={request.reviewer.profileUrl ?? ""}
+                          alt={formatFullName(
+                            request.reviewer.firstName,
+                            request.reviewer.middleName,
+                            request.reviewer.lastName
+                          )}
+                        />
+                        <AvatarFallback>
+                          {request.reviewer.firstName.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <P className="font-medium">
+                          {formatFullName(
+                            request.reviewer.firstName,
+                            request.reviewer.middleName,
+                            request.reviewer.lastName
+                          )}
+                        </P>
+                      </div>
+                    </div>
                   </div>
                 )}
-                <div className="flex flex-col gap-3">
-                  {request.reviewer && (
-                    <div>
-                      <P className="text-xs text-muted-foreground">
-                        Reviewed By:
-                      </P>
-                      <div className="flex w-full items-center p-2">
-                        <Avatar className="mr-2 h-8 w-8">
-                          <AvatarImage
-                            src={request.reviewer.profileUrl ?? ""}
-                            alt={formatFullName(
-                              request.reviewer.firstName,
-                              request.reviewer.middleName,
-                              request.reviewer.lastName
-                            )}
-                          />
-                          <AvatarFallback>
-                            {request.reviewer.firstName.charAt(0).toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1">
-                          <P className="font-medium">
-                            {formatFullName(
-                              request.reviewer.firstName,
-                              request.reviewer.middleName,
-                              request.reviewer.lastName
-                            )}
-                          </P>
-                        </div>
+                {request.jobRequest?.assignedUser && (
+                  <div>
+                    <P className="text-xs text-muted-foreground">
+                      Assigned Personnel:
+                    </P>
+                    <div className="flex w-full items-center p-2">
+                      <Avatar className="mr-2 h-8 w-8">
+                        <AvatarImage
+                          src={request.jobRequest.assignedUser.profileUrl ?? ""}
+                          alt={formatFullName(
+                            request.jobRequest.assignedUser.firstName,
+                            request.jobRequest.assignedUser.middleName,
+                            request.jobRequest.assignedUser.lastName
+                          )}
+                        />
+                        <AvatarFallback>
+                          {request.jobRequest.assignedUser.firstName
+                            .charAt(0)
+                            .toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <P className="font-medium">
+                          {formatFullName(
+                            request.jobRequest.assignedUser.firstName,
+                            request.jobRequest.assignedUser.middleName,
+                            request.jobRequest.assignedUser.lastName
+                          )}
+                        </P>
                       </div>
                     </div>
-                  )}
-                  {request.jobRequest?.assignedUser && (
-                    <div>
-                      <P className="text-xs text-muted-foreground">
-                        Assigned Personnel:
-                      </P>
-                      <div className="flex w-full items-center p-2">
-                        <Avatar className="mr-2 h-8 w-8">
-                          <AvatarImage
-                            src={
-                              request.jobRequest.assignedUser.profileUrl ?? ""
-                            }
-                            alt={formatFullName(
-                              request.jobRequest.assignedUser.firstName,
-                              request.jobRequest.assignedUser.middleName,
-                              request.jobRequest.assignedUser.lastName
-                            )}
-                          />
-                          <AvatarFallback>
-                            {request.jobRequest.assignedUser.firstName
-                              .charAt(0)
-                              .toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1">
-                          <P className="font-medium">
-                            {formatFullName(
-                              request.jobRequest.assignedUser.firstName,
-                              request.jobRequest.assignedUser.middleName,
-                              request.jobRequest.assignedUser.lastName
-                            )}
-                          </P>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  {request.jobRequest?.status === "COMPLETED" && (
-                    <>
-                      <AlertDialog
-                        open={isAlertOpen}
-                        onOpenChange={setIsAlertOpen}
-                      >
-                        <AlertDialogTrigger asChild>
-                          <Button
-                            className="w-full"
-                            disabled={
-                              isUpdateStatusPending || isAssignPersonnelPending
-                            }
-                          >
-                            Complete Request
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>
-                              Complete Request
-                            </AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Are you sure you want to mark this request as
-                              completed? This action cannot be undone.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => handleReview("COMPLETED")}
-                            >
-                              Complete
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </>
-                  )}
-                  {request.status === "REVIEWED" && (
-                    <PermissionGuard
-                      allowedRoles={allowedApproverRoles}
-                      allowedDepartment={allowedDepartment}
-                      currentUser={currentUser}
+                  </div>
+                )}
+                {request.jobRequest?.status === "COMPLETED" && (
+                  <>
+                    <AlertDialog
+                      open={isAlertOpen}
+                      onOpenChange={setIsAlertOpen}
                     >
-                      <JobRequestApproverActions
-                        request={request}
-                        isPending={
-                          isUpdateStatusPending || isAssignPersonnelPending
-                        }
-                        entityType={entityType}
-                        requestTypeId={requestTypeId}
-                      />
-                    </PermissionGuard>
-                  )}
-                </div>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          className="w-full"
+                          disabled={
+                            isUpdateStatusPending || isAssignPersonnelPending
+                          }
+                        >
+                          Complete Request
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Complete Request</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Are you sure you want to mark this request as
+                            completed? This action cannot be undone.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => handleReview("COMPLETED")}
+                          >
+                            Complete
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </>
+                )}
+                {request.status === "REVIEWED" && (
+                  <PermissionGuard
+                    allowedRoles={allowedApproverRoles}
+                    allowedDepartment={allowedDepartment}
+                    currentUser={currentUser}
+                  >
+                    <JobRequestApproverActions
+                      request={request}
+                      isPending={
+                        isUpdateStatusPending || isAssignPersonnelPending
+                      }
+                      entityType={entityType}
+                      requestTypeId={requestTypeId}
+                    />
+                  </PermissionGuard>
+                )}
               </div>
-              <Separator className="my-2" />
-              <DialogFooter>
-                <Button
-                  variant="secondary"
-                  disabled={isAssignPersonnelPending || isUpdateStatusPending}
-                  onClick={() => setIsOpen(false)}
-                >
-                  Close
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-          <TooltipContent className="flex items-center gap-3" side="bottom">
-            <P>Manage request</P>
-            <CommandShortcut>M</CommandShortcut>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+            </div>
+            <Separator className="my-2" />
+            <DialogFooter>
+              <Button
+                variant="secondary"
+                disabled={isAssignPersonnelPending || isUpdateStatusPending}
+                onClick={() => setIsOpen(false)}
+              >
+                Close
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+        <TooltipContent className="flex items-center gap-3" side="bottom">
+          <P>Manage request</P>
+          <CommandShortcut>M</CommandShortcut>
+        </TooltipContent>
+      </Tooltip>
     </PermissionGuard>
   );
 }

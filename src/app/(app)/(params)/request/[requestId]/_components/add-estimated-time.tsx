@@ -186,138 +186,136 @@ export default function AddEstimatedTime({ data }: AddEstimatedTimeProps) {
     <div>
       <P className="mb-1 text-sm">Estimated time</P>
       {canEdit ? (
-        <TooltipProvider>
-          <Tooltip open={tooltipOpen} onOpenChange={handleTooltipOpenChange}>
-            <Popover
-              open={popoverOpen}
-              onOpenChange={handlePopoverOpenChange}
-              modal
+        <Tooltip open={tooltipOpen} onOpenChange={handleTooltipOpenChange}>
+          <Popover
+            open={popoverOpen}
+            onOpenChange={handlePopoverOpenChange}
+            modal
+          >
+            <PopoverTrigger asChild>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost2"
+                  size="sm"
+                  className={cn(
+                    "w-full justify-start px-2",
+                    popoverOpen && "bg-secondary-accent"
+                  )}
+                >
+                  <Clock className="mr-2 size-4" />
+                  {data.jobRequest?.estimatedTime ? (
+                    `${data.jobRequest.estimatedTime} hours`
+                  ) : (
+                    <P className="text-muted-foreground">Add</P>
+                  )}
+                </Button>
+              </TooltipTrigger>
+            </PopoverTrigger>
+            <PopoverContent
+              className="w-[200px] p-0"
+              onCloseAutoFocus={(e) => e.preventDefault()}
+              side="left"
+              align="start"
             >
-              <PopoverTrigger asChild>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost2"
-                    size="sm"
-                    className={cn(
-                      "w-full justify-start px-2",
-                      popoverOpen && "bg-secondary-accent"
-                    )}
-                  >
-                    <Clock className="mr-2 size-4" />
-                    {data.jobRequest?.estimatedTime ? (
-                      `${data.jobRequest.estimatedTime} hours`
-                    ) : (
-                      <P className="text-muted-foreground">Add</P>
-                    )}
-                  </Button>
-                </TooltipTrigger>
-              </PopoverTrigger>
-              <PopoverContent
-                className="w-[200px] p-0"
-                onCloseAutoFocus={(e) => e.preventDefault()}
-                side="left"
-                align="start"
-              >
-                <Form {...form}>
-                  <form onSubmit={form.handleSubmit(onSubmit)}>
-                    <FormField
-                      control={form.control}
-                      name="estimatedTime"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormControl>
-                            <Command>
-                              <CommandInput placeholder="Search hours...">
-                                <CommandShortcut>T</CommandShortcut>
-                              </CommandInput>
-                              <CommandList>
-                                <CommandEmpty>No hours found.</CommandEmpty>
-                                <CommandGroup>
-                                  {predefinedHours.map((hours, index) => (
-                                    <CommandItem
-                                      key={hours}
-                                      onSelect={() => {
-                                        field.onChange(hours);
-                                        form.handleSubmit(onSubmit)();
-                                      }}
-                                    >
-                                      <Clock className="mr-2 size-4" />
-                                      {hours} {hours === 1 ? "hour" : "hours"}
-                                      <div className="ml-auto flex items-center gap-1">
-                                        {data.jobRequest?.estimatedTime ===
-                                          hours && <Check className="size-4" />}
-                                        <CommandShortcut>
-                                          {index + 1}
-                                        </CommandShortcut>
-                                      </div>
-                                    </CommandItem>
-                                  ))}
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)}>
+                  <FormField
+                    control={form.control}
+                    name="estimatedTime"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Command>
+                            <CommandInput placeholder="Search hours...">
+                              <CommandShortcut>T</CommandShortcut>
+                            </CommandInput>
+                            <CommandList>
+                              <CommandEmpty>No hours found.</CommandEmpty>
+                              <CommandGroup>
+                                {predefinedHours.map((hours, index) => (
                                   <CommandItem
-                                    onSelect={() =>
-                                      setShowCustomInput(!showCustomInput)
-                                    }
+                                    key={hours}
+                                    onSelect={() => {
+                                      field.onChange(hours);
+                                      form.handleSubmit(onSubmit)();
+                                    }}
                                   >
-                                    <Plus className="mr-2 size-4" />
-                                    Add custom time
-                                    <CommandShortcut>A</CommandShortcut>
+                                    <Clock className="mr-2 size-4" />
+                                    {hours} {hours === 1 ? "hour" : "hours"}
+                                    <div className="ml-auto flex items-center gap-1">
+                                      {data.jobRequest?.estimatedTime ===
+                                        hours && <Check className="size-4" />}
+                                      <CommandShortcut>
+                                        {index + 1}
+                                      </CommandShortcut>
+                                    </div>
                                   </CommandItem>
-                                </CommandGroup>
-                              </CommandList>
-                            </Command>
-                          </FormControl>
-                          {showCustomInput && (
-                            <>
-                              <Separator />
-                              <div className="flex flex-col items-center gap-1 px-2 pb-1">
-                                <Input
-                                  type="number"
-                                  placeholder="Enter hours"
-                                  ref={customInputRef}
-                                  className="w-full"
-                                  value={customHours}
-                                  onChange={(e) => {
-                                    const value = e.target.value;
-                                    if (
-                                      value === "" ||
-                                      (parseInt(value, 10) >= 0 &&
-                                        parseInt(value, 10) <= 999)
-                                    ) {
-                                      setCustomHours(value);
-                                    }
-                                  }}
-                                  onKeyDown={(e) => {
-                                    if (e.key === "Enter") {
-                                      e.preventDefault();
-                                      handleCustomHoursSubmit();
-                                    }
-                                  }}
-                                />
-                                <Button
-                                  type="button"
-                                  variant="secondary"
-                                  onClick={handleCustomHoursSubmit}
-                                  disabled={isPending}
-                                  className="w-full"
+                                ))}
+                                <CommandItem
+                                  onSelect={() =>
+                                    setShowCustomInput(!showCustomInput)
+                                  }
                                 >
-                                  Add
-                                </Button>
-                              </div>
-                            </>
-                          )}
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </form>
-                </Form>
-              </PopoverContent>
-            </Popover>
-            <TooltipContent className="flex items-center gap-3" side="bottom">
-              <P>Add time</P>
-              <CommandShortcut>T</CommandShortcut>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+                                  <Plus className="mr-2 size-4" />
+                                  Add custom time
+                                  <CommandShortcut>A</CommandShortcut>
+                                </CommandItem>
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </FormControl>
+                        {showCustomInput && (
+                          <>
+                            <Separator />
+                            <div className="flex flex-col items-center gap-1 px-2 pb-1">
+                              <Input
+                                type="number"
+                                placeholder="Enter hours"
+                                ref={customInputRef}
+                                className="w-full"
+                                value={customHours}
+                                onChange={(e) => {
+                                  const value = e.target.value;
+                                  if (
+                                    value === "" ||
+                                    (parseInt(value, 10) >= 0 &&
+                                      parseInt(value, 10) <= 999)
+                                  ) {
+                                    setCustomHours(value);
+                                  }
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") {
+                                    e.preventDefault();
+                                    handleCustomHoursSubmit();
+                                  }
+                                }}
+                              />
+                              <Button
+                                type="button"
+                                variant="secondary"
+                                onClick={handleCustomHoursSubmit}
+                                disabled={isPending}
+                                className="w-full"
+                              >
+                                Add
+                              </Button>
+                            </div>
+                          </>
+                        )}
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </form>
+              </Form>
+            </PopoverContent>
+          </Popover>
+          <TooltipContent className="flex items-center gap-3" side="bottom">
+            <P>Add time</P>
+            <CommandShortcut>T</CommandShortcut>
+          </TooltipContent>
+        </Tooltip>
       ) : (
         <Button
           variant="ghost2"

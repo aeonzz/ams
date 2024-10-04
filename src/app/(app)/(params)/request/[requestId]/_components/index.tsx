@@ -93,7 +93,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
                 <Avatar className="size-5 rounded-full">
-                  <AvatarImage src={`${data.user.profileUrl}` ?? ""} />
+                  <AvatarImage src={`${data.user.profileUrl}`} />
                   <AvatarFallback className="rounded-md">
                     {data.user.firstName.charAt(0).toUpperCase()}
                   </AvatarFallback>
@@ -244,7 +244,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
               <P className="mb-1 text-sm">Requested by</P>
               <div className="flex items-center space-x-2 p-1">
                 <Avatar className="size-5 rounded-full">
-                  <AvatarImage src={`${data.user.profileUrl}` ?? ""} />
+                  <AvatarImage src={`${data.user.profileUrl}`} />
                   <AvatarFallback className="rounded-md">
                     {data.user.firstName.charAt(0).toUpperCase()}
                   </AvatarFallback>
@@ -264,7 +264,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                 <div className="flex items-center space-x-2 p-1">
                   <Avatar className="size-5 rounded-full">
                     <AvatarImage
-                      src={`${data.jobRequest.assignedUser.profileUrl}` ?? ""}
+                      src={`${data.jobRequest.assignedUser.profileUrl}`}
                     />
                     <AvatarFallback className="rounded-md">
                       {data.jobRequest.assignedUser.firstName

@@ -108,40 +108,36 @@ export default function PersonnelActions({
       currentUser={currentUser}
       allowedDepartment={allowedDepartment}
     >
-      <TooltipProvider>
-        <Tooltip>
-          <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
-            <AlertDialogTrigger asChild>
-              <TooltipTrigger asChild>
-                <Button variant="secondary">{buttonText}</Button>
-              </TooltipTrigger>
-            </AlertDialogTrigger>
-            <AlertDialogContent onCloseAutoFocus={(e) => e.preventDefault()}>
-              <AlertDialogHeader>
-                <AlertDialogTitle>{dialogTitle}</AlertDialogTitle>
-                <AlertDialogDescription>
-                  {dialogDescription}
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={() => handleStatusChange(newStatus)}
-                >
-                  Continue
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-          <TooltipContent className="flex items-center gap-3" side="bottom">
-            <P>{tooltipText}</P>
-            <div className="flex gap-1">
-              <CommandShortcut>Ctrl</CommandShortcut>
-              <CommandShortcut>S</CommandShortcut>
-            </div>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      <Tooltip>
+        <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
+          <AlertDialogTrigger asChild>
+            <TooltipTrigger asChild>
+              <Button variant="secondary">{buttonText}</Button>
+            </TooltipTrigger>
+          </AlertDialogTrigger>
+          <AlertDialogContent onCloseAutoFocus={(e) => e.preventDefault()}>
+            <AlertDialogHeader>
+              <AlertDialogTitle>{dialogTitle}</AlertDialogTitle>
+              <AlertDialogDescription>
+                {dialogDescription}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={() => handleStatusChange(newStatus)}>
+                Continue
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+        <TooltipContent className="flex items-center gap-3" side="bottom">
+          <P>{tooltipText}</P>
+          <div className="flex gap-1">
+            <CommandShortcut>Ctrl</CommandShortcut>
+            <CommandShortcut>S</CommandShortcut>
+          </div>
+        </TooltipContent>
+      </Tooltip>
     </PermissionGuard>
   );
 }

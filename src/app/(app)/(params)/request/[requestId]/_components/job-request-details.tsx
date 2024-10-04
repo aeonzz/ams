@@ -3,8 +3,16 @@
 import LoadingSpinner from "@/components/loaders/loading-spinner";
 import { H4, H5, P } from "@/components/typography/text";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { CommandShortcut } from "@/components/ui/command";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { fillJobRequestEvaluationPDF } from "@/lib/fill-pdf/job-evaluation";
 import {
   cn,
   formatFullName,
@@ -22,6 +30,7 @@ import {
   CirclePlus,
   Clock,
   Dot,
+  Download,
   FileText,
   RotateCw,
   Timer,
@@ -53,13 +62,51 @@ export default function JobRequestDetails({
   });
 
   const JobStatusColor = getJobStatusColor(data.status);
+  const isEvaluated = data.jobRequestEvaluation !== null;
+
+  const handleDownloadEvaluation = async () => {
+    if (data.jobRequestEvaluation) {
+      try {
+        const pdfBlob = await fillJobRequestEvaluationPDF(
+          data.jobRequestEvaluation
+        );
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(pdfBlob);
+        link.download = `job_request_evaluation_${requestId}.pdf`;
+        link.click();
+        URL.revokeObjectURL(link.href);
+      } catch (error) {
+        console.error("Error generating PDF:", error);
+      }
+    }
+  };
 
   return (
     <>
       <div className="space-y-4">
-        <H4 className="font-semibold text-muted-foreground">
-          Job Request Details
-        </H4>
+        <div className="flex h-7 items-center justify-between">
+          <H4 className="font-semibold text-muted-foreground">
+            Job Request Details
+          </H4>
+          {isEvaluated && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost2"
+                  size="icon"
+                  className="size-7"
+                  onClick={handleDownloadEvaluation}
+                >
+                  <Download className="size-4 text-muted-foreground" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent className="flex items-center gap-3" side="bottom">
+                <P>Download evaluation form</P>
+                <CommandShortcut>D</CommandShortcut>
+              </TooltipContent>
+            </Tooltip>
+          )}
+        </div>
         <div className="flex items-center space-x-2">
           <FileText className="h-5 w-5" />
           <P>Job type: {textTransform(data.jobType)}</P>
