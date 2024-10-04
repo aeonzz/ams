@@ -51,6 +51,7 @@ export async function GET(req: Request, params: Context) {
           include: {
             files: true,
             assignedUser: true,
+            jobRequestEvaluation: true,
           },
         },
         returnableRequest: {

@@ -292,9 +292,14 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
             <RequestActions data={data} params={params} />
           )}
           {data.type === "JOB" &&
+            data.jobRequest &&
+            !data.jobRequest.jobRequestEvaluation &&
             data.status === "COMPLETED" &&
             currentUser.id === data.userId && (
-              <JobRequestEvaluationDialog>
+              <JobRequestEvaluationDialog
+                jobRequestId={data.jobRequest.id}
+                requestId={data.id}
+              >
                 <Button
                   onClick={() =>
                     dialogManager.setActiveDialog("jobRequestEvaluationDialog")

@@ -4,9 +4,11 @@ import { JobStatusSchema } from '../inputTypeSchemas/JobStatusSchema'
 import type { FileWithRelations } from './FileSchema'
 import type { RequestWithRelations } from './RequestSchema'
 import type { UserWithRelations } from './UserSchema'
+import type { JobRequestEvaluationWithRelations } from './JobRequestEvaluationSchema'
 import { FileWithRelationsSchema } from './FileSchema'
 import { RequestWithRelationsSchema } from './RequestSchema'
 import { UserWithRelationsSchema } from './UserSchema'
+import { JobRequestEvaluationWithRelationsSchema } from './JobRequestEvaluationSchema'
 
 /////////////////////////////////////////
 // JOB REQUEST SCHEMA
@@ -40,6 +42,7 @@ export type JobRequestRelations = {
   files: FileWithRelations[];
   request: RequestWithRelations;
   assignedUser?: UserWithRelations | null;
+  jobRequestEvaluation?: JobRequestEvaluationWithRelations | null;
 };
 
 export type JobRequestWithRelations = z.infer<typeof JobRequestSchema> & JobRequestRelations
@@ -48,6 +51,7 @@ export const JobRequestWithRelationsSchema: z.ZodType<JobRequestWithRelations> =
   files: z.lazy(() => FileWithRelationsSchema).array(),
   request: z.lazy(() => RequestWithRelationsSchema),
   assignedUser: z.lazy(() => UserWithRelationsSchema).nullable(),
+  jobRequestEvaluation: z.lazy(() => JobRequestEvaluationWithRelationsSchema).nullable(),
 }))
 
 export default JobRequestSchema;

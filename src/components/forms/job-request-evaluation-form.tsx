@@ -30,7 +30,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { type UseMutateAsyncFunction } from "@tanstack/react-query";
+import {
+  useQueryClient,
+  type UseMutateAsyncFunction,
+} from "@tanstack/react-query";
 import { createJobRequestEvaluation } from "@/lib/actions/evaluation";
 import { UseFormReturn } from "react-hook-form";
 import { type CreateJobEvaluationSchema } from "@/lib/schema/evaluation/job";
@@ -89,6 +92,8 @@ interface JobRequestEvaluationFormProps {
   form: UseFormReturn<CreateJobEvaluationSchema>;
   handleOpenChange: (open: boolean) => void;
   isFieldsDirty: boolean;
+  jobRequestId: string;
+  requestId: string;
 }
 
 export default function JobRequestEvaluationForm({
@@ -97,17 +102,24 @@ export default function JobRequestEvaluationForm({
   form,
   handleOpenChange,
   isFieldsDirty,
+  jobRequestId,
+  requestId,
 }: JobRequestEvaluationFormProps) {
   const pathname = usePathname();
+  const queryClient = useQueryClient();
   const onSubmit = async (values: CreateJobEvaluationSchema) => {
     try {
       const data = {
         ...values,
+        jobRequestId: jobRequestId,
         path: pathname,
       };
       toast.promise(mutateAsync(data), {
         loading: "Submitting your evaluation...",
         success: () => {
+          queryClient.invalidateQueries({
+            queryKey: [requestId],
+          });
           handleOpenChange(false);
           return "Thank you! Your evaluation has been successfully submitted.";
         },

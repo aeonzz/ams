@@ -41,10 +41,14 @@ import { P } from "../typography/text";
 
 interface JobRequestEvaluationDialogProps {
   children: React.ReactNode;
+  jobRequestId: string;
+  requestId: string;
 }
 
 export default function JobRequestEvaluationDialog({
   children,
+  jobRequestId,
+  requestId,
 }: JobRequestEvaluationDialogProps) {
   const dialogManager = useDialogManager();
   const [alertOpen, setAlertOpen] = React.useState(false);
@@ -167,6 +171,8 @@ export default function JobRequestEvaluationDialog({
             mutateAsync={mutateAsync}
             handleOpenChange={handleOpenChange}
             isFieldsDirty={isFieldsDirty}
+            jobRequestId={jobRequestId}
+            requestId={requestId}
           />
         </DialogContent>
       </Dialog>

@@ -33,6 +33,7 @@ export type CreateJobEvaluationSchema = z.infer<
 
 export const createJobEvaluationSchemaWithPath =
   createJobEvaluationSchema.extend({
+    jobRequestId: z.string(),
     path: z.string(),
   });
 

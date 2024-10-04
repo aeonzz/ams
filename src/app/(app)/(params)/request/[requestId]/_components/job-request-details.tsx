@@ -1,5 +1,6 @@
 "use client";
 
+import LoadingSpinner from "@/components/loaders/loading-spinner";
 import { H4, H5, P } from "@/components/typography/text";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -17,9 +18,12 @@ import { format } from "date-fns";
 import {
   Calendar,
   Circle,
+  CircleMinus,
+  CirclePlus,
   Clock,
   Dot,
   FileText,
+  RotateCw,
   Timer,
   User,
 } from "lucide-react";
@@ -29,6 +33,7 @@ import {
   type JobRequestWithRelations,
 } from "prisma/generated/zod";
 import React from "react";
+import { PhotoProvider, PhotoView } from "react-photo-view";
 
 interface JobRequestDetailsProps {
   data: JobRequestWithRelations;
@@ -117,22 +122,53 @@ export default function JobRequestDetails({
           </H5>
           <P className="text-wrap break-all">{data.description}</P>
         </div>
-        <div>
-          {data.files.map((file) => (
-            <div key={file.id} className="relative mb-3 w-full">
-              <Image
-                src={file.url}
-                alt={`Image of ${file.url}`}
-                placeholder="empty"
-                quality={100}
-                width={0}
-                height={0}
-                sizes="100vw"
-                className="h-auto w-full rounded-sm border object-contain"
-              />
-            </div>
-          ))}
-        </div>
+        <PhotoProvider
+          speed={() => 300}
+          maskOpacity={0.5}
+          loadingElement={<LoadingSpinner />}
+          toolbarRender={({ onScale, scale, rotate, onRotate }) => {
+            return (
+              <>
+                <div className="flex gap-3">
+                  <CirclePlus
+                    className="size-5 cursor-pointer opacity-75 transition-opacity ease-linear hover:opacity-100"
+                    onClick={() => onScale(scale + 1)}
+                  />
+                  <CircleMinus
+                    className="size-5 cursor-pointer opacity-75 transition-opacity ease-linear hover:opacity-100"
+                    onClick={() => onScale(scale - 1)}
+                  />
+                  <RotateCw
+                    className="size-5 cursor-pointer opacity-75 transition-opacity ease-linear hover:opacity-100"
+                    onClick={() => onRotate(rotate + 90)}
+                  />
+                </div>
+              </>
+            );
+          }}
+        >
+          <div>
+            {data.files.map((file) => (
+              <PhotoView key={file.id} src={file.url}>
+                <div
+                  key={file.id}
+                  className="relative mb-3 w-full cursor-pointer"
+                >
+                  <Image
+                    src={file.url}
+                    alt={`Image of ${file.url}`}
+                    placeholder="empty"
+                    quality={100}
+                    width={0}
+                    height={0}
+                    sizes="100vw"
+                    className="h-auto w-full rounded-sm border object-contain"
+                  />
+                </div>
+              </PhotoView>
+            ))}
+          </div>
+        </PhotoProvider>
       </div>
       <Separator className="my-6" />
       <div className="space-y-4 pb-20">
