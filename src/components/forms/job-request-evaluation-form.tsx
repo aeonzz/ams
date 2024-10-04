@@ -73,12 +73,12 @@ export const questionKeys = [
 
 const emojiRatings = ["😡", "😠", "😐", "🙂", "😃", "N/A"] as const;
 const emojiMeanings = [
-  "Strongly disagree",
+  "Strongly_Disagree",
   "Disagree",
-  "Neither agree nor disagree",
+  "Neither_Agree_Nor_Disagree",
   "Agree",
-  "Strongly agree",
-  "Not Applicable",
+  "Strongly_Agree",
+  "Not_Applicable",
 ];
 
 interface JobRequestEvaluationFormProps {
@@ -136,6 +136,23 @@ export default function JobRequestEvaluationForm({
 
   const awarenessLevel = form.watch("awarenessLevel");
   const showAdditionalQuestions = awarenessLevel !== "not_aware";
+
+  React.useEffect(() => {
+    if (!showAdditionalQuestions) {
+      form.setValue("visibility", "N/A", {
+        shouldValidate: true,
+        shouldDirty: true,
+        shouldTouch: true,
+      });
+      form.setValue("helpfulness", "N/A", {
+        shouldValidate: true,
+        shouldDirty: true,
+        shouldTouch: true,
+      });
+    }
+  }, [form, showAdditionalQuestions]);
+
+  console.log(form.getValues("visibility"));
 
   return (
     <Form {...form}>
@@ -268,7 +285,7 @@ export default function JobRequestEvaluationForm({
                             value={field.value}
                             className="flex flex-wrap gap-3"
                           >
-                            {["male", "female"].map((sex) => (
+                            {["Male", "Female"].map((sex) => (
                               <FormItem
                                 key={sex}
                                 className="flex items-center space-x-2 space-y-0"

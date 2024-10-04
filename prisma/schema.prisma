@@ -192,8 +192,8 @@ model JobRequestEvaluation {
   age               Int
   regionOfResidence String
   awarenessLevel    String
-  visibility        String?
-  helpfulness       String?
+  visibility        String
+  helpfulness       String
   surveyResponses   Json
   suggestions       String?
   jobRequestId      String     @unique

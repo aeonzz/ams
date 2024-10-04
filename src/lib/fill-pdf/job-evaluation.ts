@@ -27,7 +27,7 @@ export async function fillJobRequestEvaluationPDF(
   const pdfDoc = await PDFDocument.load(pdfBytes);
   pdfDoc.registerFontkit(fontkit);
 
-  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  const font = await pdfDoc.embedFont(StandardFonts.CourierBoldOblique);
   const pages = pdfDoc.getPages();
   const firstPage = pages[0];
   const { width, height } = firstPage.getSize();
@@ -35,21 +35,60 @@ export async function fillJobRequestEvaluationPDF(
   console.log(`PDF dimensions: ${width}x${height}`);
 
   const fieldPositions: FieldPositions = {
-    position: { x: 120, y: height - 140, size: 10 },
-    sex: { x: 320, y: height - 160, size: 10 },
-    age: { x: 420, y: height - 160, size: 10 },
-    regionOfResidence: { x: 180, y: height - 180, size: 10 },
-    awarenessLevel: { x: 50, y: height - 280, size: 10 },
-    visibility: { x: 50, y: height - 340, size: 10 },
-    helpfulness: { x: 50, y: height - 380, size: 10 },
-    suggestions: { x: 50, y: height - 700, size: 10 },
-    createdAt: { x: 120, y: height - 160, size: 10 },
+    age: { x: 285, y: height - 143, size: 6 },
+    regionOfResidence: { x: 86, y: height - 151, size: 6 },
+    suggestions: { x: 30, y: height - 550, size: 6 },
+    createdAt: { x: 47, y: height - 143, size: 6 },
   };
 
   const clientTypeCheckmarks: { [key: string]: CheckmarkPosition } = {
     CITIZEN: { x: 64, y: height - 126, size: 8 },
     BUSINESS: { x: 98, y: height - 126, size: 8 },
     GOVERNMENT: { x: 133, y: height - 126, size: 8 },
+  };
+
+  const positionCheckmarks: { [key: string]: CheckmarkPosition } = {
+    Faculty: { x: 53, y: height - 134, size: 8 },
+    "Non-Teaching Staff": { x: 88, y: height - 134, size: 8 },
+    Student: { x: 157, y: height - 134, size: 8 },
+    "Guardian/Parent of Student": { x: 192, y: height - 134, size: 8 },
+    Alumna: { x: 283, y: height - 134, size: 8 },
+  };
+
+  const sexCheckmarks: { [key: string]: CheckmarkPosition } = {
+    Male: { x: 169, y: height - 143.6, size: 8 },
+    Female: { x: 199, y: height - 143.6, size: 8 },
+  };
+
+  const awarenessLevelCheckmarks: { [key: string]: CheckmarkPosition } = {
+    aware_and_saw: { x: 58, y: height - 195, size: 8 },
+    aware_but_not_saw: { x: 58, y: height - 203, size: 8 },
+    learned_when_saw: { x: 58, y: height - 213, size: 8 },
+    not_aware: { x: 58, y: height - 222, size: 8 },
+  };
+
+  const visibilityCheckmarks: { [key: string]: CheckmarkPosition } = {
+    easy: { x: 58, y: height - 246, size: 8 },
+    somewhat_easy: { x: 58, y: height - 255, size: 8 },
+    difficult: { x: 58, y: height - 264, size: 8 },
+    not_visible: { x: 255, y: height - 246, size: 8 },
+    "N/A": { x: 255, y: height - 256, size: 8 },
+  };
+
+  const helpfulnessCheckmarks: { [key: string]: CheckmarkPosition } = {
+    very_helpful: { x: 58, y: height - 289, size: 8 },
+    somewhat_helpful: { x: 58, y: height - 298, size: 8 },
+    not_helpful: { x: 255, y: height - 289, size: 8 },
+    "N/A": { x: 255, y: height - 299, size: 8 },
+  };
+
+  const surveyResponsesCheckmarks: { [key: string]: CheckmarkPosition } = {
+    Strongly_Disagree: { x: 225, y: height - 380, size: 8 },
+    Disagree: { x: 263, y: height - 394, size: 8 },
+    Neither_Agree_Nor_Disagree: { x: 301, y: height - 410, size: 8 },
+    Agree: { x: 340, y: height - 430, size: 8 },
+    Strongly_Agree: { x: 379, y: height - 446, size: 8 },
+    Not_Applicable: { x: 417, y: height - 465, size: 8 },
   };
 
   if (data.clientType in clientTypeCheckmarks) {
@@ -67,6 +106,98 @@ export async function fillJobRequestEvaluationPDF(
     console.log(
       `No matching checkmark position for client type: ${data.clientType}`
     );
+  }
+
+  if (data.position in positionCheckmarks) {
+    const checkmark = positionCheckmarks[data.position];
+    console.log(
+      `Drawing position checkmark at: ${checkmark.x}, ${checkmark.y}`
+    );
+
+    firstPage.drawText("X", {
+      x: checkmark.x,
+      y: checkmark.y,
+      size: checkmark.size,
+      font: font,
+      color: rgb(0, 0, 0),
+    });
+  } else {
+    console.log(`Writing position in "Others" field: ${data.position}`);
+    firstPage.drawText(data.position, {
+      x: 390,
+      y: height - 134,
+      size: 8,
+      font: font,
+      color: rgb(0, 0, 0),
+    });
+  }
+
+  if (data.sex in sexCheckmarks) {
+    const checkmark = sexCheckmarks[data.sex];
+    console.log(`Drawing sex checkmark at: ${checkmark.x}, ${checkmark.y}`);
+
+    firstPage.drawText("X", {
+      x: checkmark.x,
+      y: checkmark.y,
+      size: checkmark.size,
+      font: font,
+      color: rgb(0, 0, 0),
+    });
+  } else {
+    console.log(`Invalid sex value: ${data.sex}`);
+  }
+
+  firstPage.drawText("Job", {
+    x: 210,
+    y: height - 151,
+    size: 6,
+    font: font,
+    color: rgb(0, 0, 0),
+  });
+
+  if (data.awarenessLevel in awarenessLevelCheckmarks) {
+    const checkmark = awarenessLevelCheckmarks[data.awarenessLevel];
+    console.log(`Drawing checkmark at: ${checkmark.x}, ${checkmark.y}`);
+
+    firstPage.drawText("X", {
+      x: checkmark.x,
+      y: checkmark.y,
+      size: checkmark.size,
+      font: font,
+      color: rgb(0, 0, 0),
+    });
+  } else {
+    console.log(`Invalid value: ${data.sex}`);
+  }
+
+  if (data.visibility in visibilityCheckmarks) {
+    const checkmark = visibilityCheckmarks[data.visibility];
+    console.log(`Drawing checkmark at: ${checkmark.x}, ${checkmark.y}`);
+
+    firstPage.drawText("X", {
+      x: checkmark.x,
+      y: checkmark.y,
+      size: checkmark.size,
+      font: font,
+      color: rgb(0, 0, 0),
+    });
+  } else {
+    console.log(`Invalid value: ${data.visibility}`);
+  }
+
+  if (data.helpfulness in helpfulnessCheckmarks) {
+    const checkmark = helpfulnessCheckmarks[data.helpfulness];
+    console.log(`Drawing checkmark at: ${checkmark.x}, ${checkmark.y}`);
+
+    firstPage.drawText("X", {
+      x: checkmark.x,
+      y: checkmark.y,
+      size: checkmark.size,
+      font: font,
+      color: rgb(0, 0, 0),
+    });
+  } else {
+    console.log(`Invalid value: ${data.helpfulness}`);
   }
 
   Object.entries(fieldPositions).forEach(([key, position]) => {
@@ -88,22 +219,53 @@ export async function fillJobRequestEvaluationPDF(
     }
   });
 
+  const surveyQuestionPositions: { [key: string]: number } = {
+    SQ0: height - 380,
+    SQ1: height - 394,
+    SQ2: height - 410,
+    SQ3: height - 430,
+    SQ4: height - 446,
+    SQ5: height - 464,
+    SQ6: height - 480,
+    SQ7: height - 496,
+    SQ8: height - 515,
+  };
+
   // Handle surveyResponses
   if (data.surveyResponses) {
-    const surveyResponsesY = height - 450;
-    let yOffset = 0;
-    Object.entries(data.surveyResponses).forEach(([key, value]) => {
-      firstPage.drawText(`${key}: ${JSON.stringify(value)}`, {
-        x: 50,
-        y: surveyResponsesY - yOffset,
-        size: 10,
-        font: font,
-        color: rgb(0, 0, 0),
+    Object.entries(data.surveyResponses).forEach(([question, response]) => {
+      // Get the Y position for the current question (matching SQ0, SQ1, etc.)
+      const questionYPosition = surveyQuestionPositions[question];
+      if (!questionYPosition) {
+        console.log(`Invalid question: ${question}`);
+        return;
+      }
+
+      // Update Y positions for the response options for the current question
+      Object.keys(surveyResponsesCheckmarks).forEach((key) => {
+        surveyResponsesCheckmarks[key].y = questionYPosition;
       });
-      yOffset += 20;
+
+      // Check if the response matches one of the checkmark positions
+      if (response in surveyResponsesCheckmarks) {
+        const checkmark = surveyResponsesCheckmarks[response as string];
+        console.log(
+          `Drawing survey response checkmark for ${question} at: ${checkmark.x}, ${checkmark.y}`
+        );
+
+        // Draw checkmark for the response
+        firstPage.drawText("X", {
+          x: checkmark.x,
+          y: checkmark.y,
+          size: checkmark.size,
+          font: font,
+          color: rgb(0, 0, 0),
+        });
+      } else {
+        console.log(`Invalid survey response: ${response} for ${question}`);
+      }
     });
   }
-
   const pdfBytes2 = await pdfDoc.save();
   return new Blob([pdfBytes2], { type: "application/pdf" });
 }

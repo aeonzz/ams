@@ -21,8 +21,8 @@ export const createJobEvaluationSchema = z.object({
   age: z.number().int().min(1, "age is required"),
   regionOfResidence: z.string().min(1, "Region of residence is required"),
   awarenessLevel: z.string().min(1, "This field is required"),
-  visibility: z.string().optional(),
-  helpfulness: z.string().optional(),
+  visibility: z.string(),
+  helpfulness: z.string(),
   surveyResponses: surveyResponseSchema,
   suggestions: z.string().optional(),
 });
