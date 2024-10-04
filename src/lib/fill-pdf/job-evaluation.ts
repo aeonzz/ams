@@ -12,6 +12,12 @@ type FieldPositions = {
   [K in keyof JobRequestEvaluation]?: FieldPosition;
 };
 
+type CheckmarkPosition = {
+  x: number;
+  y: number;
+  size: number;
+};
+
 export async function fillJobRequestEvaluationPDF(
   data: JobRequestEvaluation
 ): Promise<Blob> {
@@ -21,26 +27,47 @@ export async function fillJobRequestEvaluationPDF(
   const pdfDoc = await PDFDocument.load(pdfBytes);
   pdfDoc.registerFontkit(fontkit);
 
-  const font = await pdfDoc.embedFont(StandardFonts.CourierOblique);
+  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const pages = pdfDoc.getPages();
   const firstPage = pages[0];
-  const { height } = firstPage.getSize();
+  const { width, height } = firstPage.getSize();
+
+  console.log(`PDF dimensions: ${width}x${height}`);
 
   const fieldPositions: FieldPositions = {
-    clientType: { x: 50, y: 100 },
-    id: { x: 50, y: 120 },
-    position: { x: 50, y: 140 },
-    sex: { x: 50, y: 160 },
-    age: { x: 50, y: 180 },
-    regionOfResidence: { x: 50, y: 200 },
-    awarenessLevel: { x: 50, y: 220 },
-    visibility: { x: 50, y: 240 },
-    helpfulness: { x: 50, y: 260 },
-    suggestions: { x: 50, y: 280 },
-    jobRequestId: { x: 50, y: 300 },
-    createdAt: { x: 50, y: 320 },
-    updatedAt: { x: 50, y: 340 },
+    position: { x: 120, y: height - 140, size: 10 },
+    sex: { x: 320, y: height - 160, size: 10 },
+    age: { x: 420, y: height - 160, size: 10 },
+    regionOfResidence: { x: 180, y: height - 180, size: 10 },
+    awarenessLevel: { x: 50, y: height - 280, size: 10 },
+    visibility: { x: 50, y: height - 340, size: 10 },
+    helpfulness: { x: 50, y: height - 380, size: 10 },
+    suggestions: { x: 50, y: height - 700, size: 10 },
+    createdAt: { x: 120, y: height - 160, size: 10 },
   };
+
+  const clientTypeCheckmarks: { [key: string]: CheckmarkPosition } = {
+    CITIZEN: { x: 64, y: height - 126, size: 8 },
+    BUSINESS: { x: 98, y: height - 126, size: 8 },
+    GOVERNMENT: { x: 133, y: height - 126, size: 8 },
+  };
+
+  if (data.clientType in clientTypeCheckmarks) {
+    const checkmark = clientTypeCheckmarks[data.clientType];
+    console.log(`Drawing checkmark at: ${checkmark.x}, ${checkmark.y}`);
+
+    firstPage.drawText("X", {
+      x: checkmark.x,
+      y: checkmark.y,
+      size: checkmark.size,
+      font: font,
+      color: rgb(0, 0, 0),
+    });
+  } else {
+    console.log(
+      `No matching checkmark position for client type: ${data.clientType}`
+    );
+  }
 
   Object.entries(fieldPositions).forEach(([key, position]) => {
     if (position && key in data) {
@@ -52,7 +79,7 @@ export async function fillJobRequestEvaluationPDF(
         }
         firstPage.drawText(displayValue, {
           x: position.x,
-          y: height - position.y,
+          y: position.y,
           size: position.size || 12,
           font: font,
           color: rgb(0, 0, 0),
@@ -61,18 +88,19 @@ export async function fillJobRequestEvaluationPDF(
     }
   });
 
-  // Handle surveyResponses separately
+  // Handle surveyResponses
   if (data.surveyResponses) {
-    let yPosition = 360;
+    const surveyResponsesY = height - 450;
+    let yOffset = 0;
     Object.entries(data.surveyResponses).forEach(([key, value]) => {
       firstPage.drawText(`${key}: ${JSON.stringify(value)}`, {
         x: 50,
-        y: height - yPosition,
+        y: surveyResponsesY - yOffset,
         size: 10,
         font: font,
         color: rgb(0, 0, 0),
       });
-      yPosition += 20;
+      yOffset += 20;
     });
   }
 

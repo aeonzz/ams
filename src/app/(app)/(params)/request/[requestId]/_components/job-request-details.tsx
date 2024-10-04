@@ -77,6 +77,7 @@ export default function JobRequestDetails({
         URL.revokeObjectURL(link.href);
       } catch (error) {
         console.error("Error generating PDF:", error);
+        // Handle error (e.g., show an error message to the user)
       }
     }
   };
