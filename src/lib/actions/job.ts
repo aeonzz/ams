@@ -142,6 +142,7 @@ export const createJobRequest = authedProcedure
               id: `JRQ-${generateId(15)}`,
               description: rest.description,
               dueDate: rest.dueDate,
+              location: rest.location,
               jobType: rest.jobType,
               files: {
                 create: rest.images?.map((fileName) => ({

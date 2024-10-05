@@ -9,6 +9,10 @@ export const createjobRequestSchema = z.object({
   jobtype: JobTypeSchema.refine((val) => val !== undefined, {
     message: "Job type is required.",
   }),
+  location: z
+    .string()
+    .min(1, { message: "Must be at least 1 characters long" })
+    .max(100, { message: "Cannot be more than 100 characters long" }),
   departmentId: z.string({
     required_error: "Job section is required.",
   }),

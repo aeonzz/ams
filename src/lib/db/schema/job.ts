@@ -6,6 +6,7 @@ export const createJobRequestSchemaServer = z.object({
   description: z.string(),
   images: z.array(z.string()).optional(),
   departmentId: z.string(),
+  location: z.string(),
   dueDate: z.date(),
   jobType: JobTypeSchema,
 });

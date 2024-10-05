@@ -5,6 +5,7 @@ import { H4, H5, P } from "@/components/typography/text";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CommandShortcut } from "@/components/ui/command";
+import CommandTooltip from "@/components/ui/command-tooltip";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -32,6 +33,7 @@ import {
   Dot,
   Download,
   FileText,
+  MapPin,
   RotateCw,
   Timer,
   User,
@@ -42,7 +44,9 @@ import {
   type JobRequestWithRelations,
 } from "prisma/generated/zod";
 import React from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 import { PhotoProvider, PhotoView } from "react-photo-view";
+import { toast } from "sonner";
 
 interface JobRequestDetailsProps {
   data: JobRequestWithRelations;
@@ -65,22 +69,43 @@ export default function JobRequestDetails({
   const isEvaluated = data.jobRequestEvaluation !== null;
 
   const handleDownloadEvaluation = async () => {
-    if (data.jobRequestEvaluation) {
-      try {
-        const pdfBlob = await fillJobRequestEvaluationPDF(
-          data.jobRequestEvaluation
-        );
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(pdfBlob);
-        link.download = `job_request_evaluation_${requestId}.pdf`;
-        link.click();
-        URL.revokeObjectURL(link.href);
-      } catch (error) {
-        console.error("Error generating PDF:", error);
-        // Handle error (e.g., show an error message to the user)
+    const generateAndDownloadPDF = async () => {
+      if (data.jobRequestEvaluation) {
+        try {
+          const pdfBlob = await fillJobRequestEvaluationPDF(
+            data.jobRequestEvaluation
+          );
+          const url = URL.createObjectURL(pdfBlob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = `job_request_evaluation_${requestId}.pdf`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+          return "PDF downloaded successfully";
+        } catch (error) {
+          console.error("Error generating PDF:", error);
+          throw new Error("Failed to generate PDF");
+        }
       }
-    }
+    };
+
+    toast.promise(generateAndDownloadPDF(), {
+      loading: "Generating PDF...",
+      success: (message) => message,
+      error: (err) => `Error: ${err.message}`,
+    });
   };
+
+  useHotkeys(
+    "ctrl+shift+d",
+    (event) => {
+      event.preventDefault();
+      handleDownloadEvaluation();
+    },
+    { enableOnFormTags: false, enabled: data.jobRequestEvaluation !== null }
+  );
 
   return (
     <>
@@ -102,8 +127,11 @@ export default function JobRequestDetails({
                 </Button>
               </TooltipTrigger>
               <TooltipContent className="flex items-center gap-3" side="bottom">
-                <P>Download evaluation form</P>
-                <CommandShortcut>D</CommandShortcut>
+                <CommandTooltip text="Download evaluation form">
+                  <CommandShortcut>Ctrl</CommandShortcut>
+                  <CommandShortcut>Shift</CommandShortcut>
+                  <CommandShortcut>D</CommandShortcut>
+                </CommandTooltip>
               </TooltipContent>
             </Tooltip>
           )}
@@ -111,6 +139,10 @@ export default function JobRequestDetails({
         <div className="flex items-center space-x-2">
           <FileText className="h-5 w-5" />
           <P>Job type: {textTransform(data.jobType)}</P>
+        </div>
+        <div className="flex items-center space-x-2">
+          <MapPin className="h-5 w-5" />
+          <P>Location: {data.location}</P>
         </div>
         <div className="flex items-center space-x-2">
           <User className="h-5 w-5" />
@@ -122,7 +154,7 @@ export default function JobRequestDetails({
                   data.assignedUser.middleName,
                   data.assignedUser.lastName
                 )
-              : "N/A"}
+              : "-"}
           </P>
         </div>
         <div className="flex items-center space-x-2">

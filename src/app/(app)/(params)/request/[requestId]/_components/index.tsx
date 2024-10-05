@@ -10,6 +10,7 @@ import {
   AlertTriangle,
   Link as LinkIcon,
   Dot,
+  Link,
 } from "lucide-react";
 import NotFound from "@/app/not-found";
 import FetchDataError from "@/components/card/fetch-data-error";
@@ -41,6 +42,7 @@ import PersonnelActions from "./personnel-actions";
 import { Button } from "@/components/ui/button";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import JobRequestEvaluationDialog from "@/components/dialogs/job-request-evaluation-dialog";
+import RequestSummaryTitle from "./request-summary-title";
 
 interface RequestDetailsProps {
   params: string;
@@ -187,11 +189,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
       </div>
       <Separator orientation="vertical" className="h-full" />
       <div className="w-[320px] p-6 pt-0">
-        <div className="py-2.5">
-          <H4 className="font-semibold text-muted-foreground">
-            Request Summary
-          </H4>
-        </div>
+        <RequestSummaryTitle />
         <div>
           <div className="space-y-4">
             <div>

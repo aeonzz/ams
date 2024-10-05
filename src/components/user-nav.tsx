@@ -51,7 +51,7 @@ export default function UserNav({ isOpen }: UserNavProps) {
         >
           <Button variant="ghost" className="w-auto space-x-2 truncate px-3">
             <Avatar className="size-7 rounded-md">
-              <AvatarImage src={`${currentUser.profileUrl}` ?? ""} />
+              <AvatarImage src={`${currentUser.profileUrl}`} />
               <AvatarFallback className="rounded-md">
                 {currentUser.firstName.charAt(0).toUpperCase()}
               </AvatarFallback>

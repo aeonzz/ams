@@ -165,6 +165,7 @@ model GenericAuditLog {
 model JobRequest {
   id                   String                @id
   description          String
+  location             String
   dueDate              DateTime
   estimatedTime        Int?
   startDate            DateTime?

@@ -39,6 +39,7 @@ export default function JobDialog() {
     resolver: zodResolver(createjobRequestSchema),
     defaultValues: {
       description: "",
+      location: "",
       images: undefined,
     },
   });

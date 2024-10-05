@@ -73,12 +73,30 @@ export const questionKeys = [
 
 const emojiRatings = ["😡", "😠", "😐", "🙂", "😃", "N/A"] as const;
 const emojiMeanings = [
-  "Strongly_Disagree",
-  "Disagree",
-  "Neither_Agree_Nor_Disagree",
-  "Agree",
-  "Strongly_Agree",
-  "Not_Applicable",
+  {
+    label: "Strongly Disagree",
+    value: "Strongly_Disagree",
+  },
+  {
+    label: "Disagree",
+    value: "Disagree",
+  },
+  {
+    label: "Neither Agree nor Disagree",
+    value: "Neither_Agree_Nor_Disagree",
+  },
+  {
+    label: "Agree",
+    value: "Agree",
+  },
+  {
+    label: "Strongly Agree",
+    value: "Strongly_Agree",
+  },
+  {
+    label: "Not Applicable",
+    value: "Not_Applicable",
+  },
 ];
 
 interface JobRequestEvaluationFormProps {
@@ -151,8 +169,6 @@ export default function JobRequestEvaluationForm({
       });
     }
   }, [form, showAdditionalQuestions]);
-
-  console.log(form.getValues("visibility"));
 
   return (
     <Form {...form}>
@@ -317,16 +333,26 @@ export default function JobRequestEvaluationForm({
                           <Input
                             type="number"
                             placeholder="Your Age"
+                            autoComplete="off"
                             {...field}
+                            min={0}
                             onChange={(e) => {
                               const value = e.target.value;
                               if (
                                 value === "" ||
                                 (parseInt(value, 10) >= 0 &&
-                                  parseInt(value, 10) <= 99) ||
-                                parseInt(value, 10) <= 0
+                                  parseInt(value, 10) <= 99)
                               ) {
                                 field.onChange(parseInt(e.target.value, 10));
+                              }
+                            }}
+                            onWheel={(e) => e.currentTarget.blur()}
+                            onKeyDown={(e) => {
+                              if (
+                                e.key === "ArrowUp" ||
+                                e.key === "ArrowDown"
+                              ) {
+                                e.preventDefault();
                               }
                             }}
                           />
@@ -335,6 +361,7 @@ export default function JobRequestEvaluationForm({
                       </FormItem>
                     )}
                   />
+
                   <FormField
                     control={form.control}
                     name="regionOfResidence"
@@ -551,7 +578,9 @@ export default function JobRequestEvaluationForm({
                     {emojiRatings.map((emoji, index) => (
                       <div key={index} className="flex-1 text-center">
                         <div className="text-2xl">{emoji}</div>
-                        <div className="text-xs">{emojiMeanings[index]}</div>
+                        <div className="text-xs">
+                          {emojiMeanings[index].label}
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -568,10 +597,13 @@ export default function JobRequestEvaluationForm({
                               <FormItem className="flex flex-1 items-center justify-center">
                                 <FormControl>
                                   <Checkbox
-                                    checked={field.value === meaning}
+                                    checked={field.value === meaning.value}
                                     onCheckedChange={(checked) => {
-                                      field.onChange(checked ? meaning : "");
+                                      field.onChange(
+                                        checked ? meaning.value : ""
+                                      );
                                     }}
+                                    className="size-10"
                                   />
                                 </FormControl>
                               </FormItem>

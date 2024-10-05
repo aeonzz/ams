@@ -63,6 +63,8 @@ import { type CreateJobRequestSchema } from "./schema";
 import { type Department, JobTypeSchema } from "prisma/generated/zod";
 import axios from "axios";
 import JobRequestInputSkeleton from "./job-request-input-skeleton";
+import { ComboboxInput } from "@/components/ui/combobox-input";
+import { Input } from "@/components/ui/input";
 
 interface JobRequestInputProps {
   mutateAsync: UseMutateAsyncFunction<
@@ -114,6 +116,7 @@ export default function JobRequestInput({
         departmentId: values.departmentId,
         dueDate: values.dueDate,
         jobType: values.jobtype,
+        location: values.location,
         path: pathname,
         priority: "LOW",
         ...(uploadedFilesResult.length > 0 && {
@@ -151,12 +154,34 @@ export default function JobRequestInput({
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="scroll-bar flex max-h-[60vh] gap-6 overflow-y-auto px-4 py-1">
             <div className="flex flex-1 flex-col space-y-2">
-              <JobSectionField
-                form={form}
-                name="departmentId"
-                isPending={isPending}
-                data={data}
-              />
+              <div className="flex items-center gap-2 py-1">
+                <JobSectionField
+                  form={form}
+                  name="departmentId"
+                  isPending={isPending}
+                  data={data}
+                />
+                <FormField
+                  control={form.control}
+                  name="location"
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel className="text-muted-foreground">
+                        Location
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          autoComplete="off"
+                          placeholder="Quadrangle"
+                          disabled={isPending}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
               <div className="flex flex-wrap gap-2 py-1">
                 <FormField
                   control={form.control}

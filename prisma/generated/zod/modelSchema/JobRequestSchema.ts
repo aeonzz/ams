@@ -19,6 +19,7 @@ export const JobRequestSchema = z.object({
   status: JobStatusSchema,
   id: z.string(),
   description: z.string(),
+  location: z.string(),
   dueDate: z.coerce.date(),
   estimatedTime: z.number().int().nullable(),
   startDate: z.coerce.date().nullable(),

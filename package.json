@@ -74,6 +74,7 @@
     "react-hook-form": "^7.52.0",
     "react-hotkeys-hook": "^4.5.0",
     "react-photo-view": "^1.2.6",
+    "react-popper": "^2.3.0",
     "react-resizable-panels": "^2.1.4",
     "react-textarea-autosize": "^8.5.3",
     "recharts": "^2.12.7",
