@@ -99,7 +99,7 @@ export default function AddEstimatedTime({ data }: AddEstimatedTimeProps) {
     },
     {
       enableOnFormTags: false,
-      enabled: canEdit,
+      enabled: canEdit && data.status === "PENDING",
     }
   );
 
@@ -185,7 +185,7 @@ export default function AddEstimatedTime({ data }: AddEstimatedTimeProps) {
   return (
     <div>
       <P className="mb-1 text-sm">Estimated time</P>
-      {canEdit ? (
+      {canEdit && data.status === "PENDING" ? (
         <Tooltip open={tooltipOpen} onOpenChange={handleTooltipOpenChange}>
           <Popover
             open={popoverOpen}
@@ -321,8 +321,7 @@ export default function AddEstimatedTime({ data }: AddEstimatedTimeProps) {
           variant="ghost2"
           size="sm"
           className={cn(
-            "w-full justify-start px-2",
-            popoverOpen && "bg-secondary-accent"
+            "w-full justify-start px-2 hover:bg-transparent"
           )}
         >
           <Clock className="mr-2 size-4" />

@@ -12,19 +12,17 @@ import { toast } from "sonner";
 import { useSession } from "@/lib/hooks/use-session";
 import { type EntityTypeType } from "prisma/generated/zod/inputTypeSchemas/EntityTypeSchema";
 
-interface JobRequestApproverActionsProps {
+interface RequestApproverActionsProps {
   request: RequestWithRelations;
   isPending: boolean;
   entityType: EntityTypeType;
-  requestTypeId: string;
 }
 
-export default function JobRequestApproverActions({
+export default function RequestApproverActions({
   request,
   isPending,
   entityType,
-  requestTypeId,
-}: JobRequestApproverActionsProps) {
+}: RequestApproverActionsProps) {
   const currentUser = useSession();
   const pathname = usePathname();
   const queryClient = useQueryClient();

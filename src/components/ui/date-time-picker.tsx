@@ -133,6 +133,13 @@ export default function DateTimePicker<T extends FieldValues>({
     );
   };
 
+  const isDateDisabled = (date: Date) => {
+    return (
+      isDateInPast(date) ||
+      disabledDates.some((disabledDate) => isSameDay(date, disabledDate))
+    );
+  };
+
   return (
     <>
       <FormField
@@ -140,9 +147,7 @@ export default function DateTimePicker<T extends FieldValues>({
         name={name}
         render={({ field }) => (
           <FormItem className="flex flex-col">
-            <FormLabel className="text-left text-muted-foreground">
-              {label}
-            </FormLabel>
+            <FormLabel className="text-left">{label}</FormLabel>
             <Popover modal>
               <FormControl>
                 <PopoverTrigger asChild>
@@ -196,7 +201,7 @@ export default function DateTimePicker<T extends FieldValues>({
                       }
                     }}
                     initialFocus
-                    disabled={isDateInPast}
+                    disabled={isDateDisabled}
                   />
                   <div className="space-y-3 overflow-y-auto p-3">
                     <Select

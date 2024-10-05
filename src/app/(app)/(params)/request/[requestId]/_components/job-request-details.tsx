@@ -1,9 +1,15 @@
 "use client";
 
 import LoadingSpinner from "@/components/loaders/loading-spinner";
-import { H4, H5, P } from "@/components/typography/text";
+import { H3, H4, H5, P } from "@/components/typography/text";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { CommandShortcut } from "@/components/ui/command";
 import CommandTooltip from "@/components/ui/command-tooltip";
 import { Separator } from "@/components/ui/separator";
@@ -14,6 +20,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { fillJobRequestEvaluationPDF } from "@/lib/fill-pdf/job-evaluation";
+import { fillJobRequestFormPDF } from "@/lib/fill-pdf/job-request-form";
 import {
   cn,
   formatFullName,
@@ -32,6 +39,7 @@ import {
   Clock,
   Dot,
   Download,
+  FileCheck,
   FileText,
   MapPin,
   RotateCw,
@@ -43,6 +51,7 @@ import {
   GenericAuditLog,
   type JobRequestWithRelations,
 } from "prisma/generated/zod";
+import type { RequestStatusTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestStatusTypeSchema";
 import React from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { PhotoProvider, PhotoView } from "react-photo-view";
@@ -51,11 +60,15 @@ import { toast } from "sonner";
 interface JobRequestDetailsProps {
   data: JobRequestWithRelations;
   requestId: string;
+  cancellationReason: string | null;
+  requestStatus: RequestStatusTypeType;
 }
 
 export default function JobRequestDetails({
   data,
   requestId,
+  cancellationReason,
+  requestStatus,
 }: JobRequestDetailsProps) {
   const { data: logs, isLoading } = useQuery<GenericAuditLog[]>({
     queryFn: async () => {
@@ -98,8 +111,34 @@ export default function JobRequestDetails({
     });
   };
 
+  const handleDownloadJobRequestForm = async () => {
+    const generateAndDownloadPDF = async () => {
+      try {
+        const pdfBlob = await fillJobRequestFormPDF(data);
+        const url = URL.createObjectURL(pdfBlob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `job_request_evaluation_${requestId}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        return "PDF downloaded successfully";
+      } catch (error) {
+        console.error("Error generating PDF:", error);
+        throw new Error("Failed to generate PDF");
+      }
+    };
+
+    toast.promise(generateAndDownloadPDF(), {
+      loading: "Generating PDF...",
+      success: (message) => message,
+      error: (err) => `Error: ${err.message}`,
+    });
+  };
+
   useHotkeys(
-    "ctrl+shift+d",
+    "ctrl+shift+e",
     (event) => {
       event.preventDefault();
       handleDownloadEvaluation();
@@ -114,7 +153,7 @@ export default function JobRequestDetails({
           <H4 className="font-semibold text-muted-foreground">
             Job Request Details
           </H4>
-          {isEvaluated && (
+          <div className="space-x-2">
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -127,14 +166,38 @@ export default function JobRequestDetails({
                 </Button>
               </TooltipTrigger>
               <TooltipContent className="flex items-center gap-3" side="bottom">
-                <CommandTooltip text="Download evaluation form">
+                <CommandTooltip text="Download job request form">
                   <CommandShortcut>Ctrl</CommandShortcut>
                   <CommandShortcut>Shift</CommandShortcut>
                   <CommandShortcut>D</CommandShortcut>
                 </CommandTooltip>
               </TooltipContent>
             </Tooltip>
-          )}
+            {isEvaluated && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost2"
+                    size="icon"
+                    className="size-7"
+                    onClick={handleDownloadEvaluation}
+                  >
+                    <FileCheck className="size-4 text-muted-foreground" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent
+                  className="flex items-center gap-3"
+                  side="bottom"
+                >
+                  <CommandTooltip text="Download evaluation form">
+                    <CommandShortcut>Ctrl</CommandShortcut>
+                    <CommandShortcut>Shift</CommandShortcut>
+                    <CommandShortcut>E</CommandShortcut>
+                  </CommandTooltip>
+                </TooltipContent>
+              </Tooltip>
+            )}
+          </div>
         </div>
         <div className="flex items-center space-x-2">
           <FileText className="h-5 w-5" />
@@ -161,41 +224,47 @@ export default function JobRequestDetails({
           <Calendar className="h-5 w-5" />
           <P>Due date: {format(new Date(data.dueDate), "PPP p")}</P>
         </div>
-        <div className="flex items-center space-x-2">
-          <Timer className="h-5 w-5" />
-          <P>
-            Estimated time:{" "}
-            {data.estimatedTime ? `${data.estimatedTime} hours` : "-"}
-          </P>
-        </div>
-        <div className="flex items-center space-x-2">
-          <Circle className="h-5 w-5" />
-          <P className="inline-flex gap-3">
-            Job status:{" "}
-            <Badge variant={JobStatusColor.variant} className="pr-3.5">
-              <Dot
-                className="mr-1 size-3"
-                strokeWidth={JobStatusColor.stroke}
-                color={JobStatusColor.color}
-              />
-              {textTransform(data.status)}
-            </Badge>
-          </P>
-        </div>
-        <div className="flex items-center space-x-2">
-          <Clock className="h-5 w-5" />
-          <P>
-            Start date/time:{" "}
-            {data.startDate ? format(new Date(data.startDate), "PPP p") : "-"}
-          </P>
-        </div>
-        <div className="flex items-center space-x-2">
-          <Clock className="h-5 w-5" />
-          <P>
-            End date/time:{" "}
-            {data.endDate ? format(new Date(data.endDate), "PPP p") : "-"}
-          </P>
-        </div>
+        {requestStatus === "APPROVED" && (
+          <>
+            <div className="flex items-center space-x-2">
+              <Timer className="h-5 w-5" />
+              <P>
+                Estimated time:{" "}
+                {data.estimatedTime ? `${data.estimatedTime} hours` : "-"}
+              </P>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Circle className="h-5 w-5" />
+              <P className="inline-flex gap-3">
+                Job status:{" "}
+                <Badge variant={JobStatusColor.variant} className="pr-3.5">
+                  <Dot
+                    className="mr-1 size-3"
+                    strokeWidth={JobStatusColor.stroke}
+                    color={JobStatusColor.color}
+                  />
+                  {textTransform(data.status)}
+                </Badge>
+              </P>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Clock className="h-5 w-5" />
+              <P>
+                Start date/time:{" "}
+                {data.startDate
+                  ? format(new Date(data.startDate), "PPP p")
+                  : "-"}
+              </P>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Clock className="h-5 w-5" />
+              <P>
+                End date/time:{" "}
+                {data.endDate ? format(new Date(data.endDate), "PPP p") : "-"}
+              </P>
+            </div>
+          </>
+        )}
         <div>
           <H5 className="mb-2 font-semibold text-muted-foreground">
             Job Description:
@@ -249,6 +318,16 @@ export default function JobRequestDetails({
             ))}
           </div>
         </PhotoProvider>
+        {cancellationReason && (
+          <Card>
+            <CardHeader>
+              <H5 className="font-semibold leading-none">
+                Cancellation Reason
+              </H5>
+              <CardDescription>{cancellationReason}</CardDescription>
+            </CardHeader>
+          </Card>
+        )}
       </div>
       <Separator className="my-6" />
       <div className="space-y-4 pb-20">

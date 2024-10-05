@@ -26,7 +26,6 @@ export const JobRequestSchema = z.object({
   endDate: z.coerce.date().nullable(),
   costEstimate: z.number().nullable(),
   actualCost: z.number().nullable(),
-  progressNotes: z.string().nullable(),
   requestId: z.string(),
   assignedTo: z.string().nullable(),
   createdAt: z.coerce.date(),

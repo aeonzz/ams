@@ -288,6 +288,9 @@ export const createTransportRequest = authedProcedure
           transportRequest: {
             create: {
               id: transportRequestId,
+              department: rest.department,
+              numberOfPassengers: rest.passengersName.length,
+              passengersName: rest.passengersName,
               description: rest.description,
               destination: rest.destination,
               dateAndTimeNeeded: rest.dateAndTimeNeeded,

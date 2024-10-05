@@ -272,14 +272,12 @@ export default function VenueRequestInput({
                 name="notes"
                 render={({ field }) => (
                   <FormItem className="flex flex-grow flex-col">
-                    <FormLabel className="text-left">
-                      Notes
-                    </FormLabel>
+                    <FormLabel className="text-left">Description</FormLabel>
                     <FormControl>
                       <Textarea
                         rows={1}
                         maxRows={5}
-                        placeholder="Notes..."
+                        placeholder="Description..."
                         className="min-h-[200px] flex-grow resize-none"
                         disabled={isPending}
                         {...field}
@@ -296,9 +294,7 @@ export default function VenueRequestInput({
                 name="purpose"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>
-                      Purpose
-                    </FormLabel>
+                    <FormLabel>Purpose</FormLabel>
                     <div className="space-y-4">
                       {purpose.map((item) => (
                         <FormField
@@ -366,9 +362,7 @@ export default function VenueRequestInput({
                 name="setupRequirements"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>
-                      Venue Features
-                    </FormLabel>
+                    <FormLabel>Venue Features</FormLabel>
                     <div className="space-y-4">
                       {selectedVenue?.features &&
                         (selectedVenue.features as VenueFeaturesType[]).map(
@@ -395,7 +389,7 @@ export default function VenueRequestInput({
                                 {feature.name}
                               </FormLabel>
                             </FormItem>
-                          ) 
+                          )
                         )}
                     </div>
                     <FormMessage />

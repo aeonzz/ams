@@ -40,6 +40,7 @@ export default function TransportDialog() {
     resolver: zodResolver(transportRequestSchema),
     defaultValues: {
       vehicleId: undefined,
+      department: "",
       description: "",
       destination: undefined,
       dateAndTimeNeeded: undefined,

@@ -101,13 +101,17 @@ export const transportRequestSchema = z.object({
     required_error: "Please select a vehicle",
   }),
   description: z.string().min(1, "Description is required"),
-  destination: z.string().min(1, "Please add a destination"),
+  destination: z.string().min(1, "Destination is required"),
+  department: z.string().min(1, "Office/Dept. is required"),
+  passengersName: z
+    .array(z.string())
+    .min(1, "At least one passenger name is required"),
   dateAndTimeNeeded: z
     .date({
       required_error: "Date time is required",
     })
-    .min(new Date(), {
-      message: "Date needed must be in the future",
+    .min(new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), {
+      message: "Request should be submitted not later than 2 days prior to the requested date.",
     })
     .refine((date) => date.getHours() !== 0 || date.getMinutes() !== 0, {
       message: "Time cannot be exactly midnight (00:00)",

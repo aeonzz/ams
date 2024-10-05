@@ -43,6 +43,8 @@ import { Button } from "@/components/ui/button";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import JobRequestEvaluationDialog from "@/components/dialogs/job-request-evaluation-dialog";
 import RequestSummaryTitle from "./request-summary-title";
+import TransportRequestReviewerActions from "./transport-request-reviewer-actions";
+import TransportRequestDetails from "./transport-request-details";
 
 interface RequestDetailsProps {
   params: string;
@@ -116,7 +118,12 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
             </div>
             <Separator className="my-6" />
             {data.type === "JOB" && data.jobRequest && (
-              <JobRequestDetails data={data.jobRequest} requestId={data.id} />
+              <JobRequestDetails
+                data={data.jobRequest}
+                requestId={data.id}
+                cancellationReason={data.cancellationReason}
+                requestStatus={data.status}
+              />
             )}
             {data.type === "VENUE" && data.venueRequest && (
               <VenueRequestDetails data={data.venueRequest} />
@@ -158,31 +165,11 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
               </div>
             )}
             {data.type === "TRANSPORT" && data.transportRequest && (
-              <div className="space-y-4">
-                <H4 className="">Transport Request Details</H4>
-                <div className="flex items-center space-x-2">
-                  <Truck className="h-5 w-5" />
-                  <P>Vehicle: {data.transportRequest.vehicle.name}</P>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <MapPin className="h-5 w-5" />
-                  <P>Destination: {data.transportRequest.destination}</P>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Calendar className="h-5 w-5" />
-                  <P>
-                    Needed By:{" "}
-                    {format(
-                      new Date(data.transportRequest.dateAndTimeNeeded),
-                      "PPP p"
-                    )}
-                  </P>
-                </div>
-                <div>
-                  <H5 className="mb-2">Description:</H5>
-                  <P>{data.transportRequest.description}</P>
-                </div>
-              </div>
+              <TransportRequestDetails
+                data={data.transportRequest}
+                requestId={data.id}
+                cancellationReason={data.cancellationReason}
+              />
             )}
           </div>
         </div>
@@ -210,9 +197,6 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                 {textTransform(data.status)}
               </Badge>
             </div>
-            {data.type === "JOB" && data.status !== "CANCELLED" && (
-              <AddEstimatedTime data={data} />
-            )}
             {data.type === "JOB" &&
               data.status === "APPROVED" &&
               data.jobRequest && (
@@ -311,9 +295,9 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
             <JobRequestReviewerActions
               request={data}
               entityType="JOB_REQUEST"
+              allowedDepartment={data.departmentId}
               allowedRoles={["REQUEST_REVIEWER"]}
               allowedApproverRoles={["DEPARTMENT_HEAD"]}
-              requestTypeId={data.jobRequest.id}
             />
           )}
           {data.type === "JOB" &&
@@ -333,7 +317,15 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
               allowedRoles={["REQUEST_REVIEWER", "REQUEST_MANAGER"]}
               allowedDepartment={data.returnableRequest.departmentId}
               allowedApproverRoles={["DEPARTMENT_HEAD"]}
-              requestTypeId={data.returnableRequest.id}
+            />
+          )}
+          {data.type === "TRANSPORT" && data.transportRequest && (
+            <TransportRequestReviewerActions
+              request={data}
+              entityType="TRANSPORT_REQUEST"
+              allowedRoles={["REQUEST_REVIEWER", "REQUEST_MANAGER"]}
+              allowedDepartment={data.departmentId}
+              allowedApproverRoles={["DEPARTMENT_HEAD"]}
             />
           )}
           {/* {data.type === "VENUE" && data.venueRequest && (

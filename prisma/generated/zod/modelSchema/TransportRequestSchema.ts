@@ -11,6 +11,9 @@ import { VehicleWithRelationsSchema } from './VehicleSchema'
 export const TransportRequestSchema = z.object({
   id: z.string(),
   description: z.string(),
+  department: z.string(),
+  numberOfPassengers: z.number().int(),
+  passengersName: z.string().array(),
   destination: z.string(),
   dateAndTimeNeeded: z.coerce.date(),
   createdAt: z.coerce.date(),

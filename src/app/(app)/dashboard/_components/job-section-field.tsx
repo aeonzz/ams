@@ -62,7 +62,7 @@ export default function JobSectionField({
       name={name}
       render={({ field }) => (
         <FormItem className="flex flex-1 flex-col">
-          <FormLabel className="text-muted-foreground">Department</FormLabel>
+          <FormLabel>Department</FormLabel>
           <Popover open={open} onOpenChange={setOpen} modal>
             <PopoverTrigger asChild>
               <FormControl>

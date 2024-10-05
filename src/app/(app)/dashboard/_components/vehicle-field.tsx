@@ -57,8 +57,8 @@ export default function VehicleField({
       control={form.control}
       name={name}
       render={({ field }) => (
-        <FormItem className="flex flex-col">
-          <FormLabel className="text-muted-foreground">Vehicle</FormLabel>
+        <FormItem className="flex flex-col flex-1">
+          <FormLabel>Vehicle</FormLabel>
           <Popover open={open} onOpenChange={setOpen} modal>
             <PopoverTrigger asChild>
               <FormControl>

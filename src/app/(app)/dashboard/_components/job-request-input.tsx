@@ -166,9 +166,7 @@ export default function JobRequestInput({
                   name="location"
                   render={({ field }) => (
                     <FormItem className="flex-1">
-                      <FormLabel className="text-muted-foreground">
-                        Location
-                      </FormLabel>
+                      <FormLabel>Location</FormLabel>
                       <FormControl>
                         <Input
                           autoComplete="off"
@@ -188,9 +186,7 @@ export default function JobRequestInput({
                   name="dueDate"
                   render={({ field }) => (
                     <FormItem className="flex flex-1 flex-col">
-                      <FormLabel className="text-muted-foreground">
-                        Due date
-                      </FormLabel>
+                      <FormLabel>Due date</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
                           <FormControl>
@@ -248,9 +244,7 @@ export default function JobRequestInput({
                   name="jobtype"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
-                      <FormLabel className="text-muted-foreground">
-                        Job type
-                      </FormLabel>
+                      <FormLabel>Job type</FormLabel>
                       <Popover modal>
                         <PopoverTrigger asChild>
                           <FormControl>

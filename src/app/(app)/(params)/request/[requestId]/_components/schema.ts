@@ -28,6 +28,7 @@ export const updateRequestStatusSchema = z.object({
   status: RequestStatusTypeSchema,
   changeType: ChangeTypeSchema,
   entityType: EntityTypeSchema,
+  cancellationReason: z.string().optional(),
 });
 
 export type UpdateRequestStatusSchema = z.infer<

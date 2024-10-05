@@ -19,7 +19,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
         classNames: {
           toast: cn(
             GeistSans.className,
-            "group toast group-[.toaster]:bg-background group-[.toaster]:text-foreground group-[.toaster]:border-border group-[.toaster]:shadow-lg group-[.toaster]:pointer-events-auto"
+            "group toast group-[.toaster]:bg-tertiary group-[.toaster]:text-foreground group-[.toaster]:border-border group-[.toaster]:shadow-lg group-[.toaster]:pointer-events-auto"
           ),
           description: "group-[.toast]:text-muted-foreground",
           actionButton:

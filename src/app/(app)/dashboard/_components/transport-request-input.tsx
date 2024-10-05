@@ -46,6 +46,8 @@ import VehicleScheduleCard from "./vehicle-schedule-card";
 import { Vehicle } from "prisma/generated/zod";
 import TransportRequestInputSkeleton from "./transport-request-input-skeleton";
 import ScheduledEventCardSkeleton from "./scheduled-event-card-skeleton";
+import { TagInput } from "@/components/ui/tag-input";
+import { Info } from "lucide-react";
 
 interface VenueRequestInputProps {
   mutateAsync: UseMutateAsyncFunction<
@@ -105,7 +107,9 @@ export default function TransportRequestInput({
 
   const disabledDates = React.useMemo(() => {
     if (!data) return [];
-    return data.map((item) => new Date(item.dateAndTimeNeeded));
+    return data
+      .filter((item) => item.request.status === "APPROVED")
+      .map((item) => new Date(item.dateAndTimeNeeded));
   }, [data]);
 
   async function onSubmit(values: TransportRequestSchema) {
@@ -150,12 +154,40 @@ export default function TransportRequestInput({
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="scroll-bar flex max-h-[60vh] gap-6 overflow-y-auto px-4 py-1">
             <div className="flex flex-1 flex-col space-y-2">
-              <VehicleField
-                form={form}
-                name="vehicleId"
-                isPending={isPending}
-                data={vehicleData}
-              />
+              <div className="flex">
+                <div className="mr-2 w-fit pt-[2px]">
+                  <Info className="size-4 text-primary" />
+                </div>
+                <P className="text-muted-foreground">
+                  Request should be submitted not later than 2 days prior to the
+                  requested date.
+                </P>
+              </div>
+              <div className="flex gap-2">
+                <VehicleField
+                  form={form}
+                  name="vehicleId"
+                  isPending={isPending}
+                  data={vehicleData}
+                />
+                <FormField
+                  control={form.control}
+                  name="department"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-1 flex-col">
+                      <FormLabel className="text-left">Office/Dept.</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Offic/Dept...."
+                          disabled={isPending}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
               <DateTimePicker
                 form={form}
                 name="dateAndTimeNeeded"
@@ -169,14 +201,33 @@ export default function TransportRequestInput({
                 name="destination"
                 render={({ field }) => (
                   <FormItem className="flex flex-grow flex-col">
-                    <FormLabel className="text-left text-muted-foreground">
-                      Destination
-                    </FormLabel>
+                    <FormLabel className="text-left">Destination</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="Destination..."
+                        autoComplete="off"
                         disabled={isPending}
                         {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="passengersName"
+                render={({ field }) => (
+                  <FormItem className="flex flex-grow flex-col">
+                    <FormLabel className="text-left">
+                      Passenger(s) Name
+                    </FormLabel>
+                    <FormControl>
+                      <TagInput
+                        placeholder="Enter passenger name"
+                        disabled={isPending}
+                        value={field.value || []}
+                        onChange={field.onChange}
                       />
                     </FormControl>
                     <FormMessage />
@@ -188,15 +239,13 @@ export default function TransportRequestInput({
                 name="description"
                 render={({ field }) => (
                   <FormItem className="flex flex-grow flex-col">
-                    <FormLabel className="text-left text-muted-foreground">
-                      Purpose
-                    </FormLabel>
+                    <FormLabel className="text-left">Purpose</FormLabel>
                     <FormControl>
                       <Textarea
                         rows={1}
                         maxRows={5}
                         placeholder="Purpose..."
-                        className="min-h-[200px] flex-grow resize-none"
+                        className="min-h-[200px] flex-grow resize-none placeholder:text-sm"
                         disabled={isPending}
                         {...field}
                       />
