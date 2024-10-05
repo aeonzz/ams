@@ -325,6 +325,7 @@ model TransportRequest {
   numberOfPassengers Int
   passengersName     String[]
   destination        String
+  inProgress         Boolean  @default(false)
   dateAndTimeNeeded  DateTime
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt

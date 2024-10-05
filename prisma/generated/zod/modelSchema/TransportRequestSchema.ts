@@ -15,6 +15,7 @@ export const TransportRequestSchema = z.object({
   numberOfPassengers: z.number().int(),
   passengersName: z.string().array(),
   destination: z.string(),
+  inProgress: z.boolean(),
   dateAndTimeNeeded: z.coerce.date(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),

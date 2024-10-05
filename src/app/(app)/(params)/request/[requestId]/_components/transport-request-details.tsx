@@ -21,6 +21,11 @@ import {
 } from "@/lib/utils";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface TransportRequestDetailsProps {
   data: TransportRequestWithRelations;
@@ -48,6 +53,19 @@ export default function TransportRequestDetails({
           <H4 className="font-semibold text-muted-foreground">
             Transport Request Details
           </H4>
+          {data.inProgress && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex animate-pulse cursor-pointer items-center space-x-2 rounded-md p-2 hover:bg-tertiary">
+                  <div className="size-1.5 rounded-full bg-blue-500" />
+                  <P className="font-semibold text-blue-500 leading-none">In Progress</P>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent className="flex items-center gap-3" side="bottom">
+                Transport is in progress
+              </TooltipContent>
+            </Tooltip>
+          )}
           {/* <div className="space-x-2">
             <Tooltip>
               <TooltipTrigger asChild>
@@ -137,7 +155,7 @@ export default function TransportRequestDetails({
           <Users className="h-5 w-5" />
           <P>Office/Dept.: {data.department}</P>
         </div>
-        <div className="flex space-x-2 h-fit">
+        <div className="flex h-fit space-x-2">
           <div className="h-full">
             <UsersRound className="h-5 w-5" />
           </div>

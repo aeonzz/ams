@@ -3,12 +3,13 @@ import { Inter } from "next/font/google";
 import { GeistSans } from "geist/font/sans";
 
 import "./globals.css";
-import 'react-photo-view/dist/react-photo-view.css';
+import "react-photo-view/dist/react-photo-view.css";
 
 import { Toaster } from "@/components/ui/sonner";
 import QueryProvider from "@/components/providers/query-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { TransportRequestUpdater } from "@/components/cron/transport-request-updater";
 
 // const inter = Inter({ subsets: ['latin'] });
 
@@ -34,6 +35,7 @@ export default function RootLayout({
             themes={["light", "dark", "blue"]}
           >
             <TooltipProvider disableHoverableContent delayDuration={600}>
+              <TransportRequestUpdater />
               {children}
             </TooltipProvider>
             <Toaster richColors />

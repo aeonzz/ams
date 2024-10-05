@@ -96,10 +96,10 @@ export function ModifiedDataTable<TData>({
                 </TableRow>
               ))
             ) : (
-              <TableRow>
+              <TableRow className="border-none hover:bg-transparent">
                 <TableCell
                   colSpan={table.getAllColumns().length}
-                  className="h-24 text-center"
+                  className="h-[calc(100vh_-_233px)] text-center"
                 >
                   No results.
                 </TableCell>
