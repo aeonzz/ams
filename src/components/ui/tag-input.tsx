@@ -17,6 +17,7 @@ interface TagInputProps {
   className?: string;
   inputClassName?: string;
   tagClassName?: string;
+  autoFocus?: boolean;
 }
 
 export function TagInput({
@@ -28,6 +29,7 @@ export function TagInput({
   maxTags,
   className,
   inputClassName,
+  autoFocus = false,
   tagClassName,
 }: TagInputProps) {
   const [currentInput, setCurrentInput] = React.useState("");
@@ -63,6 +65,7 @@ export function TagInput({
             value={currentInput}
             onChange={(e) => setCurrentInput(e.target.value)}
             onKeyDown={handleKeyDown}
+            autoFocus={autoFocus}
             className={cn(
               "border-none p-0 px-2 outline-none ring-offset-secondary focus-visible:ring-0 focus-visible:ring-offset-0",
               inputClassName
@@ -73,7 +76,11 @@ export function TagInput({
             variant="outline"
             size="icon"
             onClick={() => addTag(currentInput)}
-            disabled={disabled || !currentInput.trim() || (maxTags !== undefined && value.length >= maxTags)}
+            disabled={
+              disabled ||
+              !currentInput.trim() ||
+              (maxTags !== undefined && value.length >= maxTags)
+            }
           >
             <PlusCircle className="h-4 w-4" />
           </Button>

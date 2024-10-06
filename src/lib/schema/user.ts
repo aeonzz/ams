@@ -25,38 +25,54 @@ export const createUserSchema = createUserSchemaBase.refine(
   }
 );
 
+export type CreateUserSchema = z.infer<typeof createUserSchema>;
+
 export const extendedUserInputSchema = createUserSchemaBase.extend({
   path: z.string(),
 });
 
-export type CreateUserSchema = z.infer<typeof createUserSchema>;
 export type ExtendedUserInputSchema = z.infer<typeof extendedUserInputSchema>;
 
-export const updateUserSchemaBase = z.object({
-  email: z.string().email("Invalid email").optional(),
-  firstName: z.string().optional(),
-  middleName: z.string().optional(),
-  lastName: z.string().optional(),
-  profileUrl: z.string().optional(),
-  password: z
-    .string()
-    .max(15, { message: "Cannot be more than 15 characters long" })
-    .optional(),
-  confirmPassword: z.string().optional(),
-});
+export const updateUserSchema = createUserSchemaBase
+  .omit({ password: true, confirmPassword: true })
+  .partial();
 
-export const updateUserSchema = updateUserSchemaBase.refine(
-  (data) => data.password === data.confirmPassword,
-  {
-    path: ["confirmPassword"],
-    message: "Password do not match",
-  }
-);
+export type UpdateUserSchemas = z.infer<typeof updateUserSchema>;
 
-export const extendedUpdateUserSchema = updateUserSchemaBase.extend({
-  path: z.string(),
+export const updateUserSchemaWithPath = updateUserSchema.extend({
   id: z.string().optional(),
+  path: z.string(),
 });
+
+export type UpdateUserSchemasWithPath = z.infer<
+  typeof updateUserSchemaWithPath
+>;
+
+// export const updateUserSchemaBase = z.object({
+//   email: z.string().email("Invalid email").optional(),
+//   firstName: z.string().optional(),
+//   middleName: z.string().optional(),
+//   lastName: z.string().optional(),
+//   profileUrl: z.string().optional(),
+//   password: z
+//     .string()
+//     .max(15, { message: "Cannot be more than 15 characters long" })
+//     .optional(),
+//   confirmPassword: z.string().optional(),
+// });
+
+// export const updateUserSchema = updateUserSchemaBase.refine(
+//   (data) => data.password === data.confirmPassword,
+//   {
+//     path: ["confirmPassword"],
+//     message: "Password do not match",
+//   }
+// );
+
+// export const extendedUpdateUserSchema = updateUserSchemaBase.extend({
+//   path: z.string(),
+//   id: z.string().optional(),
+// });
 
 export type UpdateUserSchema = z.infer<typeof updateUserSchema>;
 

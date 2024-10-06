@@ -100,18 +100,28 @@ export const transportRequestSchema = z.object({
   vehicleId: z.string({
     required_error: "Please select a vehicle",
   }),
-  description: z.string().min(1, "Description is required"),
-  destination: z.string().min(1, "Destination is required"),
-  department: z.string().min(1, "Office/Dept. is required"),
+  description: z
+    .string()
+    .min(1, "Description is required")
+    .max(700, "Description cannot exceed 700 characters"),
+  destination: z
+    .string()
+    .min(1, "Destination is required")
+    .max(70, "Destination cannot exceed 70 characters"),
+  department: z
+    .string()
+    .min(1, "Office/Dept. is required")
+    .max(50, "Office/Dept. cannot exceed 50 characters"),
   passengersName: z
-    .array(z.string())
+    .array(z.string().max(50, "Passenger name cannot exceed 50 characters"))
     .min(1, "At least one passenger name is required"),
   dateAndTimeNeeded: z
     .date({
       required_error: "Date time is required",
     })
     .min(new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), {
-      message: "Request should be submitted not later than 2 days prior to the requested date.",
+      message:
+        "Request should be submitted not later than 2 days prior to the requested date.",
     })
     .refine((date) => date.getHours() !== 0 || date.getMinutes() !== 0, {
       message: "Time cannot be exactly midnight (00:00)",
@@ -134,6 +144,22 @@ export const extendedTransportRequestSchema = requestSchemaBase.merge(
 
 export type ExtendedTransportRequestSchema = z.infer<
   typeof extendedTransportRequestSchema
+>;
+
+export const updateTransportRequestSchema = transportRequestSchema.partial();
+
+export type UpdateTransportRequestSchema = z.infer<
+  typeof updateTransportRequestSchema
+>;
+
+export const updateTransportRequestSchemaWithPath =
+  updateTransportRequestSchema.extend({
+    id: z.string(),
+    path: z.string(),
+  });
+
+export type UpdateTransportRequestSchemaWithPath = z.infer<
+  typeof updateTransportRequestSchemaWithPath
 >;
 
 export const updateRequestSchemaBase = z.object({

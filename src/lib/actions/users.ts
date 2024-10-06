@@ -30,8 +30,8 @@ import { GetUsersSchema } from "../schema";
 import {
   createUserRolesWithPath,
   deleteUsersSchema,
-  extendedUpdateUserSchema,
   extendedUserInputSchema,
+  updateUserSchemaWithPath,
   updateUsersSchema,
 } from "../schema/user";
 import { User } from "prisma/generated/zod";
@@ -402,7 +402,7 @@ export const removeUserDepartment = authedProcedure
 
 export const updateUser = authedProcedure
   .createServerAction()
-  .input(extendedUpdateUserSchema)
+  .input(updateUserSchemaWithPath)
   .handler(async ({ ctx, input }) => {
     const { user } = ctx;
     const { path, email, ...rest } = input;

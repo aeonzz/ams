@@ -283,9 +283,6 @@ export default function TransportRequestInput({
                         ))
                       );
                     })()}
-                    {/* {data.map((item, index) => (
-                      <VehicleScheduleCard key={index} data={item} />
-                    ))} */}
                   </>
                 )}
               </div>

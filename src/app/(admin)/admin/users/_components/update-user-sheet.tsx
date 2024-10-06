@@ -24,7 +24,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Department } from "prisma/generated/zod";
-import { updateUserSchema, UpdateUserSchema } from "@/lib/schema/user";
+import { UpdateUserSchema, updateUserSchema } from "@/lib/schema/user";
 import { Input } from "@/components/ui/input";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
 import { usePathname } from "next/navigation";
@@ -47,7 +47,7 @@ export function UpdateUserSheet({ user, ...props }: UpdateUserSheetProps) {
   const form = useForm<UpdateUserSchema>({
     resolver: zodResolver(updateUserSchema),
     defaultValues: {
-      email: user.email ?? "",
+      email: user.email,
       firstName: user.firstName,
       middleName: user.middleName ?? "",
       lastName: user.lastName,

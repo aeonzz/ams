@@ -16,6 +16,7 @@ import {
   extendedTransportRequestSchema,
   extendedUpdateJobRequestSchema,
   extendedVenueRequestSchema,
+  updateTransportRequestSchemaWithPath,
 } from "../schema/request";
 import { checkAuth } from "../auth/utils";
 import { currentUser } from "./users";
@@ -560,6 +561,27 @@ export const updateRequest = authedProcedure
       const result = await db.request.update({
         where: {
           id: id,
+        },
+        data: {
+          ...rest,
+        },
+      });
+
+      return revalidatePath(path);
+    } catch (error) {
+      getErrorMessage(error);
+    }
+  });
+
+export const updateTransportRequest = authedProcedure
+  .createServerAction()
+  .input(updateTransportRequestSchemaWithPath)
+  .handler(async ({ input }) => {
+    const { path, id, ...rest } = input;
+    try {
+      const result = await db.transportRequest.update({
+        where: {
+          requestId: id,
         },
         data: {
           ...rest,
