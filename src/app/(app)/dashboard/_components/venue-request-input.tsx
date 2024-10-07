@@ -40,7 +40,6 @@ import { type RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/Requ
 import axios from "axios";
 import { type ReservedDatesAndTimes } from "@/lib/schema/utils";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
-import DateTimePicker from "@/components/ui/date-time-picker";
 import { H3, P } from "@/components/typography/text";
 import ScheduledEventCard from "./scheduled-event-card";
 import VenueField from "./venue-field";

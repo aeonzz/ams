@@ -125,12 +125,10 @@ export default function DepartmentVenuesScreen({
                   const status = getVenueStatusColor(venue.status);
                   return (
                     <Link
+                      key={venue.id}
                       href={`/department/${departmentId}/facilities/${venue.id}`}
                     >
-                      <Card
-                        key={venue.id}
-                        className="relative cursor-pointer overflow-hidden shadow-md transition-all hover:border-primary"
-                      >
+                      <Card className="relative cursor-pointer overflow-hidden shadow-md transition-all hover:border-primary">
                         <div className="relative aspect-video h-48 w-full">
                           <Image
                             src={venue.imageUrl}

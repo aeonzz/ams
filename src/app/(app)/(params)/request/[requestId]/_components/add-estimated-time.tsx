@@ -86,6 +86,19 @@ export default function AddEstimatedTime({ data }: AddEstimatedTimeProps) {
     }
   };
 
+  const handleHotkeySubmit = React.useCallback(
+    (hours: number) => {
+      if (
+        !showCustomInput ||
+        document.activeElement !== customInputRef.current
+      ) {
+        form.setValue("estimatedTime", hours);
+        form.handleSubmit(onSubmit)();
+      }
+    },
+    [showCustomInput, form, onSubmit]
+  );
+
   const canEdit = permissionGuard({
     allowedRoles: ["DEPARTMENT_HEAD"],
     currentUser,
@@ -115,25 +128,22 @@ export default function AddEstimatedTime({ data }: AddEstimatedTimeProps) {
     }
   );
 
-  predefinedHours.forEach((hours, index) => {
-    useHotkeys(
-      `${index + 1}`,
-      (event) => {
-        if (
-          !showCustomInput ||
-          document.activeElement !== customInputRef.current
-        ) {
-          event.preventDefault();
-          form.setValue("estimatedTime", hours);
-          form.handleSubmit(onSubmit)();
+  useHotkeys(
+    predefinedHours.map((_, index) => (index + 1).toString()),
+    (event, handler) => {
+      event.preventDefault();
+      if (handler.keys && handler.keys.length > 0) {
+        const index = parseInt(handler.keys[0], 10) - 1;
+        if (index >= 0 && index < predefinedHours.length) {
+          handleHotkeySubmit(predefinedHours[index]);
         }
-      },
-      {
-        enableOnFormTags: true,
-        enabled: popoverOpen,
       }
-    );
-  });
+    },
+    {
+      enableOnFormTags: true,
+      enabled: popoverOpen,
+    }
+  );
 
   React.useEffect(() => {
     if (showCustomInput && customInputRef.current) {
@@ -320,9 +330,7 @@ export default function AddEstimatedTime({ data }: AddEstimatedTimeProps) {
         <Button
           variant="ghost2"
           size="sm"
-          className={cn(
-            "w-full justify-start px-2 hover:bg-transparent"
-          )}
+          className={cn("w-full justify-start px-2 hover:bg-transparent")}
         >
           <Clock className="mr-2 size-4" />
           {data.jobRequest?.estimatedTime ? (

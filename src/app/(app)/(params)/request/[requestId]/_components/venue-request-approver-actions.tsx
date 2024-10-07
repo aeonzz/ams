@@ -52,6 +52,7 @@ export default function VenueRequestApproverActions({
     const data: UpdateRequestStatusSchemaWithPath = {
       path: pathname,
       requestId: request.id,
+      entityType: "VENUE_REQUEST",
       reviewerId: currentUser.id,
       changeType: "REVIEWER_CHANGE",
       status: action,

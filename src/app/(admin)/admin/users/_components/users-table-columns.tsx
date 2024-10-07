@@ -127,7 +127,7 @@ export function getUsersColumns(): ColumnDef<UserType>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Departments" />
       ),
-      cell: ({ row }) => {
+      cell: function Cell({ row }) {
         const pathname = usePathname();
         const [hoveredDepartment, setHoveredDepartment] = React.useState<
           string | null

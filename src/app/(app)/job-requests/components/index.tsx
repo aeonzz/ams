@@ -93,7 +93,7 @@ export default function MyJobRequestsScreen({}: MyJobRequestsScreenProps) {
                         job.jobStatus
                       );
                       return (
-                        <Link href={`/request/${job.id}`}>
+                        <Link key={job.id} href={`/request/${job.id}`}>
                           <Card
                             key={job.id}
                             className="transition-colors hover:bg-secondary-accent"

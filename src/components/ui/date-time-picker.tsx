@@ -46,7 +46,7 @@ interface DateTimePickerProps<T extends FieldValues> {
   disabled: boolean;
   disabledDates?: Date[];
   disabledTimeRanges?: { start: Date; end: Date }[];
-  label: string;
+  label?: string;
 }
 
 const timePresets = [
@@ -111,7 +111,7 @@ export default function DateTimePicker<T extends FieldValues>({
   isLoading = false,
   disabled = false,
   name,
-  label = "Select Date and Time",
+  label,
   disabledDates = [],
   disabledTimeRanges = [],
 }: DateTimePickerProps<T>) {
@@ -147,7 +147,7 @@ export default function DateTimePicker<T extends FieldValues>({
         name={name}
         render={({ field }) => (
           <FormItem className="flex flex-col">
-            <FormLabel className="text-left">{label}</FormLabel>
+            {label && <FormLabel className="text-left">{label}</FormLabel>}
             <Popover modal>
               <FormControl>
                 <PopoverTrigger asChild>

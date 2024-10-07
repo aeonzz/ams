@@ -31,7 +31,7 @@ interface CancelledRequestsTableProps {
 export function CancelledRequestsTable({
   requestPromise,
 }: CancelledRequestsTableProps) {
-  const { data, pageCount } = React.use(getCancelledRequests);
+  const { data, pageCount } = React.use(requestPromise);
 
   // Memoize the columns so they don't re-render on every render
   const columns = React.useMemo(() => getCancelledRequestColumns(), []);

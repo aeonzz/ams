@@ -62,17 +62,23 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { CommandShortcut } from "@/components/ui/command";
 import EditInput from "./edit-input";
 import { TagInput } from "@/components/ui/tag-input";
+import EditTimeInput from "./edit-time-input";
+import type { RequestStatusTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestStatusTypeSchema";
 
 interface TransportRequestDetailsProps {
   data: TransportRequestWithRelations;
   requestId: string;
   cancellationReason: string | null;
+  requestStatus: RequestStatusTypeType;
+  isCurrentUser: boolean;
 }
 
 export default function TransportRequestDetails({
   data,
   requestId,
   cancellationReason,
+  requestStatus,
+  isCurrentUser,
 }: TransportRequestDetailsProps) {
   const [editField, setEditField] = React.useState<string | null>(null);
   const pathname = usePathname();
@@ -124,7 +130,7 @@ export default function TransportRequestDetails({
             passengersName: data.passengersName,
           });
           setEditField(null);
-          return "Request update successful";
+          return "Request updated successfully";
         },
         error: (err) => {
           console.log(err);
@@ -161,6 +167,8 @@ export default function TransportRequestDetails({
   React.useEffect(() => {
     form.reset();
   }, [editField]);
+
+  const canEdit = requestStatus === "PENDING" && isCurrentUser;
 
   return (
     <>
@@ -260,16 +268,18 @@ export default function TransportRequestDetails({
                     <P>{data.destination}</P>
                   </div>
                 </div>
-                <Button
-                  variant="link"
-                  className="opacity-0 group-hover:opacity-100"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setEditField("destination");
-                  }}
-                >
-                  Edit
-                </Button>
+                {canEdit && (
+                  <Button
+                    variant="link"
+                    className="opacity-0 group-hover:opacity-100"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setEditField("destination");
+                    }}
+                  >
+                    Edit
+                  </Button>
+                )}
               </div>
             )}
             {editField === "department" ? (
@@ -312,16 +322,18 @@ export default function TransportRequestDetails({
                     <P>{data.department}</P>
                   </div>
                 </div>
-                <Button
-                  variant="link"
-                  className="opacity-0 group-hover:opacity-100"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setEditField("department");
-                  }}
-                >
-                  Edit
-                </Button>
+                {canEdit && (
+                  <Button
+                    variant="link"
+                    className="opacity-0 group-hover:opacity-100"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setEditField("department");
+                    }}
+                  >
+                    Edit
+                  </Button>
+                )}
               </div>
             )}
             {editField === "passengersName" ? (
@@ -329,7 +341,7 @@ export default function TransportRequestDetails({
                 isPending={isPending}
                 isFieldsDirty={isFieldsDirty}
                 setEditField={setEditField}
-                label="Office/Dept."
+                label="Passengers."
               >
                 <FormField
                   control={form.control}
@@ -338,6 +350,7 @@ export default function TransportRequestDetails({
                     <FormItem>
                       <FormControl>
                         <TagInput
+                          placeholder="Enter passenger name"
                           disabled={isPending}
                           value={field.value || []}
                           autoFocus
@@ -360,39 +373,61 @@ export default function TransportRequestDetails({
                     <P>{data.passengersName.join(", ")}</P>
                   </div>
                 </div>
-                <Button
-                  variant="link"
-                  className="opacity-0 group-hover:opacity-100"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setEditField("passengersName");
-                  }}
-                >
-                  Edit
-                </Button>
+                {canEdit && (
+                  <Button
+                    variant="link"
+                    className="opacity-0 group-hover:opacity-100"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setEditField("passengersName");
+                    }}
+                  >
+                    Edit
+                  </Button>
+                )}
               </div>
             )}
-            <div className="group flex items-center justify-between">
-              <div className="flex w-full flex-col items-start">
-                <div className="flex space-x-1 text-muted-foreground">
-                  <Calendar className="h-5 w-5" />
-                  <P className="font-semibold tracking-tight">
-                    Date of Travel:
-                  </P>
-                </div>
-                <div className="w-full pl-5 pt-1">
-                  <P>{format(new Date(data.dateAndTimeNeeded), "PPP p")}</P>
-                </div>
-              </div>
-              <Button
-                variant="link"
-                className="opacity-0 group-hover:opacity-100"
-                onClick={() => setEditField("dateAndTimeNeeded")}
-              >
-                Edit
-              </Button>
-            </div>
             {editField === "dateAndTimeNeeded" ? (
+              <EditInput
+                isPending={isPending}
+                isFieldsDirty={isFieldsDirty}
+                setEditField={setEditField}
+                label="Date of Travel"
+              >
+                <EditTimeInput
+                  form={form}
+                  vehicleId={data.vehicleId}
+                  isPending={isPending}
+                />
+              </EditInput>
+            ) : (
+              <div className="group flex items-center justify-between">
+                <div className="flex w-full flex-col items-start">
+                  <div className="flex space-x-1 text-muted-foreground">
+                    <Calendar className="h-5 w-5" />
+                    <P className="font-semibold tracking-tight">
+                      Date of Travel:
+                    </P>
+                  </div>
+                  <div className="w-full pl-5 pt-1">
+                    <P>{format(new Date(data.dateAndTimeNeeded), "PPP p")}</P>
+                  </div>
+                </div>
+                {canEdit && (
+                  <Button
+                    variant="link"
+                    className="opacity-0 group-hover:opacity-100"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setEditField("dateAndTimeNeeded");
+                    }}
+                  >
+                    Edit
+                  </Button>
+                )}
+              </div>
+            )}
+            {editField === "description" ? (
               <EditInput
                 isPending={isPending}
                 isFieldsDirty={isFieldsDirty}
@@ -431,16 +466,18 @@ export default function TransportRequestDetails({
                     <P className="text-wrap break-all">{data.description}</P>
                   </div>
                 </div>
-                <Button
-                  variant="link"
-                  className="opacity-0 group-hover:opacity-100"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setEditField("dateAndTimeNeeded");
-                  }}
-                >
-                  Edit
-                </Button>
+                {canEdit && (
+                  <Button
+                    variant="link"
+                    className="opacity-0 group-hover:opacity-100"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setEditField("description");
+                    }}
+                  >
+                    Edit
+                  </Button>
+                )}
               </div>
             )}
           </form>

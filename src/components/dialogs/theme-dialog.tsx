@@ -41,18 +41,18 @@ export default function ThemeDialog() {
     [setTheme, dialogManager]
   );
 
-  themes.forEach((themeItem, index) => {
-    useHotkeys(
-      `${index + 1}`,
-      () => {
-        if (dialogManager.activeDialog === "themeCommand") {
-          handleThemeChange(themeItem.value);
-        }
-      },
-      { enableOnFormTags: true },
-      [dialogManager.activeDialog, handleThemeChange]
-    );
-  });
+  // themes.map((themeItem, index) => {
+  //   useHotkeys(
+  //     `${index + 1}`,
+  //     () => {
+  //       if (dialogManager.activeDialog === "themeCommand") {
+  //         handleThemeChange(themeItem.value);
+  //       }
+  //     },
+  //     { enableOnFormTags: true },
+  //     [dialogManager.activeDialog, handleThemeChange]
+  //   );
+  // });
 
   return (
     <CommandDialog

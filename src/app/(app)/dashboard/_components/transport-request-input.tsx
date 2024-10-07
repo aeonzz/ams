@@ -152,33 +152,104 @@ export default function TransportRequestInput({
     <>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <div className="scroll-bar flex max-h-[60vh] gap-6 overflow-y-auto px-4 py-1">
-            <div className="flex flex-1 flex-col space-y-2">
-              <div className="flex">
-                <div className="mr-2 w-fit pt-[2px]">
-                  <Info className="size-4 text-primary" />
+          <div className="flex px-4 gap-2">
+            <div className="scroll-bar flex max-h-[60vh] flex-1 overflow-y-auto py-1 px-1 ">
+              <div className="flex flex-col space-y-2">
+                <div className="flex">
+                  <div className="mr-2 w-fit pt-[2px]">
+                    <Info className="size-4 text-primary" />
+                  </div>
+                  <P className="text-muted-foreground">
+                    Request should be submitted not later than 2 days prior to
+                    the requested date.
+                  </P>
                 </div>
-                <P className="text-muted-foreground">
-                  Request should be submitted not later than 2 days prior to the
-                  requested date.
-                </P>
-              </div>
-              <div className="flex gap-2">
-                <VehicleField
+                <div className="flex gap-2">
+                  <VehicleField
+                    form={form}
+                    name="vehicleId"
+                    isPending={isPending}
+                    data={vehicleData}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="department"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-1 flex-col">
+                        <FormLabel className="text-left">
+                          Office/Dept.
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            autoComplete="off"
+                            placeholder="Offic/Dept...."
+                            disabled={isPending}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <DateTimePicker
                   form={form}
-                  name="vehicleId"
-                  isPending={isPending}
-                  data={vehicleData}
+                  name="dateAndTimeNeeded"
+                  label="Date and Time needed"
+                  isLoading={isLoading}
+                  disabled={isPending || !vehicleId}
+                  disabledDates={disabledDates}
                 />
                 <FormField
                   control={form.control}
-                  name="department"
+                  name="destination"
                   render={({ field }) => (
-                    <FormItem className="flex flex-1 flex-col">
-                      <FormLabel className="text-left">Office/Dept.</FormLabel>
+                    <FormItem className="flex flex-grow flex-col">
+                      <FormLabel className="text-left">Destination</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Offic/Dept...."
+                          placeholder="Destination..."
+                          autoComplete="off"
+                          disabled={isPending}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="passengersName"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-grow flex-col">
+                      <FormLabel className="text-left">
+                        Passenger(s) Name
+                      </FormLabel>
+                      <FormControl>
+                        <TagInput
+                          placeholder="Enter passenger name"
+                          disabled={isPending}
+                          value={field.value || []}
+                          onChange={field.onChange}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-grow flex-col">
+                      <FormLabel className="text-left">Purpose</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          rows={1}
+                          maxRows={5}
+                          placeholder="Purpose..."
+                          className="min-h-[200px] flex-grow resize-none placeholder:text-sm"
                           disabled={isPending}
                           {...field}
                         />
@@ -188,76 +259,10 @@ export default function TransportRequestInput({
                   )}
                 />
               </div>
-              <DateTimePicker
-                form={form}
-                name="dateAndTimeNeeded"
-                label="Date and Time needed"
-                isLoading={isLoading}
-                disabled={isPending || !vehicleId}
-                disabledDates={disabledDates}
-              />
-              <FormField
-                control={form.control}
-                name="destination"
-                render={({ field }) => (
-                  <FormItem className="flex flex-grow flex-col">
-                    <FormLabel className="text-left">Destination</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Destination..."
-                        autoComplete="off"
-                        disabled={isPending}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="passengersName"
-                render={({ field }) => (
-                  <FormItem className="flex flex-grow flex-col">
-                    <FormLabel className="text-left">
-                      Passenger(s) Name
-                    </FormLabel>
-                    <FormControl>
-                      <TagInput
-                        placeholder="Enter passenger name"
-                        disabled={isPending}
-                        value={field.value || []}
-                        onChange={field.onChange}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem className="flex flex-grow flex-col">
-                    <FormLabel className="text-left">Purpose</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        rows={1}
-                        maxRows={5}
-                        placeholder="Purpose..."
-                        className="min-h-[200px] flex-grow resize-none placeholder:text-sm"
-                        disabled={isPending}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
             </div>
             {vehicleId && (
               <div
-                className={cn("scroll-bar max-h-[55vh] w-72 overflow-y-auto")}
+                className={cn("scroll-bar max-h-[60vh] w-[300px] overflow-y-auto pr-1")}
               >
                 <P className="mb-2 font-semibold">Schedules</P>
                 {isLoading || isRefetching ? (

@@ -5,6 +5,7 @@ export const createUserSchemaBase = z.object({
   firstName: z.string().min(1, "First name is required"),
   middleName: z.string().optional(),
   lastName: z.string().min(1, "last name is required"),
+  profileUrl: z.string().optional(),
   departmentIds: z
     .array(z.string(), {
       required_error: "Department is required",

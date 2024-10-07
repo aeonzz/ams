@@ -165,7 +165,7 @@ export const createSupplyResourceRequest = authedProcedure
           priority: rest.priority,
           type: rest.type,
           title: text,
-          department: rest.department,
+          departmentId: rest.departmentId,
           supplyRequest: {
             create: {
               id: resourceRequestId,

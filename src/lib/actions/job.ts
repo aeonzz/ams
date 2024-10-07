@@ -10,11 +10,6 @@ import { generateText } from "ai";
 import { cohere } from "@ai-sdk/cohere";
 import { extendedJobRequestSchemaServer } from "../db/schema/job";
 import {
-  createJobSectionSchemaWithPath,
-  deleteJobSectionsSchema,
-  updateJobSectionSchemaWithPath,
-} from "@/app/(admin)/admin/job-sections/_components/schema";
-import {
   assignPersonnelSchemaWithPath,
   updateJobRequestSchemaWithPath,
   updateRequestStatusSchemaWithPath,

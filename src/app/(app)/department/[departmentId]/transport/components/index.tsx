@@ -109,12 +109,10 @@ export default function DepartmentVehicleScreen({
                   const status = getVehicleStatusColor(vehicle.status);
                   return (
                     <Link
+                      key={vehicle.id}
                       href={`/department/${departmentId}/transport/${vehicle.id}`}
                     >
-                      <Card
-                        key={vehicle.id}
-                        className="relative cursor-pointer overflow-hidden shadow-md transition-all hover:border-primary"
-                      >
+                      <Card className="relative cursor-pointer overflow-hidden shadow-md transition-all hover:border-primary">
                         <div className="relative aspect-video h-48 w-full">
                           <Image
                             src={vehicle.imageUrl}

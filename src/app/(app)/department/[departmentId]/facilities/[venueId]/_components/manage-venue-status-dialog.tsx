@@ -86,17 +86,17 @@ export function ManageVenueStatusDialog({
     { enableOnFormTags: false }
   );
 
-  VenueStatusSchema.options.forEach((status, index) => {
-    useHotkeys(
-      `${index + 1}`,
-      () => {
-        if (dialogManager.activeDialog === "updateVenueStatusCommand") {
-          handleStatusSelect(status);
-        }
-      },
-      { enableOnFormTags: true }
-    );
-  });
+  // VenueStatusSchema.options.forEach((status, index) => {
+  //   useHotkeys(
+  //     `${index + 1}`,
+  //     () => {
+  //       if (dialogManager.activeDialog === "updateVenueStatusCommand") {
+  //         handleStatusSelect(status);
+  //       }
+  //     },
+  //     { enableOnFormTags: true }
+  //   );
+  // });
 
   return (
     <>

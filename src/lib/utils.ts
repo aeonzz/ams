@@ -38,6 +38,13 @@ import {
   FileMinus,
   AlertCircle,
   Plus,
+  Trash2,
+  RotateCw,
+  Archive,
+  PlayCircle,
+  Edit,
+  Lock,
+  Map,
 } from "lucide-react";
 import { type RequestStatusTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestStatusTypeSchema";
 import { type PriorityTypeType } from "prisma/generated/zod/inputTypeSchemas/PriorityTypeSchema";
@@ -454,17 +461,17 @@ export function getChangeTypeInfo(
   const ChangeTypeInfos: ChangeTypeInfoMap = {
     STATUS_CHANGE: {
       icon: RefreshCw,
-      color: "#3b82f6",
+      color: "#3b82f6", 
       message: "Status changed",
     },
     FIELD_UPDATE: {
       icon: PenTool,
-      color: "#22c55e",
+      color: "#22c55e", 
       message: "Field updated",
     },
     ASSIGNMENT_CHANGE: {
       icon: User,
-      color: "#a855f7",
+      color: "#a855f7", 
       message: "Assignment changed",
     },
     REVIEWER_CHANGE: {
@@ -484,17 +491,62 @@ export function getChangeTypeInfo(
     },
     CANCELLED: {
       icon: XCircle,
-      color: "#ef4444",
+      color: "#ef4444", 
       message: "Cancelled",
     },
     CREATED: {
       icon: Plus,
-      color: "#3b82f6",
-      message: "System Created the request",
+      color: "#3b82f6", 
+      message: "System created the request",
+    },
+    DELETION: {
+      icon: Trash2,
+      color: "#ef4444", 
+      message: "Deleted",
+    },
+    RESTORED: {
+      icon: RotateCw,
+      color: "#10b981", 
+      message: "Restored",
+    },
+    ARCHIVED: {
+      icon: Archive,
+      color: "#f97316", 
+      message: "Archived",
+    },
+    ACTIVATED: {
+      icon: PlayCircle,
+      color: "#16a34a",
+      message: "Activated",
+    },
+    RENAME: {
+      icon: Edit,
+      color: "#eab308",
+      message: "Renamed",
+    },
+    PERMISSION_CHANGE: {
+      icon: Lock,
+      color: "#8b5cf6", 
+      message: "Permission changed",
+    },
+    VENUE_CHANGE: {
+      icon: MapPin,
+      color: "#10b981",
+      message: "Venue changed",
+    },
+    TIME_UPDATE: {
+      icon: Clock,
+      color: "#f59e0b",
+      message: "Time updated",
+    },
+    LOCATION_UPDATE: {
+      icon: Map,
+      color: "#3b82f6", 
+      message: "Location updated",
     },
     OTHER: {
       icon: AlertCircle,
-      color: "#6b7280",
+      color: "#6b7280", 
       message: "Other change",
     },
   };
@@ -502,12 +554,11 @@ export function getChangeTypeInfo(
   return (
     ChangeTypeInfos[changeType] || {
       icon: AlertCircle,
-      color: "#6b7280",
+      color: "#6b7280", // Default gray for unknown
       message: "Unknown change",
     }
   );
 }
-
 export function isOverlapping(
   start1: Date,
   end1: Date,

@@ -111,7 +111,6 @@ export default function SupplyResourceRequestInput({
 }: SupplyResourceRequestInputProps) {
   const pathname = usePathname();
   const currentUser = useSession();
-  const { department } = currentUser;
   const queryClient = useQueryClient();
   const items = form.watch("items");
 
@@ -126,7 +125,7 @@ export default function SupplyResourceRequestInput({
       ...values,
       priority: "LOW",
       type: type,
-      department: department,
+      departmentId: "test",
       path: pathname,
     };
 

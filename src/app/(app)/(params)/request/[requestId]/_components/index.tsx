@@ -169,6 +169,8 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                 data={data.transportRequest}
                 requestId={data.id}
                 cancellationReason={data.cancellationReason}
+                requestStatus={data.status}
+                isCurrentUser={currentUser.id === data.userId}
               />
             )}
           </div>

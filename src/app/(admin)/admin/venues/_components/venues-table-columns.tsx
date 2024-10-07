@@ -145,7 +145,7 @@ export function getVenuesColumns(): ColumnDef<VenueTableType>[] {
         return (
           <div className="flex flex-wrap">
             {features.map((feature, index) => (
-              <P>
+              <P key={index}>
                 {feature.name}
                 {features.length - 1 !== index && ", "}
               </P>

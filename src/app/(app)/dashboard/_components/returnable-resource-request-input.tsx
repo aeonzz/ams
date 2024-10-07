@@ -35,7 +35,6 @@ import { useSession } from "@/lib/hooks/use-session";
 import { type RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTypeSchema";
 import axios from "axios";
 import { type ReservedReturnableItemDateAndTime } from "@/lib/schema/utils";
-import DateTimePicker from "@/components/ui/date-time-picker";
 import { createReturnableResourceRequest } from "@/lib/actions/resource";
 import type {
   ExtendedReturnableResourceRequestSchema,
@@ -103,7 +102,6 @@ export default function ReturnableResourceRequestInput({
 }: ReturnableResourceRequestInputProps) {
   const pathname = usePathname();
   const currentUser = useSession();
-  const { department } = currentUser;
   const queryClient = useQueryClient();
   const itemId = form.watch("itemId");
   const [selectedDepartmentId, setSelectedDepartmentId] =
@@ -177,7 +175,7 @@ export default function ReturnableResourceRequestInput({
       priority: "LOW",
       type: type,
       itemDepartmentId: selectedDepartmentId!,
-      departmentId: department?.id || "f",
+      departmentId: "test",
       path: pathname,
     };
 

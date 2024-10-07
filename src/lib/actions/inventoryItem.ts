@@ -92,6 +92,7 @@ export const createInventorySubItem = authedProcedure
       const itemId = generateId(15);
       const item = await db.inventorySubItem.create({
         data: {
+          imageUrl: "test",
           id: itemId,
           subName: "test",
           ...rest,
