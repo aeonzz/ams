@@ -356,45 +356,49 @@ export default function VenueRequestInput({
                   )}
                 />
               )}
-              <FormField
-                control={form.control}
-                name="setupRequirements"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Venue Features</FormLabel>
-                    <div className="space-y-4">
-                      {selectedVenue?.features &&
-                        (selectedVenue.features as VenueFeaturesType[]).map(
-                          (feature) => (
-                            <FormItem
-                              key={feature.id}
-                              className="flex flex-row items-start space-x-3 space-y-0"
-                            >
-                              <FormControl>
-                                <Checkbox
-                                  disabled={isPending}
-                                  checked={field.value?.includes(feature.name)}
-                                  onCheckedChange={(checked) => {
-                                    const updatedValue = checked
-                                      ? [...(field.value || []), feature.name]
-                                      : (field.value || []).filter(
-                                          (value) => value !== feature.name
-                                        );
-                                    field.onChange(updatedValue);
-                                  }}
-                                />
-                              </FormControl>
-                              <FormLabel className="truncate break-all font-normal">
-                                {feature.name}
-                              </FormLabel>
-                            </FormItem>
-                          )
-                        )}
-                    </div>
-                    <FormMessage />
-                  </FormItem>
+              {selectedVenue &&
+                (selectedVenue.features as VenueFeaturesType[]) !== null && (
+                  <FormField
+                    control={form.control}
+                    name="setupRequirements"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Venue Features</FormLabel>
+                        <div className="space-y-4">
+                          {(selectedVenue.features as VenueFeaturesType[]).map(
+                            (feature) => (
+                              <FormItem
+                                key={feature.id}
+                                className="flex flex-row items-start space-x-3 space-y-0"
+                              >
+                                <FormControl>
+                                  <Checkbox
+                                    disabled={isPending}
+                                    checked={field.value?.includes(
+                                      feature.name
+                                    )}
+                                    onCheckedChange={(checked) => {
+                                      const updatedValue = checked
+                                        ? [...(field.value || []), feature.name]
+                                        : (field.value || []).filter(
+                                            (value) => value !== feature.name
+                                          );
+                                      field.onChange(updatedValue);
+                                    }}
+                                  />
+                                </FormControl>
+                                <FormLabel className="truncate break-all font-normal">
+                                  {feature.name}
+                                </FormLabel>
+                              </FormItem>
+                            )
+                          )}
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 )}
-              />
             </div>
             {venueId && (
               <div

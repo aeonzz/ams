@@ -158,7 +158,7 @@ export default function JobRequestInput({
                 <JobSectionField
                   form={form}
                   name="departmentId"
-                  isPending={isPending}
+                  isPending={isPending || isUploading}
                   data={data}
                 />
                 <FormField
@@ -171,7 +171,7 @@ export default function JobRequestInput({
                         <Input
                           autoComplete="off"
                           placeholder="Quadrangle"
-                          disabled={isPending}
+                          disabled={isPending || isUploading}
                           {...field}
                         />
                       </FormControl>
@@ -277,7 +277,7 @@ export default function JobRequestInput({
                                     value={job}
                                     key={index}
                                     onSelect={() => {
-                                      form.setValue("jobtype", job);
+                                      field.onChange(job);
                                     }}
                                   >
                                     {textTransform(job)}

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import {
+  JobTypeSchema,
   PriorityTypeSchema,
   RequestStatusTypeSchema,
   RequestTypeSchema,
@@ -162,29 +163,74 @@ export type UpdateTransportRequestSchemaWithPath = z.infer<
   typeof updateTransportRequestSchemaWithPath
 >;
 
-export const updateRequestSchemaBase = z.object({
-  notes: z.string().optional(),
-  priority: PriorityTypeSchema.optional(),
-  dueDate: z.date().optional(),
-  type: RequestTypeSchema.optional(),
-  status: RequestStatusTypeSchema.optional(),
-  departmentId: z.string().optional(),
+// export const updateRequestSchemaBase = z.object({
+//   notes: z.string().optional(),
+//   priority: PriorityTypeSchema.optional(),
+//   dueDate: z.date().optional(),
+//   type: RequestTypeSchema.optional(),
+//   status: RequestStatusTypeSchema.optional(),
+//   departmentId: z.string().optional(),
+// });
+
+// export const updateJobRequestSchema = updateRequestSchemaBase.extend({
+//   jobType: z.string().optional(),
+//   name: z.string().optional(),
+//   category: z.string().optional(),
+//   files: z.array(z.string()).optional(),
+// });
+
+// export type UpdateJobRequestSchema = z.infer<typeof updateJobRequestSchema>;
+
+// export const extendedUpdateJobRequestSchema = updateJobRequestSchema.extend({
+//   path: z.string(),
+//   id: z.string(),
+// });
+
+// export type ExtendedUpdateJobRequestSchema = z.infer<
+//   typeof extendedUpdateJobRequestSchema
+// >;
+
+export const createJobRequestServer = z.object({
+  description: z
+    .string()
+    .min(10, { message: "Must be at least 10 characters long" })
+    .max(600, { message: "Cannot be more than 600 characters long" }),
+  jobType: JobTypeSchema.refine((val) => val !== undefined, {
+    message: "Job type is required.",
+  }),
+  location: z
+    .string()
+    .min(1, { message: "Must be at least 1 characters long" })
+    .max(100, { message: "Cannot be more than 100 characters long" }),
+  departmentId: z.string({
+    required_error: "Job section is required.",
+  }),
+  dueDate: z
+    .date({
+      required_error: "Due date is required.",
+    })
+    .min(new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), {
+      message: "Due date must be at least 3 days in the future",
+    }),
+  images: z.array(z.string()).optional(),
 });
 
-export const updateJobRequestSchema = updateRequestSchemaBase.extend({
-  jobType: z.string().optional(),
-  name: z.string().optional(),
-  category: z.string().optional(),
-  files: z.array(z.string()).optional(),
-});
+export type CreateJobRequestSchemaServer = z.infer<
+  typeof createJobRequestServer
+>;
 
-export type UpdateJobRequestSchema = z.infer<typeof updateJobRequestSchema>;
+export const updateJobRequestSchemaServer = createJobRequestServer.partial();
 
-export const extendedUpdateJobRequestSchema = updateJobRequestSchema.extend({
-  path: z.string(),
-  id: z.string(),
-});
+export type UpdateJobRequestSchemaServer = z.infer<
+  typeof updateJobRequestSchemaServer
+>;
 
-export type ExtendedUpdateJobRequestSchema = z.infer<
-  typeof extendedUpdateJobRequestSchema
+export const updateJobRequestSchemaServerWithPath =
+  updateJobRequestSchemaServer.extend({
+    id: z.string(),
+    path: z.string(),
+  });
+
+export type UpdateJobRequestSchemaServerWithPath = z.infer<
+  typeof updateJobRequestSchemaServerWithPath
 >;

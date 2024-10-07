@@ -1,9 +1,10 @@
 {
   "name": "ams",
   "version": "0.1.0",
+  "type": "module",
   "private": true,
   "scripts": {
-    "dev": "prisma generate && next dev",
+    "dev": "prisma generate && node server.js",
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
@@ -102,6 +103,7 @@
     "@types/react": "^18",
     "@types/react-big-calendar": "^1.8.11",
     "@types/react-dom": "^18",
+    "cross-env": "^7.0.3",
     "eslint": "^8",
     "eslint-config-next": "14.2.4",
     "postcss": "^8",

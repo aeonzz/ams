@@ -19,20 +19,26 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { updateJobRequest } from "@/lib/actions/requests";
 import { fillJobRequestEvaluationPDF } from "@/lib/fill-pdf/job-evaluation";
 import { fillJobRequestFormPDF } from "@/lib/fill-pdf/job-request-form";
+import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
 import {
   cn,
   formatFullName,
   getChangeTypeInfo,
   getJobStatusColor,
+  isDateInPast,
   textTransform,
 } from "@/lib/utils";
-import { useQuery } from "@tanstack/react-query";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { format } from "date-fns";
+import { addDays, format } from "date-fns";
 import {
-  Calendar,
+  CalendarIcon,
+  Check,
+  ChevronsUpDown,
   Circle,
   CircleMinus,
   CirclePlus,
@@ -47,21 +53,61 @@ import {
   User,
 } from "lucide-react";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import {
   GenericAuditLog,
+  JobTypeSchema,
   type JobRequestWithRelations,
 } from "prisma/generated/zod";
 import type { RequestStatusTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestStatusTypeSchema";
 import React from "react";
+import { useForm, useFormState } from "react-hook-form";
 import { useHotkeys } from "react-hotkeys-hook";
 import { PhotoProvider, PhotoView } from "react-photo-view";
 import { toast } from "sonner";
+import EditInput from "./edit-input";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  updateJobRequestSchemaServer,
+  UpdateJobRequestSchemaServer,
+  UpdateJobRequestSchemaServerWithPath,
+} from "@/lib/schema/request";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Calendar } from "@/components/ui/calendar";
+import { Textarea } from "@/components/ui/text-area";
 
 interface JobRequestDetailsProps {
   data: JobRequestWithRelations;
   requestId: string;
   cancellationReason: string | null;
   requestStatus: RequestStatusTypeType;
+  isCurrentUser: boolean;
 }
 
 export default function JobRequestDetails({
@@ -69,7 +115,25 @@ export default function JobRequestDetails({
   requestId,
   cancellationReason,
   requestStatus,
+  isCurrentUser,
 }: JobRequestDetailsProps) {
+  const [editField, setEditField] = React.useState<string | null>(null);
+  const pathname = usePathname();
+  const queryClient = useQueryClient();
+  const form = useForm<UpdateJobRequestSchemaServer>({
+    resolver: zodResolver(updateJobRequestSchemaServer),
+    defaultValues: {
+      jobType: data.jobType,
+      location: data.location,
+      description: data.description,
+      dueDate: data.dueDate ? new Date(data.dueDate) : undefined,
+    },
+  });
+
+  const { mutateAsync, isPending } = useServerActionMutation(updateJobRequest);
+  const { dirtyFields } = useFormState({ control: form.control });
+  const isFieldsDirty = Object.keys(dirtyFields).length > 0;
+
   const { data: logs, isLoading } = useQuery<GenericAuditLog[]>({
     queryFn: async () => {
       const res = await axios.get(`/api/audit-log/request-log/${requestId}`);
@@ -77,6 +141,43 @@ export default function JobRequestDetails({
     },
     queryKey: ["activity", requestId],
   });
+
+  async function onSubmit(values: UpdateJobRequestSchemaServer) {
+    try {
+      const data: UpdateJobRequestSchemaServerWithPath = {
+        path: pathname,
+        id: requestId,
+        ...values,
+      };
+
+      toast.promise(mutateAsync(data), {
+        loading: "Saving...",
+        success: () => {
+          queryClient.invalidateQueries({
+            queryKey: ["activity", requestId],
+          });
+          queryClient.invalidateQueries({
+            queryKey: [requestId],
+          });
+          form.reset({
+            jobType: data.jobType,
+            location: data.location,
+            description: data.description,
+            dueDate: data.dueDate,
+          });
+          setEditField(null);
+          return "Request updated successfully";
+        },
+        error: (err) => {
+          console.log(err);
+          return err.message;
+        },
+      });
+    } catch (error) {
+      console.error("Error during update:", error);
+      toast.error("An error occurred during update. Please try again.");
+    }
+  }
 
   const JobStatusColor = getJobStatusColor(data.status);
   const isEvaluated = data.jobRequestEvaluation !== null;
@@ -146,6 +247,34 @@ export default function JobRequestDetails({
     { enableOnFormTags: false, enabled: data.jobRequestEvaluation !== null }
   );
 
+  useHotkeys(
+    "shift+enter",
+    (event) => {
+      event.preventDefault();
+      form.handleSubmit(onSubmit)();
+    },
+    {
+      enableOnFormTags: true,
+      enabled: editField !== null && isFieldsDirty,
+    }
+  );
+
+  useHotkeys(
+    "esc",
+    (event) => {
+      event.preventDefault();
+      setEditField(null);
+    },
+    { enableOnFormTags: true, enabled: editField !== null }
+  );
+
+  React.useEffect(() => {
+    form.reset();
+  }, [editField]);
+
+  const canEdit = requestStatus === "PENDING" && isCurrentUser;
+
+
   return (
     <>
       <div className="space-y-4">
@@ -199,81 +328,403 @@ export default function JobRequestDetails({
             )}
           </div>
         </div>
-        <div className="flex items-center space-x-2">
-          <FileText className="h-5 w-5" />
-          <P>Job type: {textTransform(data.jobType)}</P>
-        </div>
-        <div className="flex items-center space-x-2">
-          <MapPin className="h-5 w-5" />
-          <P>Location: {data.location}</P>
-        </div>
-        <div className="flex items-center space-x-2">
-          <User className="h-5 w-5" />
-          <P>
-            Assigned To:{" "}
-            {data.assignedUser
-              ? formatFullName(
-                  data.assignedUser.firstName,
-                  data.assignedUser.middleName,
-                  data.assignedUser.lastName
-                )
-              : "-"}
-          </P>
-        </div>
-        <div className="flex items-center space-x-2">
-          <Calendar className="h-5 w-5" />
-          <P>Due date: {format(new Date(data.dueDate), "PPP p")}</P>
-        </div>
-        {requestStatus === "APPROVED" && (
-          <>
-            <div className="flex items-center space-x-2">
-              <Timer className="h-5 w-5" />
-              <P>
-                Estimated time:{" "}
-                {data.estimatedTime ? `${data.estimatedTime} hours` : "-"}
-              </P>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Circle className="h-5 w-5" />
-              <P className="inline-flex gap-3">
-                Job status:{" "}
-                <Badge variant={JobStatusColor.variant} className="pr-3.5">
-                  <Dot
-                    className="mr-1 size-3"
-                    strokeWidth={JobStatusColor.stroke}
-                    color={JobStatusColor.color}
-                  />
-                  {textTransform(data.status)}
-                </Badge>
-              </P>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Clock className="h-5 w-5" />
-              <P>
-                Start date/time:{" "}
-                {data.startDate
-                  ? format(new Date(data.startDate), "PPP p")
-                  : "-"}
-              </P>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Clock className="h-5 w-5" />
-              <P>
-                End date/time:{" "}
-                {data.endDate ? format(new Date(data.endDate), "PPP p") : "-"}
-              </P>
-            </div>
-          </>
-        )}
-        <div>
-          <H5 className="mb-2 font-semibold text-muted-foreground">
-            Job Description:
-          </H5>
-          <P className="text-wrap break-all">{data.description}</P>
-        </div>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            {data.assignedUser && (
+              <div className="group flex items-center justify-between">
+                <div className="flex w-full flex-col items-start">
+                  <div className="flex space-x-1 text-muted-foreground">
+                    <User className="h-5 w-5" />
+                    <P className="font-semibold tracking-tight">Assigned To:</P>
+                  </div>
+                  <div className="w-full pl-5 pt-1">
+                    <P>
+                      {formatFullName(
+                        data.assignedUser.firstName,
+                        data.assignedUser.middleName,
+                        data.assignedUser.lastName
+                      )}
+                    </P>
+                  </div>
+                </div>
+              </div>
+            )}
+            {editField === "jobType" ? (
+              <EditInput
+                isPending={isPending}
+                isFieldsDirty={isFieldsDirty}
+                setEditField={setEditField}
+                label="Job Type"
+              >
+                <FormField
+                  control={form.control}
+                  name="jobType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Popover modal>
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                variant="outline"
+                                disabled={isPending}
+                                role="combobox"
+                                className={cn(
+                                  "w-full justify-between",
+                                  !field.value && "text-muted-foreground"
+                                )}
+                              >
+                                <span className="truncate">
+                                  {field.value
+                                    ? textTransform(field.value)
+                                    : "Select job type"}
+                                </span>
+                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+                          <PopoverContent
+                            className="w-[230px] p-0"
+                            align="start"
+                          >
+                            <Command className="max-h-72">
+                              <CommandInput placeholder="Search job..." />
+                              <CommandList>
+                                <CommandEmpty>No job found.</CommandEmpty>
+                                <CommandGroup>
+                                  {JobTypeSchema.options.map((job, index) => (
+                                    <CommandItem
+                                      value={job}
+                                      key={index}
+                                      onSelect={() => {
+                                        field.onChange(job);
+                                      }}
+                                    >
+                                      {textTransform(job)}
+                                      <Check
+                                        className={cn(
+                                          "ml-auto h-4 w-4",
+                                          job === field.value
+                                            ? "opacity-100"
+                                            : "opacity-0"
+                                        )}
+                                      />
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </EditInput>
+            ) : (
+              <div className="group flex items-center justify-between">
+                <div className="flex w-full flex-col items-start">
+                  <div className="flex space-x-1 text-muted-foreground">
+                    <FileText className="h-5 w-5" />
+                    <P className="font-semibold tracking-tight">Job Type:</P>
+                  </div>
+                  <div className="w-full pl-5 pt-1">
+                    <P>{textTransform(data.jobType)}</P>
+                  </div>
+                </div>
+                {canEdit && (
+                  <Button
+                    variant="link"
+                    className="opacity-0 group-hover:opacity-100"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setEditField("jobType");
+                    }}
+                  >
+                    Edit
+                  </Button>
+                )}
+              </div>
+            )}
+            {editField === "location" ? (
+              <EditInput
+                isPending={isPending}
+                isFieldsDirty={isFieldsDirty}
+                setEditField={setEditField}
+                label="Location"
+              >
+                <FormField
+                  control={form.control}
+                  name="location"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input
+                          autoComplete="off"
+                          placeholder="Location"
+                          disabled={isPending}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </EditInput>
+            ) : (
+              <div className="group flex items-center justify-between">
+                <div className="flex w-full flex-col items-start">
+                  <div className="flex space-x-1 text-muted-foreground">
+                    <MapPin className="h-5 w-5" />
+                    <P className="font-semibold tracking-tight">Location:</P>
+                  </div>
+                  <div className="w-full pl-5 pt-1">
+                    <P>{data.location}</P>
+                  </div>
+                </div>
+                {canEdit && (
+                  <Button
+                    variant="link"
+                    className="opacity-0 group-hover:opacity-100"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setEditField("location");
+                    }}
+                  >
+                    Edit
+                  </Button>
+                )}
+              </div>
+            )}
+            {editField === "dueDate" ? (
+              <EditInput
+                isPending={isPending}
+                isFieldsDirty={isFieldsDirty}
+                setEditField={setEditField}
+                label="Due Date"
+              >
+                <FormField
+                  control={form.control}
+                  name="dueDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Popover modal>
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                variant="outline"
+                                className={cn(
+                                  "w-full justify-start px-2 text-left font-normal",
+                                  !field.value && "text-muted-foreground"
+                                )}
+                                disabled={isPending}
+                              >
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {field.value ? (
+                                  format(field.value, "PPP")
+                                ) : (
+                                  <span>Due date</span>
+                                )}
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+                          <PopoverContent className="flex w-auto flex-col space-y-2 p-2">
+                            <Select
+                              onValueChange={(value) =>
+                                field.onChange(
+                                  addDays(new Date(), parseInt(value))
+                                )
+                              }
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select" />
+                              </SelectTrigger>
+                              <SelectContent position="popper">
+                                <SelectItem value="3">In 3 days</SelectItem>
+                                <SelectItem value="5">In 5 days</SelectItem>
+                                <SelectItem value="7">In a week</SelectItem>
+                                <SelectItem value="30">In a month</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <div className="rounded-md border">
+                              <Calendar
+                                mode="single"
+                                selected={field.value}
+                                onSelect={field.onChange}
+                                disabled={isDateInPast}
+                              />
+                            </div>
+                          </PopoverContent>
+                        </Popover>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </EditInput>
+            ) : (
+              <div className="group flex items-center justify-between">
+                <div className="flex w-full flex-col items-start">
+                  <div className="flex space-x-1 text-muted-foreground">
+                    <CalendarIcon className="h-5 w-5" />
+                    <P className="font-semibold tracking-tight">Due Date:</P>
+                  </div>
+                  <div className="w-full pl-5 pt-1">
+                    <P>{format(new Date(data.dueDate), "PPP p")}</P>
+                  </div>
+                </div>
+                {canEdit && (
+                  <Button
+                    variant="link"
+                    className="opacity-0 group-hover:opacity-100"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setEditField("dueDate");
+                    }}
+                  >
+                    Edit
+                  </Button>
+                )}
+              </div>
+            )}
+            {data.estimatedTime && (
+              <div className="group flex items-center justify-between">
+                <div className="flex w-full flex-col items-start">
+                  <div className="flex space-x-1 text-muted-foreground">
+                    <Timer className="h-5 w-5" />
+                    <P className="font-semibold tracking-tight">
+                      Estimated Time:
+                    </P>
+                  </div>
+                  <div className="w-full pl-5 pt-1">
+                    <P>{`${data.estimatedTime} hours`}</P>
+                  </div>
+                </div>
+              </div>
+            )}
+            {requestStatus === "APPROVED" && (
+              <>
+                <div className="group flex items-center justify-between">
+                  <div className="flex w-full flex-col items-start">
+                    <div className="flex space-x-1 text-muted-foreground">
+                      <Circle className="h-5 w-5" />
+                      <P className="font-semibold tracking-tight">
+                        Job Status:
+                      </P>
+                    </div>
+                    <div className="w-full pl-5 pt-1">
+                      <Badge
+                        variant={JobStatusColor.variant}
+                        className="pr-3.5"
+                      >
+                        <Dot
+                          className="mr-1 size-3"
+                          strokeWidth={JobStatusColor.stroke}
+                          color={JobStatusColor.color}
+                        />
+                        {textTransform(data.status)}
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+                <div className="group flex items-center justify-between">
+                  <div className="flex w-full flex-col items-start">
+                    <div className="flex space-x-1 text-muted-foreground">
+                      <Clock className="h-5 w-5" />
+                      <P className="font-semibold tracking-tight">
+                        Start Date/Time:
+                      </P>
+                    </div>
+                    <div className="w-full pl-5 pt-1">
+                      <P>
+                        {data.startDate
+                          ? format(new Date(data.startDate), "PPP p")
+                          : "-"}
+                      </P>
+                    </div>
+                  </div>
+                </div>
+                <div className="group flex items-center justify-between">
+                  <div className="flex w-full flex-col items-start">
+                    <div className="flex space-x-1 text-muted-foreground">
+                      <Clock className="h-5 w-5" />
+                      <P className="font-semibold tracking-tight">
+                        End Date/Time:
+                      </P>
+                    </div>
+                    <div className="w-full pl-5 pt-1">
+                      <P>
+                        {data.endDate
+                          ? format(new Date(data.endDate), "PPP p")
+                          : "-"}
+                      </P>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+            {editField === "description" ? (
+              <EditInput
+                isPending={isPending}
+                isFieldsDirty={isFieldsDirty}
+                setEditField={setEditField}
+                label="Job Description"
+              >
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Textarea
+                          rows={1}
+                          maxRows={7}
+                          minRows={3}
+                          placeholder="Job description..."
+                          className="text-sm"
+                          disabled={isPending}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </EditInput>
+            ) : (
+              <div className="group flex items-center justify-between">
+                <div className="flex w-full flex-col items-start">
+                  <div className="flex space-x-1 text-muted-foreground">
+                    <MapPin className="h-5 w-5" />
+                    <P className="font-semibold tracking-tight">
+                      Job Description:
+                    </P>
+                  </div>
+                  <div className="w-full pl-5 pt-1">
+                    <P>{data.description}</P>
+                  </div>
+                </div>
+                {canEdit && (
+                  <Button
+                    variant="link"
+                    className="opacity-0 group-hover:opacity-100"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setEditField("description");
+                    }}
+                  >
+                    Edit
+                  </Button>
+                )}
+              </div>
+            )}
+          </form>
+        </Form>
         <PhotoProvider
           speed={() => 300}
-          maskOpacity={0.5}
+          maskOpacity={0.8}
           loadingElement={<LoadingSpinner />}
           toolbarRender={({ onScale, scale, rotate, onRotate }) => {
             return (

@@ -219,20 +219,21 @@ model VenueRequest {
 }
 
 model Venue {
-  id           String         @id
-  name         String
-  location     String
-  capacity     Int
-  imageUrl     String
-  venueType    VenueType
-  features     Json?
-  isArchived   Boolean        @default(false)
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
-  status       VenueStatus    @default(AVAILABLE)
-  departmentId String
-  department   Department     @relation(fields: [departmentId], references: [id])
-  requests     VenueRequest[]
+  id                  String         @id
+  name                String
+  location            String
+  capacity            Int
+  imageUrl            String
+  venueType           VenueType
+  rulesAndRegulations String?
+  features            Json?
+  isArchived          Boolean        @default(false)
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+  status              VenueStatus    @default(AVAILABLE)
+  departmentId        String
+  department          Department     @relation(fields: [departmentId], references: [id])
+  requests            VenueRequest[]
 }
 
 model ReturnableRequest {

@@ -171,35 +171,41 @@ export function getUsersColumns(): ColumnDef<UserType>[] {
         return (
           <>
             <div className="flex max-w-[15vw] flex-wrap gap-2">
-              {row.original.userDepartments.map((userDepartment) => (
-                <Badge
-                  key={userDepartment.department.id}
-                  variant="outline"
-                  className="relative"
-                  onMouseEnter={() =>
-                    setHoveredDepartment(userDepartment.department.id)
-                  }
-                  onMouseLeave={() => setHoveredDepartment(null)}
-                >
-                  {userDepartment.department.name}
-                  {hoveredDepartment === userDepartment.department.id && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="absolute -right-1 -top-1 h-4 w-4 rounded-full p-0"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleRemoveDepartment({
-                          id: userDepartment.id,
-                          name: userDepartment.department.name,
-                        });
-                      }}
+              {row.original.userDepartments.length > 0 ? (
+                <>
+                  {row.original.userDepartments.map((userDepartment) => (
+                    <Badge
+                      key={userDepartment.department.id}
+                      variant="outline"
+                      className="relative"
+                      onMouseEnter={() =>
+                        setHoveredDepartment(userDepartment.department.id)
+                      }
+                      onMouseLeave={() => setHoveredDepartment(null)}
                     >
-                      <X className="h-3 w-3" />
-                    </Button>
-                  )}
-                </Badge>
-              ))}
+                      {userDepartment.department.name}
+                      {hoveredDepartment === userDepartment.department.id && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="absolute -right-1 -top-1 h-4 w-4 rounded-full p-0"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRemoveDepartment({
+                              id: userDepartment.id,
+                              name: userDepartment.department.name,
+                            });
+                          }}
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      )}
+                    </Badge>
+                  ))}
+                </>
+              ) : (
+                <p>-</p>
+              )}
             </div>
             <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
               <AlertDialogContent>

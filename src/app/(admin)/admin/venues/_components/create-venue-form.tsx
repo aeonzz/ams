@@ -49,6 +49,7 @@ import CreateVenueFormSkeleton from "./create-venue-form-skeleton";
 import { P } from "@/components/typography/text";
 import { Textarea } from "@/components/ui/text-area";
 import VenueFeatures from "./venue-features";
+import { TagInput } from "@/components/ui/tag-input";
 
 interface CreateVenueFormProps {
   setAlertOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -77,9 +78,6 @@ export default function CreateVenueForm({
   const pathname = usePathname();
   const queryClient = useQueryClient();
   const [open, setOpen] = React.useState(false);
-  const [featuresError, setFeaturesError] = React.useState<string | undefined>(
-    undefined
-  );
   const [venueType, setVenueType] = React.useState(false);
 
   const { data, isLoading } = useQuery<Department[]>({
@@ -93,9 +91,6 @@ export default function CreateVenueForm({
   const { uploadFiles, progresses, isUploading } = useUploadFile();
 
   async function onSubmit(values: CreateVenueSchema) {
-    if (featuresError) {
-      return;
-    }
     try {
       let uploadedFilesResult: { filePath: string }[] = [];
 
@@ -114,7 +109,7 @@ export default function CreateVenueForm({
         ),
       };
       toast.promise(mutateAsync(data), {
-        loading: "Submitting...",
+        loading: "Creating...",
         success: () => {
           queryClient.invalidateQueries({
             queryKey: queryKey,
@@ -184,7 +179,7 @@ export default function CreateVenueForm({
               render={({ field }) => (
                 <FormItem className="flex-1">
                   <FormLabel>Venue type</FormLabel>
-                  <Popover open={venueType} onOpenChange={setVenueType}>
+                  <Popover open={venueType} onOpenChange={setVenueType} modal>
                     <PopoverTrigger asChild>
                       <FormControl>
                         <Button
@@ -244,13 +239,13 @@ export default function CreateVenueForm({
                 render={({ field }) => (
                   <FormItem className="flex-1">
                     <FormLabel>Assign Managing Department</FormLabel>
-                    <Popover open={open} onOpenChange={setOpen}>
+                    <Popover open={open} onOpenChange={setOpen} modal>
                       <PopoverTrigger asChild>
                         <FormControl>
                           <Button
                             variant="outline"
                             role="combobox"
-                            disabled={isLoading || isPending}
+                            disabled={isLoading || isPending || isUploading}
                             className="w-full flex-1 justify-between text-muted-foreground"
                           >
                             {field.value ? (
@@ -336,12 +331,18 @@ export default function CreateVenueForm({
             control={form.control}
             name="features"
             render={({ field }) => (
-              <VenueFeatures
-                field={field}
-                disabled={isPending || isUploading}
-                error={featuresError}
-                setError={setFeaturesError}
-              />
+              <FormItem className="flex flex-grow flex-col">
+                <FormLabel className="text-left">Features</FormLabel>
+                <FormControl>
+                  <TagInput
+                    placeholder="Enter one or more feature"
+                    disabled={isPending || isUploading}
+                    value={field.value || []}
+                    onChange={field.onChange}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
             )}
           />
           <FormField
@@ -358,6 +359,26 @@ export default function CreateVenueForm({
                     maxSize={4 * 1024 * 1024}
                     progresses={progresses}
                     disabled={isPending || isUploading}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="rulesAndRegulations"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Rules and Regulations</FormLabel>
+                <FormControl>
+                  <Textarea
+                    rows={1}
+                    maxRows={15}
+                    minRows={10}
+                    placeholder="Rules and Regulations..."
+                    disabled={isUploading || isPending}
+                    {...field}
                   />
                 </FormControl>
                 <FormMessage />

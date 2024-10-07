@@ -20,6 +20,7 @@ export const VenueSchema = z.object({
   location: z.string(),
   capacity: z.number().int(),
   imageUrl: z.string(),
+  rulesAndRegulations: z.string().nullable(),
   features: JsonValueSchema.nullable(),
   isArchived: z.boolean(),
   createdAt: z.coerce.date(),

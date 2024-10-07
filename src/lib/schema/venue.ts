@@ -12,6 +12,7 @@ export const createVenueSchemaServer = z.object({
   capacity: z.number(),
   venueType: VenueTypeSchema,
   features: z.array(z.string()).optional(),
+  rulesAndRegulations: z.string().optional(),
   imageUrl: z.array(
     z.string({
       required_error: "Image is required",

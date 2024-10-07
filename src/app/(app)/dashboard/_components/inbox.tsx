@@ -13,6 +13,7 @@ import {
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import { P } from "@/components/typography/text";
+import Chat from "./chat";
 
 export default function Inbox() {
   return (
@@ -41,6 +42,7 @@ export default function Inbox() {
         </DropdownMenu>
       </div>
       <div className="flex h-full items-center justify-center">
+        <Chat />
         <div className="flex flex-col items-center space-y-3">
           <InboxIcon className="size-16" strokeWidth={1} />
           <P className="text-muted-foreground">No notifications</P>

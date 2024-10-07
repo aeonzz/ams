@@ -14,8 +14,8 @@ import path from "path";
 import {
   extendedJobRequestSchema,
   extendedTransportRequestSchema,
-  extendedUpdateJobRequestSchema,
   extendedVenueRequestSchema,
+  updateJobRequestSchemaServerWithPath,
   updateTransportRequestSchemaWithPath,
 } from "../schema/request";
 import { checkAuth } from "../auth/utils";
@@ -552,15 +552,36 @@ export async function getCancelledRequests(input: GetRequestsSchema) {
   }
 }
 
-export const updateRequest = authedProcedure
+// export const updateRequest = authedProcedure
+//   .createServerAction()
+//   .input(extendedUpdateJobRequestSchema)
+//   .handler(async ({ input }) => {
+//     const { path, id, ...rest } = input;
+//     try {
+//       const result = await db.request.update({
+//         where: {
+//           id: id,
+//         },
+//         data: {
+//           ...rest,
+//         },
+//       });
+
+//       return revalidatePath(path);
+//     } catch (error) {
+//       getErrorMessage(error);
+//     }
+//   });
+
+export const updateTransportRequest = authedProcedure
   .createServerAction()
-  .input(extendedUpdateJobRequestSchema)
+  .input(updateTransportRequestSchemaWithPath)
   .handler(async ({ input }) => {
     const { path, id, ...rest } = input;
     try {
-      const result = await db.request.update({
+      const result = await db.transportRequest.update({
         where: {
-          id: id,
+          requestId: id,
         },
         data: {
           ...rest,
@@ -573,13 +594,13 @@ export const updateRequest = authedProcedure
     }
   });
 
-export const updateTransportRequest = authedProcedure
+export const updateJobRequest = authedProcedure
   .createServerAction()
-  .input(updateTransportRequestSchemaWithPath)
+  .input(updateJobRequestSchemaServerWithPath)
   .handler(async ({ input }) => {
     const { path, id, ...rest } = input;
     try {
-      const result = await db.transportRequest.update({
+      const result = await db.jobRequest.update({
         where: {
           requestId: id,
         },

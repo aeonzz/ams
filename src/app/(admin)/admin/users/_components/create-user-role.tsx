@@ -44,7 +44,7 @@ export default function CreateUserRole({ userId }: CreateUserRoleProps) {
 
   const { data, isLoading } = useQuery<RoleDepartmentData>({
     queryFn: async () => {
-      const res = await axios.get("/api/input-data/role-department");
+      const res = await axios.get(`/api/input-data/role-department/${userId}`);
       return res.data.data;
     },
     queryKey: ["create-user-role-selection-user-table"],

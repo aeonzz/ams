@@ -123,6 +123,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                 requestId={data.id}
                 cancellationReason={data.cancellationReason}
                 requestStatus={data.status}
+                isCurrentUser={currentUser.id === data.userId}
               />
             )}
             {data.type === "VENUE" && data.venueRequest && (
