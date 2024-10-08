@@ -19,6 +19,8 @@ export default function Home() {
       socket.io.engine.on("upgrade", (transport) => {
         setTransport(transport.name);
       });
+
+      console.log("fuck");
     }
 
     function onDisconnect() {
@@ -28,6 +30,10 @@ export default function Home() {
 
     socket.on("connect", onConnect);
     socket.on("disconnect", onDisconnect);
+    socket.on("hello", (arg, callback) => {
+      console.log(arg); // "world"
+      callback("got it");
+    });
 
     return () => {
       socket.off("connect", onConnect);
@@ -39,6 +45,13 @@ export default function Home() {
     <div>
       <p>Status: {isConnected ? "connected" : "disconnected"}</p>
       <p>Transport: {transport}</p>
+      <button
+        onClick={() => {
+          socket.emit("hello", "world");
+        }}
+      >
+        ahaa
+      </button>
     </div>
   );
 }

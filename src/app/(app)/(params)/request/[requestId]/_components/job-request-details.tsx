@@ -101,6 +101,7 @@ import {
 } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { Textarea } from "@/components/ui/text-area";
+import { socket } from "@/app/socket";
 
 interface JobRequestDetailsProps {
   data: JobRequestWithRelations;
@@ -159,6 +160,7 @@ export default function JobRequestDetails({
           queryClient.invalidateQueries({
             queryKey: [requestId],
           });
+          socket.emit("request_update", requestId);
           form.reset({
             jobType: data.jobType,
             location: data.location,
@@ -273,7 +275,6 @@ export default function JobRequestDetails({
   }, [editField]);
 
   const canEdit = requestStatus === "PENDING" && isCurrentUser;
-
 
   return (
     <>

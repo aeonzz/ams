@@ -64,6 +64,7 @@ import EditInput from "./edit-input";
 import { TagInput } from "@/components/ui/tag-input";
 import EditTimeInput from "./edit-time-input";
 import type { RequestStatusTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestStatusTypeSchema";
+import { socket } from "@/app/socket";
 
 interface TransportRequestDetailsProps {
   data: TransportRequestWithRelations;
@@ -123,6 +124,7 @@ export default function TransportRequestDetails({
           queryClient.invalidateQueries({
             queryKey: [requestId],
           });
+          socket.emit("request_update", requestId);
           form.reset({
             department: data.department,
             description: data.description,

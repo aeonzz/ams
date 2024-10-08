@@ -7,6 +7,7 @@ import {
 import axios from "axios";
 import { RequestWithRelations } from "prisma/generated/zod";
 import { useEffect } from "react";
+import { socket } from "@/app/socket";
 
 interface RequestState {
   request: RequestWithRelations | null;
@@ -26,6 +27,16 @@ export function useRequest(id: string): UseQueryResult<
 } {
   const queryClient = useQueryClient();
   const { request: globalRequest, setRequest } = useRequestStore();
+
+  useEffect(() => {
+    socket.on("request_update", () => {
+      queryClient.invalidateQueries({ queryKey: [id] });
+    });
+
+    return () => {
+      socket.off("request_update");
+    };
+  }, [queryClient, id]);
 
   useEffect(() => {
     const ws = new WebSocket("ws://localhost:8080");
