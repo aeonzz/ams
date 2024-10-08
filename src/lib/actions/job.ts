@@ -14,6 +14,7 @@ import {
   updateJobRequestSchemaWithPath,
   updateRequestStatusSchemaWithPath,
 } from "@/app/(app)/(params)/request/[requestId]/_components/schema";
+import { createNotification } from "./notification";
 
 export const createJobRequest = authedProcedure
   .createServerAction()
@@ -85,6 +86,7 @@ export const createJobRequest = authedProcedure
         },
         include: {
           jobRequest: true,
+          department: true,
         },
       });
 
@@ -102,6 +104,13 @@ export const createJobRequest = authedProcedure
           newValue: newValueJson,
           changedById: user.id,
         },
+      });
+
+      await createNotification({
+        resourceId: createRequest.id,
+        title: "New Job Request",
+        message: `There is a new job request for ${createRequest.department.name}}`,
+        departmentId: rest.departmentId,
       });
 
       return revalidatePath(path);
@@ -161,6 +170,13 @@ export const assignPersonnel = authedProcedure
             newValue: newValueJson,
             changedById: user.id,
           },
+        });
+
+        await createNotification({
+          resourceId: `/notification/${updatedRequest.id}`,
+          title: `New Job Assignment: ${updatedRequest.title}`,
+          message: `You have been assigned to a new job: ${updatedRequest.title}. Please review the details and take the necessary actions.`,
+          userId: rest.personnelId,
         });
 
         return updatedRequest;

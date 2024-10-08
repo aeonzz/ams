@@ -7,6 +7,7 @@ import type { UserDepartmentWithRelations } from './UserDepartmentSchema'
 import type { RequestWithRelations } from './RequestSchema'
 import type { VenueWithRelations } from './VenueSchema'
 import type { VehicleWithRelations } from './VehicleSchema'
+import type { NotificationWithRelations } from './NotificationSchema'
 import { UserRoleWithRelationsSchema } from './UserRoleSchema'
 import { InventoryItemWithRelationsSchema } from './InventoryItemSchema'
 import { ReturnableRequestWithRelationsSchema } from './ReturnableRequestSchema'
@@ -14,6 +15,7 @@ import { UserDepartmentWithRelationsSchema } from './UserDepartmentSchema'
 import { RequestWithRelationsSchema } from './RequestSchema'
 import { VenueWithRelationsSchema } from './VenueSchema'
 import { VehicleWithRelationsSchema } from './VehicleSchema'
+import { NotificationWithRelationsSchema } from './NotificationSchema'
 
 /////////////////////////////////////////
 // DEPARTMENT SCHEMA
@@ -46,6 +48,7 @@ export type DepartmentRelations = {
   request: RequestWithRelations[];
   venue: VenueWithRelations[];
   vehicle: VehicleWithRelations[];
+  Notification: NotificationWithRelations[];
 };
 
 export type DepartmentWithRelations = z.infer<typeof DepartmentSchema> & DepartmentRelations
@@ -58,6 +61,7 @@ export const DepartmentWithRelationsSchema: z.ZodType<DepartmentWithRelations> =
   request: z.lazy(() => RequestWithRelationsSchema).array(),
   venue: z.lazy(() => VenueWithRelationsSchema).array(),
   vehicle: z.lazy(() => VehicleWithRelationsSchema).array(),
+  Notification: z.lazy(() => NotificationWithRelationsSchema).array(),
 }))
 
 export default DepartmentSchema;

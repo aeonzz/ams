@@ -7,6 +7,7 @@ export { RoleScalarFieldEnumSchema } from './RoleScalarFieldEnumSchema';
 export { SessionScalarFieldEnumSchema } from './SessionScalarFieldEnumSchema';
 export { FileScalarFieldEnumSchema } from './FileScalarFieldEnumSchema';
 export { SettingScalarFieldEnumSchema } from './SettingScalarFieldEnumSchema';
+export { NotificationScalarFieldEnumSchema } from './NotificationScalarFieldEnumSchema';
 export { RequestScalarFieldEnumSchema } from './RequestScalarFieldEnumSchema';
 export { GenericAuditLogScalarFieldEnumSchema } from './GenericAuditLogScalarFieldEnumSchema';
 export { JobRequestScalarFieldEnumSchema } from './JobRequestScalarFieldEnumSchema';

@@ -7,6 +7,7 @@ import type { JobRequestWithRelations } from './JobRequestSchema'
 import type { VenueRequestWithRelations } from './VenueRequestSchema'
 import type { GenericAuditLogWithRelations } from './GenericAuditLogSchema'
 import type { UserDepartmentWithRelations } from './UserDepartmentSchema'
+import type { NotificationWithRelations } from './NotificationSchema'
 import { SessionWithRelationsSchema } from './SessionSchema'
 import { SettingWithRelationsSchema } from './SettingSchema'
 import { RequestWithRelationsSchema } from './RequestSchema'
@@ -15,6 +16,7 @@ import { JobRequestWithRelationsSchema } from './JobRequestSchema'
 import { VenueRequestWithRelationsSchema } from './VenueRequestSchema'
 import { GenericAuditLogWithRelationsSchema } from './GenericAuditLogSchema'
 import { UserDepartmentWithRelationsSchema } from './UserDepartmentSchema'
+import { NotificationWithRelationsSchema } from './NotificationSchema'
 
 /////////////////////////////////////////
 // USER SCHEMA
@@ -51,6 +53,7 @@ export type UserRelations = {
   venueRequest: VenueRequestWithRelations[];
   genericAuditLog: GenericAuditLogWithRelations[];
   userDepartments: UserDepartmentWithRelations[];
+  notification: NotificationWithRelations[];
 };
 
 export type UserWithRelations = z.infer<typeof UserSchema> & UserRelations
@@ -65,6 +68,7 @@ export const UserWithRelationsSchema: z.ZodType<UserWithRelations> = UserSchema.
   venueRequest: z.lazy(() => VenueRequestWithRelationsSchema).array(),
   genericAuditLog: z.lazy(() => GenericAuditLogWithRelationsSchema).array(),
   userDepartments: z.lazy(() => UserDepartmentWithRelationsSchema).array(),
+  notification: z.lazy(() => NotificationWithRelationsSchema).array(),
 }))
 
 export default UserSchema;

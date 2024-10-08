@@ -6,6 +6,7 @@ export * from './RoleSchema';
 export * from './SessionSchema';
 export * from './FileSchema';
 export * from './SettingSchema';
+export * from './NotificationSchema';
 export * from './RequestSchema';
 export * from './GenericAuditLogSchema';
 export * from './JobRequestSchema';

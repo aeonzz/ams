@@ -2,18 +2,26 @@
 
 import React from "react";
 
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { useSession } from "@/lib/hooks/use-session";
 import Inbox from "./inbox";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { CirclePlus } from "lucide-react";
+import { CirclePlus, SlidersHorizontal } from "lucide-react";
 import { H1, H2, H3, P } from "@/components/typography/text";
 import PendingRequest from "./pending-requests";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import UserRequestOverview from "./user-request-overview";
 import SearchInput from "../../_components/search-input";
-import { formatFullName } from "@/lib/utils";
+import { cn, formatFullName } from "@/lib/utils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function DashboardScreen() {
   const currentUser = useSession();
@@ -51,7 +59,34 @@ export default function DashboardScreen() {
         </div>
       </div>
       <Separator orientation="vertical" className="h-full" />
-      <Inbox />
+      <div className="w-[30%]">
+        <div className="flex h-[50px] items-center justify-between border-b px-3">
+          <P className="font-medium">Notification</P>
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              className={cn(
+                buttonVariants({ variant: "ghost2", size: "icon" })
+              )}
+            >
+              <SlidersHorizontal className="size-5" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="end"
+              sideOffset={10}
+              loop
+              onCloseAutoFocus={(e) => e.preventDefault()}
+            >
+              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>Profile</DropdownMenuItem>
+              <DropdownMenuItem>Billing</DropdownMenuItem>
+              <DropdownMenuItem>Team</DropdownMenuItem>
+              <DropdownMenuItem>Subscription</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+        <Inbox />
+      </div>
     </div>
   );
 }
