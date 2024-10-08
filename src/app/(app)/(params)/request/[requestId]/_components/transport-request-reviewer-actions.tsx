@@ -15,7 +15,7 @@ import {
 import { FolderKanban } from "lucide-react";
 import type { RequestWithRelations } from "prisma/generated/zod";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
-import { updateJobRequestStatus } from "@/lib/actions/job";
+import { updateRequestStatus } from "@/lib/actions/job";
 import { UpdateRequestStatusSchemaWithPath } from "./schema";
 import {
   Tooltip,
@@ -72,7 +72,7 @@ export default function TransportRequestReviewerActions({
   const [cancellationReason, setCancellationReason] = React.useState("");
 
   const { mutateAsync: updateStatusMutate, isPending: isUpdateStatusPending } =
-    useServerActionMutation(updateJobRequestStatus);
+    useServerActionMutation(updateRequestStatus);
 
   useHotkeys(
     "m",

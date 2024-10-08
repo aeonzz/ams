@@ -173,7 +173,7 @@ export const assignPersonnel = authedProcedure
     }
   });
 
-export const updateJobRequestStatus = authedProcedure
+export const updateRequestStatus = authedProcedure
   .createServerAction()
   .input(updateRequestStatusSchemaWithPath)
   .handler(async ({ ctx, input }) => {

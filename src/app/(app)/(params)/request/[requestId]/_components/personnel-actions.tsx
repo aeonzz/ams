@@ -31,6 +31,7 @@ import type { JobRequestWithRelations } from "prisma/generated/zod";
 import { CommandShortcut } from "@/components/ui/command";
 import { P } from "@/components/typography/text";
 import { type JobStatusType } from "prisma/generated/zod/inputTypeSchemas/JobStatusSchema";
+import { socket } from "@/app/socket";
 
 interface PersonnelActionsProps {
   allowedDepartment?: string;
@@ -77,6 +78,7 @@ export default function PersonnelActions({
         success: () => {
           queryClient.invalidateQueries({ queryKey: [requestId] });
           queryClient.invalidateQueries({ queryKey: ["activity", requestId] });
+          socket.emit("request_update", requestId);
           return `Job request is now ${status.toLowerCase().replace("_", " ")}`;
         },
         error: (err) => {

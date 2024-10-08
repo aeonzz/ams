@@ -5,12 +5,13 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import type { RequestWithRelations } from "prisma/generated/zod";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
-import { updateJobRequestStatus } from "@/lib/actions/job";
+import { updateRequestStatus } from "@/lib/actions/job";
 import { UpdateRequestStatusSchemaWithPath } from "./schema";
 import { usePathname } from "next/navigation";
 import { toast } from "sonner";
 import { useSession } from "@/lib/hooks/use-session";
 import { type EntityTypeType } from "prisma/generated/zod/inputTypeSchemas/EntityTypeSchema";
+import { socket } from "@/app/socket";
 
 interface RequestApproverActionsProps {
   request: RequestWithRelations;
@@ -28,7 +29,7 @@ export default function RequestApproverActions({
   const queryClient = useQueryClient();
 
   const { mutateAsync: updateStatusMutate, isPending: isUpdateStatusPending } =
-    useServerActionMutation(updateJobRequestStatus);
+    useServerActionMutation(updateRequestStatus);
 
   const handleReview = React.useCallback(
     (action: "APPROVED" | "REJECTED") => {
@@ -53,6 +54,7 @@ export default function RequestApproverActions({
           queryClient.invalidateQueries({
             queryKey: ["activity", request.id],
           });
+          socket.emit("request_update", request.id);
           return `Request ${successText} successfully.`;
         },
         error: (err) => {

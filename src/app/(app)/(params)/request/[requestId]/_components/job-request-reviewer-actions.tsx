@@ -29,7 +29,7 @@ import type {
   UserWithRelations,
 } from "prisma/generated/zod";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
-import { updateJobRequestStatus, assignPersonnel } from "@/lib/actions/job";
+import { updateRequestStatus, assignPersonnel } from "@/lib/actions/job";
 import {
   UpdateRequestStatusSchemaWithPath,
   AssignPersonnelSchemaWithPath,
@@ -67,6 +67,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useHotkeys } from "react-hotkeys-hook";
 import AddEstimatedTime from "./add-estimated-time";
 import { Textarea } from "@/components/ui/text-area";
+import { socket } from "@/app/socket";
 
 interface JobRequestReviewerActionsProps {
   request: RequestWithRelations;
@@ -111,7 +112,7 @@ export default function JobRequestReviewerActions({
   });
 
   const { mutateAsync: updateStatusMutate, isPending: isUpdateStatusPending } =
-    useServerActionMutation(updateJobRequestStatus);
+    useServerActionMutation(updateRequestStatus);
 
   const {
     mutateAsync: assignPersonnelMutate,
@@ -182,6 +183,7 @@ export default function JobRequestReviewerActions({
           queryClient.invalidateQueries({
             queryKey: ["activity", request.id],
           });
+          socket.emit("request_update", request.id);
           setIsCancelAlertOpen(false);
           setCancellationReason("");
           return `Request ${successText} successfully.`;
@@ -228,6 +230,7 @@ export default function JobRequestReviewerActions({
           queryClient.invalidateQueries({
             queryKey: ["activity", request.id],
           });
+          socket.emit("request_update", request.id);
           return "Personnel assigned successfully.";
         },
         error: (err) => {

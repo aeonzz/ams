@@ -46,6 +46,7 @@ import { P } from "../typography/text";
 import { Info } from "lucide-react";
 import { toast } from "sonner";
 import { usePathname } from "next/navigation";
+import { socket } from "@/app/socket";
 
 const surveyQuestions = [
   "SQ0: I am satisfied with the service that I availed.",
@@ -138,6 +139,7 @@ export default function JobRequestEvaluationForm({
           queryClient.invalidateQueries({
             queryKey: [requestId],
           });
+          socket.emit("request_update", requestId);
           handleOpenChange(false);
           return "Thank you! Your evaluation has been successfully submitted.";
         },

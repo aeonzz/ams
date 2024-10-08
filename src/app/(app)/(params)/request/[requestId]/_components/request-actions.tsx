@@ -24,37 +24,42 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { updateRequest } from "@/lib/actions/requests";
-import { type ExtendedUpdateJobRequestSchema } from "@/lib/schema/request";
 import { type RequestWithRelations } from "prisma/generated/zod";
 import { CommandShortcut } from "@/components/ui/command";
 import { P } from "@/components/typography/text";
 import { useHotkeys } from "react-hotkeys-hook";
+import { updateRequestStatus } from "@/lib/actions/job";
+import { type UpdateRequestStatusSchemaWithPath } from "./schema";
+import { EntityTypeType } from "prisma/generated/zod/inputTypeSchemas/EntityTypeSchema";
+import { socket } from "@/app/socket";
 
 interface RequestActionsProps {
   data: RequestWithRelations;
   params: string;
+  entityType: EntityTypeType;
 }
 
-export default function RequestActions({ data, params }: RequestActionsProps) {
+export default function RequestActions({
+  data,
+  params,
+  entityType,
+}: RequestActionsProps) {
   const pathname = usePathname();
   const queryClient = useQueryClient();
-  const { mutateAsync, isPending } = useServerActionMutation(updateRequest);
+  const { mutateAsync, isPending } =
+    useServerActionMutation(updateRequestStatus);
 
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
 
   function handleCancellation() {
-    const values: ExtendedUpdateJobRequestSchema = {
-      id: data.id,
+    const values: UpdateRequestStatusSchemaWithPath = {
+      requestId: data.id,
       path: pathname,
+      changeType: "CANCELLED",
+
+      entityType: entityType,
       status: "CANCELLED",
     };
-
-    // Optimistic update
-    queryClient.setQueryData([params], (oldData: RequestWithRelations) => ({
-      ...oldData,
-      status: "CANCELLED",
-    }));
 
     toast.promise(mutateAsync(values), {
       loading: "Cancelling...",
@@ -68,6 +73,7 @@ export default function RequestActions({ data, params }: RequestActionsProps) {
         queryClient.invalidateQueries({
           queryKey: ["user-dashboard-overview"],
         });
+        socket.emit("request_update", data.id);
         setIsDialogOpen(false);
         return "Request cancelled successfully";
       },

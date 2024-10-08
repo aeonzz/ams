@@ -274,7 +274,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
         <Separator className="my-6" />
         <div className="flex flex-col gap-3">
           {currentUser.id === data.userId && (
-            <RequestActions data={data} params={params} />
+            <RequestActions data={data} params={params} entityType="OTHER" />
           )}
           {data.type === "JOB" &&
             data.jobRequest &&
