@@ -50,7 +50,7 @@ export const updateJobRequestSchema = z.object({
   estimatedTime: z.number().optional(),
   status: JobStatusSchema.optional(),
   startDate: z.date().optional(),
-  endDate: z.string().optional(),
+  endDate: z.date().optional(),
   jobType: JobTypeSchema.optional(),
   progressNotes: z.string().optional(),
 });
@@ -61,3 +61,24 @@ export const updateJobRequestSchemaWithPath = updateJobRequestSchema.extend({
   path: z.string(),
   requestId: z.string(),
 });
+
+export const reworkJobRequestSchema = z.object({
+  id: z.string(),
+  rejectionReason: z.string(),
+  status: JobStatusSchema,
+});
+
+export type ReworkJobRequestSchema = z.infer<typeof reworkJobRequestSchema>;
+
+export const updateReworkJobRequestSchema = z.object({
+  requestId: z.string(),
+  startDate: z.date().optional(),
+  endDate: z.date().optional(),
+  reworkStartDate: z.date().optional(),
+  reworkEndDate: z.date().optional(),
+  status: JobStatusSchema,
+});
+
+export type UpdateReworkJobRequestSchema = z.infer<
+  typeof updateReworkJobRequestSchema
+>;

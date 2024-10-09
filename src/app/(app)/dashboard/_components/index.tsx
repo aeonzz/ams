@@ -58,7 +58,7 @@ export default function DashboardScreen() {
           <UserRequestOverview />
         </div>
       </div>
-      <Separator orientation="vertical" className="h-full" />
+      {/* <Separator orientation="vertical" className="h-full" />
       <div className="w-[30%]">
         <div className="flex h-[50px] items-center justify-between border-b px-3">
           <P className="font-medium">Notification</P>
@@ -86,7 +86,7 @@ export default function DashboardScreen() {
           </DropdownMenu>
         </div>
         <Inbox />
-      </div>
+      </div> */}
     </div>
   );
 }

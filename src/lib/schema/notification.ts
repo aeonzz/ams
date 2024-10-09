@@ -18,3 +18,11 @@ export const updateNotificationStatusSchema = z.object({
 export type UpdateNotificationStatusSchema = z.infer<
   typeof updateNotificationStatusSchema
 >;
+
+export const deleteNotificationStatusSchema = z.object({
+  notificationId: z.string(),
+});
+
+export type DeleteNotificationStatusSchema = z.infer<
+  typeof deleteNotificationStatusSchema
+>;

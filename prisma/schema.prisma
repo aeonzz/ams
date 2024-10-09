@@ -144,7 +144,7 @@ model Notification {
   readAt       DateTime?
   updatedAt    DateTime    @updatedAt
 
-  @@index([userId, isRead])          
+  @@index([userId, isRead])
   @@index([departmentId, isRead])
 }
 
@@ -195,6 +195,8 @@ model JobRequest {
   actualCost           Float?
   jobType              JobType
   files                File[]
+  reworkAttempts       Rework[]
+  priority             PriorityType          @default(NO_PRIORITY)
   requestId            String                @unique
   request              Request               @relation(fields: [requestId], references: [id], onDelete: Cascade)
   status               JobStatus             @default(PENDING)
@@ -203,6 +205,17 @@ model JobRequest {
   createdAt            DateTime              @default(now())
   updatedAt            DateTime              @updatedAt
   jobRequestEvaluation JobRequestEvaluation?
+}
+
+model Rework {
+  id              String     @id
+  jobRequestId    String
+  jobRequest      JobRequest @relation(fields: [jobRequestId], references: [id], onDelete: Cascade)
+  reworkStartDate DateTime?
+  reworkEndDate   DateTime?
+  rejectionReason String
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
 }
 
 model JobRequestEvaluation {
@@ -379,6 +392,9 @@ enum JobStatus {
   COMPLETED
   ON_HOLD
   CANCELLED
+  REJECTED
+  REWORK_IN_PROGRESS
+  VERIFIED
 }
 
 enum ChangeType {

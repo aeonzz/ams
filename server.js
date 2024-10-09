@@ -24,6 +24,13 @@ app.prepare().then(() => {
       // Broadcast the event to all clients (or specific clients if needed)
       io.emit("request_update", requestId);
     });
+
+    socket.on("notifications", () => {
+      console.log("Notification sent:");
+
+      io.emit("notifications");
+    });
+
     socket.on("disconnect", () => {
       console.log("user disconnected");
     });

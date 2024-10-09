@@ -29,7 +29,11 @@ import type {
   UserWithRelations,
 } from "prisma/generated/zod";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
-import { updateRequestStatus, assignPersonnel } from "@/lib/actions/job";
+import {
+  updateRequestStatus,
+  assignPersonnel,
+  updateJobRequest,
+} from "@/lib/actions/job";
 import {
   UpdateRequestStatusSchemaWithPath,
   AssignPersonnelSchemaWithPath,
@@ -68,6 +72,7 @@ import { useHotkeys } from "react-hotkeys-hook";
 import AddEstimatedTime from "./add-estimated-time";
 import { Textarea } from "@/components/ui/text-area";
 import { socket } from "@/app/socket";
+import RejectJob from "./reject-job";
 
 interface JobRequestReviewerActionsProps {
   request: RequestWithRelations;
@@ -119,6 +124,9 @@ export default function JobRequestReviewerActions({
     isPending: isAssignPersonnelPending,
   } = useServerActionMutation(assignPersonnel);
 
+  const { isPending: isPendingMutation, mutateAsync } =
+    useServerActionMutation(updateJobRequest);
+
   useHotkeys(
     "m",
     (event) => {
@@ -133,7 +141,7 @@ export default function JobRequestReviewerActions({
   }, [request.jobRequest?.assignedTo]);
 
   const handleReview = React.useCallback(
-    (action: "REVIEWED" | "REJECTED" | "COMPLETED" | "CANCELLED") => {
+    async (action: "REVIEWED" | "REJECTED" | "COMPLETED" | "CANCELLED") => {
       const data: UpdateRequestStatusSchemaWithPath = {
         path: pathname,
         requestId: request.id,
@@ -174,30 +182,40 @@ export default function JobRequestReviewerActions({
               ? "completed"
               : "cancelled";
 
-      toast.promise(updateStatusMutate(data), {
-        loading: `${actionText} request...`,
-        success: () => {
-          queryClient.invalidateQueries({
-            queryKey: [request.id],
+      try {
+        toast.promise(updateStatusMutate(data), {
+          loading: `${actionText} request...`,
+          success: `Request ${successText} successfully.`,
+          error: `Failed to ${action.toLowerCase()} request. Please try again.`,
+        });
+
+        if (action === "COMPLETED") {
+          await mutateAsync({
+            path: pathname,
+            status: "VERIFIED",
+            requestId: request.id,
           });
-          queryClient.invalidateQueries({
-            queryKey: ["activity", request.id],
-          });
-          socket.emit("request_update", request.id);
-          setIsCancelAlertOpen(false);
-          setCancellationReason("");
-          return `Request ${successText} successfully.`;
-        },
-        error: (err) => {
-          console.error(err);
-          return `Failed to ${action.toLowerCase()} request. Please try again.`;
-        },
-      });
+        }
+
+        queryClient.invalidateQueries({
+          queryKey: [request.id],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["activity", request.id],
+        });
+        socket.emit("request_update", request.id);
+        socket.emit("notifications");
+        setIsCancelAlertOpen(false);
+        setCancellationReason("");
+      } catch (err) {
+        console.error(err);
+      }
     },
     [
       pathname,
       request.id,
       updateStatusMutate,
+      mutateAsync,
       queryClient,
       currentUser.id,
       currentUser.userRole,
@@ -280,7 +298,7 @@ export default function JobRequestReviewerActions({
     }
 
     return (
-      <Command className="max-h-[250px]">
+      <Command className="h-fit max-h-[250px]">
         <CommandInput placeholder="Search personnel..." />
         <CommandList>
           <CommandEmpty>No personnel found.</CommandEmpty>
@@ -357,8 +375,9 @@ export default function JobRequestReviewerActions({
                 Review and take action on this request.
               </DialogDescription>
             </DialogHeader>
-            <div className="scroll-bar flex max-h-[60vh] flex-col gap-3 overflow-y-auto px-4 py-1">
-              {request.status !== "APPROVED" && <>{renderPersonnelList()}</>}
+            <div className="scroll-bar max-h-[55vh] gap-3 space-y-1 overflow-y-auto px-4 py-1">
+              {request.status !== "APPROVED" &&
+                request.status !== "REJECTED" && <>{renderPersonnelList()}</>}
               <AddEstimatedTime data={request} />
               {request.jobRequest?.assignedUser && (
                 <div>
@@ -462,10 +481,12 @@ export default function JobRequestReviewerActions({
                         <Button
                           className="w-full"
                           disabled={
-                            isUpdateStatusPending || isAssignPersonnelPending
+                            isUpdateStatusPending ||
+                            isAssignPersonnelPending ||
+                            isPendingMutation
                           }
                         >
-                          Complete Request
+                          Verify and Complete Request
                         </Button>
                       </AlertDialogTrigger>
                       <AlertDialogContent>
@@ -486,6 +507,10 @@ export default function JobRequestReviewerActions({
                         </AlertDialogFooter>
                       </AlertDialogContent>
                     </AlertDialog>
+                    <RejectJob
+                      requestId={request.id}
+                      disabled={isUpdateStatusPending || isPendingMutation}
+                    />
                   </>
                 )}
                 {request.status === "REVIEWED" && (

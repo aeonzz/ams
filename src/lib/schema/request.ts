@@ -1,5 +1,6 @@
 import { z } from "zod";
 import {
+  JobStatusSchema,
   JobTypeSchema,
   PriorityTypeSchema,
   RequestStatusTypeSchema,
@@ -213,6 +214,7 @@ export const createJobRequestServer = z.object({
       message: "Due date must be at least 3 days in the future",
     }),
   images: z.array(z.string()).optional(),
+  status: JobStatusSchema.optional(),
 });
 
 export type CreateJobRequestSchemaServer = z.infer<

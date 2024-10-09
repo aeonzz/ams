@@ -12,6 +12,7 @@ interface MenuButtonProps {
   active: boolean;
   isOpen: boolean | undefined;
   href: string;
+  hasUnreadNotifications?: boolean | undefined;
 }
 
 export default function MenuButton({
@@ -20,6 +21,7 @@ export default function MenuButton({
   active,
   isOpen,
   href,
+  hasUnreadNotifications,
 }: MenuButtonProps) {
   return (
     <Button
@@ -32,7 +34,12 @@ export default function MenuButton({
     >
       <Link href={href} prefetch>
         <span className={cn(isOpen === false ? "" : "mr-4")}>
-          <Icon className="size-5" />
+          <div className="relative">
+            {label === "Notifications" && hasUnreadNotifications && (
+              <span className="h-2 w-2 top-0 left-2.5 absolute rounded-full bg-red-500"></span>
+            )}
+            <Icon className="size-5" />
+          </div>
         </span>
         <p
           className={cn(

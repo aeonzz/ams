@@ -5,7 +5,10 @@ import { Form } from "@/components/ui/form";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { DialogFooter } from "@/components/ui/dialog";
-import { type UseMutateAsyncFunction } from "@tanstack/react-query";
+import {
+  useQueryClient,
+  type UseMutateAsyncFunction,
+} from "@tanstack/react-query";
 import { type UseFormReturn } from "react-hook-form";
 import { usePathname } from "next/navigation";
 import {
@@ -50,6 +53,7 @@ export default function AddUserDepartmentsForm({
   userId,
 }: AddUserDepartmentsFormProps) {
   const pathname = usePathname();
+  const queryClient = useQueryClient();
 
   async function onSubmit(values: AddUserDepartmentsSchema) {
     const submitData: AddUserDepartmentsSchemaWithPath = {
@@ -60,6 +64,9 @@ export default function AddUserDepartmentsForm({
     toast.promise(mutateAsync(submitData), {
       loading: "Adding user...",
       success: () => {
+        queryClient.invalidateQueries({
+          queryKey: ["create-user-role-selection-user-table"],
+        });
         setOpen(false);
         return "User added successfully";
       },

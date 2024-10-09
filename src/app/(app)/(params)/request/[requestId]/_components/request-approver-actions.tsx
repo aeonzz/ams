@@ -27,7 +27,7 @@ export default function RequestApproverActions({
   const currentUser = useSession();
   const pathname = usePathname();
   const queryClient = useQueryClient();
-
+  console.log(request);
   const { mutateAsync: updateStatusMutate, isPending: isUpdateStatusPending } =
     useServerActionMutation(updateRequestStatus);
 
@@ -54,7 +54,14 @@ export default function RequestApproverActions({
           queryClient.invalidateQueries({
             queryKey: ["activity", request.id],
           });
+          queryClient.invalidateQueries({
+            queryKey: [
+              "get-user-notifications",
+              request.jobRequest?.assignedTo,
+            ],
+          });
           socket.emit("request_update", request.id);
+          socket.emit("notifications");
           return `Request ${successText} successfully.`;
         },
         error: (err) => {

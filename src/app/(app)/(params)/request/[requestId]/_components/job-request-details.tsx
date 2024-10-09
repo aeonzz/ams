@@ -180,7 +180,6 @@ export default function JobRequestDetails({
       toast.error("An error occurred during update. Please try again.");
     }
   }
-
   const JobStatusColor = getJobStatusColor(data.status);
   const isEvaluated = data.jobRequestEvaluation !== null;
 
@@ -214,31 +213,31 @@ export default function JobRequestDetails({
     });
   };
 
-  const handleDownloadJobRequestForm = async () => {
-    const generateAndDownloadPDF = async () => {
-      try {
-        const pdfBlob = await fillJobRequestFormPDF(data);
-        const url = URL.createObjectURL(pdfBlob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = `job_request_evaluation_${requestId}.pdf`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-        return "PDF downloaded successfully";
-      } catch (error) {
-        console.error("Error generating PDF:", error);
-        throw new Error("Failed to generate PDF");
-      }
-    };
+  // const handleDownloadJobRequestForm = async () => {
+  //   const generateAndDownloadPDF = async () => {
+  //     try {
+  //       const pdfBlob = await fillJobRequestFormPDF(data);
+  //       const url = URL.createObjectURL(pdfBlob);
+  //       const link = document.createElement("a");
+  //       link.href = url;
+  //       link.download = `job_request_evaluation_${requestId}.pdf`;
+  //       document.body.appendChild(link);
+  //       link.click();
+  //       document.body.removeChild(link);
+  //       URL.revokeObjectURL(url);
+  //       return "PDF downloaded successfully";
+  //     } catch (error) {
+  //       console.error("Error generating PDF:", error);
+  //       throw new Error("Failed to generate PDF");
+  //     }
+  //   };
 
-    toast.promise(generateAndDownloadPDF(), {
-      loading: "Generating PDF...",
-      success: (message) => message,
-      error: (err) => `Error: ${err.message}`,
-    });
-  };
+  //   toast.promise(generateAndDownloadPDF(), {
+  //     loading: "Generating PDF...",
+  //     success: (message) => message,
+  //     error: (err) => `Error: ${err.message}`,
+  //   });
+  // };
 
   useHotkeys(
     "ctrl+shift+e",
@@ -782,38 +781,59 @@ export default function JobRequestDetails({
         )}
       </div>
       <Separator className="my-6" />
-      <div className="space-y-4 pb-20">
-        <H4 className="font-semibold">Activity</H4>
-        {isLoading ? (
-          <>
-            {[...Array(2)].map((_, index) => (
-              <div key={index} className="flex items-center space-x-2">
-                <Skeleton className="h-6 w-6 rounded-full" />
-                <Skeleton className="h-4 w-2/3" />
+      {data.reworkAttempts.length > 0 && (
+        <div className="space-y-2 pb-20">
+          <P className="font-semibold text-muted-foreground">
+            Rework Information
+          </P>
+          {data.reworkAttempts.map((rework) => (
+            <div key={rework.id} className="space-y-4">
+              <div className="space-y-2">
+                <H4 className="font-semibold">Reason:</H4>
+                <P className="text-muted-foreground">
+                  {rework.rejectionReason}
+                </P>
               </div>
-            ))}
-          </>
-        ) : (
-          <div className="space-y-4">
-            {logs?.map((activity) => {
-              const {
-                color,
-                icon: Icon,
-                message,
-              } = getChangeTypeInfo(activity.changeType);
-              return (
-                <div key={activity.id} className="flex items-center space-x-2">
-                  <Icon className="size-5" color={color} />
-                  <P className="inline-flex items-center text-muted-foreground">
-                    {message}
-                    <Dot /> {format(new Date(activity.timestamp), "MMM d")}
-                  </P>
+              <div className="flex w-full items-center justify-between">
+                <div className="group flex items-center justify-between">
+                  <div className="flex w-full flex-col items-start">
+                    <div className="flex space-x-1 text-muted-foreground">
+                      <Clock className="h-5 w-5" />
+                      <P className="font-semibold tracking-tight">
+                        Start Date/Time:
+                      </P>
+                    </div>
+                    <div className="w-full pl-5 pt-1">
+                      <P>
+                        {rework.reworkStartDate
+                          ? format(new Date(rework.reworkStartDate), "PPP p")
+                          : "-"}
+                      </P>
+                    </div>
+                  </div>
                 </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
+                <div className="group flex items-center justify-between">
+                  <div className="flex w-full flex-col items-start">
+                    <div className="flex space-x-1 text-muted-foreground">
+                      <Clock className="h-5 w-5" />
+                      <P className="font-semibold tracking-tight">
+                        End Date/Time:
+                      </P>
+                    </div>
+                    <div className="w-full pl-5 pt-1">
+                      <P>
+                        {rework.reworkEndDate
+                          ? format(new Date(rework.reworkEndDate), "PPP p")
+                          : "-"}
+                      </P>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </>
   );
 }

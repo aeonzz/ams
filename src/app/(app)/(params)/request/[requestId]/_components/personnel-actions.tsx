@@ -5,7 +5,7 @@ import { PermissionGuard } from "@/components/permission-guard";
 import { useSession } from "@/lib/hooks/use-session";
 import { Button } from "@/components/ui/button";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
-import { updateJobRequest } from "@/lib/actions/job";
+import { reworkJobRequest, updateJobRequest, updateReworkJobRequest } from "@/lib/actions/job";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -52,7 +52,7 @@ export default function PersonnelActions({
   const [alertOpen, setAlertOpen] = React.useState(false);
 
   const { isPending: isPendingMutation, mutateAsync } =
-    useServerActionMutation(updateJobRequest);
+    useServerActionMutation(updateReworkJobRequest);
 
   useHotkeys(
     "ctrl+s",
@@ -64,14 +64,16 @@ export default function PersonnelActions({
   );
 
   const handleStatusChange = async (status: JobStatusType) => {
+    console.log(status)
     const now = new Date();
     toast.promise(
       mutateAsync({
         status,
-        path: pathname,
-        requestId,
-        ...(status === "IN_PROGRESS" ? { startDate: now } : {}),
-        ...(status === "COMPLETED" ? { endDate: now.toISOString() } : {}),
+        requestId: requestId,
+        startDate: status === "IN_PROGRESS" ? now : undefined,
+        reworkStartDate: status === "REWORK_IN_PROGRESS" ? now : undefined,
+        endDate: status === "COMPLETED" ? now : undefined,
+        reworkEndDate: status === "COMPLETED" ? now : undefined,
       }),
       {
         loading: "Loading...",
@@ -89,18 +91,52 @@ export default function PersonnelActions({
     );
   };
 
-  const isPending = data.status === "PENDING";
-  const buttonText = isPending ? "Start Job" : "Mark as Done";
-  const newStatus: JobStatusType = isPending ? "IN_PROGRESS" : "COMPLETED";
-  const tooltipText = isPending ? "Start job" : "Mark this job as done";
-  const dialogTitle = isPending
-    ? "Confirm Job Start"
-    : "Confirm Job Completion";
-  const dialogDescription = isPending
-    ? "Are you sure you want to begin this job? Once started, it cannot be paused or reverted. Please ensure you have the necessary resources and permissions to proceed."
-    : "Are you sure you want to mark this job as done? Once marked, it will be considered complete, and no further changes can be made.";
+  const getButtonConfig = () => {
+    switch (data.status) {
+      case "REJECTED":
+        return {
+          buttonText: "Restart Job",
+          newStatus: "REWORK_IN_PROGRESS" as JobStatusType,
+          tooltipText: "Restart this job for rework",
+          dialogTitle: "Confirm Job Restart",
+          dialogDescription:
+            "Are you sure you want to restart this job for rework? This will change the status to 'Rework in Progress'.",
+        };
+      case "REWORK_IN_PROGRESS":
+        return {
+          buttonText: "Mark as Done",
+          newStatus: "COMPLETED" as JobStatusType,
+          tooltipText: "Mark this rework as done",
+          dialogTitle: "Confirm Rework Completion",
+          dialogDescription:
+            "Are you sure you want to mark this rework as done? Once marked, it will be considered complete, and no further changes can be made.",
+        };
+      case "PENDING":
+        return {
+          buttonText: "Start Job",
+          newStatus: "IN_PROGRESS" as JobStatusType,
+          tooltipText: "Start job",
+          dialogTitle: "Confirm Job Start",
+          dialogDescription:
+            "Are you sure you want to begin this job? Once started, it cannot be paused or reverted. Please ensure you have the necessary resources and permissions to proceed.",
+        };
+      case "IN_PROGRESS":
+        return {
+          buttonText: "Mark as Done",
+          newStatus: "COMPLETED" as JobStatusType,
+          tooltipText: "Mark this job as done",
+          dialogTitle: "Confirm Job Completion",
+          dialogDescription:
+            "Are you sure you want to mark this job as done? Once marked, it will be considered complete, and no further changes can be made.",
+        };
+      default:
+        return null;
+    }
+  };
 
-  if (data.status === "COMPLETED") {
+  const config = getButtonConfig();
+
+  if (data.status === "COMPLETED" || !config) {
     return null;
   }
 
@@ -114,26 +150,28 @@ export default function PersonnelActions({
         <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
           <AlertDialogTrigger asChild>
             <TooltipTrigger asChild>
-              <Button variant="secondary">{buttonText}</Button>
+              <Button variant="secondary">{config.buttonText}</Button>
             </TooltipTrigger>
           </AlertDialogTrigger>
           <AlertDialogContent onCloseAutoFocus={(e) => e.preventDefault()}>
             <AlertDialogHeader>
-              <AlertDialogTitle>{dialogTitle}</AlertDialogTitle>
+              <AlertDialogTitle>{config.dialogTitle}</AlertDialogTitle>
               <AlertDialogDescription>
-                {dialogDescription}
+                {config.dialogDescription}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={() => handleStatusChange(newStatus)}>
+              <AlertDialogAction
+                onClick={() => handleStatusChange(config.newStatus)}
+              >
                 Continue
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
         <TooltipContent className="flex items-center gap-3" side="bottom">
-          <P>{tooltipText}</P>
+          <P>{config.tooltipText}</P>
           <div className="flex gap-1">
             <CommandShortcut>Ctrl</CommandShortcut>
             <CommandShortcut>S</CommandShortcut>

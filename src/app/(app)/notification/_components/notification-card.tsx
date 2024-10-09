@@ -33,8 +33,10 @@ export default function NotificationCard({
       )}
       onClick={onClick}
     >
-      <div className="py-5 pl-3">
-        {!data.isRead && <div className="size-2.5 rounded-full bg-primary" />}
+      <div className="w-[22px] py-5 pl-3">
+        {!data.isRead && (
+          <div className="size-2.5 animate-pulse rounded-full bg-primary" />
+        )}
       </div>
       <div className="w-[calc(100%_-_28px)]">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 truncate pb-1 pl-2">

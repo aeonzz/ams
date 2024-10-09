@@ -11,10 +11,20 @@ interface Context {
 export async function GET(req: Request, context: Context) {
   await checkAuth();
   try {
+    const url = new URL(req.url);
+    const page = parseInt(url.searchParams.get("page") || "1");
+    const limit = parseInt(url.searchParams.get("limit") || "10");
+    const skip = (page - 1) * limit;
+
     const result = await db.notification.findMany({
       where: {
         userId: context.params.userId,
       },
+      orderBy: {
+        createdAt: "desc",
+      },
+      skip,
+      take: limit,
     });
 
     return NextResponse.json({ data: result }, { status: 200 });

@@ -306,15 +306,24 @@ export function getJobStatusColor(status: JobStatusType): JobStatusColorConfig {
       variant: "purple",
       stroke: 10,
     },
+    REJECTED: {
+      color: "#ef4444",
+      variant: "red",
+      stroke: 10,
+    },
+    REWORK_IN_PROGRESS: {
+      color: "#f59e0b",
+      variant: "orange",
+      stroke: 10,
+    },
+    VERIFIED: {
+      color: "#3b82f6",
+      variant: "blue",
+      stroke: 10,
+    },
   };
 
-  return (
-    jobStatusColors[status] || {
-      color: "#64748b",
-      variant: "gray",
-      stroke: 10,
-    }
-  );
+  return jobStatusColors[status];
 }
 
 type VehicleStatusColorConfig = {
@@ -461,17 +470,17 @@ export function getChangeTypeInfo(
   const ChangeTypeInfos: ChangeTypeInfoMap = {
     STATUS_CHANGE: {
       icon: RefreshCw,
-      color: "#3b82f6", 
+      color: "#3b82f6",
       message: "Status changed",
     },
     FIELD_UPDATE: {
       icon: PenTool,
-      color: "#22c55e", 
+      color: "#22c55e",
       message: "Field updated",
     },
     ASSIGNMENT_CHANGE: {
       icon: User,
-      color: "#a855f7", 
+      color: "#a855f7",
       message: "Assignment changed",
     },
     REVIEWER_CHANGE: {
@@ -491,27 +500,27 @@ export function getChangeTypeInfo(
     },
     CANCELLED: {
       icon: XCircle,
-      color: "#ef4444", 
+      color: "#ef4444",
       message: "Cancelled",
     },
     CREATED: {
       icon: Plus,
-      color: "#3b82f6", 
+      color: "#3b82f6",
       message: "System created the request",
     },
     DELETION: {
       icon: Trash2,
-      color: "#ef4444", 
+      color: "#ef4444",
       message: "Deleted",
     },
     RESTORED: {
       icon: RotateCw,
-      color: "#10b981", 
+      color: "#10b981",
       message: "Restored",
     },
     ARCHIVED: {
       icon: Archive,
-      color: "#f97316", 
+      color: "#f97316",
       message: "Archived",
     },
     ACTIVATED: {
@@ -526,7 +535,7 @@ export function getChangeTypeInfo(
     },
     PERMISSION_CHANGE: {
       icon: Lock,
-      color: "#8b5cf6", 
+      color: "#8b5cf6",
       message: "Permission changed",
     },
     VENUE_CHANGE: {
@@ -541,12 +550,12 @@ export function getChangeTypeInfo(
     },
     LOCATION_UPDATE: {
       icon: Map,
-      color: "#3b82f6", 
+      color: "#3b82f6",
       message: "Location updated",
     },
     OTHER: {
       icon: AlertCircle,
-      color: "#6b7280", 
+      color: "#6b7280",
       message: "Other change",
     },
   };

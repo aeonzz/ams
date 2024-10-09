@@ -6,6 +6,7 @@ import { authedProcedure, getErrorMessage } from "./utils";
 import { db } from "@/lib/db/index";
 import {
   createNotificationSchema,
+  deleteNotificationStatusSchema,
   updateNotificationStatusSchema,
 } from "../schema/notification";
 import { revalidatePath } from "next/cache";
@@ -43,6 +44,24 @@ export const updateNotificationStatus = authedProcedure
         },
         data: {
           ...rest,
+        },
+      });
+
+      return result;
+    } catch (error) {
+      getErrorMessage(error);
+    }
+  });
+
+export const deleteNotification = authedProcedure
+  .createServerAction()
+  .input(deleteNotificationStatusSchema)
+  .handler(async ({ input }) => {
+    const { notificationId } = input;
+    try {
+      const result = await db.notification.delete({
+        where: {
+          id: notificationId,
         },
       });
 

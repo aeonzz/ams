@@ -11,8 +11,10 @@ import { cohere } from "@ai-sdk/cohere";
 import { extendedJobRequestSchemaServer } from "../db/schema/job";
 import {
   assignPersonnelSchemaWithPath,
+  reworkJobRequestSchema,
   updateJobRequestSchemaWithPath,
   updateRequestStatusSchemaWithPath,
+  updateReworkJobRequestSchema,
 } from "@/app/(app)/(params)/request/[requestId]/_components/schema";
 import { createNotification } from "./notification";
 
@@ -172,13 +174,6 @@ export const assignPersonnel = authedProcedure
           },
         });
 
-        await createNotification({
-          resourceId: `/notification/${updatedRequest.id}`,
-          title: `New Job Assignment: ${updatedRequest.title}`,
-          message: `You have been assigned to a new job: ${updatedRequest.title}. Please review the details and take the necessary actions.`,
-          userId: rest.personnelId,
-        });
-
         return updatedRequest;
       });
 
@@ -235,6 +230,29 @@ export const updateRequestStatus = authedProcedure
             changedById: user.id,
           },
         });
+
+        if (
+          rest.status === "APPROVED" &&
+          updatedRequest.type === "JOB" &&
+          updatedRequest.jobRequest?.assignedTo
+        ) {
+          const existingNotification = await prisma.notification.findFirst({
+            where: {
+              resourceId: `/request/${updatedRequest.id}`,
+              userId: updatedRequest.jobRequest?.assignedTo,
+              title: `New Job Assignment: ${updatedRequest.title}`,
+            },
+          });
+
+          if (!existingNotification) {
+            await createNotification({
+              resourceId: `/request/${updatedRequest.id}`,
+              title: `New Job Assignment: ${updatedRequest.title}`,
+              message: `You have been assigned to a new job: ${updatedRequest.title}. Please review the details and take the necessary actions.`,
+              userId: updatedRequest.jobRequest?.assignedTo,
+            });
+          }
+        }
 
         return updatedRequest;
       });
@@ -301,6 +319,73 @@ export const updateJobRequest = authedProcedure
       });
 
       return revalidatePath(path);
+    } catch (error) {
+      console.log(error);
+      getErrorMessage(error);
+    }
+  });
+
+export const reworkJobRequest = authedProcedure
+  .createServerAction()
+  .input(reworkJobRequestSchema)
+  .handler(async ({ ctx, input }) => {
+    const { id, status, rejectionReason, ...rest } = input;
+    try {
+      const result = await db.$transaction(async (prisma) => {
+        const updateJobRequestStatus = await db.jobRequest.update({
+          where: {
+            requestId: id,
+          },
+          data: {
+            status: status,
+          },
+        });
+
+        await prisma.rework.create({
+          data: {
+            id: generateId(15),
+            jobRequestId: updateJobRequestStatus.id,
+            rejectionReason: rejectionReason,
+          },
+        });
+
+        return updateJobRequestStatus;
+      });
+
+      return result;
+    } catch (error) {
+      console.log(error);
+      getErrorMessage(error);
+    }
+  });
+
+export const updateReworkJobRequest = authedProcedure
+  .createServerAction()
+  .input(updateReworkJobRequestSchema)
+  .handler(async ({ ctx, input }) => {
+    const { requestId, status, endDate, startDate, ...rest } = input;
+    try {
+      const result = await db.$transaction(async (prisma) => {
+        const updateJobRequestStatus = await db.rework.update({
+          where: {
+            id: reworkId,
+          },
+          data: {
+            jobRequest: {
+              update: {
+                status: status,
+                startDate: startDate,
+                endDate: endDate,
+              },
+            },
+            ...rest,
+          },
+        });
+
+        return updateJobRequestStatus;
+      });
+
+      return result;
     } catch (error) {
       console.log(error);
       getErrorMessage(error);

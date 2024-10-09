@@ -10,13 +10,20 @@ interface Context {
 export async function GET(req: Request, context: Context) {
   const { notificationId } = context.params;
   try {
-    const result = await db.notification.findUnique({
+    const isNotificationExist = await db.notification.findUnique({
       where: {
         id: notificationId,
       },
     });
 
-    return NextResponse.json({ data: result }, { status: 200 });
+    if (!isNotificationExist) {
+      return NextResponse.json(
+        { error: "Notification not found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({ data: isNotificationExist }, { status: 200 });
   } catch (error) {
     console.log(error);
     return NextResponse.json(

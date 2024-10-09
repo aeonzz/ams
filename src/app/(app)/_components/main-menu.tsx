@@ -3,7 +3,6 @@
 import React, { useMemo } from "react";
 import { usePathname } from "next/navigation";
 import { Ellipsis, LogOut } from "lucide-react";
-import { User } from "prisma/generated/zod";
 
 import { getMenuList } from "@/config/menu-list";
 import { cn } from "@/lib/utils";
@@ -21,9 +20,13 @@ import { useSession } from "@/lib/hooks/use-session";
 
 interface MainMenuProps {
   isOpen: boolean | undefined;
+  hasUnreadNotifications: boolean | undefined;
 }
 
-export default function MainMenu({ isOpen }: MainMenuProps) {
+export default function MainMenu({
+  isOpen,
+  hasUnreadNotifications,
+}: MainMenuProps) {
   const pathname = usePathname();
   const currentUser = useSession();
   const menuList = getMenuList({
@@ -73,6 +76,7 @@ export default function MainMenu({ isOpen }: MainMenuProps) {
                               active={active}
                               isOpen={isOpen}
                               href={href}
+                              hasUnreadNotifications={hasUnreadNotifications}
                             />
                           </TooltipTrigger>
                           {isOpen === false && (

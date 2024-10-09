@@ -129,6 +129,6 @@
     @apply bg-background text-foreground;
   }
   .scroll-bar {
-    @apply scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/30;
+    @apply scrollbar-thin scrollbar-track-transparent dark:scrollbar-thumb-white/20 scrollbar-thumb-black/20;
   }
 }

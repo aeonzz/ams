@@ -52,6 +52,7 @@ export async function GET(req: Request, params: Context) {
             files: true,
             assignedUser: true,
             jobRequestEvaluation: true,
+            reworkAttempts: true,
           },
         },
         returnableRequest: {

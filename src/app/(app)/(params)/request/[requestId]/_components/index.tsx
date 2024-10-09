@@ -201,8 +201,8 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
               </Badge>
             </div>
             {data.type === "JOB" &&
-              data.status === "APPROVED" &&
-              data.jobRequest && (
+              data.jobRequest &&
+              (data.status === "APPROVED" || data.status === "COMPLETED") && (
                 <div>
                   <P className="mb-1 text-sm">Job Status</P>
                   {(() => {

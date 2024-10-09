@@ -599,6 +599,7 @@ export const updateJobRequest = authedProcedure
   .input(updateJobRequestSchemaServerWithPath)
   .handler(async ({ input }) => {
     const { path, id, ...rest } = input;
+
     try {
       const result = await db.jobRequest.update({
         where: {
@@ -608,7 +609,6 @@ export const updateJobRequest = authedProcedure
           ...rest,
         },
       });
-
       return revalidatePath(path);
     } catch (error) {
       getErrorMessage(error);
