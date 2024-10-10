@@ -194,19 +194,6 @@ export const updateRequestStatus = authedProcedure
 
     try {
       const result = await db.$transaction(async (prisma) => {
-        const currentRequest = await prisma.request.findUnique({
-          where: {
-            id: requestId,
-          },
-          include: {
-            jobRequest: true,
-          },
-        });
-
-        if (!currentRequest) {
-          throw "Request not found";
-        }
-
         const updatedRequest = await prisma.request.update({
           where: { id: requestId },
           data: {
@@ -214,21 +201,6 @@ export const updateRequestStatus = authedProcedure
             reviewedBy: reviewerId,
           },
           include: { jobRequest: true },
-        });
-        const oldValueJson = JSON.parse(JSON.stringify(currentRequest));
-        const newValueJson = JSON.parse(
-          JSON.stringify(updatedRequest.jobRequest)
-        );
-        await prisma.genericAuditLog.create({
-          data: {
-            id: generateId(15),
-            entityId: requestId,
-            entityType: entityType,
-            changeType: changeType,
-            oldValue: oldValueJson,
-            newValue: newValueJson,
-            changedById: user.id,
-          },
         });
 
         if (
@@ -250,6 +222,44 @@ export const updateRequestStatus = authedProcedure
               title: `New Job Assignment: ${updatedRequest.title}`,
               message: `You have been assigned to a new job: ${updatedRequest.title}. Please review the details and take the necessary actions.`,
               userId: updatedRequest.jobRequest?.assignedTo,
+            });
+          }
+        }
+
+        if (rest.status === "CANCELLED") {
+          const existingNotification = await prisma.notification.findFirst({
+            where: {
+              resourceId: `/request/${updatedRequest.id}`,
+              userId: updatedRequest.userId,
+              title: `Request Cancelled: ${updatedRequest.title}`,
+            },
+          });
+
+          if (!existingNotification) {
+            await createNotification({
+              resourceId: `/request/${updatedRequest.id}`,
+              title: `Request Cancelled: ${updatedRequest.title}`,
+              message: `Your request for "${updatedRequest.title}" has been cancelled. Please check the request for further details.`,
+              userId: updatedRequest.userId,
+            });
+          }
+        }
+
+        if (rest.status === "COMPLETED") {
+          const existingNotification = await prisma.notification.findFirst({
+            where: {
+              resourceId: `/request/${updatedRequest.id}`,
+              userId: updatedRequest.userId,
+              title: `Request Completed: ${updatedRequest.title}`,
+            },
+          });
+
+          if (!existingNotification) {
+            await createNotification({
+              resourceId: `/request/${updatedRequest.id}`,
+              title: `Request Completed: ${updatedRequest.title}`,
+              message: `Your request for "${updatedRequest.title}" has been successfully completed. Please review the final details.`,
+              userId: updatedRequest.userId,
             });
           }
         }
@@ -338,6 +348,9 @@ export const reworkJobRequest = authedProcedure
           },
           data: {
             status: status,
+            rejectionCount: {
+              increment: 1,
+            },
           },
         });
 
@@ -363,7 +376,7 @@ export const updateReworkJobRequest = authedProcedure
   .createServerAction()
   .input(updateReworkJobRequestSchema)
   .handler(async ({ ctx, input }) => {
-    const { requestId, status, endDate, startDate, ...rest } = input;
+    const { reworkId, status, ...rest } = input;
     try {
       const result = await db.$transaction(async (prisma) => {
         const updateJobRequestStatus = await db.rework.update({
@@ -374,8 +387,6 @@ export const updateReworkJobRequest = authedProcedure
             jobRequest: {
               update: {
                 status: status,
-                startDate: startDate,
-                endDate: endDate,
               },
             },
             ...rest,

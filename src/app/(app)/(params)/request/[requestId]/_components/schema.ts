@@ -71,9 +71,7 @@ export const reworkJobRequestSchema = z.object({
 export type ReworkJobRequestSchema = z.infer<typeof reworkJobRequestSchema>;
 
 export const updateReworkJobRequestSchema = z.object({
-  requestId: z.string(),
-  startDate: z.date().optional(),
-  endDate: z.date().optional(),
+  reworkId: z.string(),
   reworkStartDate: z.date().optional(),
   reworkEndDate: z.date().optional(),
   status: JobStatusSchema,

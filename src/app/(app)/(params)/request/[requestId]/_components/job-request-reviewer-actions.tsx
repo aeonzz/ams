@@ -185,7 +185,16 @@ export default function JobRequestReviewerActions({
       try {
         toast.promise(updateStatusMutate(data), {
           loading: `${actionText} request...`,
-          success: `Request ${successText} successfully.`,
+          success: () => {
+            queryClient.invalidateQueries({
+              queryKey: [request.id],
+            });
+            socket.emit("notifications");
+            socket.emit("request_update", request.id);
+            setIsCancelAlertOpen(false);
+            setCancellationReason("");
+            return `Request ${successText} successfully.`;
+          },
           error: `Failed to ${action.toLowerCase()} request. Please try again.`,
         });
 
@@ -200,13 +209,11 @@ export default function JobRequestReviewerActions({
         queryClient.invalidateQueries({
           queryKey: [request.id],
         });
-        queryClient.invalidateQueries({
-          queryKey: ["activity", request.id],
-        });
-        socket.emit("request_update", request.id);
         socket.emit("notifications");
+        socket.emit("request_update", request.id);
         setIsCancelAlertOpen(false);
         setCancellationReason("");
+        console.log("fuck");
       } catch (err) {
         console.error(err);
       }

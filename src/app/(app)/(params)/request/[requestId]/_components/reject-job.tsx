@@ -114,6 +114,7 @@ export default function RejectJob({ requestId, disabled }: RejectJobProps) {
                 <FormItem>
                   <FormControl>
                     <Textarea
+                      maxRows={7}
                       placeholder="Rejection reason..."
                       className="resize-none placeholder:text-sm"
                       {...field}

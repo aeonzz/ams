@@ -11,6 +11,7 @@ export const ReworkSchema = z.object({
   jobRequestId: z.string(),
   reworkStartDate: z.coerce.date().nullable(),
   reworkEndDate: z.coerce.date().nullable(),
+  status: z.boolean(),
   rejectionReason: z.string(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),

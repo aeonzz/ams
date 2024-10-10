@@ -7,7 +7,6 @@ import { DataTableSkeleton } from "@/components/data-table/data-table-skeleton";
 import { GetRequestsSchema } from "@/lib/schema";
 import { getMyRequests } from "@/lib/actions/requests";
 import { RequestTable } from "./request-table";
-import LoadingSpinner from "@/components/loaders/loading-spinner";
 interface MyRequestScreenProps {
   search: GetRequestsSchema;
 }

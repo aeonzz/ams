@@ -196,6 +196,7 @@ model JobRequest {
   jobType              JobType
   files                File[]
   reworkAttempts       Rework[]
+  rejectionCount       Int                   @default(0)
   priority             PriorityType          @default(NO_PRIORITY)
   requestId            String                @unique
   request              Request               @relation(fields: [requestId], references: [id], onDelete: Cascade)
@@ -213,6 +214,7 @@ model Rework {
   jobRequest      JobRequest @relation(fields: [jobRequestId], references: [id], onDelete: Cascade)
   reworkStartDate DateTime?
   reworkEndDate   DateTime?
+  status          Boolean    @default(false)
   rejectionReason String
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt

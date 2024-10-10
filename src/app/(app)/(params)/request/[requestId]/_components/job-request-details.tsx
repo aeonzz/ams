@@ -703,7 +703,7 @@ export default function JobRequestDetails({
                     </P>
                   </div>
                   <div className="w-full pl-5 pt-1">
-                    <P>{data.description}</P>
+                    <P className="break-all">{data.description}</P>
                   </div>
                 </div>
                 {canEdit && (
@@ -775,7 +775,9 @@ export default function JobRequestDetails({
               <H5 className="font-semibold leading-none">
                 Cancellation Reason
               </H5>
-              <CardDescription>{cancellationReason}</CardDescription>
+              <CardDescription className="break-all">
+                {cancellationReason}
+              </CardDescription>
             </CardHeader>
           </Card>
         )}
@@ -786,52 +788,59 @@ export default function JobRequestDetails({
           <P className="font-semibold text-muted-foreground">
             Rework Information
           </P>
-          {data.reworkAttempts.map((rework) => (
-            <div key={rework.id} className="space-y-4">
-              <div className="space-y-2">
-                <H4 className="font-semibold">Reason:</H4>
-                <P className="text-muted-foreground">
-                  {rework.rejectionReason}
-                </P>
-              </div>
-              <div className="flex w-full items-center justify-between">
-                <div className="group flex items-center justify-between">
-                  <div className="flex w-full flex-col items-start">
-                    <div className="flex space-x-1 text-muted-foreground">
-                      <Clock className="h-5 w-5" />
-                      <P className="font-semibold tracking-tight">
-                        Start Date/Time:
-                      </P>
+          <div className="space-y-5">
+            {data.reworkAttempts.map((rework) => (
+              <div key={rework.id} className="space-y-4 rounded-md border p-3">
+                <div className="space-y-1">
+                  <div className="flex w-full justify-between">
+                    <P className="font-semibold">Reason</P>
+                    <P className="text-muted-foreground">
+                      {format(new Date(rework.createdAt), "P")}
+                    </P>
+                  </div>
+                  <P className="break-all text-muted-foreground">
+                    {rework.rejectionReason}
+                  </P>
+                </div>
+                <div className="flex w-full items-center justify-between">
+                  <div className="group flex items-center justify-between">
+                    <div className="flex w-full flex-col items-start">
+                      <div className="flex space-x-1 text-muted-foreground">
+                        <Clock className="h-5 w-5" />
+                        <P className="font-semibold tracking-tight">
+                          Start Date/Time:
+                        </P>
+                      </div>
+                      <div className="w-full pl-5 pt-1">
+                        <P>
+                          {rework.reworkStartDate
+                            ? format(new Date(rework.reworkStartDate), "PPP p")
+                            : "-"}
+                        </P>
+                      </div>
                     </div>
-                    <div className="w-full pl-5 pt-1">
-                      <P>
-                        {rework.reworkStartDate
-                          ? format(new Date(rework.reworkStartDate), "PPP p")
-                          : "-"}
-                      </P>
+                  </div>
+                  <div className="group flex items-center justify-between">
+                    <div className="flex w-full flex-col items-start">
+                      <div className="flex space-x-1 text-muted-foreground">
+                        <Clock className="h-5 w-5" />
+                        <P className="font-semibold tracking-tight">
+                          End Date/Time:
+                        </P>
+                      </div>
+                      <div className="w-full pl-5 pt-1">
+                        <P>
+                          {rework.reworkEndDate
+                            ? format(new Date(rework.reworkEndDate), "PPP p")
+                            : "-"}
+                        </P>
+                      </div>
                     </div>
                   </div>
                 </div>
-                <div className="group flex items-center justify-between">
-                  <div className="flex w-full flex-col items-start">
-                    <div className="flex space-x-1 text-muted-foreground">
-                      <Clock className="h-5 w-5" />
-                      <P className="font-semibold tracking-tight">
-                        End Date/Time:
-                      </P>
-                    </div>
-                    <div className="w-full pl-5 pt-1">
-                      <P>
-                        {rework.reworkEndDate
-                          ? format(new Date(rework.reworkEndDate), "PPP p")
-                          : "-"}
-                      </P>
-                    </div>
-                  </div>
-                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       )}
     </>

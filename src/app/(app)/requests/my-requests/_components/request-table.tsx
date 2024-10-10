@@ -25,12 +25,15 @@ import {
 import { RequestTableFloatingBar } from "./request-table-floating-bar";
 import { ModifiedDataTable } from "@/components/data-table/modified-data-table";
 import { Dot } from "lucide-react";
+import { socket } from "@/app/socket";
+import { useRouter } from "next/navigation";
 
 interface RequestTableProps {
   requestPromise: ReturnType<typeof getMyRequests>;
 }
 
 export function RequestTable({ requestPromise }: RequestTableProps) {
+  const router = useRouter();
   const { data, pageCount } = React.use(requestPromise);
 
   // Memoize the columns so they don't re-render on every render
@@ -95,6 +98,16 @@ export function RequestTable({ requestPromise }: RequestTableProps) {
     getRowId: (originalRow, index) => `${originalRow.id}-${index}`,
     /* */
   });
+
+  React.useEffect(() => {
+    socket.on("request_update", () => {
+      router.refresh();
+    });
+
+    return () => {
+      socket.off("request_update");
+    };
+  }, [router]);
 
   return (
     <ModifiedDataTable
