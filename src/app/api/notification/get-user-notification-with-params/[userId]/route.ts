@@ -18,10 +18,13 @@ export async function GET(req: Request, context: Context) {
 
     const result = await db.notification.findMany({
       where: {
-        userId: context.params.userId,
+        recepientId: context.params.userId,
       },
       orderBy: {
         createdAt: "desc",
+      },
+      include: {
+        user: true,
       },
       skip,
       take: limit,

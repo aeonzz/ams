@@ -3,15 +3,15 @@
 import React from "react";
 import { useSession } from "@/lib/hooks/use-session";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { P } from "@/components/typography/text";
+import { H1, P } from "@/components/typography/text";
 import Inbox from "../../dashboard/_components/inbox";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { type Notification } from "prisma/generated/zod";
 import { Skeleton } from "@/components/ui/skeleton";
-import { InboxIcon, Trash } from "lucide-react";
+import { Bell, CheckCircle, InboxIcon, Trash } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   deleteNotification,
   updateNotificationStatus,
@@ -38,8 +38,9 @@ import {
 } from "@/components/ui/alert-dialog";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { cn, textTransform } from "@/lib/utils";
 import { socket } from "@/app/socket";
+import { Badge } from "@/components/ui/badge";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -58,17 +59,20 @@ export default function NotificationScreen() {
   const { mutateAsync: updateStatusMutate, isPending: isUpdatePending } =
     useServerActionMutation(updateNotificationStatus);
 
-  React.useEffect(() => {
-    socket.on("notifications", () => {
-      queryClient.invalidateQueries({
-        queryKey: ["get-user-notifications-with-params", currentUser.id],
-      });
+  const handleNotification = React.useCallback(() => {
+    console.log("Notification received in NotificationScreen");
+    queryClient.invalidateQueries({
+      queryKey: ["get-user-notifications-with-params", currentUser.id],
     });
+  }, [queryClient, currentUser.id]);
+
+  React.useEffect(() => {
+    socket.on("notifications", handleNotification);
 
     return () => {
-      socket.off("notifications");
+      socket.off("notifications", handleNotification);
     };
-  }, [queryClient, currentUser.id]);
+  }, [handleNotification]);
 
   const fetchNotifications = async ({ pageParam = 1 }) => {
     const res = await axios.get(
@@ -85,7 +89,7 @@ export default function NotificationScreen() {
     isFetchingNextPage,
     status: notificationsStatus,
   } = useInfiniteQuery({
-    queryKey: ["get-user-notifications-with-params", currentUser.id],
+    queryKey: ["get-user-notifications-with-params", currentUser.id, activeTab],
     queryFn: fetchNotifications,
     initialPageParam: 1,
     getNextPageParam: (lastPage, pages) => {
@@ -118,7 +122,11 @@ export default function NotificationScreen() {
         isRead: true,
       }).then(() => {
         queryClient.invalidateQueries({
-          queryKey: ["get-user-notifications-with-params", currentUser.id],
+          queryKey: [
+            "get-user-notifications-with-params",
+            currentUser.id,
+            activeTab,
+          ],
         });
         queryClient.invalidateQueries({
           queryKey: ["get-user-notifications", currentUser.id],
@@ -135,6 +143,12 @@ export default function NotificationScreen() {
     }
   }, [filteredNotifications, selectedNotificationId]);
 
+  React.useEffect(() => {
+    if (allNotifications.length > 0 && !selectedNotificationId) {
+      setSelectedNotificationId(allNotifications[0].id);
+    }
+  }, [allNotifications, selectedNotificationId]);
+
   const handleNotificationSelect = (notificationId: string) => {
     setSelectedNotificationId(notificationId);
   };
@@ -149,7 +163,11 @@ export default function NotificationScreen() {
           loading: "Deleting...",
           success: () => {
             queryClient.invalidateQueries({
-              queryKey: ["get-user-notifications-with-params", currentUser.id],
+              queryKey: [
+                "get-user-notifications-with-params",
+                currentUser.id,
+                activeTab,
+              ],
             });
             setIsAlertOpen(false);
             setSelectedNotificationId(null);
@@ -176,19 +194,30 @@ export default function NotificationScreen() {
     }
   );
 
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    setSelectedNotificationId(null);
+    queryClient.invalidateQueries({
+      queryKey: ["get-user-notifications-with-params", currentUser.id, value],
+    });
+  };
+
   return (
     <div className="flex h-full w-full">
       <div className="w-[36%] border-r">
         <div className="flex h-[50px] items-center border-b px-3">
           <Tabs
-            defaultValue="all"
+            value={activeTab}
             className="w-full"
-            onValueChange={setActiveTab}
+            onValueChange={handleTabChange}
           >
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="all">All</TabsTrigger>
-              <TabsTrigger value="unread">Unread</TabsTrigger>
-              <TabsTrigger value="read">Read</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="all">
+                <Bell className="mr-2 h-4 w-4" /> All
+              </TabsTrigger>
+              <TabsTrigger value="read">
+                <CheckCircle className="mr-2 h-4 w-4" /> Read
+              </TabsTrigger>
             </TabsList>
           </Tabs>
         </div>
@@ -213,12 +242,14 @@ export default function NotificationScreen() {
             </div>
           ) : selectedNotification ? (
             <div className="flex gap-1">
-              <Link
-                href={selectedNotification.resourceId}
-                className={cn(buttonVariants({ size: "sm" }), "text-sm")}
-              >
-                View
-              </Link>
+              {selectedNotification.resourceId && (
+                <Link
+                  href={selectedNotification.resourceId}
+                  className={cn(buttonVariants({ size: "sm" }), "text-sm")}
+                >
+                  View
+                </Link>
+              )}
               <Tooltip>
                 <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
                   <AlertDialogTrigger asChild>
@@ -290,9 +321,12 @@ export default function NotificationScreen() {
             </div>
           ) : selectedNotification ? (
             <div>
-              <h2 className="mb-4 text-2xl font-bold">
-                {selectedNotification.title}
-              </h2>
+              <div className="mb-4">
+                <H1 className="font-bold tracking-tight">{selectedNotification.title}</H1>
+                <Badge variant="outline">
+                  {textTransform(selectedNotification.resourceType)}
+                </Badge>
+              </div>
               <P className="mb-2 text-muted-foreground">
                 {new Date(selectedNotification.createdAt).toLocaleString()}
               </P>

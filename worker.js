@@ -1,7 +1,7 @@
-const { PrismaClient } = require("@prisma/client");
-const { CronJob } = require("cron");
-const { formatInTimeZone, toDate } = require("date-fns-tz");
-const WebSocket = require("ws");
+import { PrismaClient } from "@prisma/client";
+import { CronJob } from "cron";
+import { formatInTimeZone, toDate } from "date-fns-tz";
+import WebSocket, { WebSocketServer } from "ws";
 
 const prisma = new PrismaClient();
 const wss = new WebSocket.Server({ port: 8080 });
@@ -54,7 +54,7 @@ async function updateInProgressStatus() {
             id: { in: vehicleIdsArray },
           },
           data: {
-            status: "IN_USE"
+            status: "IN_USE",
           },
         });
       }

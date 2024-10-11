@@ -1,11 +1,17 @@
+import {
+  NotificationTypeSchema,
+  ResourceTypeSchema,
+} from "prisma/generated/zod";
 import { z } from "zod";
 
 export const createNotificationSchema = z.object({
   title: z.string(),
   message: z.string(),
   resourceId: z.string(),
-  userId: z.string().optional(),
-  departmentId: z.string().optional(),
+  resourceType: ResourceTypeSchema,
+  notificationType: NotificationTypeSchema.optional(),
+  userId: z.string(),
+  recepientId: z.string(),
 });
 
 export type CreateNotificationSchema = z.infer<typeof createNotificationSchema>;

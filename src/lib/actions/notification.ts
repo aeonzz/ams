@@ -15,12 +15,11 @@ export const createNotification = authedProcedure
   .createServerAction()
   .input(createNotificationSchema)
   .handler(async ({ input }) => {
-    const { departmentId, userId, ...rest } = input;
+    const { userId, ...rest } = input;
     try {
       const result = await db.notification.create({
         data: {
           id: generateId(15),
-          departmentId: departmentId,
           userId: userId,
           ...rest,
         },

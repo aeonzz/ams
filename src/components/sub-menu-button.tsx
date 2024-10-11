@@ -24,12 +24,12 @@ export default function SubMenuButton({
       variant="ghost"
       className={cn(
         active && "bg-tertiary hover:bg-tertiary",
-        "mb-1 h-10 w-full justify-start"
+        "mb-1 h-8 w-full justify-start"
       )}
       asChild
     >
       <Link href={href}>
-        <span className="ml-2 mr-4">
+        <span className="ml-2 mr-3">
           <Dot size={18} />
         </span>
         <p

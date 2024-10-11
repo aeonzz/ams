@@ -135,14 +135,6 @@ export default function JobRequestDetails({
   const { dirtyFields } = useFormState({ control: form.control });
   const isFieldsDirty = Object.keys(dirtyFields).length > 0;
 
-  const { data: logs, isLoading } = useQuery<GenericAuditLog[]>({
-    queryFn: async () => {
-      const res = await axios.get(`/api/audit-log/request-log/${requestId}`);
-      return res.data.data;
-    },
-    queryKey: ["activity", requestId],
-  });
-
   async function onSubmit(values: UpdateJobRequestSchemaServer) {
     try {
       const data: UpdateJobRequestSchemaServerWithPath = {
@@ -213,31 +205,55 @@ export default function JobRequestDetails({
     });
   };
 
-  // const handleDownloadJobRequestForm = async () => {
-  //   const generateAndDownloadPDF = async () => {
-  //     try {
-  //       const pdfBlob = await fillJobRequestFormPDF(data);
-  //       const url = URL.createObjectURL(pdfBlob);
-  //       const link = document.createElement("a");
-  //       link.href = url;
-  //       link.download = `job_request_evaluation_${requestId}.pdf`;
-  //       document.body.appendChild(link);
-  //       link.click();
-  //       document.body.removeChild(link);
-  //       URL.revokeObjectURL(url);
-  //       return "PDF downloaded successfully";
-  //     } catch (error) {
-  //       console.error("Error generating PDF:", error);
-  //       throw new Error("Failed to generate PDF");
-  //     }
-  //   };
+  let personAttended: string;
+  if (data.assignedUser) {
+    personAttended = formatFullName(
+      data.assignedUser.firstName,
+      data.assignedUser.middleName,
+      data.assignedUser.lastName
+    );
+  }
+  const requestedBy = formatFullName(
+    data.request.user.firstName,
+    data.request.user.middleName,
+    data.request.user.lastName
+  );
 
-  //   toast.promise(generateAndDownloadPDF(), {
-  //     loading: "Generating PDF...",
-  //     success: (message) => message,
-  //     error: (err) => `Error: ${err.message}`,
-  //   });
-  // };
+  const handleDownloadJobRequestForm = async () => {
+    const generateAndDownloadPDF = async () => {
+      try {
+        const pdfBlob = await fillJobRequestFormPDF({
+          id: data.id,
+          description: data.description,
+          location: data.location,
+          createdAt: data.createdAt,
+          startDate: data.startDate,
+          endDate: data.endDate,
+          personAttended: personAttended,
+          status: requestStatus,
+          requestedBy: requestedBy,
+        });
+        const url = URL.createObjectURL(pdfBlob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `FM_USTP_MEWS_01_JOB_REQUEST_FORM_${requestId}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        return "PDF downloaded successfully";
+      } catch (error) {
+        console.error("Error generating PDF:", error);
+        throw new Error("Failed to generate PDF");
+      }
+    };
+
+    toast.promise(generateAndDownloadPDF(), {
+      loading: "Generating PDF...",
+      success: (message) => message,
+      error: (err) => `Error: ${err.message}`,
+    });
+  };
 
   useHotkeys(
     "ctrl+shift+e",
@@ -289,7 +305,7 @@ export default function JobRequestDetails({
                   variant="ghost2"
                   size="icon"
                   className="size-7"
-                  onClick={handleDownloadEvaluation}
+                  onClick={handleDownloadJobRequestForm}
                 >
                   <Download className="size-4 text-muted-foreground" />
                 </Button>

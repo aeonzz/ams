@@ -1,21 +1,23 @@
 import { z } from 'zod';
+import { ResourceTypeSchema } from '../inputTypeSchemas/ResourceTypeSchema'
+import { NotificationTypeSchema } from '../inputTypeSchemas/NotificationTypeSchema'
 import type { UserWithRelations } from './UserSchema'
-import type { DepartmentWithRelations } from './DepartmentSchema'
 import { UserWithRelationsSchema } from './UserSchema'
-import { DepartmentWithRelationsSchema } from './DepartmentSchema'
 
 /////////////////////////////////////////
 // NOTIFICATION SCHEMA
 /////////////////////////////////////////
 
 export const NotificationSchema = z.object({
+  resourceType: ResourceTypeSchema,
+  notificationType: NotificationTypeSchema,
   id: z.string(),
   title: z.string(),
+  userId: z.string(),
   message: z.string(),
   isRead: z.boolean(),
-  resourceId: z.string(),
-  userId: z.string().nullable(),
-  departmentId: z.string().nullable(),
+  resourceId: z.string().nullable(),
+  recepientId: z.string(),
   createdAt: z.coerce.date(),
   readAt: z.coerce.date().nullable(),
   updatedAt: z.coerce.date(),
@@ -28,15 +30,13 @@ export type Notification = z.infer<typeof NotificationSchema>
 /////////////////////////////////////////
 
 export type NotificationRelations = {
-  user?: UserWithRelations | null;
-  department?: DepartmentWithRelations | null;
+  user: UserWithRelations;
 };
 
 export type NotificationWithRelations = z.infer<typeof NotificationSchema> & NotificationRelations
 
 export const NotificationWithRelationsSchema: z.ZodType<NotificationWithRelations> = NotificationSchema.merge(z.object({
-  user: z.lazy(() => UserWithRelationsSchema).nullable(),
-  department: z.lazy(() => DepartmentWithRelationsSchema).nullable(),
+  user: z.lazy(() => UserWithRelationsSchema),
 }))
 
 export default NotificationSchema;

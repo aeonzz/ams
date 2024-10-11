@@ -305,6 +305,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
           )}
           {data.type === "JOB" &&
             data.jobRequest &&
+            data.jobRequest.assignedTo === currentUser.id &&
             data.status === "APPROVED" && (
               <PersonnelActions
                 requestId={params}

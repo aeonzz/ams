@@ -51,8 +51,17 @@ export async function GET(req: Request, params: Context) {
           include: {
             files: true,
             assignedUser: true,
+            request: {
+              select: {
+                user: true,
+              },
+            },
             jobRequestEvaluation: true,
-            reworkAttempts: true,
+            reworkAttempts: {
+              orderBy: {
+                createdAt: "desc",
+              },
+            },
           },
         },
         returnableRequest: {

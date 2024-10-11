@@ -67,12 +67,12 @@ export default function CollapseMenuButton({
             <Button
               variant="ghost"
               className={cn(
-                "h-10 w-full justify-start"
+                "h-8 w-full justify-start"
               )}
             >
               <div className="flex w-full items-center gap-1">
                 <div className="flex items-center">
-                  <span className="mr-4">
+                  <span className="mr-3">
                     <Icon size={18} />
                   </span>
                   <p

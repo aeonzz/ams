@@ -31,6 +31,7 @@ import { CommandShortcut } from "@/components/ui/command";
 import { P } from "@/components/typography/text";
 import { type JobStatusType } from "prisma/generated/zod/inputTypeSchemas/JobStatusSchema";
 import { socket } from "@/app/socket";
+import { textTransform } from "@/lib/utils";
 
 interface ReworkJobActionsProps {
   allowedDepartment?: string;
@@ -91,7 +92,8 @@ export default function ReworkJobActions({
         success: () => {
           queryClient.invalidateQueries({ queryKey: [requestId] });
           socket.emit("request_update", requestId);
-          return `Job request is now ${status.toLowerCase().replace("_", " ")}`;
+          socket.emit("notifications", requestId);
+          return `Job request is now ${textTransform(status)}`;
         },
         error: (err) => {
           console.error(err);

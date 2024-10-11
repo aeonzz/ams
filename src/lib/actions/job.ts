@@ -11,6 +11,7 @@ import { cohere } from "@ai-sdk/cohere";
 import { extendedJobRequestSchemaServer } from "../db/schema/job";
 import {
   assignPersonnelSchemaWithPath,
+  cancelOwnRequestSchema,
   reworkJobRequestSchema,
   updateJobRequestSchemaWithPath,
   updateRequestStatusSchemaWithPath,
@@ -108,12 +109,12 @@ export const createJobRequest = authedProcedure
         },
       });
 
-      await createNotification({
-        resourceId: createRequest.id,
-        title: "New Job Request",
-        message: `There is a new job request for ${createRequest.department.name}}`,
-        departmentId: rest.departmentId,
-      });
+      // await createNotification({
+      //   resourceId: createRequest.id,
+      //   title: "New Job Request",
+      //   resourceType: "REQUEST",
+      //   message: `There is a new job request for ${createRequest.department.name}}`,
+      // });
 
       return revalidatePath(path);
     } catch (error) {
@@ -130,19 +131,6 @@ export const assignPersonnel = authedProcedure
 
     try {
       const result = await db.$transaction(async (prisma) => {
-        const currentRequest = await prisma.request.findUnique({
-          where: {
-            id: requestId,
-          },
-          include: {
-            jobRequest: true,
-          },
-        });
-
-        if (!currentRequest) {
-          throw "Request not found";
-        }
-
         const updatedRequest = await prisma.request.update({
           where: {
             id: requestId,
@@ -156,21 +144,6 @@ export const assignPersonnel = authedProcedure
           },
           include: {
             jobRequest: true,
-          },
-        });
-
-        const oldValueJson = JSON.parse(JSON.stringify(currentRequest));
-        const newValueJson = JSON.parse(JSON.stringify(updatedRequest));
-
-        await prisma.genericAuditLog.create({
-          data: {
-            id: generateId(15),
-            entityId: requestId,
-            changeType: "ASSIGNMENT_CHANGE",
-            entityType: "JOB_REQUEST",
-            oldValue: oldValueJson,
-            newValue: newValueJson,
-            changedById: user.id,
           },
         });
 
@@ -208,29 +181,32 @@ export const updateRequestStatus = authedProcedure
           updatedRequest.type === "JOB" &&
           updatedRequest.jobRequest?.assignedTo
         ) {
-          const existingNotification = await prisma.notification.findFirst({
-            where: {
-              resourceId: `/request/${updatedRequest.id}`,
-              userId: updatedRequest.jobRequest?.assignedTo,
-              title: `New Job Assignment: ${updatedRequest.title}`,
-            },
+          await createNotification({
+            resourceId: `/request/${updatedRequest.id}`,
+            title: `New Job Assignment: ${updatedRequest.title}`,
+            resourceType: "TASK",
+            message: `You have been assigned to a new job: ${updatedRequest.title}. Please review the details and take the necessary actions.`,
+            userId: user.id,
+            recepientId: updatedRequest.jobRequest?.assignedTo,
           });
 
-          if (!existingNotification) {
-            await createNotification({
-              resourceId: `/request/${updatedRequest.id}`,
-              title: `New Job Assignment: ${updatedRequest.title}`,
-              message: `You have been assigned to a new job: ${updatedRequest.title}. Please review the details and take the necessary actions.`,
-              userId: updatedRequest.jobRequest?.assignedTo,
-            });
-          }
+          await createNotification({
+            resourceId: `/request/${updatedRequest.id}`,
+            title: `Request Approved: ${updatedRequest.title}`,
+            resourceType: "REQUEST",
+            message: `Congratulations! Your request for "${updatedRequest.title}" has been approved. Please check the request for further details.`,
+            userId: user.id,
+            recepientId: updatedRequest.userId,
+          });
         }
 
         if (rest.status === "CANCELLED") {
           const existingNotification = await prisma.notification.findFirst({
             where: {
               resourceId: `/request/${updatedRequest.id}`,
-              userId: updatedRequest.userId,
+              userId: user.id,
+              resourceType: "REQUEST",
+              recepientId: updatedRequest.id,
               title: `Request Cancelled: ${updatedRequest.title}`,
             },
           });
@@ -239,8 +215,10 @@ export const updateRequestStatus = authedProcedure
             await createNotification({
               resourceId: `/request/${updatedRequest.id}`,
               title: `Request Cancelled: ${updatedRequest.title}`,
+              resourceType: "REQUEST",
               message: `Your request for "${updatedRequest.title}" has been cancelled. Please check the request for further details.`,
-              userId: updatedRequest.userId,
+              userId: user.id,
+              recepientId: updatedRequest.id,
             });
           }
         }
@@ -249,7 +227,9 @@ export const updateRequestStatus = authedProcedure
           const existingNotification = await prisma.notification.findFirst({
             where: {
               resourceId: `/request/${updatedRequest.id}`,
-              userId: updatedRequest.userId,
+              userId: user.id,
+              resourceType: "REQUEST",
+              recepientId: updatedRequest.id,
               title: `Request Completed: ${updatedRequest.title}`,
             },
           });
@@ -258,12 +238,40 @@ export const updateRequestStatus = authedProcedure
             await createNotification({
               resourceId: `/request/${updatedRequest.id}`,
               title: `Request Completed: ${updatedRequest.title}`,
+              resourceType: "REQUEST",
               message: `Your request for "${updatedRequest.title}" has been successfully completed. Please review the final details.`,
-              userId: updatedRequest.userId,
+              userId: user.id,
+              recepientId: updatedRequest.id,
             });
           }
         }
 
+        return updatedRequest;
+      });
+
+      return revalidatePath(path);
+    } catch (error) {
+      console.log(error);
+      getErrorMessage(error);
+    }
+  });
+
+export const cancelOwnRequest = authedProcedure
+  .createServerAction()
+  .input(cancelOwnRequestSchema)
+  .handler(async ({ ctx, input }) => {
+    const { user } = ctx;
+    const { path, requestId, ...rest } = input;
+
+    try {
+      const result = await db.$transaction(async (prisma) => {
+        const updatedRequest = await prisma.request.update({
+          where: { id: requestId },
+          data: {
+            ...rest,
+          },
+          include: { jobRequest: true },
+        });
         return updatedRequest;
       });
 
@@ -279,23 +287,10 @@ export const updateJobRequest = authedProcedure
   .input(updateJobRequestSchemaWithPath)
   .handler(async ({ ctx, input }) => {
     const { user } = ctx;
-    const { path, requestId, ...rest } = input;
+    const { path, requestId, status, ...rest } = input;
 
     try {
       const result = await db.$transaction(async (prisma) => {
-        const currentRequest = await prisma.request.findUnique({
-          where: {
-            id: requestId,
-          },
-          include: {
-            jobRequest: true,
-          },
-        });
-
-        if (!currentRequest) {
-          throw "Request not found";
-        }
-
         const updatedRequest = await prisma.request.update({
           where: {
             id: requestId,
@@ -303,6 +298,7 @@ export const updateJobRequest = authedProcedure
           data: {
             jobRequest: {
               update: {
+                status: status,
                 ...rest,
               },
             },
@@ -311,19 +307,61 @@ export const updateJobRequest = authedProcedure
             jobRequest: true,
           },
         });
-        const oldValueJson = JSON.parse(JSON.stringify(currentRequest));
-        const newValueJson = JSON.parse(JSON.stringify(updatedRequest));
-        await prisma.genericAuditLog.create({
-          data: {
-            id: generateId(15),
-            entityId: requestId,
-            entityType: "JOB_REQUEST",
-            changeType: "FIELD_UPDATE",
-            oldValue: oldValueJson,
-            newValue: newValueJson,
-            changedById: user.id,
-          },
-        });
+
+        if (status === "IN_PROGRESS" && updatedRequest.reviewedBy) {
+          await createNotification({
+            resourceId: `/request/${updatedRequest.id}`,
+            title: `Job In Progress: ${updatedRequest.title}`,
+            resourceType: "TASK",
+            notificationType: "INFO",
+            message: `The job for "${updatedRequest.title}" is currently in progress. Please check the request for further details.`,
+            recepientId: updatedRequest.reviewedBy,
+            userId: user.id,
+          });
+
+          await createNotification({
+            resourceId: `/request/${updatedRequest.id}`,
+            title: `Job In Progress: ${updatedRequest.title}`,
+            resourceType: "REQUEST",
+            notificationType: "INFO",
+            message: `Your job request for "${updatedRequest.title}" is currently in progress. Please check the request for further details.`,
+            recepientId: updatedRequest.userId,
+            userId: user.id,
+          });
+        }
+
+        if (status === "COMPLETED" && updatedRequest.reviewedBy) {
+          await createNotification({
+            resourceId: `/request/${updatedRequest.id}`,
+            title: `Job Completed: ${updatedRequest.title}`,
+            resourceType: "TASK",
+            notificationType: "INFO",
+            message: `The job for "${updatedRequest.title}" has been successfully completed. Please review the request for further details.`,
+            recepientId: updatedRequest.reviewedBy,
+            userId: user.id,
+          });
+        }
+
+        if (status === "VERIFIED" && updatedRequest.jobRequest?.assignedTo) {
+          await createNotification({
+            resourceId: `/request/${updatedRequest.id}`,
+            title: `Job Verified: ${updatedRequest.title}`,
+            resourceType: "TASK",
+            notificationType: "INFO",
+            message: `Your work on the job request "${updatedRequest.title}" has been successfully verified and completed.`,
+            recepientId: updatedRequest.jobRequest.assignedTo,
+            userId: user.id,
+          });
+
+          await createNotification({
+            resourceId: `/request/${updatedRequest.id}`,
+            title: `Job Request Completed: ${updatedRequest.title}`,
+            resourceType: "REQUEST",
+            message: `Your job request for "${updatedRequest.title}" has been successfully completed. Thank you for your patience! Please review the request for any further details.`,
+            userId: user.id,
+            recepientId: updatedRequest.userId,
+          });
+        }
 
         return updatedRequest;
       });
@@ -339,7 +377,8 @@ export const reworkJobRequest = authedProcedure
   .createServerAction()
   .input(reworkJobRequestSchema)
   .handler(async ({ ctx, input }) => {
-    const { id, status, rejectionReason, ...rest } = input;
+    const { user } = ctx;
+    const { id, status, rejectionReason } = input;
     try {
       const result = await db.$transaction(async (prisma) => {
         const updateJobRequestStatus = await db.jobRequest.update({
@@ -352,6 +391,9 @@ export const reworkJobRequest = authedProcedure
               increment: 1,
             },
           },
+          include: {
+            request: true,
+          },
         });
 
         await prisma.rework.create({
@@ -361,6 +403,28 @@ export const reworkJobRequest = authedProcedure
             rejectionReason: rejectionReason,
           },
         });
+
+        if (updateJobRequestStatus.assignedTo) {
+          await createNotification({
+            resourceId: `/request/${updateJobRequestStatus.requestId}`,
+            title: `Job Rejected: ${updateJobRequestStatus.request.title}`,
+            resourceType: "TASK",
+            notificationType: "ALERT",
+            message: `The job for "${updateJobRequestStatus.request.title}" has been rejected after review. Specific issues were identified, and a rework is required to meet the necessary standards. Please check the request for detailed feedback and instructions on the next steps.`,
+            recepientId: updateJobRequestStatus.assignedTo,
+            userId: user.id,
+          });
+
+          await createNotification({
+            resourceId: `/request/${updateJobRequestStatus.requestId}`,
+            title: `Job Rejected: ${updateJobRequestStatus.request.title}`,
+            resourceType: "REQUEST",
+            notificationType: "INFO",
+            message: `Your job request for "${updateJobRequestStatus.request.title}" has been rejected and requires a rework. Please check the request for further details on the changes needed.`,
+            recepientId: updateJobRequestStatus.request.userId,
+            userId: user.id,
+          });
+        }
 
         return updateJobRequestStatus;
       });
@@ -376,6 +440,7 @@ export const updateReworkJobRequest = authedProcedure
   .createServerAction()
   .input(updateReworkJobRequestSchema)
   .handler(async ({ ctx, input }) => {
+    const { user } = ctx;
     const { reworkId, status, ...rest } = input;
     try {
       const result = await db.$transaction(async (prisma) => {
@@ -391,7 +456,54 @@ export const updateReworkJobRequest = authedProcedure
             },
             ...rest,
           },
+          select: {
+            jobRequest: {
+              select: {
+                request: true,
+              },
+            },
+          },
         });
+
+        if (
+          status === "REWORK_IN_PROGRESS" &&
+          updateJobRequestStatus.jobRequest.request.reviewedBy
+        ) {
+          await createNotification({
+            resourceId: `/request/${updateJobRequestStatus.jobRequest.request.id}`,
+            title: `Rework In Progress: ${updateJobRequestStatus.jobRequest.request.title}`,
+            resourceType: "TASK",
+            notificationType: "INFO",
+            message: `The rework for "${updateJobRequestStatus.jobRequest.request.title}" job is currently in progress. Please check the request for further details.`,
+            recepientId: updateJobRequestStatus.jobRequest.request.reviewedBy,
+            userId: user.id,
+          });
+
+          await createNotification({
+            resourceId: `/request/${updateJobRequestStatus.jobRequest.request.id}`,
+            title: `Rework In Progress: ${updateJobRequestStatus.jobRequest.request.title}`,
+            resourceType: "REQUEST",
+            notificationType: "INFO",
+            message: `Your job request for "${updateJobRequestStatus.jobRequest.request.title}" is currently under rework. Please check the request for further details.`,
+            recepientId: updateJobRequestStatus.jobRequest.request.userId,
+            userId: user.id,
+          });
+        }
+
+        if (
+          status === "COMPLETED" &&
+          updateJobRequestStatus.jobRequest.request.reviewedBy
+        ) {
+          await createNotification({
+            resourceId: `/request/${updateJobRequestStatus.jobRequest.request.id}`,
+            title: `Rework Completed: ${updateJobRequestStatus.jobRequest.request.title}`,
+            resourceType: "TASK",
+            notificationType: "INFO",
+            message: `The rework for the request "${updateJobRequestStatus.jobRequest.request.title}" has been successfully completed. Please review the request for further details.`,
+            recepientId: updateJobRequestStatus.jobRequest.request.reviewedBy,
+            userId: user.id,
+          });
+        }
 
         return updateJobRequestStatus;
       });

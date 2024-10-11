@@ -4,7 +4,6 @@ import React from "react";
 
 import { Button, buttonVariants } from "@/components/ui/button";
 import { useSession } from "@/lib/hooks/use-session";
-import Inbox from "./inbox";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { CirclePlus, SlidersHorizontal } from "lucide-react";

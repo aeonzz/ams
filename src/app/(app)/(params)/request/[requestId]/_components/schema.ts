@@ -80,3 +80,11 @@ export const updateReworkJobRequestSchema = z.object({
 export type UpdateReworkJobRequestSchema = z.infer<
   typeof updateReworkJobRequestSchema
 >;
+
+export const cancelOwnRequestSchema = z.object({
+  requestId: z.string(),
+  path: z.string(),
+  status: RequestStatusTypeSchema
+});
+
+export type CancelOwnRequestSchema = z.infer<typeof cancelOwnRequestSchema>;

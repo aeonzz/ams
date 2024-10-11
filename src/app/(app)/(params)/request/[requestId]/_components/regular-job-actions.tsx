@@ -77,6 +77,7 @@ export default function RegularJobActions({
         success: () => {
           queryClient.invalidateQueries({ queryKey: [requestId] });
           socket.emit("request_update", requestId);
+          socket.emit("notifications", requestId);
           return `Job request is now ${status.toLowerCase().replace("_", " ")}`;
         },
         error: (err) => {

@@ -10,52 +10,36 @@ import { socket } from "@/app/socket";
 import { type Notification, User } from "prisma/generated/zod";
 import DashboardSidebar from "./dashboard-sidebar";
 import { useSession } from "@/lib/hooks/use-session";
+import { useRouter } from "next/navigation";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
+  notification: Notification[];
 }
 
-export default function DashboardLayout({ children }: DashboardLayoutProps) {
-  const queryClient = useQueryClient();
-  const currentUser = useSession();
+export default function DashboardLayout({
+  children,
+  notification,
+}: DashboardLayoutProps) {
+  const router = useRouter();
   const sidebar = useStore(useSidebarToggle, (state) => state);
-
-  const { data } = useQuery<Notification[]>({
-    queryFn: async () => {
-      const res = await axios.get(
-        `/api/notification/get-user-notification/${currentUser.id}`
-      );
-      return res.data.data;
-    },
-    queryKey: ["get-user-notifications", currentUser.id],
-    staleTime: 0,
-  });
-
-  const hasUnreadNotifications = React.useMemo(() => {
-    return data?.some((notification) => !notification.isRead);
-  }, [data]);
 
   React.useEffect(() => {
     const handleNotification = () => {
       console.log("Notification received in DashboardLayout");
-      queryClient.invalidateQueries({
-        queryKey: ["get-user-notifications", currentUser.id],
-      });
+      router.refresh();
     };
 
     socket.on("notifications", handleNotification);
-    socket.on("request_update", handleNotification);
-
-    // Ensure the socket is connected
-    if (!socket.connected) {
-      socket.connect();
-    }
 
     return () => {
       socket.off("notifications", handleNotification);
-      socket.off("request_update", handleNotification);
     };
-  }, [queryClient, currentUser.id]);
+  }, []);
+
+  const hasUnreadNotifications = React.useMemo(() => {
+    return notification?.some((notification) => !notification.isRead);
+  }, [notification]);
 
   if (!sidebar) return null;
 

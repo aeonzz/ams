@@ -34,6 +34,8 @@ export { JobStatusSchema } from './JobStatusSchema';
 export { ChangeTypeSchema } from './ChangeTypeSchema';
 export { EntityTypeSchema } from './EntityTypeSchema';
 export { JobTypeSchema } from './JobTypeSchema';
+export { NotificationTypeSchema } from './NotificationTypeSchema';
+export { ResourceTypeSchema } from './ResourceTypeSchema';
 export { VenueTypeSchema } from './VenueTypeSchema';
 export { ClientTypeSchema } from './ClientTypeSchema';
 export { ItemStatusSchema } from './ItemStatusSchema';

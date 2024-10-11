@@ -2,13 +2,13 @@ import React, { useEffect, useRef } from "react";
 import { InboxIcon } from "lucide-react";
 import { P } from "@/components/typography/text";
 import NotificationCard from "../../notification/_components/notification-card";
-import { type Notification } from "prisma/generated/zod";
+import type { NotificationWithRelations } from "prisma/generated/zod";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 
 interface InboxProps {
   className?: string;
-  notifications: Notification[] | undefined;
+  notifications: NotificationWithRelations[] | undefined;
   onNotificationSelect: (notificationId: string) => void;
   selectedNotificationId: string | null;
   status: "pending" | "error" | "success";
@@ -52,7 +52,7 @@ export default function Inbox({
 
   const renderNotifications = () => {
     if (status === "pending") {
-      return Array.from({ length: 5 }).map((_, index) => (
+      return Array.from({ length: 10 }).map((_, index) => (
         <NotificationSkeleton key={index} />
       ));
     }
@@ -74,7 +74,7 @@ export default function Inbox({
       );
     }
 
-    return notifications.map((notification: Notification) => (
+    return notifications.map((notification: NotificationWithRelations) => (
       <NotificationCard
         key={notification.id}
         data={notification}
@@ -88,7 +88,7 @@ export default function Inbox({
     <div className={className}>
       <div className="scroll-bar h-[calc(100vh-64px)] overflow-y-auto p-1">
         {renderNotifications()}
-        {isFetchingNextPage && <NotificationSkeleton />}
+        {hasNextPage && isFetchingNextPage && <NotificationSkeleton />}
         <div ref={observerTarget} />
       </div>
     </div>

@@ -28,8 +28,8 @@ import { type RequestWithRelations } from "prisma/generated/zod";
 import { CommandShortcut } from "@/components/ui/command";
 import { P } from "@/components/typography/text";
 import { useHotkeys } from "react-hotkeys-hook";
-import { updateRequestStatus } from "@/lib/actions/job";
-import { type UpdateRequestStatusSchemaWithPath } from "./schema";
+import { cancelOwnRequest } from "@/lib/actions/job";
+import type { CancelOwnRequestSchema } from "./schema";
 import { EntityTypeType } from "prisma/generated/zod/inputTypeSchemas/EntityTypeSchema";
 import { socket } from "@/app/socket";
 
@@ -46,18 +46,14 @@ export default function RequestActions({
 }: RequestActionsProps) {
   const pathname = usePathname();
   const queryClient = useQueryClient();
-  const { mutateAsync, isPending } =
-    useServerActionMutation(updateRequestStatus);
+  const { mutateAsync, isPending } = useServerActionMutation(cancelOwnRequest);
 
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
 
   function handleCancellation() {
-    const values: UpdateRequestStatusSchemaWithPath = {
+    const values: CancelOwnRequestSchema = {
       requestId: data.id,
       path: pathname,
-      changeType: "CANCELLED",
-
-      entityType: entityType,
       status: "CANCELLED",
     };
 
