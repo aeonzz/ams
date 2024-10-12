@@ -52,16 +52,22 @@ import { Textarea } from "@/components/ui/text-area";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn, textTransform } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface UpdateDepartmentSheetProps
   extends React.ComponentPropsWithRef<typeof Sheet> {
   department: Department;
+  queryKey?: string[];
+  removeField?: boolean;
 }
 
 export function UpdateDepartmentSheet({
   department,
+  queryKey,
+  removeField = false,
   ...props
 }: UpdateDepartmentSheetProps) {
+  const queryClient = useQueryClient();
   const pathname = usePathname();
   const [open, setOpen] = React.useState(false);
   const form = useForm<UpdateDepartmentSchema>({
@@ -101,6 +107,9 @@ export function UpdateDepartmentSheet({
     toast.promise(mutateAsync(data), {
       loading: "Saving...",
       success: () => {
+        queryClient.invalidateQueries({
+          queryKey: queryKey,
+        });
         props.onOpenChange?.(false);
         return "Department updated successfully";
       },
@@ -121,9 +130,9 @@ export function UpdateDepartmentSheet({
         }}
       >
         <SheetHeader className="text-left">
-          <SheetTitle>Update task</SheetTitle>
+          <SheetTitle>Update department</SheetTitle>
           <SheetDescription>
-            Update the task details and save the changes
+            Update the department details and save the changes
           </SheetDescription>
         </SheetHeader>
         <Form {...form}>
@@ -131,7 +140,7 @@ export function UpdateDepartmentSheet({
             onSubmit={form.handleSubmit(onSubmit)}
             className="flex h-screen flex-col justify-between"
           >
-            <div className="relative space-y-2 px-4">
+            <div className="scroll-bar relative max-h-[75vh] space-y-2 overflow-y-auto px-4 pb-1">
               <FormField
                 control={form.control}
                 name="name"
@@ -179,7 +188,7 @@ export function UpdateDepartmentSheet({
                         rows={1}
                         maxRows={10}
                         placeholder="responsibilities..."
-                        className="min-h-[100px] flex-grow resize-none"
+                        className="min-h-[100px] flex-grow resize-none bg-transparent"
                         disabled={isPending}
                         {...field}
                       />

@@ -525,7 +525,6 @@ enum DepartmentType {
   ACADEMIC
   ADMINISTRATIVE
   TECHNICAL
-  SUPPORT
 }
 
 enum VenueStatus {

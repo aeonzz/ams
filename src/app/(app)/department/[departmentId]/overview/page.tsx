@@ -1,7 +1,17 @@
-import React from 'react'
+import ContentLayout from "@/components/layouts/content-layout";
+import DepartmentOverviewSchreen from "./_components";
 
-export default function DepartmentOverview() {
+export interface DepartmentOverview {
+  params: {
+    departmentId: string;
+    venueId: string;
+  };
+}
+
+export default function DepartmentOverview({ params }: DepartmentOverview) {
   return (
-    <div>DepartmentOverview</div>
-  )
+    <ContentLayout title="Overview">
+      <DepartmentOverviewSchreen departmentId={params.departmentId} />
+    </ContentLayout>
+  );
 }

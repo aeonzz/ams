@@ -31,7 +31,8 @@ export default function NotificationCard({
   return (
     <div
       className={cn(
-        "mb-1 flex w-full cursor-pointer rounded-md border hover:bg-secondary-accent"
+        "mb-1 flex w-full cursor-pointer rounded-md border hover:bg-secondary-accent",
+        isSelected && "bg-tertiary"
       )}
       onClick={onClick}
     >

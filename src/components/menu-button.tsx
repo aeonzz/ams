@@ -28,17 +28,17 @@ export default function MenuButton({
       variant="ghost"
       className={cn(
         active && "bg-tertiary hover:bg-tertiary",
-        "mb-1 h-8 w-full justify-start"
+        "group mb-1 h-8 w-full justify-start"
       )}
       asChild
     >
       <Link href={href} prefetch>
-        <span className={cn(isOpen === false ? "" : "mr-3")}>
+        <span className={cn(isOpen === false ? "" : "mr-2")}>
           <div className="relative">
             {label === "Notifications" && hasUnreadNotifications && (
-              <span className="h-2 w-2 top-0 left-2.5 absolute rounded-full bg-red-500"></span>
+              <span className="absolute left-2.5 top-0 h-2 w-2 rounded-full bg-red-500"></span>
             )}
-            <Icon className="size-5" />
+            <Icon className="size-5 opacity-70 transition-opacity group-hover:opacity-100" />
           </div>
         </span>
         <p

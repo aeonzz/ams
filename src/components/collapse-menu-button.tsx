@@ -66,14 +66,12 @@ export default function CollapseMenuButton({
           >
             <Button
               variant="ghost"
-              className={cn(
-                "h-8 w-full justify-start"
-              )}
+              className={cn("group h-8 w-full justify-start")}
             >
               <div className="flex w-full items-center gap-1">
                 <div className="flex items-center">
-                  <span className="mr-3">
-                    <Icon size={18} />
+                  <span className="mr-2">
+                    <Icon className="size-5 opacity-70 transition-opacity group-hover:opacity-100" />
                   </span>
                   <p
                     className={cn(
@@ -102,7 +100,7 @@ export default function CollapseMenuButton({
               </div>
             </Button>
           </CollapsibleTrigger>
-          <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+          <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down pl-10">
             {submenus.map(({ href, label, active }, index) => (
               <SubMenuButton
                 key={index}

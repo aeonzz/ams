@@ -29,9 +29,6 @@ export default function SubMenuButton({
       asChild
     >
       <Link href={href}>
-        <span className="ml-2 mr-3">
-          <Dot size={18} />
-        </span>
         <p
           className={cn(
             "max-w-[170px] truncate",
