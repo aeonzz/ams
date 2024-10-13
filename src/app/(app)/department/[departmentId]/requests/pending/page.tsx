@@ -7,6 +7,7 @@ import { SearchParams } from "@/lib/types";
 import ManageRequestScreen from "./_components";
 import { RoleGuard } from "@/components/role-guard";
 import NotFound from "@/app/not-found";
+import DepartmentLayout from "../../_components/department-layout";
 
 export interface ManageRequestPageProps {
   params: { departmentId: string };
@@ -22,7 +23,9 @@ export default async function ManageRequestPage({
   return (
     <RoleGuard allowedRoles={["REQUEST_REVIEWER", "DEPARTMENT_HEAD"]}>
       <ContentLayout title="Requests">
-        <ManageRequestScreen search={search} departmentId={departmentId} />
+        <DepartmentLayout departmentId={params.departmentId}>
+          <ManageRequestScreen search={search} departmentId={departmentId} />
+        </DepartmentLayout>
       </ContentLayout>
     </RoleGuard>
   );

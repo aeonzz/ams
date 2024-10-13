@@ -19,6 +19,14 @@ export async function GET(req: Request, context: Context) {
           include: {
             jobRequest: true,
           },
+          orderBy: {
+            createdAt: "desc",
+          },
+        },
+        userDepartments: {
+          include: {
+            user: true,
+          },
         },
       },
     });

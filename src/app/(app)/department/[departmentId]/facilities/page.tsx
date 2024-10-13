@@ -1,5 +1,6 @@
 import ContentLayout from "@/components/layouts/content-layout";
 import ManageVenueScreen from "./_components";
+import DepartmentLayout from "../_components/department-layout";
 
 export interface DepartmentVenuesPage {
   params: {
@@ -11,7 +12,9 @@ export interface DepartmentVenuesPage {
 export default function DepartmentVenuesPage({ params }: DepartmentVenuesPage) {
   return (
     <ContentLayout title="Venues">
-      <ManageVenueScreen departmentId={params.departmentId} />
+      <DepartmentLayout departmentId={params.departmentId}>
+        <ManageVenueScreen departmentId={params.departmentId} />
+      </DepartmentLayout>
     </ContentLayout>
   );
 }

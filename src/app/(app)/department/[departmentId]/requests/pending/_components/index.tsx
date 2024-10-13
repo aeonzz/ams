@@ -19,28 +19,20 @@ export default function ManageRequestScreen({
   const requestPromise = getManageRequests({ ...search, departmentId });
 
   return (
-    <div className="flex h-full w-full">
-      <div className="flex-1">
-        <div className="flex h-[50px] items-center justify-between border-b px-3">
-          <P className="font-medium">Pending Requests</P>
-          <SearchInput />
-        </div>
-        <div className="grid min-h-[calc(100vh_-_100px)] place-items-center items-center py-2">
-          <React.Suspense
-            fallback={
-              <DataTableSkeleton
-                columnCount={4}
-                searchableColumnCount={1}
-                filterableColumnCount={2}
-                cellWidths={["10rem", "30rem", "12rem", "12rem", "8rem"]}
-                shrinkZero
-              />
-            }
-          >
-            <ManageRequestsTable requestPromise={requestPromise} />
-          </React.Suspense>
-        </div>
-      </div>
+    <div className="w-full">
+      <React.Suspense
+        fallback={
+          <DataTableSkeleton
+            columnCount={4}
+            searchableColumnCount={1}
+            filterableColumnCount={2}
+            cellWidths={["10rem", "30rem", "12rem", "12rem", "8rem"]}
+            shrinkZero
+          />
+        }
+      >
+        <ManageRequestsTable requestPromise={requestPromise} />
+      </React.Suspense>
     </div>
   );
 }

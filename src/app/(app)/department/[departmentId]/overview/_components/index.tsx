@@ -161,121 +161,105 @@ export default function DepartmentOverviewScreen({
         : "No pending jobs at the moment.";
 
   return (
-    <div className="flex h-full w-full flex-col">
-      <div className="flex h-[50px] items-center justify-between border-b px-3">
-        <P className="font-medium">{data.name}</P>
-        <div className="flex items-center gap-2">
-          <OverviewNavigationMenu data={data} />
-          <SearchInput />
+    <div className="container w-full p-0">
+      <div className="grid grid-flow-row grid-cols-2 gap-3">
+        <div className="col-span-2 flex h-[450px] rounded-md border">
+          <div className="w-[40%] border-r">
+            <div className="flex h-[50px] items-center justify-between border-b px-3">
+              <P className="font-medium">Inbox</P>
+            </div>
+            <Inbox
+              className="w-full"
+              notifications={allNotifications}
+              onNotificationSelect={handleNotificationSelect}
+              selectedNotificationId={selectedNotificationId}
+              status={notificationsStatus}
+              fetchNextPage={fetchNextPage}
+              hasNextPage={hasNextPage}
+              isFetchingNextPage={isFetchingNextPage}
+              height="h-[400px]"
+            />
+          </div>
+          <div className="flex-1">
+            <div className="flex h-[50px] items-center justify-between border-b px-3">
+              <P className="font-medium">Details</P>
+              {notificationsStatus === "pending" ? (
+                <div className="flex gap-1">
+                  <Skeleton className="h-8 w-20" />
+                  <Skeleton className="h-8 w-20" />
+                </div>
+              ) : selectedNotification ? (
+                <div className="flex gap-1">
+                  {selectedNotification.resourceId && (
+                    <Link
+                      href={selectedNotification.resourceId}
+                      className={cn(buttonVariants({ size: "sm" }), "text-sm")}
+                    >
+                      View
+                    </Link>
+                  )}
+                </div>
+              ) : null}
+            </div>
+            <ScrollArea className="h-[calc(100%-50px)] p-4">
+              {notificationsStatus === "pending" ? (
+                <div className="space-y-4">
+                  <Skeleton className="h-8 w-3/4" />
+                  <Skeleton className="h-4 w-1/2" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-3/4" />
+                </div>
+              ) : notificationsStatus === "error" ? (
+                <div className="flex h-[calc(100vh_-_80px)] items-center justify-center">
+                  <div className="flex flex-col items-center space-y-3">
+                    <InboxIcon className="size-16" strokeWidth={1} />
+                    <P className="text-muted-foreground">
+                      Error loading notifications
+                    </P>
+                  </div>
+                </div>
+              ) : selectedNotification ? (
+                <div>
+                  <div className="mb-4">
+                    <H1 className="font-bold tracking-tight">
+                      {selectedNotification.title}
+                    </H1>
+                    <Badge variant="outline">
+                      {textTransform(selectedNotification.resourceType)}
+                    </Badge>
+                  </div>
+                  <P className="mb-2 text-muted-foreground">
+                    {new Date(selectedNotification.createdAt).toLocaleString()}
+                  </P>
+                  <P>{selectedNotification.message}</P>
+                </div>
+              ) : null}
+            </ScrollArea>
+          </div>
         </div>
-      </div>
-      <div className="scroll-bar flex flex-1 justify-center overflow-y-auto p-3">
-        <div className="container w-full p-0">
-          <div className="grid grid-flow-row grid-cols-2 gap-3">
-            <div className="col-span-2 flex h-[450px] rounded-md border">
-              <div className="w-[40%] border-r">
-                <div className="flex h-[50px] items-center justify-between border-b px-3">
-                  <P className="font-medium">Inbox</P>
-                </div>
-                <Inbox
-                  className="w-full"
-                  notifications={allNotifications}
-                  onNotificationSelect={handleNotificationSelect}
-                  selectedNotificationId={selectedNotificationId}
-                  status={notificationsStatus}
-                  fetchNextPage={fetchNextPage}
-                  hasNextPage={hasNextPage}
-                  isFetchingNextPage={isFetchingNextPage}
-                  height="h-[400px]"
-                />
-              </div>
-              <div className="flex-1">
-                <div className="flex h-[50px] items-center justify-between border-b px-3">
-                  <P className="font-medium">Details</P>
-                  {notificationsStatus === "pending" ? (
-                    <div className="flex gap-1">
-                      <Skeleton className="h-8 w-20" />
-                      <Skeleton className="h-8 w-20" />
-                    </div>
-                  ) : selectedNotification ? (
-                    <div className="flex gap-1">
-                      {selectedNotification.resourceId && (
-                        <Link
-                          href={selectedNotification.resourceId}
-                          className={cn(
-                            buttonVariants({ size: "sm" }),
-                            "text-sm"
-                          )}
-                        >
-                          View
-                        </Link>
-                      )}
-                    </div>
-                  ) : null}
-                </div>
-                <ScrollArea className="h-[calc(100%-50px)] p-4">
-                  {notificationsStatus === "pending" ? (
-                    <div className="space-y-4">
-                      <Skeleton className="h-8 w-3/4" />
-                      <Skeleton className="h-4 w-1/2" />
-                      <Skeleton className="h-4 w-full" />
-                      <Skeleton className="h-4 w-full" />
-                      <Skeleton className="h-4 w-3/4" />
-                    </div>
-                  ) : notificationsStatus === "error" ? (
-                    <div className="flex h-[calc(100vh_-_80px)] items-center justify-center">
-                      <div className="flex flex-col items-center space-y-3">
-                        <InboxIcon className="size-16" strokeWidth={1} />
-                        <P className="text-muted-foreground">
-                          Error loading notifications
-                        </P>
-                      </div>
-                    </div>
-                  ) : selectedNotification ? (
-                    <div>
-                      <div className="mb-4">
-                        <H1 className="font-bold tracking-tight">
-                          {selectedNotification.title}
-                        </H1>
-                        <Badge variant="outline">
-                          {textTransform(selectedNotification.resourceType)}
-                        </Badge>
-                      </div>
-                      <P className="mb-2 text-muted-foreground">
-                        {new Date(
-                          selectedNotification.createdAt
-                        ).toLocaleString()}
-                      </P>
-                      <P>{selectedNotification.message}</P>
-                    </div>
-                  ) : null}
-                </ScrollArea>
-              </div>
+        <div className="col-span-2 flex flex-col gap-3">
+          <div className="flex h-fit gap-2">
+            <div className="flex-1">
+              <TotalOpenRequests totalRequestsCount={openRequests.length} />
             </div>
-            <div className="col-span-2 flex flex-col gap-3">
-              <div className="flex h-fit gap-2">
-                <div className="flex-1">
-                  <TotalOpenRequests totalRequestsCount={openRequests.length} />
+            <Card className="flex-1 bg-secondary">
+              <CardHeader className="p-4 pb-0">
+                <CardTitle>Pending Jobs</CardTitle>
+                <CardDescription>{description}</CardDescription>
+              </CardHeader>
+              <CardContent className="flex flex-row items-baseline gap-4 p-4 pt-0">
+                <div className="flex items-baseline gap-1 text-3xl font-bold tabular-nums leading-none">
+                  {pendingJobsCount}
+                  <span className="text-sm font-normal text-muted-foreground">
+                    jobs
+                  </span>
                 </div>
-                <Card className="flex-1 bg-secondary">
-                  <CardHeader className="p-4 pb-0">
-                    <CardTitle>Pending Jobs</CardTitle>
-                    <CardDescription>{description}</CardDescription>
-                  </CardHeader>
-                  <CardContent className="flex flex-row items-baseline gap-4 p-4 pt-0">
-                    <div className="flex items-baseline gap-1 text-3xl font-bold tabular-nums leading-none">
-                      {pendingJobsCount}
-                      <span className="text-sm font-normal text-muted-foreground">
-                        jobs
-                      </span>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-              <div className="">
-                <OpenRequestsTable data={openRequests} />
-              </div>
-            </div>
+              </CardContent>
+            </Card>
+          </div>
+          <div className="">
+            <OpenRequestsTable data={openRequests} />
           </div>
         </div>
       </div>

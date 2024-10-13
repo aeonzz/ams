@@ -336,6 +336,7 @@ export const updateJobRequest = authedProcedure
                 ...rest,
               },
             },
+            completedAt: status === "VERIFIED" ? new Date() : undefined,
           },
           include: {
             jobRequest: true,

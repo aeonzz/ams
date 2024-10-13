@@ -26,7 +26,7 @@ export const RequestSchema = z.object({
   type: RequestTypeSchema,
   status: RequestStatusTypeSchema,
   id: z.string(),
-  approvedAt: z.coerce.date().nullable(),
+  completedAt: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
   title: z.string(),

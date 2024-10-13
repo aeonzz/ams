@@ -64,11 +64,7 @@ export default function DepartmentVehicleScreen({
   }
 
   return (
-    <div className="flex h-full w-full flex-col">
-      <div className="flex h-[50px] items-center justify-between border-b px-3">
-        <P className="font-medium">Vehicles</P>
-        <SearchInput />
-      </div>
+    <>
       <div className="flex w-full justify-between p-3 pb-0">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 transform text-muted-foreground" />
@@ -158,6 +154,6 @@ export default function DepartmentVehicleScreen({
           </div>
         )}
       </div>
-    </div>
+    </>
   );
 }

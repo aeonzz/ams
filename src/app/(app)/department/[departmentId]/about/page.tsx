@@ -1,5 +1,6 @@
 import ContentLayout from "@/components/layouts/content-layout";
 import AboutDepartmentScreen from "./_components";
+import DepartmentLayout from "../_components/department-layout";
 
 export interface AboutDepartment {
   params: {
@@ -10,7 +11,9 @@ export interface AboutDepartment {
 export default function AboutDepartment({ params }: AboutDepartment) {
   return (
     <ContentLayout title="About">
-      <AboutDepartmentScreen departmentId={params.departmentId} />
+      <DepartmentLayout departmentId={params.departmentId}>
+        <AboutDepartmentScreen departmentId={params.departmentId} />
+      </DepartmentLayout>
     </ContentLayout>
   );
 }

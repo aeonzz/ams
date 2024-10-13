@@ -80,100 +80,94 @@ export default function DepartmentVenuesScreen({
   }
 
   return (
-    <div className="flex h-full w-full flex-col">
-      <div className="flex h-[50px] items-center justify-between border-b px-3">
-        <P className="font-medium">Facilities</P>
-        <SearchInput />
-      </div>
-      <div className="scroll-bar flex flex-1 justify-center overflow-y-auto p-3">
-        {isLoading ? (
-          <DepartmentVenuesSkeleton />
-        ) : isError ? (
-          <div className="flex h-screen w-full items-center justify-center">
-            <FetchDataError refetch={refetch} />
-          </div>
-        ) : data?.length === 0 ? (
-          <NoDataMessage message="No facilities available." />
-        ) : (
-          <div className="w-[1280px]">
-            <div className="mb-3 flex w-full justify-between">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 transform text-muted-foreground" />
-                <Input
-                  type="text"
-                  placeholder="Search facilities..."
-                  className="h-9 w-[280px] bg-tertiary pl-8"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-              <Button
-                variant="default"
-                onClick={() =>
-                  dialogManager.setActiveDialog("adminCreateVenueDialog")
-                }
-              >
-                <PlusIcon className="mr-1 size-4" aria-hidden="true" />
-                <P className="font-semibold">Add</P>
-              </Button>
+    <div className="scroll-bar flex flex-1 justify-center overflow-y-auto p-3">
+      {isLoading ? (
+        <DepartmentVenuesSkeleton />
+      ) : isError ? (
+        <div className="flex h-screen w-full items-center justify-center">
+          <FetchDataError refetch={refetch} />
+        </div>
+      ) : data?.length === 0 ? (
+        <NoDataMessage message="No facilities available." />
+      ) : (
+        <div className="w-[1280px]">
+          <div className="mb-3 flex w-full justify-between">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 transform text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Search facilities..."
+                className="h-9 w-[280px] bg-tertiary pl-8"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
-            {filteredVenues.length === 0 ? (
-              <NoDataMessage message="No facilities found. Try adjusting your search" />
-            ) : (
-              <div className="grid grid-cols-1 gap-3 pb-3 md:grid-cols-2 lg:grid-cols-3">
-                {filteredVenues.map((venue) => {
-                  const status = getVenueStatusColor(venue.status);
-                  return (
-                    <Link
-                      key={venue.id}
-                      href={`/department/${departmentId}/facilities/${venue.id}`}
-                    >
-                      <Card className="relative cursor-pointer overflow-hidden shadow-md transition-all hover:border-primary">
-                        <div className="relative aspect-video h-48 w-full">
-                          <Image
-                            src={venue.imageUrl}
-                            alt={`Image of ${venue.name}`}
-                            fill
-                            priority
-                            className="object-cover"
-                          />
-                        </div>
-                        <CardHeader className="p-3">
-                          <CardTitle className="flex max-w-64 items-center justify-between">
-                            <H4 className="truncate">{venue.name}</H4>
-                          </CardTitle>
-                          <div className="flex items-center justify-between">
-                            <Badge variant={status.variant} className="pr-3.5">
-                              <Dot
-                                className="mr-1 size-3"
-                                strokeWidth={status.stroke}
-                                color={status.color}
-                              />
-                              {textTransform(venue.status)}
-                            </Badge>
-                            <Link
-                              href={`/department/${departmentId}/facilities/${venue.id}`}
-                              className={cn(
-                                buttonVariants({
-                                  variant: "ghost2",
-                                  size: "icon",
-                                })
-                              )}
-                              prefetch
-                            >
-                              <ExternalLink className="size-5" />
-                            </Link>
-                          </div>
-                        </CardHeader>
-                      </Card>
-                    </Link>
-                  );
-                })}
-              </div>
-            )}
+            <Button
+              variant="default"
+              onClick={() =>
+                dialogManager.setActiveDialog("adminCreateVenueDialog")
+              }
+            >
+              <PlusIcon className="mr-1 size-4" aria-hidden="true" />
+              <P className="font-semibold">Add</P>
+            </Button>
           </div>
-        )}
-      </div>
+          {filteredVenues.length === 0 ? (
+            <NoDataMessage message="No facilities found. Try adjusting your search" />
+          ) : (
+            <div className="grid grid-cols-1 gap-3 pb-3 md:grid-cols-2 lg:grid-cols-3">
+              {filteredVenues.map((venue) => {
+                const status = getVenueStatusColor(venue.status);
+                return (
+                  <Link
+                    key={venue.id}
+                    href={`/department/${departmentId}/facilities/${venue.id}`}
+                  >
+                    <Card className="relative cursor-pointer overflow-hidden shadow-md transition-all hover:border-primary">
+                      <div className="relative aspect-video h-48 w-full">
+                        <Image
+                          src={venue.imageUrl}
+                          alt={`Image of ${venue.name}`}
+                          fill
+                          priority
+                          className="object-cover"
+                        />
+                      </div>
+                      <CardHeader className="p-3">
+                        <CardTitle className="flex max-w-64 items-center justify-between">
+                          <H4 className="truncate">{venue.name}</H4>
+                        </CardTitle>
+                        <div className="flex items-center justify-between">
+                          <Badge variant={status.variant} className="pr-3.5">
+                            <Dot
+                              className="mr-1 size-3"
+                              strokeWidth={status.stroke}
+                              color={status.color}
+                            />
+                            {textTransform(venue.status)}
+                          </Badge>
+                          <Link
+                            href={`/department/${departmentId}/facilities/${venue.id}`}
+                            className={cn(
+                              buttonVariants({
+                                variant: "ghost2",
+                                size: "icon",
+                              })
+                            )}
+                            prefetch
+                          >
+                            <ExternalLink className="size-5" />
+                          </Link>
+                        </div>
+                      </CardHeader>
+                    </Card>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
