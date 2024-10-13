@@ -38,23 +38,23 @@ export function useRequest(id: string): UseQueryResult<
     };
   }, []);
 
-  // useEffect(() => {
-  //   const ws = new WebSocket("ws://localhost:8080");
+  useEffect(() => {
+    const ws = new WebSocket("ws://localhost:8080");
 
-  //   ws.onmessage = (event) => {
-  //     const data = JSON.parse(event.data);
-  //     console.log(data.queryKey);
-  //     if (data.type === "INVALIDATE_QUERIES") {
-  //       if (data.queryKey.includes(id)) {
-  //         queryClient.invalidateQueries({ queryKey: [id] });
-  //       }
-  //     }
-  //   };
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      console.log(data.queryKey);
+      if (data.type === "INVALIDATE_QUERIES") {
+        if (data.queryKey.includes(id)) {
+          queryClient.invalidateQueries({ queryKey: [id] });
+        }
+      }
+    };
 
-  //   return () => {
-  //     ws.close();
-  //   };
-  // }, [queryClient, id]);
+    return () => {
+      ws.close();
+    };
+  }, [queryClient, id]);
 
   const query = useQuery<RequestWithRelations, Error>({
     queryKey: [id],

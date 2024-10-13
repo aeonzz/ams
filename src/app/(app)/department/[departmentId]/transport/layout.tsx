@@ -6,6 +6,7 @@ import SettingsDialog from "@/components/dialogs/settings-dialog";
 import CreateVehicleDialog from "@/app/(admin)/admin/vehicles/_components/create-vehicle-dialog";
 import RequestOption from "@/app/(app)/dashboard/_components/request-option";
 import NotFound from "@/app/not-found";
+import { RoleGuard } from "@/components/role-guard";
 
 export interface Props {
   params: {
@@ -20,7 +21,7 @@ export default async function CommandLayout({ children, params }: Props) {
       id: params.departmentId,
     },
     select: {
-      acceptsTransport: true,
+      managesTransport: true,
     },
   });
 
@@ -28,22 +29,24 @@ export default async function CommandLayout({ children, params }: Props) {
     return <NotFound />;
   }
 
-  if (!department.acceptsTransport) {
+  if (!department.managesTransport) {
     return <NotFound />;
   }
 
   return (
     <>
-      <CommandSearchDialog>
-        <ThemeDialog />
-        <SettingsDialog />
-        <CreateVehicleDialog
-          queryKey={["department-vehicles", params.departmentId]}
-          departmentId={params.departmentId}
-        />
-      </CommandSearchDialog>
-      <RequestOption />
-      {children}
+      <RoleGuard allowedRoles={["DEPARTMENT_HEAD", "ADMIN"]}>
+        <CommandSearchDialog>
+          <ThemeDialog />
+          <SettingsDialog />
+          <CreateVehicleDialog
+            queryKey={["department-vehicles", params.departmentId]}
+            departmentId={params.departmentId}
+          />
+        </CommandSearchDialog>
+        <RequestOption />
+        {children}
+      </RoleGuard>
     </>
   );
 }

@@ -48,6 +48,7 @@ export default function DashboardScreen() {
             <Button
               variant="shine"
               onClick={() => dialogManager.setActiveDialog("requestDialog")}
+              className="text-slate-100 dark:text-foreground"
             >
               <CirclePlus className="mr-2 size-5" />
               Create request

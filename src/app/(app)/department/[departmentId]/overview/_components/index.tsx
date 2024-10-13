@@ -42,7 +42,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { socket } from "@/app/socket";
 import DepartmentOverviewSkeleton from "./department-overview-skeleton";
-import OverviewNavigationMenu from "./navigation-menu";
+import OverviewNavigationMenu from "../../_components/navigation-menu";
+import { useDepartmentData } from "@/lib/hooks/use-department-data";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -61,16 +62,7 @@ export default function DepartmentOverviewScreen({
   const { mutateAsync: updateStatusMutate, isPending: isUpdatePending } =
     useServerActionMutation(updateNotificationStatus);
 
-  const { data, isLoading, refetch, isError } =
-    useQuery<DepartmentWithRelations>({
-      queryFn: async () => {
-        const res = await axios.get(
-          `/api/department/get-department-by-id/${departmentId}`
-        );
-        return res.data.data;
-      },
-      queryKey: [departmentId],
-    });
+  const { data, isLoading, isError, refetch } = useDepartmentData(departmentId);
 
   const fetchNotifications = async ({ pageParam = 1 }) => {
     const res = await axios.get(

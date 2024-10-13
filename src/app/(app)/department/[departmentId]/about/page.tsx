@@ -4,7 +4,6 @@ import AboutDepartmentScreen from "./_components";
 export interface AboutDepartment {
   params: {
     departmentId: string;
-    venueId: string;
   };
 }
 

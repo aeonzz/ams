@@ -30,7 +30,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { UpdateDepartmentSheet } from "@/app/(admin)/admin/departments/_components/update-department-sheet";
 import { useHotkeys } from "react-hotkeys-hook";
 import Link from "next/link";
-import OverviewNavigationMenu from "../../overview/_components/navigation-menu";
+import OverviewNavigationMenu from "../../_components/navigation-menu";
 
 interface AboutDepartmentScreenProps {
   departmentId: string;
@@ -77,7 +77,7 @@ export default function AboutDepartmentScreen({
       <div className="flex h-[50px] items-center justify-between border-b px-3">
         <P className="font-medium">{data.name}</P>
         <div className="flex items-center gap-2">
-          <OverviewNavigationMenu departmentId={departmentId} />
+          <OverviewNavigationMenu data={data} />
           <SearchInput />
         </div>
       </div>

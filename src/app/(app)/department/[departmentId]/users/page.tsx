@@ -5,7 +5,6 @@ import ContentLayout from "@/components/layouts/content-layout";
 import { userSearchParamsSchema } from "@/lib/schema";
 import { SearchParams } from "@/lib/types";
 import DepartmentUsersScreen from "./_components";
-import { RoleGuard } from "@/components/role-guard";
 
 export interface DepartmentUsersPageProps {
   params: { departmentId: string };
@@ -20,10 +19,8 @@ export default async function DepartmentUsersPage({
   const { departmentId } = params;
 
   return (
-    <RoleGuard allowedRoles={["DEPARTMENT_HEAD", "ADMIN"]}>
-      <ContentLayout title="Users">
-        <DepartmentUsersScreen search={search} departmentId={departmentId} />
-      </ContentLayout>
-    </RoleGuard>
+    <ContentLayout title="Users">
+      <DepartmentUsersScreen search={search} departmentId={departmentId} />
+    </ContentLayout>
   );
 }

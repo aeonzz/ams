@@ -5,34 +5,34 @@
 @layer base {
   :root {
     --background: 240 4.8% 98.6%;
-    --foreground: 240 10% 3.9%;
+    --foreground: 240 10% 16%;
 
     --card: 234 20% 96.6%;
-    --card-foreground: 240 10% 3.9%;
+    --card-foreground: 240 10% 16%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
+    --popover-foreground: 240 10% 16%;
 
     --primary: 234 56% 59%;
-    --primary-foreground: 0 0% 98%;
+    --primary-foreground: 210 40% 96.1%;
 
     --secondary: 0 0% 100%;
-    --secondary-foreground: 240 5.9% 10%;
+    --secondary-foreground: 240 10% 16%;
 
     --tertiary: 234 20% 96.6%;
-    --tertiary-foreground: 240 5.9% 10%;
+    --tertiary-foreground: 240 10% 16%;
 
     --muted: 240 4.8% 95.9%;
     --muted-foreground: 240 3.8% 46.1%;
 
     --accent: 234 56% 96%;
-    --accent-foreground: 240 5.9% 10%;
+    --accent-foreground: 240 10% 16%;
 
     --secondary-accent: 240 13.5% 90%;
-    --secondary-accent-foreground: 240 5.9% 10%;
+    --secondary-accent-foreground: 240 10% 16%;
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive-foreground: 210 40% 96.1%;
 
     --border: 240 5.9% 90%;
     --input: 0 0% 100%;
@@ -49,31 +49,31 @@
 
   .dark {
     --background: 240 5% 4%;
-    --foreground: 0 0% 90%;
+    --foreground: 210 40% 96.1%;
 
     --card: 234 7% 12%;
-    --card-foreground: 0 0% 90%;
+    --card-foreground: 210 40% 96.1%;
 
     --popover: 234 8% 7%;
-    --popover-foreground: 0 0% 90%;
+    --popover-foreground: 210 40% 96.1%;
 
     --primary: 234 45% 55%;
-    --primary-foreground: 0 0% 90%;
+    --primary-foreground: 210 40% 96.1%;
 
     --secondary: 234 8% 7%;
-    --secondary-foreground: 0 0% 90%;
+    --secondary-foreground: 210 40% 96.1%;
 
     --tertiary: 234 7% 12%;
-    --tertiary-foreground: 0 0% 90%;
+    --tertiary-foreground: 210 40% 96.1%;
 
     --muted: 0 0% 14.9%;
     --muted-foreground: 0 0% 63.9%;
 
     --accent: 234 8% 7%;
-    --accent-foreground: 0 0% 90%;
+    --accent-foreground: 210 40% 96.1%;
 
     --secondary-accent: 234 13.5% 15%;
-    --secondary-accent-foreground: 0 0% 90%;
+    --secondary-accent-foreground: 210 40% 96.1%;
 
     --destructive: 0 62.8% 40%;
     --destructive-foreground: 0 0% 95%;
@@ -129,6 +129,6 @@
     @apply bg-background text-foreground;
   }
   .scroll-bar {
-    @apply scrollbar-thin scrollbar-track-transparent dark:scrollbar-thumb-white/20 scrollbar-thumb-black/20;
+    @apply scrollbar-thin scrollbar-track-transparent scrollbar-thumb-black/20 dark:scrollbar-thumb-white/20;
   }
 }

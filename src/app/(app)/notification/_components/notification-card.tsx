@@ -80,7 +80,7 @@ export default function NotificationCard({
         )}
       >
         <CardHeader className="flex flex-row items-center justify-between space-y-0 truncate pb-1 pl-2">
-          <H5 className="truncate font-semibold leading-none tracking-tight">
+          <H5 className="truncate font-medium leading-none tracking-tight">
             {data.title}
           </H5>
         </CardHeader>
