@@ -15,17 +15,22 @@ export const createNotification = authedProcedure
   .createServerAction()
   .input(createNotificationSchema)
   .handler(async ({ input }) => {
-    const { userId, ...rest } = input;
+    const { userId, recepientIds, ...rest } = input;
     try {
-      const result = await db.notification.create({
-        data: {
-          id: generateId(15),
-          userId: userId,
-          ...rest,
-        },
-      });
+      const notifications = await Promise.all(
+        recepientIds.map(async (recepientId) => {
+          return await db.notification.create({
+            data: {
+              id: generateId(15),
+              userId: userId,
+              recepientId: recepientId,
+              ...rest,
+            },
+          });
+        })
+      );
 
-      return result;
+      return notifications;
     } catch (error) {
       getErrorMessage(error);
     }

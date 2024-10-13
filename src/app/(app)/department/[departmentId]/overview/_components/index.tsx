@@ -29,30 +29,20 @@ import Link from "next/link";
 import OpenRequestsTable from "./open-requests-table";
 import TotalOpenRequests from "./total-open-requests";
 import Inbox from "@/app/(app)/dashboard/_components/inbox";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
-import { deleteNotification } from "@/lib/actions/notification";
+import {
+  deleteNotification,
+  updateNotificationStatus,
+} from "@/lib/actions/notification";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
 import { InboxIcon, Trash } from "lucide-react";
 import { CommandShortcut } from "@/components/ui/command";
 import { toast } from "sonner";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
+import { socket } from "@/app/socket";
+import DepartmentOverviewSkeleton from "./department-overview-skeleton";
+import OverviewNavigationMenu from "./navigation-menu";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -67,10 +57,9 @@ export default function DepartmentOverviewScreen({
   const [selectedNotificationId, setSelectedNotificationId] = React.useState<
     string | null
   >(null);
-  const [isAlertOpen, setIsAlertOpen] = React.useState(false);
 
-  const { mutateAsync: deleteNotificationMutate, isPending: isDeletePending } =
-    useServerActionMutation(deleteNotification);
+  const { mutateAsync: updateStatusMutate, isPending: isUpdatePending } =
+    useServerActionMutation(updateNotificationStatus);
 
   const { data, isLoading, refetch, isError } =
     useQuery<DepartmentWithRelations>({
@@ -111,6 +100,23 @@ export default function DepartmentOverviewScreen({
     return notificationsData?.pages.flatMap((page) => page.data) || [];
   }, [notificationsData]);
 
+  React.useEffect(() => {
+    socket.on("notifications", () => {
+      console.log("wtf");
+      refetchNotifications();
+    });
+
+    return () => {
+      socket.off("notifications");
+    };
+  }, []);
+
+  React.useEffect(() => {
+    if (allNotifications.length > 0 && !selectedNotificationId) {
+      setSelectedNotificationId(allNotifications[0].id);
+    }
+  }, [allNotifications, selectedNotificationId]);
+
   const handleNotificationSelect = (notificationId: string) => {
     setSelectedNotificationId(notificationId);
   };
@@ -121,36 +127,21 @@ export default function DepartmentOverviewScreen({
     );
   }, [allNotifications, selectedNotificationId]);
 
-  const handleNotificationDelete = () => {
-    if (selectedNotification) {
-      toast.promise(
-        deleteNotificationMutate({
-          notificationId: selectedNotification.id,
-        }),
-        {
-          loading: "Deleting...",
-          success: () => {
-            queryClient.invalidateQueries({
-              queryKey: [
-                "get-department-notifications-with-params",
-                departmentId,
-              ],
-            });
-            setIsAlertOpen(false);
-            setSelectedNotificationId(null);
-            return "Notification successfully deleted";
-          },
-          error: (err) => {
-            console.log(err);
-            return err.message;
-          },
-        }
-      );
+  React.useEffect(() => {
+    if (selectedNotification && !selectedNotification.isRead) {
+      updateStatusMutate({
+        notificationId: selectedNotification.id,
+        isRead: true,
+      }).then(() => {
+        refetchNotifications();
+        socket.emit("notifications");
+        console.log("Notification updated and socket event emitted");
+      });
     }
-  };
+  }, [selectedNotification, updateStatusMutate, queryClient, departmentId]);
 
   if (isLoading) {
-    return <DepartmentSkeleton />;
+    return <DepartmentOverviewSkeleton />;
   }
 
   if (isError || !data) {
@@ -182,34 +173,18 @@ export default function DepartmentOverviewScreen({
       <div className="flex h-[50px] items-center justify-between border-b px-3">
         <P className="font-medium">{data.name}</P>
         <div className="flex items-center gap-2">
-          <div className="flex">
-            <Link
-              href={`/department/${departmentId}/overview`}
-              className={cn(
-                buttonVariants({ variant: "ghost2", size: "sm" }),
-                "px-3 text-xs font-bold underline underline-offset-2"
-              )}
-            >
-              Overview
-            </Link>
-            <Link
-              href={`/department/${departmentId}/about`}
-              className={cn(
-                buttonVariants({ variant: "ghost2", size: "sm" }),
-                "px-3 text-xs"
-              )}
-            >
-              About
-            </Link>
-          </div>
+          <OverviewNavigationMenu data={data} />
           <SearchInput />
         </div>
       </div>
       <div className="scroll-bar flex flex-1 justify-center overflow-y-auto p-3">
         <div className="container w-full p-0">
           <div className="grid grid-flow-row grid-cols-2 gap-3">
-            <div className="col-span-2 flex h-[350px] border">
-              <div className="w-[36%] border-r">
+            <div className="col-span-2 flex h-[450px] rounded-md border">
+              <div className="w-[40%] border-r">
+                <div className="flex h-[50px] items-center justify-between border-b px-3">
+                  <P className="font-medium">Inbox</P>
+                </div>
                 <Inbox
                   className="w-full"
                   notifications={allNotifications}
@@ -219,11 +194,12 @@ export default function DepartmentOverviewScreen({
                   fetchNextPage={fetchNextPage}
                   hasNextPage={hasNextPage}
                   isFetchingNextPage={isFetchingNextPage}
+                  height="h-[400px]"
                 />
               </div>
               <div className="flex-1">
                 <div className="flex h-[50px] items-center justify-between border-b px-3">
-                  <P className="font-medium">Notification Details</P>
+                  <P className="font-medium">Details</P>
                   {notificationsStatus === "pending" ? (
                     <div className="flex gap-1">
                       <Skeleton className="h-8 w-20" />
@@ -242,58 +218,6 @@ export default function DepartmentOverviewScreen({
                           View
                         </Link>
                       )}
-                      <Tooltip>
-                        <AlertDialog
-                          open={isAlertOpen}
-                          onOpenChange={setIsAlertOpen}
-                        >
-                          <AlertDialogTrigger asChild>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant="secondary"
-                                size="sm"
-                                className="flex items-center pl-3"
-                                disabled={isDeletePending}
-                              >
-                                {isDeletePending ? (
-                                  <LoadingSpinner className="mr-1 size-3.5" />
-                                ) : (
-                                  <Trash className="mr-1 size-3.5" />
-                                )}
-                                Delete notification
-                              </Button>
-                            </TooltipTrigger>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent
-                            onCloseAutoFocus={(e) => e.preventDefault()}
-                          >
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                This action cannot be undone. This will
-                                permanently delete the notification from our
-                                servers.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction
-                                onClick={handleNotificationDelete}
-                                className="bg-destructive hover:bg-destructive/90"
-                              >
-                                Delete
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                        <TooltipContent
-                          className="flex items-center gap-3"
-                          side="bottom"
-                        >
-                          <P>Delete notification</P>
-                          <CommandShortcut>D</CommandShortcut>
-                        </TooltipContent>
-                      </Tooltip>
                     </div>
                   ) : null}
                 </div>
@@ -362,43 +286,6 @@ export default function DepartmentOverviewScreen({
             </div>
           </div>
         </div>
-      </div>
-    </div>
-  );
-}
-
-function DepartmentSkeleton() {
-  return (
-    <div className="flex h-full w-full flex-col p-6">
-      <div className="mb-6 flex h-[50px] items-center justify-between border-b px-3">
-        <Skeleton className="h-6 w-40" />
-        <Skeleton className="h-10 w-64" />
-      </div>
-      <div className="space-y-6">
-        <div className="rounded-lg border">
-          <CardHeader>
-            <Skeleton className="mb-2 h-8 w-64" />
-            <Skeleton className="h-4 w-full" />
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {[...Array(4)].map((_, i) => (
-                <Skeleton key={i} className="h-6 w-full" />
-              ))}
-            </div>
-          </CardContent>
-        </div>
-        <Card>
-          <CardHeader>
-            <Skeleton className="h-8 w-64" />
-          </CardHeader>
-          <CardContent>
-            <div className="flex justify-between">
-              <Skeleton className="h-6 w-40" />
-              <Skeleton className="h-6 w-40" />
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );

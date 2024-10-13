@@ -460,6 +460,9 @@ enum NotificationType {
   INFO
   ALERT
   REMINDER
+  SUCCESS
+  WARNING
+  APPROVAL
 }
 
 enum ResourceType {

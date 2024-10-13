@@ -133,6 +133,7 @@ export default function JobRequestInput({
           queryClient.invalidateQueries({
             queryKey: ["user-dashboard-overview"],
           });
+          socket.emit("notifications");
           socket.emit("request_update");
           handleOpenChange(false);
           return "Your request has been submitted and is awaiting approval.";

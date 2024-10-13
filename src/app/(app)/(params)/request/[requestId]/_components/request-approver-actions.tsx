@@ -54,12 +54,6 @@ export default function RequestApproverActions({
           queryClient.invalidateQueries({
             queryKey: ["activity", request.id],
           });
-          queryClient.invalidateQueries({
-            queryKey: [
-              "get-user-notifications",
-              request.jobRequest?.assignedTo,
-            ],
-          });
           socket.emit("request_update", request.id);
           socket.emit("notifications");
           return `Request ${successText} successfully.`;

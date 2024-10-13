@@ -63,7 +63,7 @@ export const createJobRequest = authedProcedure
                Now, create a title for the request using the provided details above.`,
       });
 
-      const createRequest = await db.request.create({
+      const createdReaquest = await db.request.create({
         data: {
           id: `REQ-${generateId(15)}`,
           userId: user.id,
@@ -93,28 +93,15 @@ export const createJobRequest = authedProcedure
         },
       });
 
-      if (!createRequest.jobRequest) {
-        throw "Something went wrong, please try again later.";
-      }
-
-      const newValueJson = JSON.parse(JSON.stringify(createRequest));
-      await db.genericAuditLog.create({
-        data: {
-          id: generateId(15),
-          entityId: createRequest.id,
-          entityType: "JOB_REQUEST",
-          changeType: "CREATED",
-          newValue: newValueJson,
-          changedById: user.id,
-        },
+      await createNotification({
+        resourceId: `/request/${createdReaquest.id}`,
+        title: `New Request Assigned: ${createdReaquest.title}`,
+        resourceType: "REQUEST",
+        notificationType: "INFO",
+        message: `A new request titled "${createdReaquest.title}" has been assigned to your department. Please review the request for further details.`,
+        recepientIds: [createdReaquest.departmentId],
+        userId: user.id,
       });
-
-      // await createNotification({
-      //   resourceId: createRequest.id,
-      //   title: "New Job Request",
-      //   resourceType: "REQUEST",
-      //   message: `There is a new job request for ${createRequest.department.name}}`,
-      // });
 
       return revalidatePath(path);
     } catch (error) {
@@ -173,31 +160,77 @@ export const updateRequestStatus = authedProcedure
             ...rest,
             reviewedBy: reviewerId,
           },
-          include: { jobRequest: true },
+          include: {
+            jobRequest: true,
+            department: {
+              include: {
+                userRole: {
+                  where: {
+                    role: {
+                      name: "DEPARTMENT_HEAD",
+                    },
+                  },
+                  select: {
+                    user: true,
+                    role: true,
+                  },
+                },
+              },
+            },
+          },
         });
 
-        if (
-          rest.status === "APPROVED" &&
-          updatedRequest.type === "JOB" &&
-          updatedRequest.jobRequest?.assignedTo
-        ) {
+        const departmentHeads = updatedRequest.department.userRole
+          ?.filter((role) => role.role.name === "DEPARTMENT_HEAD")
+          .map((role) => role.user.id);
+
+        if (rest.status === "REVIEWED") {
           await createNotification({
             resourceId: `/request/${updatedRequest.id}`,
-            title: `New Job Assignment: ${updatedRequest.title}`,
-            resourceType: "TASK",
-            message: `You have been assigned to a new job: ${updatedRequest.title}. Please review the details and take the necessary actions.`,
+            title: `Request Reviewed: ${updatedRequest.title}`,
+            resourceType: "REQUEST",
+            notificationType: "APPROVAL",
+            message: `The request titled "${updatedRequest.title}" has been reviewed and is awaiting your approval. Please review the details and take the necessary actions.`,
             userId: user.id,
-            recepientId: updatedRequest.jobRequest?.assignedTo,
+            recepientIds: departmentHeads,
+          });
+        }
+
+        if (rest.status === "APPROVED") {
+          await createNotification({
+            resourceId: `/request/${updatedRequest.id}`,
+            title: `Request Approved: ${updatedRequest.title}`,
+            resourceType: "REQUEST",
+            notificationType: "SUCCESS",
+            message: `Congratulations! Your request for "${updatedRequest.title}" has been approved. Please check the request for further details.`,
+            userId: user.id,
+            recepientIds: [updatedRequest.userId],
           });
 
           await createNotification({
             resourceId: `/request/${updatedRequest.id}`,
             title: `Request Approved: ${updatedRequest.title}`,
             resourceType: "REQUEST",
-            message: `Congratulations! Your request for "${updatedRequest.title}" has been approved. Please check the request for further details.`,
+            notificationType: "APPROVAL",
+            message: `The request titled "${updatedRequest.title}" has been approved. Please check the request for further details.`,
             userId: user.id,
-            recepientId: updatedRequest.userId,
+            recepientIds: [updatedRequest.departmentId],
           });
+
+          if (
+            updatedRequest.type === "JOB" &&
+            updatedRequest.jobRequest?.assignedTo
+          ) {
+            await createNotification({
+              resourceId: `/request/${updatedRequest.id}`,
+              title: `New Job Assignment: ${updatedRequest.title}`,
+              resourceType: "TASK",
+              notificationType: "REMINDER",
+              message: `You have been assigned to a new job: ${updatedRequest.title}. Please review the details and take the necessary actions.`,
+              userId: user.id,
+              recepientIds: [updatedRequest.jobRequest?.assignedTo],
+            });
+          }
         }
 
         if (rest.status === "CANCELLED") {
@@ -206,7 +239,7 @@ export const updateRequestStatus = authedProcedure
               resourceId: `/request/${updatedRequest.id}`,
               userId: user.id,
               resourceType: "REQUEST",
-              recepientId: updatedRequest.id,
+              recepientId: updatedRequest.userId,
               title: `Request Cancelled: ${updatedRequest.title}`,
             },
           });
@@ -216,35 +249,36 @@ export const updateRequestStatus = authedProcedure
               resourceId: `/request/${updatedRequest.id}`,
               title: `Request Cancelled: ${updatedRequest.title}`,
               resourceType: "REQUEST",
+              notificationType: "WARNING",
               message: `Your request for "${updatedRequest.title}" has been cancelled. Please check the request for further details.`,
               userId: user.id,
-              recepientId: updatedRequest.id,
+              recepientIds: [updatedRequest.userId],
             });
           }
         }
 
-        if (rest.status === "COMPLETED") {
-          const existingNotification = await prisma.notification.findFirst({
-            where: {
-              resourceId: `/request/${updatedRequest.id}`,
-              userId: user.id,
-              resourceType: "REQUEST",
-              recepientId: updatedRequest.id,
-              title: `Request Completed: ${updatedRequest.title}`,
-            },
-          });
+        // if (rest.status === "COMPLETED") {
+        //   const existingNotification = await prisma.notification.findFirst({
+        //     where: {
+        //       resourceId: `/request/${updatedRequest.id}`,
+        //       userId: user.id,
+        //       resourceType: "REQUEST",
+        //       recepientId: updatedRequest.userId,
+        //       title: `Request Completed: ${updatedRequest.title}`,
+        //     },
+        //   });
 
-          if (!existingNotification) {
-            await createNotification({
-              resourceId: `/request/${updatedRequest.id}`,
-              title: `Request Completed: ${updatedRequest.title}`,
-              resourceType: "REQUEST",
-              message: `Your request for "${updatedRequest.title}" has been successfully completed. Please review the final details.`,
-              userId: user.id,
-              recepientId: updatedRequest.id,
-            });
-          }
-        }
+        //   if (!existingNotification) {
+        //     await createNotification({
+        //       resourceId: `/request/${updatedRequest.id}`,
+        //       title: `Request Completed: ${updatedRequest.title}`,
+        //       resourceType: "REQUEST",
+        //       message: `Your request for "${updatedRequest.title}" has been successfully completed. Please review the final details.`,
+        //       userId: user.id,
+        //       recepientIds: [updatedRequest.userId],
+        //     });
+        //   }
+        // }
 
         return updatedRequest;
       });
@@ -315,7 +349,10 @@ export const updateJobRequest = authedProcedure
             resourceType: "TASK",
             notificationType: "INFO",
             message: `The job for "${updatedRequest.title}" is currently in progress. Please check the request for further details.`,
-            recepientId: updatedRequest.reviewedBy,
+            recepientIds: [
+              updatedRequest.reviewedBy,
+              updatedRequest.departmentId,
+            ],
             userId: user.id,
           });
 
@@ -325,7 +362,7 @@ export const updateJobRequest = authedProcedure
             resourceType: "REQUEST",
             notificationType: "INFO",
             message: `Your job request for "${updatedRequest.title}" is currently in progress. Please check the request for further details.`,
-            recepientId: updatedRequest.userId,
+            recepientIds: [updatedRequest.userId],
             userId: user.id,
           });
         }
@@ -335,9 +372,12 @@ export const updateJobRequest = authedProcedure
             resourceId: `/request/${updatedRequest.id}`,
             title: `Job Completed: ${updatedRequest.title}`,
             resourceType: "TASK",
-            notificationType: "INFO",
+            notificationType: "SUCCESS",
             message: `The job for "${updatedRequest.title}" has been successfully completed. Please review the request for further details.`,
-            recepientId: updatedRequest.reviewedBy,
+            recepientIds: [
+              updatedRequest.reviewedBy,
+              updatedRequest.departmentId,
+            ],
             userId: user.id,
           });
         }
@@ -347,9 +387,9 @@ export const updateJobRequest = authedProcedure
             resourceId: `/request/${updatedRequest.id}`,
             title: `Job Verified: ${updatedRequest.title}`,
             resourceType: "TASK",
-            notificationType: "INFO",
+            notificationType: "APPROVAL",
             message: `Your work on the job request "${updatedRequest.title}" has been successfully verified and completed.`,
-            recepientId: updatedRequest.jobRequest.assignedTo,
+            recepientIds: [updatedRequest.jobRequest.assignedTo],
             userId: user.id,
           });
 
@@ -357,9 +397,10 @@ export const updateJobRequest = authedProcedure
             resourceId: `/request/${updatedRequest.id}`,
             title: `Job Request Completed: ${updatedRequest.title}`,
             resourceType: "REQUEST",
+            notificationType: "SUCCESS",
             message: `Your job request for "${updatedRequest.title}" has been successfully completed. Thank you for your patience! Please review the request for any further details.`,
             userId: user.id,
-            recepientId: updatedRequest.userId,
+            recepientIds: [updatedRequest.userId],
           });
         }
 
@@ -411,7 +452,7 @@ export const reworkJobRequest = authedProcedure
             resourceType: "TASK",
             notificationType: "ALERT",
             message: `The job for "${updateJobRequestStatus.request.title}" has been rejected after review. Specific issues were identified, and a rework is required to meet the necessary standards. Please check the request for detailed feedback and instructions on the next steps.`,
-            recepientId: updateJobRequestStatus.assignedTo,
+            recepientIds: [updateJobRequestStatus.assignedTo],
             userId: user.id,
           });
 
@@ -421,7 +462,7 @@ export const reworkJobRequest = authedProcedure
             resourceType: "REQUEST",
             notificationType: "INFO",
             message: `Your job request for "${updateJobRequestStatus.request.title}" has been rejected and requires a rework. Please check the request for further details on the changes needed.`,
-            recepientId: updateJobRequestStatus.request.userId,
+            recepientIds: [updateJobRequestStatus.request.userId],
             userId: user.id,
           });
         }
@@ -475,7 +516,9 @@ export const updateReworkJobRequest = authedProcedure
             resourceType: "TASK",
             notificationType: "INFO",
             message: `The rework for "${updateJobRequestStatus.jobRequest.request.title}" job is currently in progress. Please check the request for further details.`,
-            recepientId: updateJobRequestStatus.jobRequest.request.reviewedBy,
+            recepientIds: [
+              updateJobRequestStatus.jobRequest.request.reviewedBy,
+            ],
             userId: user.id,
           });
 
@@ -485,7 +528,7 @@ export const updateReworkJobRequest = authedProcedure
             resourceType: "REQUEST",
             notificationType: "INFO",
             message: `Your job request for "${updateJobRequestStatus.jobRequest.request.title}" is currently under rework. Please check the request for further details.`,
-            recepientId: updateJobRequestStatus.jobRequest.request.userId,
+            recepientIds: [updateJobRequestStatus.jobRequest.request.userId],
             userId: user.id,
           });
         }
@@ -498,9 +541,11 @@ export const updateReworkJobRequest = authedProcedure
             resourceId: `/request/${updateJobRequestStatus.jobRequest.request.id}`,
             title: `Rework Completed: ${updateJobRequestStatus.jobRequest.request.title}`,
             resourceType: "TASK",
-            notificationType: "INFO",
+            notificationType: "SUCCESS",
             message: `The rework for the request "${updateJobRequestStatus.jobRequest.request.title}" has been successfully completed. Please review the request for further details.`,
-            recepientId: updateJobRequestStatus.jobRequest.request.reviewedBy,
+            recepientIds: [
+              updateJobRequestStatus.jobRequest.request.reviewedBy,
+            ],
             userId: user.id,
           });
         }

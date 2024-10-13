@@ -30,6 +30,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { UpdateDepartmentSheet } from "@/app/(admin)/admin/departments/_components/update-department-sheet";
 import { useHotkeys } from "react-hotkeys-hook";
 import Link from "next/link";
+import OverviewNavigationMenu from "../../overview/_components/navigation-menu";
 
 interface AboutDepartmentScreenProps {
   departmentId: string;
@@ -76,26 +77,7 @@ export default function AboutDepartmentScreen({
       <div className="flex h-[50px] items-center justify-between border-b px-3">
         <P className="font-medium">{data.name}</P>
         <div className="flex items-center gap-2">
-          <div className="flex">
-            <Link
-              href={`/department/${departmentId}/overview`}
-              className={cn(
-                buttonVariants({ variant: "ghost2", size: "sm" }),
-                "px-3 text-xs"
-              )}
-            >
-              Overview
-            </Link>
-            <Link
-              href={`/department/${departmentId}/about`}
-              className={cn(
-                buttonVariants({ variant: "ghost2", size: "sm" }),
-                "px-3 text-xs underline underline-offset-2 font-bold"
-              )}
-            >
-              About
-            </Link>
-          </div>
+          <OverviewNavigationMenu departmentId={departmentId} />
           <SearchInput />
         </div>
       </div>

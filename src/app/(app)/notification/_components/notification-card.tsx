@@ -10,10 +10,20 @@ import {
 } from "@/components/ui/card";
 import type { NotificationWithRelations } from "prisma/generated/zod";
 import { format, formatDistanceToNow } from "date-fns";
-import { P } from "@/components/typography/text";
+import { H4, H5, P } from "@/components/typography/text";
 import Link from "next/link";
 import { cn, textTransform } from "@/lib/utils";
-import { Check } from "lucide-react";
+import {
+  AlertCircle,
+  AlertTriangle,
+  Bell,
+  Check,
+  CheckCircle,
+  CircleAlert,
+  Clock,
+  Info,
+  ThumbsUp,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -32,17 +42,34 @@ export default function NotificationCard({
     <div
       className={cn(
         "mb-1 flex w-full cursor-pointer rounded-md border hover:bg-secondary-accent",
-        isSelected && "bg-tertiary"
+        isSelected && "bg-secondary-accent"
       )}
       onClick={onClick}
     >
       <div className="flex w-auto items-center gap-1 py-4 pl-3">
-        <Avatar className="size-8 rounded-full">
-          <AvatarImage src={`${data.user.profileUrl}`} />
-          <AvatarFallback className="rounded-md">
-            {data.user.firstName.charAt(0).toUpperCase()}
-          </AvatarFallback>
-        </Avatar>
+        <div className="relative">
+          <Avatar className="size-8 rounded-full">
+            <AvatarImage src={`${data.user.profileUrl}`} />
+            <AvatarFallback className="rounded-md">
+              {data.user.firstName.charAt(0).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+          <div className="absolute -bottom-1.5 -right-1.5 grid size-6 place-items-center rounded-full border bg-tertiary">
+            {data.notificationType === "ALERT" ? (
+              <AlertTriangle className="size-4 stroke-red-500" />
+            ) : data.notificationType === "INFO" ? (
+              <Info className="size-4 stroke-blue-500" />
+            ) : data.notificationType === "REMINDER" ? (
+              <Clock className="size-4 stroke-orange-500" />
+            ) : data.notificationType === "SUCCESS" ? (
+              <CheckCircle className="size-4 stroke-green-500" />
+            ) : data.notificationType === "APPROVAL" ? (
+              <ThumbsUp className="size-4 stroke-yellow-500" />
+            ) : (
+              <AlertCircle className="size-4 stroke-red-500" />
+            )}
+          </div>
+        </div>
         {!data.isRead && (
           <div className="mt-1 size-2.5 animate-pulse self-start rounded-full bg-primary" />
         )}
@@ -53,7 +80,9 @@ export default function NotificationCard({
         )}
       >
         <CardHeader className="flex flex-row items-center justify-between space-y-0 truncate pb-1 pl-2">
-          <CardTitle className="truncate">{data.title}</CardTitle>
+          <H5 className="truncate font-semibold leading-none tracking-tight">
+            {data.title}
+          </H5>
         </CardHeader>
         <CardContent className="pb-2 pl-2"></CardContent>
         <CardFooter className="flex items-center justify-between pl-2">

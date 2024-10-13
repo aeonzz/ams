@@ -91,7 +91,7 @@ export function RolesDialog({
           <CommandGroup heading="Roles">
             <CommandEmpty>No results found.</CommandEmpty>
             {data
-              ?.filter((role) => role.name !== "DEPARTMENT_HEAD")
+              ?.filter((role) => role.name !== "ADMIN")
               .map((role) => (
                 <CommandItem
                   key={role.id}

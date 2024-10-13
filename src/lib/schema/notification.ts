@@ -11,7 +11,7 @@ export const createNotificationSchema = z.object({
   resourceType: ResourceTypeSchema,
   notificationType: NotificationTypeSchema.optional(),
   userId: z.string(),
-  recepientId: z.string(),
+  recepientIds: z.array(z.string()),
 });
 
 export type CreateNotificationSchema = z.infer<typeof createNotificationSchema>;

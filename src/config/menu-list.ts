@@ -48,27 +48,16 @@ export function getMenuList({
           pathname ===
           `/department/${userDepartment.departmentId}/requests/pending`,
       },
-      {
-        href: `/department/${userDepartment.departmentId}/facilities`,
-        label: "Facilities",
-        active:
-          pathname === `/department/${userDepartment.departmentId}/facilities`,
-      },
-      {
-        href: `/department/${userDepartment.departmentId}/users`,
-        label: "Users",
-        active: pathname === `/department/${userDepartment.departmentId}/users`,
-      },
     ];
 
-    if (userDepartment.department.acceptsTransport) {
-      baseSubmenus.push({
-        href: `/department/${userDepartment.departmentId}/transport`,
-        label: "Transport Service",
-        active:
-          pathname === `/department/${userDepartment.departmentId}/transport`,
-      });
-    }
+    // if (userDepartment.department.acceptsTransport) {
+    //   baseSubmenus.push({
+    //     href: `/department/${userDepartment.departmentId}/transport`,
+    //     label: "Transport Service",
+    //     active:
+    //       pathname === `/department/${userDepartment.departmentId}/transport`,
+    //   });
+    // }
 
     return {
       href: `/department/${userDepartment.departmentId}`,

@@ -5,6 +5,7 @@ import NotificationCard from "../../notification/_components/notification-card";
 import type { NotificationWithRelations } from "prisma/generated/zod";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 interface InboxProps {
   className?: string;
@@ -15,6 +16,7 @@ interface InboxProps {
   fetchNextPage: () => void;
   hasNextPage: boolean | undefined;
   isFetchingNextPage: boolean;
+  height?: string;
 }
 
 export default function Inbox({
@@ -26,6 +28,7 @@ export default function Inbox({
   fetchNextPage,
   hasNextPage,
   isFetchingNextPage,
+  height = "h-[calc(100vh-64px)]",
 }: InboxProps) {
   const observerTarget = useRef<HTMLDivElement>(null);
 
@@ -65,7 +68,7 @@ export default function Inbox({
 
     if (!notifications || notifications.length === 0) {
       return (
-        <div className="flex h-[calc(100vh_-_80px)] items-center justify-center">
+        <div className={cn("flex items-center justify-center", height)}>
           <div className="flex flex-col items-center space-y-3">
             <InboxIcon className="size-16" strokeWidth={1} />
             <P className="text-muted-foreground">No notifications</P>
@@ -86,7 +89,7 @@ export default function Inbox({
 
   return (
     <div className={className}>
-      <div className="scroll-bar h-[calc(100vh-64px)] overflow-y-auto p-1">
+      <div className={cn("scroll-bar overflow-y-auto p-1", height)}>
         {renderNotifications()}
         {hasNextPage && isFetchingNextPage && <NotificationSkeleton />}
         <div ref={observerTarget} />
