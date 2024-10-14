@@ -21,7 +21,7 @@ export default async function DepartmentUsersPage({
 
   return (
     <ContentLayout title="Users">
-      <DepartmentLayout departmentId={params.departmentId}>
+      <DepartmentLayout departmentId={params.departmentId} name="Users">
         <DepartmentUsersScreen search={search} departmentId={departmentId} />
       </DepartmentLayout>
     </ContentLayout>

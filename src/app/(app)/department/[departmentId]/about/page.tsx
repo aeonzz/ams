@@ -11,7 +11,7 @@ export interface AboutDepartment {
 export default function AboutDepartment({ params }: AboutDepartment) {
   return (
     <ContentLayout title="About">
-      <DepartmentLayout departmentId={params.departmentId}>
+      <DepartmentLayout departmentId={params.departmentId} name="About">
         <AboutDepartmentScreen departmentId={params.departmentId} />
       </DepartmentLayout>
     </ContentLayout>

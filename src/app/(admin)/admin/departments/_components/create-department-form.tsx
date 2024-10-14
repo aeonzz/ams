@@ -229,7 +229,7 @@ export default function CreateDepartmentForm({
             />
             <FormField
               control={form.control}
-              name="acceptsTransport"
+              name="managesTransport"
               render={({ field }) => (
                 <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                   <div className="space-y-0.5">
@@ -239,6 +239,75 @@ export default function CreateDepartmentForm({
                     <FormDescription className="text-xs">
                       Indicates whether this department offers or manages
                       transport services.
+                    </FormDescription>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="managesBorrowRequest"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                  <div className="space-y-0.5">
+                    <FormLabel className="text-sm">
+                      Borrow Request Management
+                    </FormLabel>
+                    <FormDescription className="text-xs">
+                      Indicates whether this department manages or handles
+                      borrow requests.
+                    </FormDescription>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="managesSupplyRequest"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                  <div className="space-y-0.5">
+                    <FormLabel className="text-sm">
+                      Supply Request Management
+                    </FormLabel>
+                    <FormDescription className="text-xs">
+                      Indicates whether this department manages or handles
+                      supply requests.
+                    </FormDescription>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="managesFacility"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                  <div className="space-y-0.5">
+                    <FormLabel className="text-sm">
+                      Facility Management
+                    </FormLabel>
+                    <FormDescription className="text-xs">
+                      Indicates whether this department manages or handles
+                      facilities.
                     </FormDescription>
                   </div>
                   <FormControl>

@@ -145,7 +145,7 @@ export function getDepartmentsColumns(): ColumnDef<DepartmentsTableType>[] {
       cell: ({ row }) => {
         return (
           <div className="flex justify-center space-x-2">
-            {row.original.acceptsTransport ? (
+            {row.original.managesTransport ? (
               <CircleCheck className="size-5 text-green-500" />
             ) : (
               <CircleX className="size-5 text-red-500" />

@@ -59,21 +59,6 @@ export default function NotificationScreen() {
   const { mutateAsync: updateStatusMutate, isPending: isUpdatePending } =
     useServerActionMutation(updateNotificationStatus);
 
-  const handleNotification = React.useCallback(() => {
-    console.log("Notification received in NotificationScreen");
-    queryClient.invalidateQueries({
-      queryKey: ["get-user-notifications-with-params", currentUser.id],
-    });
-  }, [queryClient, currentUser.id]);
-
-  React.useEffect(() => {
-    socket.on("notifications", handleNotification);
-
-    return () => {
-      socket.off("notifications", handleNotification);
-    };
-  }, [handleNotification]);
-
   const fetchNotifications = async ({ pageParam = 1 }) => {
     const res = await axios.get(
       `/api/notification/get-user-notification-with-params/${currentUser.id}?page=${pageParam}&limit=${ITEMS_PER_PAGE}`
@@ -98,6 +83,19 @@ export default function NotificationScreen() {
     },
   });
 
+  const handleNotification = React.useCallback(() => {
+    console.log("Notification received in NotificationScreen");
+    refetch();
+  }, [queryClient, currentUser.id]);
+
+  React.useEffect(() => {
+    socket.on("notifications", handleNotification);
+
+    return () => {
+      socket.off("notifications", handleNotification);
+    };
+  }, [handleNotification]);
+
   const allNotifications = React.useMemo(() => {
     return notificationsData?.pages.flatMap((page) => page.data) || [];
   }, [notificationsData]);
@@ -121,16 +119,7 @@ export default function NotificationScreen() {
         notificationId: selectedNotification.id,
         isRead: true,
       }).then(() => {
-        queryClient.invalidateQueries({
-          queryKey: [
-            "get-user-notifications-with-params",
-            currentUser.id,
-            activeTab,
-          ],
-        });
-        queryClient.invalidateQueries({
-          queryKey: ["get-user-notifications", currentUser.id],
-        });
+        refetch();
         socket.emit("notifications");
         console.log("Notification updated and socket event emitted");
       });
@@ -222,6 +211,7 @@ export default function NotificationScreen() {
           </Tabs>
         </div>
         <Inbox
+          key={currentUser.id}
           className="w-full"
           notifications={filteredNotifications}
           onNotificationSelect={handleNotificationSelect}
@@ -322,7 +312,9 @@ export default function NotificationScreen() {
           ) : selectedNotification ? (
             <div>
               <div className="mb-4">
-                <H1 className="font-bold tracking-tight">{selectedNotification.title}</H1>
+                <H1 className="font-bold tracking-tight">
+                  {selectedNotification.title}
+                </H1>
                 <Badge variant="outline">
                   {textTransform(selectedNotification.resourceType)}
                 </Badge>

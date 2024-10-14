@@ -8,7 +8,10 @@ export const createDepartmentSchema = z.object({
     .max(30, "Cannot be more than 15 characters long"),
   description: z.string().optional(),
   acceptsJobs: z.boolean().default(false).optional(),
-  acceptsTransport: z.boolean().default(false).optional(),
+  managesTransport: z.boolean().default(false).optional(),
+  managesBorrowRequest: z.boolean().default(false).optional(),
+  managesSupplyRequest: z.boolean().default(false).optional(),
+  managesFacility: z.boolean().default(false).optional(),
   responsibilities: z.string().optional(),
   departmentType: DepartmentTypeSchema,
 });
@@ -23,7 +26,7 @@ export const updateDepartmentSchema = z.object({
   name: z.string().optional(),
   description: z.string().optional(),
   acceptsJobs: z.boolean().optional(),
-  acceptsTransport: z.boolean().optional(),
+  managesTransport: z.boolean().optional(),
   responsibilities: z.string().optional(),
   departmentType: DepartmentTypeSchema.optional(),
 });

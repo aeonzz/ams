@@ -12,7 +12,7 @@ export interface DepartmentVenuesPage {
 export default function DepartmentVenuesPage({ params }: DepartmentVenuesPage) {
   return (
     <ContentLayout title="Venues">
-      <DepartmentLayout departmentId={params.departmentId}>
+      <DepartmentLayout departmentId={params.departmentId} name="Facilities">
         <ManageVenueScreen departmentId={params.departmentId} />
       </DepartmentLayout>
     </ContentLayout>

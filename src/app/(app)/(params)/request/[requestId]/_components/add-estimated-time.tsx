@@ -101,7 +101,7 @@ export default function AddEstimatedTime({ data }: AddEstimatedTimeProps) {
   );
 
   const canEdit = permissionGuard({
-    allowedRoles: ["REQUEST_REVIEWER"],
+    allowedRoles: ["REQUEST_MANAGER"],
     currentUser,
   });
 

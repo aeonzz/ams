@@ -91,7 +91,7 @@ export default function Inbox({
     <div className={className}>
       <div className={cn("scroll-bar overflow-y-auto p-1", height)}>
         {renderNotifications()}
-        {hasNextPage && isFetchingNextPage && <NotificationSkeleton />}
+        {isFetchingNextPage && <NotificationSkeleton />}
         <div ref={observerTarget} />
       </div>
     </div>

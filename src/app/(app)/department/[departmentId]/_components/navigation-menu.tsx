@@ -16,6 +16,9 @@ import { usePathname } from "next/navigation";
 import { P } from "@/components/typography/text";
 import type { DepartmentWithRelations } from "prisma/generated/zod";
 import { BarChartIcon, Circle } from "lucide-react";
+import { useDepartmentData } from "@/lib/hooks/use-department-data";
+import FetchDataError from "@/components/card/fetch-data-error";
+import NavigationMenuSkeleton from "./navigation-menu-skeleton";
 
 const management: {
   title: string;
@@ -36,10 +39,11 @@ const management: {
       "View and manage all pending requests within the department. Ensure timely follow-up and resolution of outstanding requests.",
   },
   {
-    title: "Request History",
-    href: "/management/request-history",
+    title: "Managing Job Requests",
+    href: "job-requests",
     description:
-      "Access a record of all requests submitted by the department. Track progress, status changes, and outcomes for accountability.",
+      "Manage all job requests submitted by the department. Track progress, assign tasks, and ensure job completion.",
+    condition: true,
   },
   {
     title: "Request Escalations",
@@ -91,14 +95,28 @@ const resources: { title: string; href: string; description: string }[] = [
 ];
 
 interface OverviewNavigationMenuProps {
-  data: DepartmentWithRelations;
+  departmentId: string;
 }
 
 export default function OverviewNavigationMenu({
-  data,
+  departmentId,
 }: OverviewNavigationMenuProps) {
   const pathname = usePathname();
-  const { id: departmentId, managesTransport, managesFacility } = data;
+  const { data, isLoading, isError, refetch } = useDepartmentData(departmentId);
+
+  if (isLoading) {
+    return <NavigationMenuSkeleton />;
+  }
+
+  if (isError || !data) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <FetchDataError refetch={refetch} />
+      </div>
+    );
+  }
+
+  const { managesTransport, managesFacility, acceptsJobs } = data;
 
   const managementWithConditions = management.map((item) => {
     if (item.title === "Transport Services") {
@@ -106,6 +124,9 @@ export default function OverviewNavigationMenu({
     }
     if (item.title === "Facilities Management") {
       return { ...item, condition: managesFacility };
+    }
+    if (item.title === "Managing Job Requests") {
+      return { ...item, condition: acceptsJobs };
     }
     return item;
   });
@@ -161,7 +182,7 @@ export default function OverviewNavigationMenu({
                     >
                       <NavigationMenuLink
                         className={cn(
-                          "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-secondary-accent hover:text-secondary-accent-foreground focus:bg-secondary-accent focus:text-secondary-accent-foreground",
+                          "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-secondary-accent hover:text-secondary-accent-foreground focus:bg-secondary-accent focus:text-secondary-accent-foreground"
                         )}
                       >
                         <div className="text-sm font-medium leading-none">

@@ -146,7 +146,7 @@ export default function JobRequestReviewerActions({
         path: pathname,
         requestId: request.id,
         reviewerId: currentUser.userRole.some(
-          (role) => role.role.name === "REQUEST_REVIEWER"
+          (role) => role.role.name === "REQUEST_MANAGER"
         )
           ? currentUser.id
           : undefined,
@@ -186,11 +186,11 @@ export default function JobRequestReviewerActions({
         toast.promise(updateStatusMutate(data), {
           loading: `${actionText} request...`,
           success: () => {
+            socket.emit("notifications");
+            socket.emit("request_update");
             queryClient.invalidateQueries({
               queryKey: [request.id],
             });
-            socket.emit("notifications");
-            socket.emit("request_update", request.id);
             setIsCancelAlertOpen(false);
             setCancellationReason("");
             return `Request ${successText} successfully.`;
@@ -210,7 +210,7 @@ export default function JobRequestReviewerActions({
           queryKey: [request.id],
         });
         socket.emit("notifications");
-        socket.emit("request_update", request.id);
+        socket.emit("request_update");
         setIsCancelAlertOpen(false);
         setCancellationReason("");
         console.log("fuck");
@@ -249,13 +249,13 @@ export default function JobRequestReviewerActions({
       toast.promise(assignPersonnelMutate(data), {
         loading: "Assigning...",
         success: () => {
+          socket.emit("request_update", request.id);
           queryClient.invalidateQueries({
             queryKey: [request.id],
           });
           queryClient.invalidateQueries({
             queryKey: ["activity", request.id],
           });
-          socket.emit("request_update", request.id);
           return "Personnel assigned successfully.";
         },
         error: (err) => {

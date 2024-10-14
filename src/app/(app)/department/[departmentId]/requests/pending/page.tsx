@@ -23,7 +23,7 @@ export default async function ManageRequestPage({
   return (
     <RoleGuard allowedRoles={["REQUEST_REVIEWER", "DEPARTMENT_HEAD"]}>
       <ContentLayout title="Requests">
-        <DepartmentLayout departmentId={params.departmentId}>
+        <DepartmentLayout departmentId={params.departmentId}  name="Pending Requests">
           <ManageRequestScreen search={search} departmentId={departmentId} />
         </DepartmentLayout>
       </ContentLayout>

@@ -10,8 +10,8 @@ export interface DepartmentInsights {
 
 export default function DepartmentInsights({ params }: DepartmentInsights) {
   return (
-    <ContentLayout title="Overview">
-      <DepartmentLayout departmentId={params.departmentId}>
+    <ContentLayout title="Insights">
+      <DepartmentLayout departmentId={params.departmentId} name="Insights">
         <DepartmentInsightsScreen departmentId={params.departmentId} />
       </DepartmentLayout>
     </ContentLayout>

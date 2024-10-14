@@ -18,23 +18,32 @@ export default function DepartmentKPICards({
 
   // Calculate KPIs
   const totalRequests = request.length;
-  const completedTasks = request.filter((r) => r.status === "APPROVED").length;
+  const completedTasks = request.filter((r) => r.status === "COMPLETED").length;
   const activeUsers = userDepartments.filter(
     (ud) => !ud.user.isArchived
   ).length;
 
-  // Calculate average completion time
-  const completedRequests = request.filter(
-    (r) => r.status === "APPROVED" && r.completedAt
-  );
+  const completedRequests = request.filter((r) => r.status === "COMPLETED");
+
   const totalCompletionTime = completedRequests.reduce((sum, r) => {
-    const completionTime = r.completedAt!.getTime() - r.createdAt.getTime();
+    const completedAt = r.completedAt ? new Date(r.completedAt) : null;
+    const createdAt = r.createdAt ? new Date(r.createdAt) : null;
+
+    if (!completedAt || !createdAt) {
+      return sum; // Skip if either date is invalid
+    }
+
+    const completionTime = completedAt.getTime() - createdAt.getTime();
     return sum + completionTime;
   }, 0);
+
   const averageCompletionTime =
     completedRequests.length > 0
-      ? totalCompletionTime / completedRequests.length / (1000 * 60 * 60 * 24) // Convert to days
+      ? totalCompletionTime / completedRequests.length / (1000 * 60 * 60) // Convert to hours
       : 0;
+
+  // Round the average completion time to 2 decimal places
+  const roundedAverageCompletionTime = Number(averageCompletionTime.toFixed(2));
 
   return (
     <div className={cn("grid gap-3 md:grid-cols-2 lg:grid-cols-4", className)}>
@@ -71,7 +80,7 @@ export default function DepartmentKPICards({
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            {averageCompletionTime.toFixed(1)} days
+            {roundedAverageCompletionTime} hours
           </div>
           <p className="text-xs text-muted-foreground">
             Average time to complete requests

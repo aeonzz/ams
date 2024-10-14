@@ -14,7 +14,7 @@ export default function DepartmentVehiclePage({
 }: DepartmentVehiclePage) {
   return (
     <ContentLayout title="Vehicles">
-      <DepartmentLayout departmentId={params.departmentId}>
+      <DepartmentLayout departmentId={params.departmentId} name="Vehicles">
         <DepartmentVehicleScreen departmentId={params.departmentId} />
       </DepartmentLayout>
     </ContentLayout>

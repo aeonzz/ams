@@ -4,10 +4,9 @@ import { currentUser } from "@/lib/actions/users";
 import { checkAuth } from "@/lib/auth/utils";
 
 export async function GET(req: Request) {
+  // await checkAuth();
+  const [data] = await currentUser();
   try {
-    await checkAuth();
-    const [data] = await currentUser();
-
     const result = await db.request.findMany({
       where: {
         userId: data?.id,

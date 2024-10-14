@@ -92,16 +92,17 @@ export default function DepartmentOverviewScreen({
     return notificationsData?.pages.flatMap((page) => page.data) || [];
   }, [notificationsData]);
 
+  const handleNotification = React.useCallback(() => {
+    refetchNotifications();
+  }, [queryClient, departmentId]);
+
   React.useEffect(() => {
-    socket.on("notifications", () => {
-      console.log("wtf");
-      refetchNotifications();
-    });
+    socket.on("notifications", handleNotification);
 
     return () => {
-      socket.off("notifications");
+      socket.off("notifications", handleNotification);
     };
-  }, []);
+  }, [handleNotification]);
 
   React.useEffect(() => {
     if (allNotifications.length > 0 && !selectedNotificationId) {
@@ -169,6 +170,7 @@ export default function DepartmentOverviewScreen({
               <P className="font-medium">Inbox</P>
             </div>
             <Inbox
+              key={departmentId}
               className="w-full"
               notifications={allNotifications}
               onNotificationSelect={handleNotificationSelect}

@@ -4,7 +4,7 @@ import { formatInTimeZone, toDate } from "date-fns-tz";
 import WebSocket, { WebSocketServer } from "ws";
 
 const prisma = new PrismaClient();
-const wss = new WebSocket.Server({ port: 8080 });
+const wss = new WebSocketServer({ port: 8080 });
 
 wss.on("connection", (ws) => {
   console.log("Client connected");

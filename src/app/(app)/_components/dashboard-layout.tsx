@@ -26,8 +26,8 @@ export default function DashboardLayout({
 
   React.useEffect(() => {
     const handleNotification = () => {
-      console.log("Notification received in DashboardLayout");
       router.refresh();
+      console.log("Notification received in DashboardLayout");
     };
 
     socket.on("notifications", handleNotification);

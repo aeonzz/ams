@@ -7,7 +7,7 @@ import { dateFnsLocalizer, Views } from "react-big-calendar";
 import { enUS } from "date-fns/locale/en-US";
 import { format, getDay, parse, startOfWeek } from "date-fns";
 import type { JobRequestsTableType } from "./type";
-import { CustomCalendarEvent } from "./custom-calendar-event";
+import { JobRequestScheduleCard } from "./job-request-schedule-card";
 
 const locales = {
   "en-US": enUS,
@@ -60,7 +60,7 @@ export default function ScheduleCalendar({ data }: ScheduleCalendarProps) {
         view={view}
         onView={handleViewChange}
         components={{
-          event: CustomCalendarEvent,
+          event: JobRequestScheduleCard,
         }}
         tooltipAccessor={null}
       />

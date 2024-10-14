@@ -78,7 +78,7 @@ export function UpdateDepartmentSheet({
       departmentType: department.departmentType,
       description: department.description ?? "",
       responsibilities: department.responsibilities ?? "",
-      acceptsTransport: department.acceptsTransport,
+      managesTransport: department.managesTransport,
     },
   });
 
@@ -93,7 +93,7 @@ export function UpdateDepartmentSheet({
       departmentType: department.departmentType,
       description: department.description ?? "",
       responsibilities: department.responsibilities ?? "",
-      acceptsTransport: department.acceptsTransport,
+      managesTransport: department.managesTransport,
     });
   }, [department, form]);
 
@@ -284,7 +284,7 @@ export function UpdateDepartmentSheet({
               />
               <FormField
                 control={form.control}
-                name="acceptsTransport"
+                name="managesTransport"
                 render={({ field }) => (
                   <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                     <div className="space-y-0.5">
