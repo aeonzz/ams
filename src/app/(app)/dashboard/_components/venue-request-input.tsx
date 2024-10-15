@@ -49,33 +49,6 @@ import VenueRequestInputSkeleton from "./venue-request-input-skeleton";
 import { VenueFeaturesType } from "@/lib/types/venue";
 import ScheduledEventCardSkeleton from "./scheduled-event-card-skeleton";
 
-const purpose = [
-  {
-    id: "Lecture/Forum/Symposium",
-    label: "Lecture/Forum/Symposium",
-  },
-  {
-    id: "Film Showing",
-    label: "Film Showing",
-  },
-  {
-    id: "Seminar/Workshop",
-    label: "Seminar/Workshop",
-  },
-  {
-    id: "Video Coverage",
-    label: "Video Coverage",
-  },
-  {
-    id: "College Meeting/Conference",
-    label: "College Meeting/Conference",
-  },
-  {
-    id: "other",
-    label: "Others",
-  },
-] as const;
-
 interface VenueRequestInputProps {
   mutateAsync: UseMutateAsyncFunction<
     any,
@@ -241,7 +214,7 @@ export default function VenueRequestInput({
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="scroll-bar flex max-h-[60vh] gap-6 overflow-y-auto px-4 py-1">
-            <div className="flex w-[307px] flex-col space-y-2">
+            <div className="flex flex-1 flex-col space-y-2">
               <VenueField
                 form={form}
                 name="venueId"
@@ -268,16 +241,16 @@ export default function VenueRequestInput({
               />
               <FormField
                 control={form.control}
-                name="notes"
+                name="purpose"
                 render={({ field }) => (
                   <FormItem className="flex flex-grow flex-col">
-                    <FormLabel className="text-left">Description</FormLabel>
+                    <FormLabel className="text-left">Purpose</FormLabel>
                     <FormControl>
                       <Textarea
                         rows={1}
                         maxRows={5}
-                        placeholder="Description..."
-                        className="min-h-[200px] flex-grow resize-none"
+                        placeholder="Purpose..."
+                        className="min-h-[200px] flex-grow resize-none placeholder:text-sm"
                         disabled={isPending}
                         {...field}
                       />
@@ -286,119 +259,6 @@ export default function VenueRequestInput({
                   </FormItem>
                 )}
               />
-            </div>
-            <div className="flex flex-1 flex-col space-y-6 overflow-hidden">
-              <FormField
-                control={form.control}
-                name="purpose"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Purpose</FormLabel>
-                    <div className="space-y-4">
-                      {purpose.map((item) => (
-                        <FormField
-                          key={item.id}
-                          control={form.control}
-                          name="purpose"
-                          render={({ field }) => {
-                            return (
-                              <FormItem
-                                key={item.id}
-                                className="flex flex-row items-start space-x-3 space-y-0"
-                              >
-                                <FormControl>
-                                  <Checkbox
-                                    disabled={isPending}
-                                    checked={field.value?.includes(item.id)}
-                                    onCheckedChange={(checked) => {
-                                      return checked
-                                        ? field.onChange([
-                                            ...field.value,
-                                            item.id,
-                                          ])
-                                        : field.onChange(
-                                            field.value?.filter(
-                                              (value) => value !== item.id
-                                            )
-                                          );
-                                    }}
-                                  />
-                                </FormControl>
-                                <FormLabel className="truncate font-normal">
-                                  {item.label}
-                                </FormLabel>
-                              </FormItem>
-                            );
-                          }}
-                        />
-                      ))}
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              {form.watch("purpose").includes("other") && (
-                <FormField
-                  control={form.control}
-                  name="otherPurpose"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Other Purpose</FormLabel>
-                      <FormControl>
-                        <Input
-                          disabled={isPending}
-                          {...field}
-                          placeholder="Specify other purpose"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
-              {selectedVenue &&
-                (selectedVenue.features as VenueFeaturesType[]) !== null && (
-                  <FormField
-                    control={form.control}
-                    name="setupRequirements"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Venue Features</FormLabel>
-                        <div className="space-y-4">
-                          {(selectedVenue.features as VenueFeaturesType[]).map(
-                            (feature) => (
-                              <FormItem
-                                key={feature.id}
-                                className="flex flex-row items-start space-x-3 space-y-0"
-                              >
-                                <FormControl>
-                                  <Checkbox
-                                    disabled={isPending}
-                                    checked={field.value?.includes(
-                                      feature.name
-                                    )}
-                                    onCheckedChange={(checked) => {
-                                      const updatedValue = checked
-                                        ? [...(field.value || []), feature.name]
-                                        : (field.value || []).filter(
-                                            (value) => value !== feature.name
-                                          );
-                                      field.onChange(updatedValue);
-                                    }}
-                                  />
-                                </FormControl>
-                                <FormLabel className="truncate break-all font-normal">
-                                  {feature.name}
-                                </FormLabel>
-                              </FormItem>
-                            )
-                          )}
-                        </div>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                )}
             </div>
             {venueId && (
               <div

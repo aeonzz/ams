@@ -39,10 +39,13 @@ export const venueRequestSchemaBase = z.object({
   venueId: z.string({
     required_error: "Please select a venue",
   }),
-  purpose: z.array(z.string()).refine((value) => value.some((item) => item), {
-    message: "You have to select at least one item.",
-  }),
-  otherPurpose: z.string().optional(),
+  purpose: z
+    .string()
+    .min(10, { message: "Must be at least 10 characters long" })
+    .max(600, { message: "Cannot be more than 600 characters long" }),
+  setupRequirements: z
+    .array(z.string().max(50, "Passenger name cannot exceed 50 characters"))
+    .min(1, "At least one passenger name is required"),
   startTime: z
     .date({
       required_error: "Start time is required",
@@ -62,11 +65,6 @@ export const venueRequestSchemaBase = z.object({
     })
     .refine((date) => date.getHours() !== 0 || date.getMinutes() !== 0, {
       message: "Time cannot be exactly midnight (00:00)",
-    }),
-  setupRequirements: z
-    .array(z.string())
-    .refine((value) => value.some((item) => item), {
-      message: "You have to select at least one item.",
     }),
   notes: z.string().optional(),
 });

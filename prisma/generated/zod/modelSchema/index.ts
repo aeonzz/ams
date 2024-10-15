@@ -14,6 +14,7 @@ export * from './ReworkSchema';
 export * from './JobRequestEvaluationSchema';
 export * from './VenueRequestSchema';
 export * from './VenueSchema';
+export * from './VenueSetupRequirementSchema';
 export * from './ReturnableRequestSchema';
 export * from './InventorySubItemSchema';
 export * from './InventoryItemSchema';

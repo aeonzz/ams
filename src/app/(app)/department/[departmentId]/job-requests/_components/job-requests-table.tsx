@@ -18,7 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatDate } from "date-fns";
+import { format, formatDate } from "date-fns";
 import { Input } from "@/components/ui/input";
 import { cn, getJobStatusColor, textTransform } from "@/lib/utils";
 import Link from "next/link";
@@ -56,24 +56,6 @@ export default function JobRequestsTable({ data }: JobRequestsTableProps) {
         },
       },
       {
-        accessorKey: "department",
-        header: "Department",
-        cell: ({ row }) => <div>{row.original.department}</div>,
-      },
-      {
-        accessorKey: "dueDate",
-        header: "Due Date",
-        cell: ({ row }) => formatDate(row.original.dueDate, "PP"),
-      },
-      {
-        accessorKey: "estimatedTime",
-        header: "Estimated Time",
-        cell: ({ row }) =>
-          row.original.estimatedTime
-            ? `${row.original.estimatedTime} hours`
-            : "-",
-      },
-      {
         accessorKey: "status",
         header: "Job Status",
         cell: ({ row }) => {
@@ -93,6 +75,23 @@ export default function JobRequestsTable({ data }: JobRequestsTableProps) {
             </div>
           );
         },
+      },
+      {
+        accessorKey: "estimatedTime",
+        header: "Estimated Time",
+        cell: ({ row }) =>
+          row.original.estimatedTime
+            ? `${row.original.estimatedTime} hours`
+            : "-",
+      },
+      {
+        accessorKey: "dueDate",
+        header: "Due Date",
+        cell: ({ cell }) => (
+          <P className="text-muted-foreground">
+            {format(cell.getValue() as Date, "PP")}
+          </P>
+        ),
       },
     ],
     []
@@ -118,7 +117,7 @@ export default function JobRequestsTable({ data }: JobRequestsTableProps) {
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className="px-5 bg-transparent">
+                  <TableHead key={header.id} className="bg-transparent px-5">
                     {header.isPlaceholder
                       ? null
                       : flexRender(

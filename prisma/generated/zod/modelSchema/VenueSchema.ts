@@ -5,8 +5,10 @@ import { VenueStatusSchema } from '../inputTypeSchemas/VenueStatusSchema'
 import type { JsonValueType } from '../inputTypeSchemas/JsonValueSchema';
 import type { DepartmentWithRelations } from './DepartmentSchema'
 import type { VenueRequestWithRelations } from './VenueRequestSchema'
+import type { VenueSetupRequirementWithRelations } from './VenueSetupRequirementSchema'
 import { DepartmentWithRelationsSchema } from './DepartmentSchema'
 import { VenueRequestWithRelationsSchema } from './VenueRequestSchema'
+import { VenueSetupRequirementWithRelationsSchema } from './VenueSetupRequirementSchema'
 
 /////////////////////////////////////////
 // VENUE SCHEMA
@@ -37,6 +39,7 @@ export type Venue = z.infer<typeof VenueSchema>
 export type VenueRelations = {
   department: DepartmentWithRelations;
   requests: VenueRequestWithRelations[];
+  venueSetupRequirement: VenueSetupRequirementWithRelations[];
 };
 
 export type VenueWithRelations = Omit<z.infer<typeof VenueSchema>, "features"> & {
@@ -46,6 +49,7 @@ export type VenueWithRelations = Omit<z.infer<typeof VenueSchema>, "features"> &
 export const VenueWithRelationsSchema: z.ZodType<VenueWithRelations> = VenueSchema.merge(z.object({
   department: z.lazy(() => DepartmentWithRelationsSchema),
   requests: z.lazy(() => VenueRequestWithRelationsSchema).array(),
+  venueSetupRequirement: z.lazy(() => VenueSetupRequirementWithRelationsSchema).array(),
 }))
 
 export default VenueSchema;

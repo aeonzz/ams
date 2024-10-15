@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React from "react";
 import { InboxIcon } from "lucide-react";
 import { P } from "@/components/typography/text";
 import NotificationCard from "../../notification/_components/notification-card";
@@ -6,6 +6,7 @@ import type { NotificationWithRelations } from "prisma/generated/zod";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { useInView } from "react-intersection-observer";
 
 interface InboxProps {
   className?: string;
@@ -30,28 +31,15 @@ export default function Inbox({
   isFetchingNextPage,
   height = "h-[calc(100vh-64px)]",
 }: InboxProps) {
-  const observerTarget = useRef<HTMLDivElement>(null);
+  const { ref, inView } = useInView({
+    threshold: 1.0,
+  });
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
-          fetchNextPage();
-        }
-      },
-      { threshold: 1.0 }
-    );
-
-    if (observerTarget.current) {
-      observer.observe(observerTarget.current);
+  React.useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
     }
-
-    return () => {
-      if (observerTarget.current) {
-        observer.unobserve(observerTarget.current);
-      }
-    };
-  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+  }, [inView, fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   const renderNotifications = () => {
     if (status === "pending") {
@@ -92,7 +80,7 @@ export default function Inbox({
       <div className={cn("scroll-bar overflow-y-auto p-1", height)}>
         {renderNotifications()}
         {isFetchingNextPage && <NotificationSkeleton />}
-        <div ref={observerTarget} />
+        <div ref={ref} />
       </div>
     </div>
   );

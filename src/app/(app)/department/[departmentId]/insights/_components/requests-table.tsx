@@ -20,13 +20,25 @@ import {
 } from "@/components/ui/table";
 import { cn, getStatusColor, textTransform } from "@/lib/utils";
 import Link from "next/link";
-import { buttonVariants } from "@/components/ui/button";
-import { H2, H3, H4, P } from "@/components/typography/text";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { H3, P } from "@/components/typography/text";
 import { DataTablePagination } from "@/components/data-table/data-table-pagination";
 import { Badge } from "@/components/ui/badge";
-import { Dot } from "lucide-react";
-import type { Request } from "prisma/generated/zod";
+import { ChevronDown, Dot } from "lucide-react";
+import {
+  RequestStatusTypeSchema,
+  RequestTypeSchema,
+  type Request,
+} from "prisma/generated/zod";
 import { format } from "date-fns";
+import { StatusFilter } from "./status-filter";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 
 interface DepartmentRequestsTableProps {
   data: Request[];
@@ -37,6 +49,8 @@ export default function DepartmentRequestsTable({
   data,
   className,
 }: DepartmentRequestsTableProps) {
+  const [statusFilter, setStatusFilter] = React.useState<string[]>([]);
+
   const columns: ColumnDef<Request>[] = React.useMemo(
     () => [
       {
@@ -106,6 +120,19 @@ export default function DepartmentRequestsTable({
           );
         },
       },
+      {
+        accessorKey: "completedAt",
+        header: "Completed",
+        cell: ({ row }) => {
+          return (
+            <P className="text-muted-foreground">
+              {row.original.completedAt
+                ? format(row.original.completedAt, "PP p")
+                : "-"}
+            </P>
+          );
+        },
+      },
     ],
     []
   );
@@ -117,12 +144,70 @@ export default function DepartmentRequestsTable({
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    state: {
+      globalFilter: statusFilter,
+    },
+    onGlobalFilterChange: setStatusFilter,
+    globalFilterFn: (row, columnId, filterValue) => {
+      if (filterValue.length === 0) return true;
+      const status = row.getValue(columnId) as string;
+      return filterValue.includes(status);
+    },
   });
+
+  const statusOptions = React.useMemo(() => {
+    return RequestStatusTypeSchema.options.map((status) => ({
+      value: status,
+      label: textTransform(status),
+    }));
+  }, []);
 
   return (
     <div className={cn("rounded-md border p-3", className)}>
       <div className="flex items-center justify-between px-3 py-1">
-        <H3 className="font-semibold tracking-tight">All Requests</H3>
+        <div className="flex space-x-3">
+          <H3 className="font-semibold tracking-tight">All Requests</H3>
+          <Input
+            placeholder="Filter titles..."
+            value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
+            onChange={(event) =>
+              table.getColumn("title")?.setFilterValue(event.target.value)
+            }
+            className="h-8 w-80"
+          />
+          <StatusFilter
+            options={statusOptions}
+            onChange={(selectedStatuses) =>
+              table.setGlobalFilter(selectedStatuses)
+            }
+          />
+        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="ml-auto" size="sm">
+              Columns <ChevronDown className="ml-2 h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {table
+              .getAllColumns()
+              .filter((column) => column.getCanHide())
+              .map((column) => {
+                return (
+                  <DropdownMenuCheckboxItem
+                    key={column.id}
+                    className="capitalize"
+                    checked={column.getIsVisible()}
+                    onCheckedChange={(value) =>
+                      column.toggleVisibility(!!value)
+                    }
+                  >
+                    {column.id}
+                  </DropdownMenuCheckboxItem>
+                );
+              })}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
       <div className="scroll-bar overflow-y-auto">
         <Table>

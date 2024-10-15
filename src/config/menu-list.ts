@@ -86,17 +86,17 @@ export function getMenuList({
           icon: Bell,
           submenus: [],
         },
-        ...(isPersonnel
-          ? [
-              {
-                href: "/job-requests",
-                label: "My Job Requests",
-                active: pathname.includes("/job-request"),
-                icon: Hammer,
-                submenus: [],
-              },
-            ]
-          : []),
+        // ...(isPersonnel
+        //   ? [
+        //       {
+        //         href: "/job-requests",
+        //         label: "My Job Requests",
+        //         active: pathname.includes("/job-request"),
+        //         icon: Hammer,
+        //         submenus: [],
+        //       },
+        //     ]
+        //   : []),
       ],
     },
     ...(hasAllowedRole

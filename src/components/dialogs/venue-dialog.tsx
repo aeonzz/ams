@@ -46,8 +46,7 @@ export default function VenueDialog() {
       notes: "",
       startTime: undefined,
       endTime: undefined,
-      otherPurpose: "",
-      purpose: [],
+      purpose: "",
     },
   });
 
@@ -83,7 +82,6 @@ export default function VenueDialog() {
             setAlertOpen(true);
           }
         }}
-        className={cn(venueId ? "max-w-5xl" : "max-w-2xl")}
         isLoading={isPending}
       >
         <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>

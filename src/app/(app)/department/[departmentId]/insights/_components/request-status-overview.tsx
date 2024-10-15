@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { TrendingUp } from "lucide-react";
 import { Label, Pie, PieChart } from "recharts";
 
 import {
@@ -18,50 +17,60 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { JobRequestWithRelations } from "prisma/generated/zod";
-
-export const description = "A donut chart showing job status distribution";
+import { DepartmentWithRelations } from "prisma/generated/zod";
+import { cn } from "@/lib/utils";
 
 const chartConfig = {
-  jobs: {
-    label: "Jobs",
+  requests: {
+    label: "Requests",
   },
   pending: {
     label: "Pending",
     color: "hsl(var(--chart-1))",
   },
-  in_progress: {
-    label: "In Progress",
+  approved: {
+    label: "Approved",
+    color: "hsl(var(--chart-5))",
+  },
+  reviewed: {
+    label: "Reviewed",
+    color: "hsl(var(--chart-3))",
+  },
+  completed: {
+    label: "Completed",
+    color: "hsl(var(--chart-4))",
+  },
+  rejected: {
+    label: "Rejected",
     color: "hsl(var(--chart-2))",
   },
   cancelled: {
     label: "Cancelled",
     color: "hsl(var(--chart-3))",
   },
-  completed: {
-    label: "Completed",
-    color: "hsl(var(--chart-5))",
-  },
-  on_hold: {
-    label: "On Hold",
-    color: "hsl(var(--chart-4))",
-  },
 } satisfies ChartConfig;
 
-interface JobStatusChartProps {
-  data: JobRequestWithRelations[];
+interface RequestStatusOverviewProps {
+  data: DepartmentWithRelations;
+  className?: string;
 }
 
-export default function JobStatusChart({ data }: JobStatusChartProps) {
-  const jobStatusCounts = React.useMemo(() => {
+export default function RequestStatusOverview({
+  data,
+  className,
+}: RequestStatusOverviewProps) {
+  const { request, name } = data;
+
+  const requestStatusCounts = React.useMemo(() => {
     const counts = {
       pending: 0,
-      in_progress: 0,
+      approved: 0,
+      reviewed: 0,
       completed: 0,
-      on_hold: 0,
+      rejected: 0,
       cancelled: 0,
     };
-    data.forEach((request) => {
+    request.forEach((request) => {
       counts[request.status.toLowerCase() as keyof typeof counts]++;
     });
     return counts;
@@ -69,23 +78,27 @@ export default function JobStatusChart({ data }: JobStatusChartProps) {
 
   const chartData = React.useMemo(
     () =>
-      Object.entries(jobStatusCounts).map(([status, count]) => ({
+      Object.entries(requestStatusCounts).map(([status, count]) => ({
         status,
         count,
         fill: `var(--color-${status})`,
       })),
-    [jobStatusCounts]
+    [requestStatusCounts]
   );
 
-  const totalJobs = React.useMemo(() => {
+  const totalRequests = React.useMemo(() => {
     return chartData.reduce((acc, curr) => acc + curr.count, 0);
   }, [chartData]);
 
+  const completedRequests = React.useMemo(() => {
+    return chartData.find((d) => d.status === "completed")?.count || 0;
+  }, [chartData]);
+
   return (
-    <Card className="flex w-[50%] flex-col bg-transparent">
+    <Card className={cn("flex flex-col bg-transparent", className)}>
       <CardHeader className="items-center pb-0">
-        <CardTitle>Job Status Distribution</CardTitle>
-        <CardDescription>Assigned Job Requests</CardDescription>
+        <CardTitle>Request Status Overview</CardTitle>
+        <CardDescription>{name} - Overall</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
         <ChartContainer
@@ -119,14 +132,14 @@ export default function JobStatusChart({ data }: JobStatusChartProps) {
                           y={viewBox.cy}
                           className="fill-foreground text-3xl font-bold"
                         >
-                          {totalJobs.toLocaleString()}
+                          {totalRequests.toLocaleString()}
                         </tspan>
                         <tspan
                           x={viewBox.cx}
                           y={(viewBox.cy || 0) + 24}
                           className="fill-muted-foreground"
                         >
-                          Jobs
+                          Total Requests
                         </tspan>
                       </text>
                     );
@@ -139,10 +152,11 @@ export default function JobStatusChart({ data }: JobStatusChartProps) {
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
         <div className="flex items-center gap-2 font-medium leading-none">
-          {chartData[2].count} completed jobs <TrendingUp className="h-4 w-4" />
+          Completion Rate:{" "}
+          {((completedRequests / totalRequests) * 100).toFixed(1)}%
         </div>
         <div className="text-center leading-none text-muted-foreground">
-          Showing total job requests and their current statuses
+          Showing request status breakdown for {name}
         </div>
       </CardFooter>
     </Card>

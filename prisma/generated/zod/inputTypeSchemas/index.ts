@@ -15,6 +15,7 @@ export { ReworkScalarFieldEnumSchema } from './ReworkScalarFieldEnumSchema';
 export { JobRequestEvaluationScalarFieldEnumSchema } from './JobRequestEvaluationScalarFieldEnumSchema';
 export { VenueRequestScalarFieldEnumSchema } from './VenueRequestScalarFieldEnumSchema';
 export { VenueScalarFieldEnumSchema } from './VenueScalarFieldEnumSchema';
+export { VenueSetupRequirementScalarFieldEnumSchema } from './VenueSetupRequirementScalarFieldEnumSchema';
 export { ReturnableRequestScalarFieldEnumSchema } from './ReturnableRequestScalarFieldEnumSchema';
 export { InventorySubItemScalarFieldEnumSchema } from './InventorySubItemScalarFieldEnumSchema';
 export { InventoryItemScalarFieldEnumSchema } from './InventoryItemScalarFieldEnumSchema';
