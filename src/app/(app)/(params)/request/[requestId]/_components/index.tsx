@@ -42,8 +42,8 @@ import { Button } from "@/components/ui/button";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import JobRequestEvaluationDialog from "@/components/dialogs/job-request-evaluation-dialog";
 import RequestSummaryTitle from "./request-summary-title";
-import TransportRequestReviewerActions from "./transport-request-reviewer-actions";
 import TransportRequestDetails from "./transport-request-details";
+import RequestReviewerActions from "./request-reviewer-actions";
 
 interface RequestDetailsProps {
   params: string;
@@ -349,7 +349,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
             />
           )}
           {data.type === "TRANSPORT" && data.transportRequest && (
-            <TransportRequestReviewerActions
+            <RequestReviewerActions
               request={data}
               entityType="TRANSPORT_REQUEST"
               allowedRoles={["REQUEST_MANAGER"]}
@@ -358,9 +358,9 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
             />
           )}
           {data.type === "VENUE" && data.venueRequest && (
-            <TransportRequestReviewerActions
+            <RequestReviewerActions
               request={data}
-              entityType="TRANSPORT_REQUEST"
+              entityType="VENUE_REQUEST"
               allowedRoles={["REQUEST_MANAGER"]}
               allowedDepartment={data.departmentId}
               allowedApproverRoles={["DEPARTMENT_HEAD"]}

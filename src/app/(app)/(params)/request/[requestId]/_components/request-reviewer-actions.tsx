@@ -47,8 +47,9 @@ import type { EntityTypeType } from "prisma/generated/zod/inputTypeSchemas/Entit
 import { useHotkeys } from "react-hotkeys-hook";
 import { Textarea } from "@/components/ui/text-area";
 import { CommandShortcut } from "@/components/ui/command";
+import { socket } from "@/app/socket";
 
-interface TransportRequestReviewerActionsProps {
+interface RequestReviewerActionsProps {
   request: RequestWithRelations;
   entityType: EntityTypeType;
   allowedRoles: string[];
@@ -56,16 +57,15 @@ interface TransportRequestReviewerActionsProps {
   allowedApproverRoles: string[];
 }
 
-export default function TransportRequestReviewerActions({
+export default function RequestReviewerActions({
   request,
   entityType,
   allowedRoles,
   allowedDepartment,
   allowedApproverRoles,
-}: TransportRequestReviewerActionsProps) {
+}: RequestReviewerActionsProps) {
   const currentUser = useSession();
   const pathname = usePathname();
-  const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = React.useState(false);
   const [isAlertOpen, setIsAlertOpen] = React.useState(false);
   const [isCancelAlertOpen, setIsCancelAlertOpen] = React.useState(false);
@@ -124,12 +124,8 @@ export default function TransportRequestReviewerActions({
       toast.promise(updateStatusMutate(data), {
         loading: `${actionText} request...`,
         success: () => {
-          queryClient.invalidateQueries({
-            queryKey: [request.id],
-          });
-          queryClient.invalidateQueries({
-            queryKey: ["activity", request.id],
-          });
+          socket.emit("notifications");
+          socket.emit("request_update");
           setIsCancelAlertOpen(false);
           setCancellationReason("");
           return `Request ${successText} successfully.`;
@@ -144,7 +140,6 @@ export default function TransportRequestReviewerActions({
       pathname,
       request.id,
       updateStatusMutate,
-      queryClient,
       currentUser.id,
       currentUser.userRole,
       entityType,

@@ -96,6 +96,21 @@ export type ExtendedVenueRequestSchema = z.infer<
   typeof extendedVenueRequestSchema
 >;
 
+export const updateVenueRequestSchema = venueRequestSchemaBase.partial();
+
+export type UpdateVenueRequestSchema = z.infer<typeof updateVenueRequestSchema>;
+
+export const updateVenueRequestSchemaWithPath = updateVenueRequestSchema.extend(
+  {
+    id: z.string(),
+    path: z.string(),
+  }
+);
+
+export type UpdateVenueRequestSchemaWithPath = z.infer<
+  typeof updateVenueRequestSchemaWithPath
+>;
+
 export const transportRequestSchema = z.object({
   vehicleId: z.string({
     required_error: "Please select a vehicle",

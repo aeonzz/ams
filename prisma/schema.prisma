@@ -247,6 +247,7 @@ model VenueRequest {
   setupRequirements String[]
   startTime         DateTime
   endTime           DateTime
+  inProgress        Boolean  @default(false)
   reviewedBy        String?
   reviewer          User?    @relation(fields: [reviewedBy], references: [id])
   requestId         String   @unique

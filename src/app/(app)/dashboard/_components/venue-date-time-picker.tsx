@@ -53,11 +53,11 @@ interface DateTimePickerProps<T extends FieldValues> {
 }
 
 const timePresets = [
-  { label: "4:00 AM", hours: 4, minutes: 0 },
-  { label: "4:30 AM", hours: 4, minutes: 30 },
-  { label: "5:30 AM", hours: 5, minutes: 30 },
-  { label: "6:00 AM", hours: 6, minutes: 0 },
-  { label: "6:30 AM", hours: 6, minutes: 30 },
+  // { label: "4:00 AM", hours: 4, minutes: 0 },
+  // { label: "4:30 AM", hours: 4, minutes: 30 },
+  // { label: "5:30 AM", hours: 5, minutes: 30 },
+  // { label: "6:00 AM", hours: 6, minutes: 0 },
+  // { label: "6:30 AM", hours: 6, minutes: 30 },
   { label: "7:00 AM", hours: 7, minutes: 0 },
   { label: "7:30 AM", hours: 7, minutes: 30 },
   { label: "8:00 AM", hours: 8, minutes: 0 },
@@ -85,13 +85,13 @@ const timePresets = [
   { label: "7:00 PM", hours: 19, minutes: 0 },
   { label: "7:30 PM", hours: 19, minutes: 30 },
   { label: "8:00 PM", hours: 20, minutes: 0 },
-  { label: "8:30 PM", hours: 20, minutes: 30 },
-  { label: "9:00 PM", hours: 21, minutes: 0 },
-  { label: "9:30 PM", hours: 21, minutes: 30 },
-  { label: "10:00 PM", hours: 22, minutes: 0 },
-  { label: "10:30 PM", hours: 22, minutes: 30 },
-  { label: "11:00 PM", hours: 23, minutes: 0 },
-  { label: "11:30 PM", hours: 23, minutes: 30 },
+  // { label: "8:30 PM", hours: 20, minutes: 30 },
+  // { label: "9:00 PM", hours: 21, minutes: 0 },
+  // { label: "9:30 PM", hours: 21, minutes: 30 },
+  // { label: "10:00 PM", hours: 22, minutes: 0 },
+  // { label: "10:30 PM", hours: 22, minutes: 30 },
+  // { label: "11:00 PM", hours: 23, minutes: 0 },
+  // { label: "11:30 PM", hours: 23, minutes: 30 },
 ] as const;
 
 const monthNames = [

@@ -99,13 +99,6 @@ export default function TransportRequestDetails({
   const { dirtyFields } = useFormState({ control: form.control });
   const isFieldsDirty = Object.keys(dirtyFields).length > 0;
   const { variant, color, stroke } = getVehicleStatusColor(data.vehicle.status);
-  const { data: logs, isLoading } = useQuery<GenericAuditLog[]>({
-    queryFn: async () => {
-      const res = await axios.get(`/api/audit-log/request-log/${requestId}`);
-      return res.data.data;
-    },
-    queryKey: ["activity", requestId],
-  });
 
   async function onSubmit(values: UpdateTransportRequestSchema) {
     try {
@@ -496,38 +489,6 @@ export default function TransportRequestDetails({
         )}
       </div>
       <Separator className="my-6" />
-      <div className="space-y-4 pb-20">
-        <H4 className="font-semibold">Activity</H4>
-        {isLoading ? (
-          <>
-            {[...Array(2)].map((_, index) => (
-              <div key={index} className="flex items-center space-x-2">
-                <Skeleton className="h-6 w-6 rounded-full" />
-                <Skeleton className="h-4 w-2/3" />
-              </div>
-            ))}
-          </>
-        ) : (
-          <div className="space-y-4">
-            {logs?.map((activity) => {
-              const {
-                color,
-                icon: Icon,
-                message,
-              } = getChangeTypeInfo(activity.changeType);
-              return (
-                <div key={activity.id} className="flex items-center space-x-2">
-                  <Icon className="size-5" color={color} />
-                  <P className="inline-flex items-center text-muted-foreground">
-                    {message}
-                    <Dot /> {format(new Date(activity.timestamp), "MMM d")}
-                  </P>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
     </>
   );
 }
