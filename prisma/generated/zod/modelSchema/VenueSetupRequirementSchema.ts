@@ -9,6 +9,7 @@ import { VenueWithRelationsSchema } from './VenueSchema'
 export const VenueSetupRequirementSchema = z.object({
   id: z.string(),
   venueId: z.string(),
+  available: z.boolean(),
   name: z.string(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),

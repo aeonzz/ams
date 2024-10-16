@@ -149,7 +149,7 @@ export const updateRequestStatus = authedProcedure
   .input(updateRequestStatusSchemaWithPath)
   .handler(async ({ ctx, input }) => {
     const { user } = ctx;
-    const { path, requestId, reviewerId, changeType, entityType, ...rest } =
+    const { path, requestId, reviewerId, ...rest } =
       input;
 
     try {

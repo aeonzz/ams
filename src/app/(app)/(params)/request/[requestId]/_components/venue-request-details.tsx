@@ -291,6 +291,21 @@ export default function VenueRequestDetails({
                 )}
               </div>
             )}
+            {data.actualEndtime && (
+              <div className="group flex items-center justify-between">
+                <div className="flex w-full flex-col items-start">
+                  <div className="flex space-x-1 text-muted-foreground">
+                    <CalendarIcon className="h-5 w-5" />
+                    <P className="font-semibold tracking-tight">
+                      Actual End Time:
+                    </P>
+                  </div>
+                  <div className="w-full pl-5 pt-1">
+                    <P>{format(new Date(data.actualEndtime), "PPP p")}</P>
+                  </div>
+                </div>
+              </div>
+            )}
             {editField === "setupRequirements" ? (
               <EditInput
                 isPending={isPending}

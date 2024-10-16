@@ -47,6 +47,7 @@ export default function VenueDialog() {
       startTime: undefined,
       endTime: undefined,
       purpose: "",
+      setupRequirements: []
     },
   });
 

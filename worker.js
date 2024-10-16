@@ -1,6 +1,5 @@
 import { PrismaClient } from "@prisma/client";
 import { CronJob } from "cron";
-import { formatInTimeZone, toDate } from "date-fns-tz";
 import WebSocket, { WebSocketServer } from "ws";
 
 const prisma = new PrismaClient();
@@ -17,7 +16,8 @@ async function updateInProgressStatus() {
 
   try {
     const result = await prisma.$transaction(async (prisma) => {
-      const updatedRequests = await prisma.transportRequest.updateMany({
+      // Update TransportRequests
+      const updatedTransportRequests = await prisma.transportRequest.updateMany({
         where: {
           dateAndTimeNeeded: {
             lte: now,
@@ -32,7 +32,7 @@ async function updateInProgressStatus() {
         },
       });
 
-      if (updatedRequests.count > 0) {
+      if (updatedTransportRequests.count > 0) {
         const vehicleIds = await prisma.transportRequest.findMany({
           where: {
             dateAndTimeNeeded: {
@@ -59,32 +59,106 @@ async function updateInProgressStatus() {
         });
       }
 
-      return updatedRequests;
+      // Update VenueRequests
+      const updatedVenueRequests = await prisma.venueRequest.updateMany({
+        where: {
+          startTime: {
+            lte: now,
+          },
+          endTime: {
+            gt: now,
+          },
+          inProgress: false,
+          request: {
+            status: "APPROVED",
+          },
+        },
+        data: {
+          inProgress: true,
+        },
+      });
+
+      if (updatedVenueRequests.count > 0) {
+        const venueIds = await prisma.venueRequest.findMany({
+          where: {
+            startTime: {
+              lte: now,
+            },
+            endTime: {
+              gt: now,
+            },
+            inProgress: true,
+            request: {
+              status: "APPROVED",
+            },
+          },
+          select: {
+            venueId: true,
+          },
+        });
+
+        const venueIdsArray = venueIds.map((v) => v.venueId);
+        await prisma.venue.updateMany({
+          where: {
+            id: { in: venueIdsArray },
+          },
+          data: {
+            status: "IN_USE",
+          },
+        });
+      }
+
+      return {
+        transportRequests: updatedTransportRequests,
+        venueRequests: updatedVenueRequests,
+      };
     });
 
-    console.log(`Successfully updated ${result.count} transport requests`);
+    console.log(`Successfully updated ${result.transportRequests.count} transport requests and ${result.venueRequests.count} venue requests`);
 
-    const updatedRequests = await prisma.transportRequest.findMany({
-      where: {
-        dateAndTimeNeeded: {
-          lte: now,
+    // Fetch updated requests for WebSocket notifications
+    const updatedRequests = await prisma.$transaction([
+      prisma.transportRequest.findMany({
+        where: {
+          dateAndTimeNeeded: {
+            lte: now,
+          },
+          inProgress: {
+            equals: true,
+          },
+          request: {
+            status: "APPROVED",
+          },
         },
-        inProgress: {
-          equals: true,
+        select: {
+          requestId: true,
         },
-        request: {
-          status: "APPROVED",
+      }),
+      prisma.venueRequest.findMany({
+        where: {
+          startTime: {
+            lte: now,
+          },
+          endTime: {
+            gt: now,
+          },
+          inProgress: {
+            equals: true,
+          },
+          request: {
+            status: "APPROVED",
+          },
         },
-      },
-      select: {
-        requestId: true,
-      },
-    });
+        select: {
+          requestId: true,
+        },
+      }),
+    ]);
 
-    const updatedRequestIds = updatedRequests.map(
-      (request) => request.requestId
-    );
-    console.log(updatedRequestIds);
+    const updatedRequestIds = [
+      ...updatedRequests[0].map((request) => request.requestId),
+      ...updatedRequests[1].map((request) => request.requestId),
+    ];
 
     wss.clients.forEach((client) => {
       if (client.readyState === WebSocket.OPEN) {

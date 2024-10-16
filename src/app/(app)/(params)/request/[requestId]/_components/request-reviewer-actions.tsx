@@ -51,7 +51,6 @@ import { socket } from "@/app/socket";
 
 interface RequestReviewerActionsProps {
   request: RequestWithRelations;
-  entityType: EntityTypeType;
   allowedRoles: string[];
   allowedDepartment?: string;
   allowedApproverRoles: string[];
@@ -59,7 +58,6 @@ interface RequestReviewerActionsProps {
 
 export default function RequestReviewerActions({
   request,
-  entityType,
   allowedRoles,
   allowedDepartment,
   allowedApproverRoles,
@@ -96,8 +94,6 @@ export default function RequestReviewerActions({
         status: action,
         cancellationReason:
           action === "CANCELLED" ? cancellationReason : undefined,
-        changeType: "REVIEWER_CHANGE",
-        entityType: entityType,
       };
 
       if (action === "CANCELLED" && !cancellationReason.trim()) {
@@ -142,7 +138,6 @@ export default function RequestReviewerActions({
       updateStatusMutate,
       currentUser.id,
       currentUser.userRole,
-      entityType,
       cancellationReason,
     ]
   );
@@ -280,7 +275,6 @@ export default function RequestReviewerActions({
                       <RequestApproverActions
                         request={request}
                         isPending={isUpdateStatusPending}
-                        entityType={entityType}
                       />
                     </PermissionGuard>
                   )}

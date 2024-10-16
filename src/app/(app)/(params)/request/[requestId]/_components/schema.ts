@@ -26,8 +26,6 @@ export const updateRequestStatusSchema = z.object({
   requestId: z.string(),
   reviewerId: z.string().optional(),
   status: RequestStatusTypeSchema,
-  changeType: ChangeTypeSchema,
-  entityType: EntityTypeSchema,
   cancellationReason: z.string().optional(),
 });
 

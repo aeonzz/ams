@@ -76,7 +76,6 @@ import RejectJob from "./reject-job";
 
 interface JobRequestReviewerActionsProps {
   request: RequestWithRelations;
-  entityType: EntityTypeType;
   allowedRoles: string[];
   allowedDepartment?: string;
   allowedApproverRoles: string[];
@@ -84,7 +83,6 @@ interface JobRequestReviewerActionsProps {
 
 export default function JobRequestReviewerActions({
   request,
-  entityType,
   allowedRoles,
   allowedDepartment,
   allowedApproverRoles,
@@ -153,8 +151,6 @@ export default function JobRequestReviewerActions({
         status: action,
         cancellationReason:
           action === "CANCELLED" ? cancellationReason : undefined,
-        changeType: "REVIEWER_CHANGE",
-        entityType: entityType,
       };
 
       if (!request.jobRequest?.estimatedTime && action !== "CANCELLED") {
@@ -226,7 +222,6 @@ export default function JobRequestReviewerActions({
       queryClient,
       currentUser.id,
       currentUser.userRole,
-      entityType,
       request.jobRequest?.estimatedTime,
       cancellationReason,
     ]
@@ -531,7 +526,6 @@ export default function JobRequestReviewerActions({
                       isPending={
                         isUpdateStatusPending || isAssignPersonnelPending
                       }
-                      entityType={entityType}
                     />
                   </PermissionGuard>
                 )}

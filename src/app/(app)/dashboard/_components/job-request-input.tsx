@@ -66,6 +66,7 @@ import JobRequestInputSkeleton from "./job-request-input-skeleton";
 import { ComboboxInput } from "@/components/ui/combobox-input";
 import { Input } from "@/components/ui/input";
 import { socket } from "@/app/socket";
+import GenerateDescription from "./generate-description";
 
 interface JobRequestInputProps {
   mutateAsync: UseMutateAsyncFunction<
@@ -305,7 +306,8 @@ export default function JobRequestInput({
                 />
               </div>
               <div className="rounded-md border p-3">
-                <FormField
+                <GenerateDescription form={form} />
+                {/* <FormField
                   control={form.control}
                   name="description"
                   render={({ field }) => (
@@ -324,7 +326,7 @@ export default function JobRequestInput({
                       <FormMessage />
                     </FormItem>
                   )}
-                />
+                /> */}
                 <FormField
                   control={form.control}
                   name="images"

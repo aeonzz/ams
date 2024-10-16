@@ -291,54 +291,41 @@ export const deleteVenues = authedProcedure
     }
   });
 
-export const updateVenueRequestStatus = authedProcedure
+export const completeVenueRequest = authedProcedure
   .createServerAction()
   .input(updateRequestStatusSchemaWithPath)
   .handler(async ({ ctx, input }) => {
     const { user } = ctx;
-    const { path, requestId, reviewerId, changeType, ...rest } = input;
+    const { path, requestId, reviewerId, ...rest } = input;
 
     try {
       const result = await db.$transaction(async (prisma) => {
-        const currentVenueRequest = await prisma.venueRequest.findUnique({
+        const updatedVenueRequest = await prisma.venueRequest.update({
           where: {
             requestId: requestId,
           },
-        });
-
-        if (!currentVenueRequest) {
-          throw "VenueRequest or Request not found";
-        }
-
-        const updatedRequest = await prisma.request.update({
-          where: { id: requestId },
           data: {
-            ...rest,
-            venueRequest: {
+            request: {
               update: {
-                reviewedBy: reviewerId,
+                completedAt: new Date(),
+                ...rest,
               },
             },
-          },
-          include: { venueRequest: true },
-        });
-        const oldValueJson = JSON.parse(JSON.stringify(currentVenueRequest));
-        const newValueJson = JSON.parse(
-          JSON.stringify(updatedRequest.venueRequest)
-        );
-        await prisma.genericAuditLog.create({
-          data: {
-            id: generateId(15),
-            entityId: currentVenueRequest.id,
-            entityType: "VENUE_REQUEST",
-            changeType: changeType,
-            oldValue: oldValueJson,
-            newValue: newValueJson,
-            changedById: user.id,
+            inProgress: false,
+            actualEndtime: new Date(),
           },
         });
 
-        return updatedRequest;
+        await db.venue.update({
+          where: {
+            id: updatedVenueRequest.venueId,
+          },
+          data: {
+            status: "AVAILABLE",
+          },
+        });
+
+        return updatedVenueRequest;
       });
 
       return revalidatePath(path);

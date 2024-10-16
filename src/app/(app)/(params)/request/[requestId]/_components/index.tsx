@@ -44,6 +44,7 @@ import JobRequestEvaluationDialog from "@/components/dialogs/job-request-evaluat
 import RequestSummaryTitle from "./request-summary-title";
 import TransportRequestDetails from "./transport-request-details";
 import RequestReviewerActions from "./request-reviewer-actions";
+import CompleteVenuRequest from "./complete-venue-request";
 
 interface RequestDetailsProps {
   params: string;
@@ -301,7 +302,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
         <Separator className="my-6" />
         <div className="flex flex-col gap-3">
           {currentUser.id === data.userId && (
-            <RequestActions data={data} params={params} entityType="OTHER" />
+            <RequestActions data={data} params={data.id} entityType="OTHER" />
           )}
           {data.type === "JOB" &&
             data.jobRequest &&
@@ -324,7 +325,6 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
           {data.type === "JOB" && data.jobRequest && (
             <JobRequestReviewerActions
               request={data}
-              entityType="JOB_REQUEST"
               allowedDepartment={data.departmentId}
               allowedRoles={["REQUEST_MANAGER"]}
               allowedApproverRoles={["DEPARTMENT_HEAD"]}
@@ -335,7 +335,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
             data.jobRequest.assignedTo === currentUser.id &&
             data.status === "APPROVED" && (
               <PersonnelActions
-                requestId={params}
+                requestId={data.id}
                 allowedDepartment={data.departmentId}
                 allowedRoles={["PERSONNEL"]}
                 data={data.jobRequest}
@@ -344,7 +344,6 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
           {data.type === "RESOURCE" && data.returnableRequest && (
             <JobRequestReviewerActions
               request={data}
-              entityType="RETURNABLE_REQUEST"
               allowedRoles={["REQUEST_MANAGER"]}
               allowedDepartment={data.returnableRequest.departmentId}
               allowedApproverRoles={["DEPARTMENT_HEAD"]}
@@ -353,7 +352,6 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
           {data.type === "TRANSPORT" && data.transportRequest && (
             <RequestReviewerActions
               request={data}
-              entityType="TRANSPORT_REQUEST"
               allowedRoles={["REQUEST_MANAGER"]}
               allowedDepartment={data.departmentId}
               allowedApproverRoles={["DEPARTMENT_HEAD"]}
@@ -362,11 +360,13 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
           {data.type === "VENUE" && data.venueRequest && (
             <RequestReviewerActions
               request={data}
-              entityType="VENUE_REQUEST"
               allowedRoles={["REQUEST_MANAGER"]}
               allowedDepartment={data.departmentId}
               allowedApproverRoles={["DEPARTMENT_HEAD"]}
             />
+          )}
+          {data.type === "VENUE" && data.venueRequest && data.venueRequest.inProgress && (
+            <CompleteVenuRequest requestId={data.id} />
           )}
           {/* {data.type === "VENUE" && data.venueRequest && (
             <JobRequestReviewerActions

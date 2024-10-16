@@ -176,6 +176,7 @@ export default function DepartmentRequestsTable({
             className="h-8 w-80"
           />
           <StatusFilter
+            title="Status"
             options={statusOptions}
             onChange={(selectedStatuses) =>
               table.setGlobalFilter(selectedStatuses)

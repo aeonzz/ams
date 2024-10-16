@@ -42,7 +42,6 @@ model User {
   requestAsReviewer        Request[]         @relation(name: "ReviewerRelation")
   userRole                 UserRole[]
   jobRequestsAsAssigned    JobRequest[]
-  venueRequest             VenueRequest[]
   genericAuditLog          GenericAuditLog[]
   userDepartments          UserDepartment[]
   notification             Notification[]
@@ -241,19 +240,18 @@ model JobRequestEvaluation {
 }
 
 model VenueRequest {
-  id                String   @id
+  id                String    @id
   notes             String?
   purpose           String
   setupRequirements String[]
   startTime         DateTime
   endTime           DateTime
-  inProgress        Boolean  @default(false)
-  reviewedBy        String?
-  reviewer          User?    @relation(fields: [reviewedBy], references: [id])
-  requestId         String   @unique
-  request           Request  @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  actualEndtime     DateTime?
+  inProgress        Boolean   @default(false)
+  requestId         String    @unique
+  request           Request   @relation(fields: [requestId], references: [id], onDelete: Cascade)
   venueId           String
-  venue             Venue    @relation(fields: [venueId], references: [id])
+  venue             Venue     @relation(fields: [venueId], references: [id])
 }
 
 model Venue {
@@ -277,6 +275,7 @@ model Venue {
 model VenueSetupRequirement {
   id        String   @id
   venueId   String
+  available Boolean  @default(true)
   venue     Venue    @relation(fields: [venueId], references: [id], onDelete: Cascade)
   name      String
   createdAt DateTime @default(now())

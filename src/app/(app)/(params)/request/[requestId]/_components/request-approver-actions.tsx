@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import type { RequestWithRelations } from "prisma/generated/zod";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
@@ -10,24 +9,19 @@ import { UpdateRequestStatusSchemaWithPath } from "./schema";
 import { usePathname } from "next/navigation";
 import { toast } from "sonner";
 import { useSession } from "@/lib/hooks/use-session";
-import { type EntityTypeType } from "prisma/generated/zod/inputTypeSchemas/EntityTypeSchema";
 import { socket } from "@/app/socket";
 
 interface RequestApproverActionsProps {
   request: RequestWithRelations;
   isPending: boolean;
-  entityType: EntityTypeType;
 }
 
 export default function RequestApproverActions({
   request,
   isPending,
-  entityType,
 }: RequestApproverActionsProps) {
   const currentUser = useSession();
   const pathname = usePathname();
-  const queryClient = useQueryClient();
-  console.log(request);
   const { mutateAsync: updateStatusMutate, isPending: isUpdateStatusPending } =
     useServerActionMutation(updateRequestStatus);
 
@@ -37,8 +31,6 @@ export default function RequestApproverActions({
         path: pathname,
         requestId: request.id,
         status: action,
-        changeType: action === "APPROVED" ? "APPROVED" : "APPROVER_CHANGE",
-        entityType: entityType,
       };
 
       const actionText =
@@ -48,13 +40,7 @@ export default function RequestApproverActions({
       toast.promise(updateStatusMutate(data), {
         loading: `${actionText} request...`,
         success: () => {
-          queryClient.invalidateQueries({
-            queryKey: [request.id],
-          });
-          queryClient.invalidateQueries({
-            queryKey: ["activity", request.id],
-          });
-          socket.emit("request_update", request.id);
+          socket.emit("request_update");
           socket.emit("notifications");
           return `Request ${successText} successfully.`;
         },
@@ -64,7 +50,7 @@ export default function RequestApproverActions({
         },
       });
     },
-    [pathname, request.id, updateStatusMutate, queryClient, currentUser.id]
+    [pathname, request.id, updateStatusMutate, currentUser.id]
   );
 
   return (

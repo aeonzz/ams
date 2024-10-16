@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 import { DateRange } from "react-day-picker";
 import { addDays, format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
+import DepartmentInsightsSkeleton from "./department-insights-skeleton";
 
 interface DepartmentInsightsScreenProps {
   departmentId: string;
@@ -33,7 +34,11 @@ export default function DepartmentInsightsScreen({
   const { data, isLoading, isError, refetch } = useDepartmentData(departmentId);
 
   if (isLoading) {
-    return <p>...loading</p>;
+    return (
+      <div className="w-full">
+        <DepartmentInsightsSkeleton />
+      </div>
+    );
   }
 
   if (isError || !data) {
