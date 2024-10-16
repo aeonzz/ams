@@ -44,10 +44,11 @@ import { H3, P } from "@/components/typography/text";
 import ScheduledEventCard from "./scheduled-event-card";
 import VenueField from "./venue-field";
 import VenueDateTimePicker from "./venue-date-time-picker";
-import { type Venue } from "prisma/generated/zod";
+import type { VenueWithRelations } from "prisma/generated/zod";
 import VenueRequestInputSkeleton from "./venue-request-input-skeleton";
 import { VenueFeaturesType } from "@/lib/types/venue";
 import ScheduledEventCardSkeleton from "./scheduled-event-card-skeleton";
+import VenueSetupRequirements from "./venue-setup-requirements";
 
 interface VenueRequestInputProps {
   mutateAsync: UseMutateAsyncFunction<
@@ -75,7 +76,9 @@ export default function VenueRequestInput({
   const queryClient = useQueryClient();
   const venueId = form.watch("venueId");
 
-  const { data: venueData, isLoading: isLoadingVenueData } = useQuery<Venue[]>({
+  const { data: venueData, isLoading: isLoadingVenueData } = useQuery<
+    VenueWithRelations[]
+  >({
     queryFn: async () => {
       const res = await axios.get("/api/input-data/venue");
       return res.data.data;
@@ -214,12 +217,17 @@ export default function VenueRequestInput({
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="scroll-bar flex max-h-[60vh] gap-6 overflow-y-auto px-4 py-1">
-            <div className="flex flex-1 flex-col space-y-2">
+            <div className="flex flex-1 scroll-m-10 scroll-p-10 flex-col space-y-2">
               <VenueField
                 form={form}
                 name="venueId"
                 isPending={isPending}
                 data={venueData}
+              />
+              <VenueSetupRequirements
+                form={form}
+                isPending={isPending}
+                data={selectedVenue?.venueSetupRequirement}
               />
               <VenueDateTimePicker
                 form={form}
@@ -244,13 +252,31 @@ export default function VenueRequestInput({
                 name="purpose"
                 render={({ field }) => (
                   <FormItem className="flex flex-grow flex-col">
-                    <FormLabel className="text-left">Purpose</FormLabel>
                     <FormControl>
                       <Textarea
                         rows={1}
                         maxRows={5}
                         placeholder="Purpose..."
-                        className="min-h-[200px] flex-grow resize-none placeholder:text-sm"
+                        className="min-h-[150px] flex-grow resize-none placeholder:text-sm"
+                        disabled={isPending}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="notes"
+                render={({ field }) => (
+                  <FormItem className="flex flex-grow flex-col">
+                    <FormControl>
+                      <Textarea
+                        rows={1}
+                        maxRows={5}
+                        placeholder="Other info..."
+                        className="min-h-[120px] flex-grow resize-none placeholder:text-sm"
                         disabled={isPending}
                         {...field}
                       />

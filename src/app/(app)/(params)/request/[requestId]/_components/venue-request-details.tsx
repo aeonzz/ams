@@ -21,13 +21,6 @@ interface VenueRequestDetailsProps {
 export default function VenueRequestDetails({
   data,
 }: VenueRequestDetailsProps) {
-  const { data: logs, isLoading } = useQuery<GenericAuditLog[]>({
-    queryFn: async () => {
-      const res = await axios.get(`/api/audit-log/request-log/${data.id}`);
-      return res.data.data;
-    },
-    queryKey: [data.id],
-  });
   return (
     <>
       <div className="space-y-4">
@@ -51,7 +44,7 @@ export default function VenueRequestDetails({
             Setup Requirements:
           </H5>
           <ul className="ml-4 mt-2 list-disc">
-            {data.setupRequirements.split(", ").map((requirement, index) => (
+            {data.setupRequirements.map((requirement, index) => (
               <li key={index} className="mb-1 text-sm">
                 {requirement}
               </li>
@@ -59,41 +52,6 @@ export default function VenueRequestDetails({
           </ul>
         </div>
         <Separator className="my-6" />
-        <div className="space-y-4 pb-20">
-          <H4 className="font-semibold">Activity</H4>
-          {isLoading ? (
-            <>
-              {[...Array(2)].map((_, index) => (
-                <div key={index} className="flex items-center space-x-2">
-                  <Skeleton className="h-6 w-6 rounded-full" />
-                  <Skeleton className="h-4 w-2/3" />
-                </div>
-              ))}
-            </>
-          ) : (
-            <div className="space-y-4">
-              {logs?.map((activity) => {
-                const {
-                  color,
-                  icon: Icon,
-                  message,
-                } = getChangeTypeInfo(activity.changeType);
-                return (
-                  <div
-                    key={activity.id}
-                    className="flex items-center space-x-2"
-                  >
-                    <Icon className="size-5" color={color} />
-                    <P className="inline-flex items-center text-muted-foreground">
-                      {message}
-                      <Dot /> {format(new Date(activity.timestamp), "MMM d")}
-                    </P>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
       </div>
     </>
   );

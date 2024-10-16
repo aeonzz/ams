@@ -1,8 +1,6 @@
 import { z } from 'zod';
-import { JsonValueSchema } from '../inputTypeSchemas/JsonValueSchema'
 import { VenueTypeSchema } from '../inputTypeSchemas/VenueTypeSchema'
 import { VenueStatusSchema } from '../inputTypeSchemas/VenueStatusSchema'
-import type { JsonValueType } from '../inputTypeSchemas/JsonValueSchema';
 import type { DepartmentWithRelations } from './DepartmentSchema'
 import type { VenueRequestWithRelations } from './VenueRequestSchema'
 import type { VenueSetupRequirementWithRelations } from './VenueSetupRequirementSchema'
@@ -23,7 +21,6 @@ export const VenueSchema = z.object({
   capacity: z.number().int(),
   imageUrl: z.string(),
   rulesAndRegulations: z.string().nullable(),
-  features: JsonValueSchema.nullable(),
   isArchived: z.boolean(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
@@ -42,9 +39,7 @@ export type VenueRelations = {
   venueSetupRequirement: VenueSetupRequirementWithRelations[];
 };
 
-export type VenueWithRelations = Omit<z.infer<typeof VenueSchema>, "features"> & {
-  features?: JsonValueType | null;
-} & VenueRelations
+export type VenueWithRelations = z.infer<typeof VenueSchema> & VenueRelations
 
 export const VenueWithRelationsSchema: z.ZodType<VenueWithRelations> = VenueSchema.merge(z.object({
   department: z.lazy(() => DepartmentWithRelationsSchema),

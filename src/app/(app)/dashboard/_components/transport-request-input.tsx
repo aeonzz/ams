@@ -153,7 +153,7 @@ export default function TransportRequestInput({
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="flex px-4 gap-2">
-            <div className="scroll-bar flex max-h-[60vh] flex-1 overflow-y-auto py-1 px-1 ">
+            <div className="scroll-bar flex max-h-[60vh] flex-1 overflow-y-auto py-1 px-1">
               <div className="flex flex-col space-y-2">
                 <div className="flex">
                   <div className="mr-2 w-fit pt-[2px]">

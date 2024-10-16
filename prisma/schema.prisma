@@ -263,7 +263,6 @@ model Venue {
   imageUrl              String
   venueType             VenueType
   rulesAndRegulations   String?
-  features              Json?
   isArchived            Boolean                 @default(false)
   createdAt             DateTime                @default(now())
   updatedAt             DateTime                @updatedAt

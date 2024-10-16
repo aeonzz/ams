@@ -357,6 +357,15 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
               allowedApproverRoles={["DEPARTMENT_HEAD"]}
             />
           )}
+          {data.type === "VENUE" && data.venueRequest && (
+            <TransportRequestReviewerActions
+              request={data}
+              entityType="TRANSPORT_REQUEST"
+              allowedRoles={["REQUEST_MANAGER"]}
+              allowedDepartment={data.departmentId}
+              allowedApproverRoles={["DEPARTMENT_HEAD"]}
+            />
+          )}
           {/* {data.type === "VENUE" && data.venueRequest && (
             <JobRequestReviewerActions
               request={data}

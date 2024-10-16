@@ -15,8 +15,8 @@ export const createVenueSchema = z.object({
   imageUrl: z.array(z.instanceof(File), {
     required_error: "Image is required",
   }),
-  features: z
-    .array(z.string().max(50, "Feature cannot exceed 50 characters"))
+  setupRequirements: z
+    .array(z.string().max(50, "Item cannot exceed 50 characters"))
     .optional(),
   rulesAndRegulations: z.string().optional(),
 });

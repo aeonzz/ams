@@ -84,7 +84,11 @@ export async function GET(req: Request, params: Context) {
         },
         venueRequest: {
           include: {
-            venue: true,
+            venue: {
+              include: {
+                venueSetupRequirement: true,
+              }
+            },
           },
         },
       },

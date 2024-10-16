@@ -11,7 +11,7 @@ export const createVenueSchemaServer = z.object({
   departmenId: z.string(),
   capacity: z.number(),
   venueType: VenueTypeSchema,
-  features: z.array(z.string()).optional(),
+  setupRequirements: z.array(z.string()).optional(),
   rulesAndRegulations: z.string().optional(),
   imageUrl: z.array(
     z.string({

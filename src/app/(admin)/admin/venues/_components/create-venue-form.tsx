@@ -102,7 +102,7 @@ export default function CreateVenueForm({
         location: values.location,
         venueType: values.venueType,
         departmenId: values.departmentId,
-        features: values.features,
+        setupRequirements: values.setupRequirements,
         path: pathname,
         imageUrl: uploadedFilesResult.map(
           (result: { filePath: string }) => result.filePath
@@ -329,13 +329,13 @@ export default function CreateVenueForm({
           />
           <FormField
             control={form.control}
-            name="features"
+            name="setupRequirements"
             render={({ field }) => (
               <FormItem className="flex flex-grow flex-col">
-                <FormLabel className="text-left">Features</FormLabel>
+                <FormLabel className="text-left">Setup Requirements</FormLabel>
                 <FormControl>
                   <TagInput
-                    placeholder="Enter one or more feature"
+                    placeholder="Enter one or more items"
                     disabled={isPending || isUploading}
                     value={field.value || []}
                     onChange={field.onChange}
@@ -370,13 +370,12 @@ export default function CreateVenueForm({
             name="rulesAndRegulations"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Rules and Regulations</FormLabel>
                 <FormControl>
                   <Textarea
                     rows={1}
-                    maxRows={15}
-                    minRows={10}
+                    maxRows={10}
                     placeholder="Rules and Regulations..."
+                    className="min-h-[150px] flex-grow resize-none placeholder:text-sm"
                     disabled={isUploading || isPending}
                     {...field}
                   />

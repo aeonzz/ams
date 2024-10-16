@@ -148,7 +148,7 @@ export const createVenueRequest = authedProcedure
                  Notes: 
                  ${input.type} request
                  ${input.notes}
-                 ${rest.purpose.join(", ")}
+                 ${rest.purpose}
 
                  
                  Guidelines:
@@ -189,13 +189,8 @@ export const createVenueRequest = authedProcedure
               id: venuRequestId,
               startTime: rest.startTime,
               endTime: rest.endTime,
-              purpose: rest.purpose.includes("other")
-                ? [
-                    ...rest.purpose.filter((p) => p !== "other"),
-                    rest.otherPurpose,
-                  ].join(", ")
-                : rest.purpose.join(", "),
-              setupRequirements: rest.setupRequirements.join(", "),
+              purpose: rest.purpose,
+              setupRequirements: rest.setupRequirements,
               notes: rest.notes,
               venueId: rest.venueId,
             },

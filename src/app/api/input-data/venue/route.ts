@@ -6,7 +6,11 @@ import { checkAuth } from "@/lib/auth/utils";
 export async function GET(req: Request) {
   await checkAuth();
   try {
-    const venues = await db.venue.findMany({});
+    const venues = await db.venue.findMany({
+      include: {
+        venueSetupRequirement: true,
+      },
+    });
 
     return NextResponse.json({ data: venues }, { status: 200 });
   } catch (error) {

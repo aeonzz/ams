@@ -154,7 +154,7 @@ export default function VenueDateTimePicker<T extends FieldValues>({
         control={form.control}
         name={name}
         render={({ field }) => (
-          <FormItem className="flex flex-col">
+          <FormItem className="flex flex-col flex-1">
             <FormLabel className="text-left">{label}</FormLabel>
             <Popover modal>
               <FormControl>

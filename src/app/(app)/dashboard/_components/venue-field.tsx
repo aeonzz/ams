@@ -28,18 +28,18 @@ import { Check, ChevronsUpDown, Dot } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Path, UseFormReturn } from "react-hook-form";
 import { cn, getVenueStatusColor, textTransform } from "@/lib/utils";
-import { type Venue } from "prisma/generated/zod";
 import { type VenueRequestSchema } from "@/lib/schema/request";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
 import { H3, H5, P } from "@/components/typography/text";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
+import type { VenueWithRelations } from "prisma/generated/zod";
 
 interface VenueProps {
   form: UseFormReturn<VenueRequestSchema>;
   name: Path<VenueRequestSchema>;
   isPending: boolean;
-  data: Venue[] | undefined;
+  data: VenueWithRelations[] | undefined;
 }
 
 export default function VenueField({
@@ -55,7 +55,7 @@ export default function VenueField({
       control={form.control}
       name={name}
       render={({ field }) => (
-        <FormItem className="flex flex-col">
+        <FormItem className="flex flex-col flex-1">
           <FormLabel>Venue</FormLabel>
           <Popover open={open} onOpenChange={setOpen} modal>
             <PopoverTrigger asChild>

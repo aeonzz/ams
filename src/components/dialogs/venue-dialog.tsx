@@ -82,6 +82,7 @@ export default function VenueDialog() {
             setAlertOpen(true);
           }
         }}
+        className={cn(venueId ? "max-w-3xl" : "")}
         isLoading={isPending}
       >
         <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>

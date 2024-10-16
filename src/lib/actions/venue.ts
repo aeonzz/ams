@@ -85,39 +85,35 @@ export const createVenue = authedProcedure
   .createServerAction()
   .input(createVenueSchemaWithPath)
   .handler(async ({ input, ctx }) => {
-    const { path, imageUrl, departmenId, features, ...rest } = input;
+    const { path, imageUrl, departmenId, setupRequirements, ...rest } = input;
     const { user } = ctx;
 
     try {
       const result = await db.$transaction(async (prisma) => {
-        const venueId = generateId(15);
-
-        const featuresWithIds = features?.map((feature) => ({
-          id: generateId(15),
-          name: feature,
-        }));
-
         const createVenue = await prisma.venue.create({
           data: {
-            id: venueId,
+            id: generateId(15),
             imageUrl: imageUrl[0],
             departmentId: departmenId,
-            features: featuresWithIds,
             ...rest,
           },
         });
 
-        const newValueJson = JSON.parse(JSON.stringify(createVenue));
-        await prisma.genericAuditLog.create({
-          data: {
-            id: generateId(15),
-            entityId: createVenue.id,
-            entityType: "VENUE",
-            changeType: "CREATED",
-            newValue: newValueJson,
-            changedById: user.id,
-          },
-        });
+        if (setupRequirements && setupRequirements.length > 0) {
+          const setupRequirementsData = setupRequirements.map(
+            (requirement) => ({
+              id: generateId(15),
+              venueId: createVenue.id,
+              name: requirement,
+            })
+          );
+
+          await prisma.venueSetupRequirement.createMany({
+            data: setupRequirementsData,
+          });
+        }
+
+        return createVenue;
       });
 
       return revalidatePath(path);
