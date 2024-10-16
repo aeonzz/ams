@@ -31,7 +31,7 @@ export default function MainMenu({
   const currentUser = useSession();
   const menuList = getMenuList({
     pathname,
-    roles: ["DEPARTMENT_HEAD", "REQUEST_REVIEWER", "REQUEST_MANAGER"],
+    roles: ["DEPARTMENT_HEAD", "REQUEST_MANAGER"],
     currentUser,
   });
 

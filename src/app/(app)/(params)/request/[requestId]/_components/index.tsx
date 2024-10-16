@@ -126,7 +126,13 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
               />
             )}
             {data.type === "VENUE" && data.venueRequest && (
-              <VenueRequestDetails data={data.venueRequest} />
+              <VenueRequestDetails
+                data={data.venueRequest}
+                requestId={data.id}
+                cancellationReason={data.cancellationReason}
+                requestStatus={data.status}
+                isCurrentUser={currentUser.id === data.userId}
+              />
             )}
             {data.type === "RESOURCE" && data.returnableRequest && (
               <ReturnableResourceDetails data={data.returnableRequest} />
@@ -247,13 +253,9 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                 <P className="mb-1 text-sm">Reviewed by</P>
                 <div className="flex items-center space-x-2 p-1">
                   <Avatar className="size-5 rounded-full">
-                    <AvatarImage
-                      src={`${data.reviewer.profileUrl}`}
-                    />
+                    <AvatarImage src={`${data.reviewer.profileUrl}`} />
                     <AvatarFallback className="rounded-md">
-                      {data.reviewer.firstName
-                        .charAt(0)
-                        .toUpperCase()}
+                      {data.reviewer.firstName.charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <P>

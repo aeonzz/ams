@@ -12,9 +12,9 @@ interface Context {
 }
 
 export async function GET(req: Request, params: Context) {
+  await checkAuth();
   const { requestId } = params.params;
   try {
-    await checkAuth();
     const result = await db.request.findFirst({
       where: {
         id: requestId,

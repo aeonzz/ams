@@ -63,7 +63,7 @@ export const createJobRequest = authedProcedure
                Now, create a title for the request using the provided details above.`,
       });
 
-      const createdReaquest = await db.request.create({
+      const createdRequest = await db.request.create({
         data: {
           id: `REQ-${generateId(15)}`,
           userId: user.id,
@@ -94,12 +94,12 @@ export const createJobRequest = authedProcedure
       });
 
       await createNotification({
-        resourceId: `/request/${createdReaquest.id}`,
-        title: `New Request Assigned: ${createdReaquest.title}`,
+        resourceId: `/request/${createdRequest.id}`,
+        title: `New Job Request: ${createdRequest.title}`,
         resourceType: "REQUEST",
         notificationType: "INFO",
-        message: `A new request titled "${createdReaquest.title}" has been assigned to your department. Please review the request for further details.`,
-        recepientIds: [createdReaquest.departmentId],
+        message: `A new job request titled "${createdRequest.title}" has been submitted. Please review the details and take the necessary actions.`,
+        recepientIds: [createdRequest.departmentId],
         userId: user.id,
       });
 

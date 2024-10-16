@@ -62,7 +62,7 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { CommandShortcut } from "@/components/ui/command";
 import EditInput from "./edit-input";
 import { TagInput } from "@/components/ui/tag-input";
-import EditTimeInput from "./edit-time-input";
+import TransportEditTimeInput from "./transport-edit-time-input";
 import type { RequestStatusTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestStatusTypeSchema";
 import { socket } from "@/app/socket";
 
@@ -167,7 +167,7 @@ export default function TransportRequestDetails({
 
   return (
     <>
-      <div className="space-y-4">
+      <div className="space-y-4 pb-10">
         <div className="flex h-7 items-center justify-between">
           <H4 className="font-semibold text-muted-foreground">
             Transport Request Details
@@ -389,7 +389,7 @@ export default function TransportRequestDetails({
                 setEditField={setEditField}
                 label="Date of Travel"
               >
-                <EditTimeInput
+                <TransportEditTimeInput
                   form={form}
                   vehicleId={data.vehicleId}
                   isPending={isPending}

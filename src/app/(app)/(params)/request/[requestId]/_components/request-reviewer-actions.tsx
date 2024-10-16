@@ -89,7 +89,7 @@ export default function RequestReviewerActions({
         path: pathname,
         requestId: request.id,
         reviewerId: currentUser.userRole.some(
-          (role) => role.role.name === "REQUEST_REVIEWER"
+          (role) => role.role.name === "REQUEST_MANAGER"
         )
           ? currentUser.id
           : undefined,

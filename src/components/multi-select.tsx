@@ -25,36 +25,42 @@ import { Check, ChevronsUpDown, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { P } from "@/components/typography/text";
-import { UseFormReturn } from "react-hook-form";
+import type { Path, UseFormReturn } from "react-hook-form";
 import { Badge } from "@/components/ui/badge";
-import { z } from "zod";
-import type { VenueRequestSchema } from "@/lib/schema/request";
 
-interface VenueSetupRequirement {
+interface Item {
   id: string;
   name: string;
 }
 
-interface VenueSetupRequirementsProps {
-  form: UseFormReturn<VenueRequestSchema>;
+interface MultiSelectProps<T extends Record<string, any>> {
+  form: UseFormReturn<T>;
+  name: Path<T>;
+  label: string;
+  items: Item[] | undefined;
   isPending: boolean;
-  data: VenueSetupRequirement[] | undefined;
+  placeholder?: string;
+  emptyMessage?: string;
 }
 
-export default function VenueSetupRequirements({
+export default function MultiSelect<T extends Record<string, any>>({
   form,
+  name,
+  label,
+  items,
   isPending,
-  data,
-}: VenueSetupRequirementsProps) {
+  placeholder = "Select items",
+  emptyMessage = "No items found.",
+}: MultiSelectProps<T>) {
   const [open, setOpen] = React.useState(false);
 
   return (
     <FormField
       control={form.control}
-      name="setupRequirements"
+      name={name}
       render={({ field }) => (
         <FormItem className="flex flex-1 flex-col">
-          <FormLabel>Venue Setup Requirements</FormLabel>
+          <FormLabel>{label}</FormLabel>
           <div className="space-y-2">
             <Popover open={open} onOpenChange={setOpen} modal>
               <PopoverTrigger asChild>
@@ -62,15 +68,15 @@ export default function VenueSetupRequirements({
                   <Button
                     variant="outline"
                     role="combobox"
-                    disabled={isPending || !data}
+                    disabled={isPending || !items}
                     className={cn(
                       "w-full justify-between",
                       !field.value?.length && "text-muted-foreground"
                     )}
                   >
-                    {field.value?.length
+                    {field.value && Array.isArray(field.value) && field.value.length > 0
                       ? `${field.value.length} selected`
-                      : "Select items"}
+                      : placeholder}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </FormControl>
@@ -79,19 +85,17 @@ export default function VenueSetupRequirements({
                 <Command>
                   <CommandInput placeholder="Search items..." />
                   <CommandList>
-                    <CommandEmpty>No items found.</CommandEmpty>
+                    <CommandEmpty>{emptyMessage}</CommandEmpty>
                     <CommandGroup>
-                      {data?.map((requirement) => (
+                      {items?.map((item) => (
                         <CommandItem
-                          key={requirement.id}
-                          value={requirement.name}
+                          key={item.id}
+                          value={item.name}
                           onSelect={() => {
-                            const currentValue = field.value || [];
-                            const newValue = currentValue.includes(
-                              requirement.name
-                            )
-                              ? currentValue.filter((v) => v !== requirement.name)
-                              : [...currentValue, requirement.name];
+                            const currentValue = (field.value as string[]) || [];
+                            const newValue = currentValue.includes(item.name)
+                              ? currentValue.filter((v) => v !== item.name)
+                              : [...currentValue, item.name];
                             field.onChange(newValue);
                           }}
                           className="flex items-center"
@@ -99,12 +103,12 @@ export default function VenueSetupRequirements({
                           <Check
                             className={cn(
                               "mr-2 h-4 w-4",
-                              field.value?.includes(requirement.name)
+                              field.value && Array.isArray(field.value) && field.value.includes(item.name)
                                 ? "opacity-100"
                                 : "opacity-0"
                             )}
                           />
-                          <P className="truncate">{requirement.name}</P>
+                          <P className="truncate">{item.name}</P>
                         </CommandItem>
                       ))}
                     </CommandGroup>
@@ -112,17 +116,17 @@ export default function VenueSetupRequirements({
                 </Command>
               </PopoverContent>
             </Popover>
-            {field.value && field.value.length > 0 && (
+            {field.value && Array.isArray(field.value) && field.value.length > 0 && (
               <div className="flex flex-wrap gap-2">
-                {field.value.map((name, index) => {
-                  const requirement = data?.find((r) => r.name === name);
+                {field.value.map((name: string, index: number) => {
+                  const item = items?.find((r) => r.name === name);
                   return (
                     <Badge
                       key={index}
                       variant="outline"
                       className="flex items-center gap-1 px-2 py-1"
                     >
-                      {requirement?.name}
+                      {item?.name}
 
                       <Button
                         type="button"
@@ -130,7 +134,7 @@ export default function VenueSetupRequirements({
                         size="sm"
                         className="ml-1 h-4 w-4 p-0"
                         onClick={() => {
-                          const newValue = field.value.filter((v) => v !== name);
+                          const newValue = (field.value as string[]).filter((v) => v !== name);
                           field.onChange(newValue);
                         }}
                         disabled={isPending}

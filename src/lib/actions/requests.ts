@@ -17,10 +17,12 @@ import {
   extendedVenueRequestSchema,
   updateJobRequestSchemaServerWithPath,
   updateTransportRequestSchemaWithPath,
+  updateVenueRequestSchemaWithPath,
 } from "../schema/request";
 import { checkAuth } from "../auth/utils";
 import { currentUser } from "./users";
 import { UserCheck2Icon } from "lucide-react";
+import { createNotification } from "./notification";
 
 const cohere = createCohere({
   apiKey: process.env.COHERE_API_KEY,
@@ -176,7 +178,7 @@ export const createVenueRequest = authedProcedure
       const requestId = `REQ-${generateId(15)}`;
       const venuRequestId = `VRQ-${generateId(15)}`;
 
-      const createRequest = await db.request.create({
+      const createdRequest = await db.request.create({
         data: {
           id: requestId,
           userId: user.id,
@@ -201,23 +203,14 @@ export const createVenueRequest = authedProcedure
         },
       });
 
-      if (!createRequest.venueRequest) {
-        throw "Something went wrong, please try again later.";
-      }
-
-      const newValueJson = JSON.parse(
-        JSON.stringify(createRequest.venueRequest)
-      );
-
-      await db.genericAuditLog.create({
-        data: {
-          id: generateId(15),
-          entityId: createRequest.venueRequest.id,
-          entityType: "VENUE_REQUEST",
-          changeType: "CREATED",
-          newValue: newValueJson,
-          changedById: user.id,
-        },
+      await createNotification({
+        resourceId: `/request/${createdRequest.id}`,
+        title: `New Venue Request: ${createdRequest.title}`,
+        resourceType: "REQUEST",
+        notificationType: "INFO",
+        message: `A new venue request titled "${createdRequest.title}" has been submitted. Please check the details and proceed with the necessary actions.`,
+        recepientIds: [createdRequest.departmentId],
+        userId: user.id,
       });
 
       return revalidatePath(path);
@@ -575,6 +568,27 @@ export const updateTransportRequest = authedProcedure
     const { path, id, ...rest } = input;
     try {
       const result = await db.transportRequest.update({
+        where: {
+          requestId: id,
+        },
+        data: {
+          ...rest,
+        },
+      });
+
+      return revalidatePath(path);
+    } catch (error) {
+      getErrorMessage(error);
+    }
+  });
+
+export const udpateVenueRequest = authedProcedure
+  .createServerAction()
+  .input(updateVenueRequestSchemaWithPath)
+  .handler(async ({ input }) => {
+    const { path, id, ...rest } = input;
+    try {
+      const result = await db.venueRequest.update({
         where: {
           requestId: id,
         },

@@ -48,7 +48,8 @@ import type { VenueWithRelations } from "prisma/generated/zod";
 import VenueRequestInputSkeleton from "./venue-request-input-skeleton";
 import { VenueFeaturesType } from "@/lib/types/venue";
 import ScheduledEventCardSkeleton from "./scheduled-event-card-skeleton";
-import VenueSetupRequirements from "./venue-setup-requirements";
+import MultiSelect from "@/components/multi-select";
+import { socket } from "@/app/socket";
 
 interface VenueRequestInputProps {
   mutateAsync: UseMutateAsyncFunction<
@@ -132,11 +133,7 @@ export default function VenueRequestInput({
   const disabledTimeRanges = React.useMemo(() => {
     return (
       data
-        ?.filter(
-          (item) =>
-            item.request.status === "APPROVED" ||
-            item.request.status === "REVIEWED"
-        )
+        ?.filter((item) => item.request.status === "APPROVED")
         .map(({ startTime, endTime }) => ({
           start: new Date(startTime),
           end: new Date(endTime),
@@ -200,6 +197,8 @@ export default function VenueRequestInput({
         queryClient.invalidateQueries({
           queryKey: ["user-dashboard-overview"],
         });
+        socket.emit("notifications");
+        socket.emit("request_update");
         handleOpenChange(false);
         return "Your request has been submitted and is awaiting approval.";
       },
@@ -224,10 +223,14 @@ export default function VenueRequestInput({
                 isPending={isPending}
                 data={venueData}
               />
-              <VenueSetupRequirements
+              <MultiSelect
                 form={form}
+                name="setupRequirements"
+                label="Venue Setup Requirements"
+                items={selectedVenue?.venueSetupRequirement}
                 isPending={isPending}
-                data={selectedVenue?.venueSetupRequirement}
+                placeholder="Select items"
+                emptyMessage="No items found."
               />
               <VenueDateTimePicker
                 form={form}

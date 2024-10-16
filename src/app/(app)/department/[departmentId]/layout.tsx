@@ -21,7 +21,7 @@ export default async function PageLayout({ children, params }: Props) {
   return (
     <>
       <PageGuard
-        allowedRoles={["DEPARTMENT_HEAD", "REQUEST_REVIEWER"]}
+        allowedRoles={["DEPARTMENT_HEAD", "REQUEST_MANAGER"]}
         allowedDepartment={params.departmentId}
         //@ts-ignore
         currentUser={data}

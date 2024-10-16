@@ -8,17 +8,17 @@ import axios from "axios";
 import React from "react";
 import { type UseFormReturn } from "react-hook-form";
 
-interface EditTimeInputProps {
+interface TransportEditTimeInputProps {
   form: UseFormReturn<UpdateTransportRequestSchema>;
   vehicleId: string;
   isPending: boolean;
 }
 
-export default function EditTimeInput({
+export default function TransportEditTimeInput({
   form,
   vehicleId,
   isPending,
-}: EditTimeInputProps) {
+}: TransportEditTimeInputProps) {
   const { data, isLoading, refetch, isRefetching } = useQuery<
     ReservedTransportDateAndTime[]
   >({
