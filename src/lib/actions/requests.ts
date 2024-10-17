@@ -23,6 +23,7 @@ import { checkAuth } from "../auth/utils";
 import { currentUser } from "./users";
 import { UserCheck2Icon } from "lucide-react";
 import { createNotification } from "./notification";
+import { updateRequestStatusSchemaWithPath } from "@/app/(app)/(params)/request/[requestId]/_components/schema";
 
 const cohere = createCohere({
   apiKey: process.env.COHERE_API_KEY,
@@ -620,6 +621,93 @@ export const updateJobRequest = authedProcedure
       });
       return revalidatePath(path);
     } catch (error) {
+      getErrorMessage(error);
+    }
+  });
+
+export const completeVenueRequest = authedProcedure
+  .createServerAction()
+  .input(updateRequestStatusSchemaWithPath)
+  .handler(async ({ ctx, input }) => {
+    const { user } = ctx;
+    const { path, requestId, reviewerId, ...rest } = input;
+
+    try {
+      const result = await db.$transaction(async (prisma) => {
+        const updatedVenueRequest = await prisma.venueRequest.update({
+          where: {
+            requestId: requestId,
+          },
+          data: {
+            request: {
+              update: {
+                completedAt: new Date(),
+                ...rest,
+              },
+            },
+            inProgress: false,
+            actualEndtime: new Date(),
+          },
+        });
+
+        await db.venue.update({
+          where: {
+            id: updatedVenueRequest.venueId,
+          },
+          data: {
+            status: "AVAILABLE",
+          },
+        });
+
+        return updatedVenueRequest;
+      });
+
+      return revalidatePath(path);
+    } catch (error) {
+      console.log(error);
+      getErrorMessage(error);
+    }
+  });
+
+export const completeTransportRequest = authedProcedure
+  .createServerAction()
+  .input(updateRequestStatusSchemaWithPath)
+  .handler(async ({ ctx, input }) => {
+    const { user } = ctx;
+    const { path, requestId, reviewerId, ...rest } = input;
+
+    try {
+      const result = await db.$transaction(async (prisma) => {
+        const updatedTransportRequest = await prisma.transportRequest.update({
+          where: {
+            requestId: requestId,
+          },
+          data: {
+            request: {
+              update: {
+                completedAt: new Date(),
+                ...rest,
+              },
+            },
+            inProgress: false,
+          },
+        });
+
+        await db.vehicle.update({
+          where: {
+            id: updatedTransportRequest.vehicleId
+          },
+          data: {
+            status: "AVAILABLE",
+          },
+        });
+
+        return updatedTransportRequest;
+      });
+
+      return revalidatePath(path);
+    } catch (error) {
+      console.log(error);
       getErrorMessage(error);
     }
   });

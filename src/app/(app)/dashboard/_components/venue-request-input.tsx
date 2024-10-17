@@ -209,6 +209,9 @@ export default function VenueRequestInput({
     });
   }
 
+  const filteredVenueSetupRequirements =
+    selectedVenue?.venueSetupRequirement.filter((v) => v.available);
+
   if (isLoadingVenueData) return <VenueRequestInputSkeleton />;
 
   return (
@@ -227,7 +230,7 @@ export default function VenueRequestInput({
                 form={form}
                 name="setupRequirements"
                 label="Venue Setup Requirements"
-                items={selectedVenue?.venueSetupRequirement}
+                items={filteredVenueSetupRequirements}
                 isPending={isPending}
                 placeholder="Select items"
                 emptyMessage="No items found."

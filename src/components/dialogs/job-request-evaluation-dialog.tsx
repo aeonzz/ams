@@ -3,11 +3,11 @@
 import React from "react";
 
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -39,17 +39,17 @@ import {
 import { createJobRequestEvaluation } from "@/lib/actions/evaluation";
 import { P } from "../typography/text";
 
-interface JobRequestEvaluationDialogProps {
+interface JobRequestEvaluationSheetProps {
   children: React.ReactNode;
   jobRequestId: string;
   requestId: string;
 }
 
-export default function JobRequestEvaluationDialog({
+export default function JobRequestEvaluationSheet({
   children,
   jobRequestId,
   requestId,
-}: JobRequestEvaluationDialogProps) {
+}: JobRequestEvaluationSheetProps) {
   const dialogManager = useDialogManager();
   const [alertOpen, setAlertOpen] = React.useState(false);
 
@@ -89,11 +89,11 @@ export default function JobRequestEvaluationDialog({
 
   return (
     <>
-      <Dialog
+      <Sheet
         open={dialogManager.activeDialog === "jobRequestEvaluationDialog"}
         onOpenChange={handleOpenChange}
       >
-        <DialogContent
+        <SheetContent
           onInteractOutside={(e) => {
             if (isPending) {
               e.preventDefault();
@@ -103,15 +103,14 @@ export default function JobRequestEvaluationDialog({
               setAlertOpen(true);
             }
           }}
-          isLoading={isPending}
-          className="max-w-4xl"
+          className="md:max-w-5xl"
         >
           <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
             {isFieldsDirty && !isPending && (
               <AlertDialogTrigger disabled={isPending} asChild>
                 <button
                   disabled={isPending}
-                  className="absolute right-4 top-4 z-50 cursor-pointer rounded-sm opacity-70 ring-offset-background transition-opacity data-[state=open]:bg-accent data-[state=open]:text-muted-foreground hover:opacity-100 focus:outline-none focus:ring-0 focus:ring-ring focus:ring-offset-0 active:scale-95 disabled:pointer-events-none"
+                  className="absolute right-4 top-4 z-50 cursor-pointer rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-0 focus:ring-ring focus:ring-offset-0 active:scale-95 disabled:pointer-events-none"
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -136,8 +135,8 @@ export default function JobRequestEvaluationDialog({
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
-          <DialogHeader className="flex-row items-center gap-2 space-y-0">
-            <DialogTitle>Job Evaluation</DialogTitle>
+          <SheetHeader className="flex-row items-center gap-2 space-y-0">
+            <SheetTitle>Job Evaluation</SheetTitle>
             <HoverCard openDelay={100} closeDelay={0}>
               <HoverCardTrigger asChild>
                 <CircleHelp className="size-4 cursor-pointer text-muted-foreground transition-colors hover:text-foreground" />
@@ -164,7 +163,7 @@ export default function JobRequestEvaluationDialog({
                 </div>
               </HoverCardContent>
             </HoverCard>
-          </DialogHeader>
+          </SheetHeader>
           <JobRequestEvaluationForm
             form={form}
             isPending={isPending}
@@ -174,8 +173,8 @@ export default function JobRequestEvaluationDialog({
             jobRequestId={jobRequestId}
             requestId={requestId}
           />
-        </DialogContent>
-      </Dialog>
+        </SheetContent>
+      </Sheet>
       {children}
     </>
   );

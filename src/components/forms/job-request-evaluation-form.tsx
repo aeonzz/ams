@@ -174,8 +174,8 @@ export default function JobRequestEvaluationForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
-        <div className="scroll-bar flex max-h-[60vh] gap-6 overflow-y-auto py-1">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
+        <div className="scroll-bar flex h-[calc(100vh_-_150px)] gap-6 overflow-y-auto py-1">
           <div className="flex flex-1 flex-col">
             <div className="flex flex-col space-y-6 px-4">
               <div className="flex">

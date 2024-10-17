@@ -292,7 +292,7 @@ export default function JobRequestDetails({
   const canEdit = requestStatus === "PENDING" && isCurrentUser;
 
   return (
-    <>
+    <div className="pb-10">
       <div className="space-y-4">
         <div className="flex h-7 items-center justify-between">
           <H4 className="font-semibold text-muted-foreground">
@@ -859,6 +859,6 @@ export default function JobRequestDetails({
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }

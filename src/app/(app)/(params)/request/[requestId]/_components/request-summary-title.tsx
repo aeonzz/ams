@@ -18,14 +18,23 @@ import { toast } from "sonner";
 export default function RequestSummaryTitle() {
   const pathname = usePathname();
   const [isCopying, setIsCopying] = React.useState(false);
+
+  const getFullUrl = () => {
+    if (typeof window !== 'undefined') {
+      return `${window.location.origin}${pathname}`;
+    }
+    return pathname; 
+  };
+
   const copyToClipboard = async () => {
     setIsCopying(true);
     try {
-      await navigator.clipboard.writeText(pathname);
-      toast("The link has been copied to your clipboard.");
+      const fullUrl = getFullUrl();
+      await navigator.clipboard.writeText(fullUrl);
+      toast("The full URL has been copied to your clipboard.");
     } catch (err) {
       console.error("Failed to copy: ", err);
-      toast.error("There was an error copying the link. Please try again.");
+      toast.error("There was an error copying the URL. Please try again.");
     } finally {
       setIsCopying(false);
     }
@@ -56,7 +65,7 @@ export default function RequestSummaryTitle() {
           </Button>
         </TooltipTrigger>
         <TooltipContent className="flex items-center gap-3" side="bottom">
-          <CommandTooltip text="Copy request url">
+          <CommandTooltip text="Copy full request URL">
             <CommandShortcut>Ctrl</CommandShortcut>
             <CommandShortcut>Shift</CommandShortcut>
             <CommandShortcut>L</CommandShortcut>

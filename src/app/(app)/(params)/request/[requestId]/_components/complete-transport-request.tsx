@@ -3,7 +3,7 @@
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
 import React from "react";
 import type { UpdateRequestStatusSchemaWithPath } from "./schema";
-import { usePathname } from "next/navigation";
+import { usePathname } from "next/navigation"; 
 import type { RequestStatusTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestStatusTypeSchema";
 import { toast } from "sonner";
 import { socket } from "@/app/socket";
@@ -19,18 +19,19 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { completeVenueRequest } from "@/lib/actions/requests";
+import { completeTransportRequest } from "@/lib/actions/requests";
 
-interface CompleteVenueRequestProps {
+interface CompleteTransportRequestProps {
   requestId: string;
 }
 
-export default function CompleteVenueRequest({
+export default function CompleteTransportRequest({
   requestId,
-}: CompleteVenueRequestProps) {
+}: CompleteTransportRequestProps) {
   const pathname = usePathname();
-  const { mutateAsync, isPending } =
-    useServerActionMutation(completeVenueRequest);
+  const { mutateAsync, isPending } = useServerActionMutation(
+    completeTransportRequest
+  );
 
   async function handleUpdate(status: RequestStatusTypeType) {
     const data: UpdateRequestStatusSchemaWithPath = {
@@ -40,11 +41,11 @@ export default function CompleteVenueRequest({
     };
 
     toast.promise(mutateAsync(data), {
-      loading: "Marking reservation as completed...",
+      loading: "Marking transport request as completed...",
       success: () => {
         socket.emit("request_update");
         socket.emit("notifications");
-        return "The reservation has been marked as completed successfully.";
+        return "The transport request has been marked as completed successfully.";
       },
       error: (err) => {
         console.log(err);
@@ -60,9 +61,9 @@ export default function CompleteVenueRequest({
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Confirm Mark as Completed</AlertDialogTitle>
+          <AlertDialogTitle>Confirm Completion</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to mark this venue reservation as completed?
+            Are you sure you want to mark this transport request as completed?
             This action is irreversible.
           </AlertDialogDescription>
         </AlertDialogHeader>

@@ -44,7 +44,7 @@ import JobRequestEvaluationDialog from "@/components/dialogs/job-request-evaluat
 import RequestSummaryTitle from "./request-summary-title";
 import TransportRequestDetails from "./transport-request-details";
 import RequestReviewerActions from "./request-reviewer-actions";
-import CompleteVenuRequest from "./complete-venue-request";
+import CompleteVenueRequest from "./complete-venue-request";
 
 interface RequestDetailsProps {
   params: string;
@@ -366,7 +366,10 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
             />
           )}
           {data.type === "VENUE" && data.venueRequest && data.venueRequest.inProgress && (
-            <CompleteVenuRequest requestId={data.id} />
+            <CompleteVenueRequest requestId={data.id} />
+          )}
+          {data.type === "TRANSPORT" && data.transportRequest && data.transportRequest.inProgress && (
+            <CompleteVenueRequest requestId={data.id} />
           )}
           {/* {data.type === "VENUE" && data.venueRequest && (
             <JobRequestReviewerActions
