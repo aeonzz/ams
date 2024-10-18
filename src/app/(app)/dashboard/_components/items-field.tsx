@@ -34,11 +34,17 @@ import { type ReturnableResourceRequestSchema } from "@/lib/schema/resource/retu
 import { P } from "@/components/typography/text";
 import Image from "next/image";
 import { InventoryItemWithRelations } from "prisma/generated/zod";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 
 interface ItemsFieldProps {
   form: UseFormReturn<ReturnableResourceRequestSchema>;
   name: Path<ReturnableResourceRequestSchema>;
   isPending: boolean;
+  data: InventoryItemWithRelations[] | undefined;
   onDepartmentIdChange: (departmentId: string) => void;
 }
 
@@ -46,19 +52,12 @@ export default function ItemsField({
   form,
   name,
   isPending,
+  data,
   onDepartmentIdChange,
 }: ItemsFieldProps) {
   const [open, setOpen] = React.useState(false);
   const [selectedItem, setSelectedItem] =
     useState<InventoryItemWithRelations | null>(null);
-
-  const { data, isLoading } = useQuery<InventoryItemWithRelations[]>({
-    queryFn: async () => {
-      const res = await axios.get("/api/input-data/resource-items/returnable");
-      return res.data.data;
-    },
-    queryKey: ["get-input-returnable-resource"],
-  });
 
   const handleItemSelect = (item: InventoryItemWithRelations) => {
     setSelectedItem(item);
@@ -70,20 +69,46 @@ export default function ItemsField({
     setOpen(false);
   };
 
+  const [dimensions, setDimensions] = React.useState({ width: 0, height: 0 });
+
+  const handleImageLoad = (img: HTMLImageElement) => {
+    setDimensions({
+      width: img.naturalWidth,
+      height: img.naturalHeight,
+    });
+  };
+
+  const maxWidth = 400;
+  const maxHeight = 300;
+  const aspectRatio = dimensions.width / dimensions.height;
+
+  let hoverCardWidth = dimensions.width;
+  let hoverCardHeight = dimensions.height;
+
+  if (hoverCardWidth > maxWidth) {
+    hoverCardWidth = maxWidth;
+    hoverCardHeight = hoverCardWidth / aspectRatio;
+  }
+
+  if (hoverCardHeight > maxHeight) {
+    hoverCardHeight = maxHeight;
+    hoverCardWidth = hoverCardHeight * aspectRatio;
+  }
+
   return (
     <FormField
       control={form.control}
       name={name}
       render={({ field }) => (
         <FormItem className="flex flex-col">
-          <FormLabel className="text-muted-foreground">Resources</FormLabel>
+          <FormLabel>Resources</FormLabel>
           <FormControl>
             <Popover open={open} onOpenChange={setOpen} modal>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
                   role="combobox"
-                  disabled={isPending || isLoading}
+                  disabled={isPending}
                   className={cn(
                     "justify-start truncate",
                     !field.value && "text-muted-foreground"
@@ -102,11 +127,7 @@ export default function ItemsField({
                   ) : (
                     "Select item"
                   )}
-                  {isLoading ? (
-                    <LoadingSpinner className="ml-auto" />
-                  ) : (
-                    <ChevronsUpDown className="ml-auto h-4 w-4 shrink-0 opacity-50" />
-                  )}
+                  <ChevronsUpDown className="ml-auto h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-[470px] p-0">
@@ -141,7 +162,36 @@ export default function ItemsField({
                                       : "opacity-0"
                                   )}
                                 />
-                                {selectedItem.name} - SubItem {subItem.id}
+                                <HoverCard closeDelay={0} openDelay={300}>
+                                  <HoverCardTrigger asChild>
+                                    <div className="relative mr-2 aspect-square h-16 cursor-pointer transition-colors hover:brightness-75">
+                                      <Image
+                                        src={subItem.imageUrl}
+                                        alt={`Image of ${subItem.id}`}
+                                        fill
+                                        className="rounded-md border object-cover"
+                                        onLoadingComplete={handleImageLoad}
+                                      />
+                                    </div>
+                                  </HoverCardTrigger>
+                                  <HoverCardContent
+                                    className="p-0"
+                                    style={{
+                                      width: hoverCardWidth,
+                                      height: hoverCardHeight,
+                                    }}
+                                  >
+                                    <div className="relative h-full w-full">
+                                      <Image
+                                        src={subItem.imageUrl}
+                                        alt={`Enlarged image of ${subItem.id}`}
+                                        fill
+                                        className="rounded-md object-contain"
+                                      />
+                                    </div>
+                                  </HoverCardContent>
+                                </HoverCard>
+                                {subItem.subName}
                                 <Badge variant={variant} className="ml-auto">
                                   <Icon className="mr-1 size-4" />
                                   {textTransform(subItem.status)}
@@ -182,12 +232,9 @@ export default function ItemsField({
                                     <Badge variant="green">
                                       {availableSubItems} available
                                     </Badge>
-                                    <P className="text-xs text-muted-foreground">
-                                      Created:{" "}
-                                      {new Date(
-                                        item.createdAt
-                                      ).toLocaleDateString()}
-                                    </P>
+                                    <Badge variant="outline">
+                                      {item.department.name}
+                                    </Badge>
                                   </div>
                                 </div>
                                 <ChevronRight className="h-4 w-4 opacity-50" />

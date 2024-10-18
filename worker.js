@@ -17,20 +17,22 @@ async function updateInProgressStatus() {
   try {
     const result = await prisma.$transaction(async (prisma) => {
       // Update TransportRequests
-      const updatedTransportRequests = await prisma.transportRequest.updateMany({
-        where: {
-          dateAndTimeNeeded: {
-            lte: now,
+      const updatedTransportRequests = await prisma.transportRequest.updateMany(
+        {
+          where: {
+            dateAndTimeNeeded: {
+              lte: now,
+            },
+            inProgress: false,
+            request: {
+              status: "APPROVED",
+            },
           },
-          inProgress: false,
-          request: {
-            status: "APPROVED",
+          data: {
+            inProgress: true,
           },
-        },
-        data: {
-          inProgress: true,
-        },
-      });
+        }
+      );
 
       if (updatedTransportRequests.count > 0) {
         const vehicleIds = await prisma.transportRequest.findMany({
@@ -108,13 +110,35 @@ async function updateInProgressStatus() {
         });
       }
 
+      const updatedReturnableRequests =
+        await prisma.returnableRequest.updateMany({
+          where: {
+            dateAndTimeNeeded: {
+              lte: now,
+            },
+            returnDateAndTime: {
+              gt: now,
+            },
+            inProgress: false,
+            request: {
+              status: "APPROVED",
+            },
+          },
+          data: {
+            inProgress: true,
+          },
+        });
+
       return {
         transportRequests: updatedTransportRequests,
         venueRequests: updatedVenueRequests,
+        returnableRequest: updatedReturnableRequests,
       };
     });
 
-    console.log(`Successfully updated ${result.transportRequests.count} transport requests and ${result.venueRequests.count} venue requests`);
+    console.log(
+      `Successfully updated ${result.transportRequests.count} transport requests, ${result.venueRequests.count} venue requests and ${result.returnableRequest.count} returnable requests.`
+    );
 
     // Fetch updated requests for WebSocket notifications
     const updatedRequests = await prisma.$transaction([
@@ -153,11 +177,31 @@ async function updateInProgressStatus() {
           requestId: true,
         },
       }),
+      prisma.returnableRequest.findMany({
+        where: {
+          dateAndTimeNeeded: {
+            lte: now,
+          },
+          returnDateAndTime: {
+            gt: now,
+          },
+          inProgress: {
+            equals: true,
+          },
+          request: {
+            status: "APPROVED",
+          },
+        },
+        select: {
+          requestId: true,
+        },
+      }),
     ]);
 
     const updatedRequestIds = [
       ...updatedRequests[0].map((request) => request.requestId),
       ...updatedRequests[1].map((request) => request.requestId),
+      ...updatedRequests[2].map((request) => request.requestId),
     ];
 
     wss.clients.forEach((client) => {

@@ -36,7 +36,7 @@ import {
 } from "@/components/ui/form";
 import {
   updateVenueRequestSchema,
-  UpdateVenueRequestSchemaWithPath,
+  type UpdateVenueRequestSchemaWithPath,
   type UpdateVenueRequestSchema,
 } from "@/lib/schema/request";
 import { useForm, useFormState } from "react-hook-form";
@@ -53,11 +53,12 @@ import { usePathname } from "next/navigation";
 import MultiSelect from "@/components/multi-select";
 import { Textarea } from "@/components/ui/text-area";
 import { useHotkeys } from "react-hotkeys-hook";
+import RejectionReasonCard from "./rejection-reason-card";
 
 interface VenueRequestDetailsProps {
   data: VenueRequestWithRelations;
   requestId: string;
-  cancellationReason: string | null;
+  rejectionReason: string | null;
   requestStatus: RequestStatusTypeType;
   isCurrentUser: boolean;
 }
@@ -65,7 +66,7 @@ interface VenueRequestDetailsProps {
 export default function VenueRequestDetails({
   data,
   requestId,
-  cancellationReason,
+  rejectionReason,
   requestStatus,
   isCurrentUser,
 }: VenueRequestDetailsProps) {
@@ -97,8 +98,11 @@ export default function VenueRequestDetails({
       ) {
         form.setError("startTime", {
           type: "manual",
-          message:
-            "Date and time needed must not be later than the end date and time",
+          message: "Start time must not be later than the end time",
+        });
+        form.setError("endTime", {
+          type: "manual",
+          message: "The end time must be after the start time.",
         });
         return;
       }
@@ -221,6 +225,7 @@ export default function VenueRequestDetails({
                 isFieldsDirty={isFieldsDirty}
                 setEditField={setEditField}
                 label="Start Time"
+                reset={form.reset}
               >
                 <VenueEditTimeInput
                   form={form}
@@ -259,6 +264,7 @@ export default function VenueRequestDetails({
                 isFieldsDirty={isFieldsDirty}
                 setEditField={setEditField}
                 label="End Time"
+                reset={form.reset}
               >
                 <VenueEditTimeInput
                   form={form}
@@ -312,6 +318,7 @@ export default function VenueRequestDetails({
                 isFieldsDirty={isFieldsDirty}
                 setEditField={setEditField}
                 label="Setup Requirements"
+                reset={form.reset}
               >
                 <MultiSelect
                   form={form}
@@ -362,6 +369,7 @@ export default function VenueRequestDetails({
                 isFieldsDirty={isFieldsDirty}
                 setEditField={setEditField}
                 label="Purpose"
+                reset={form.reset}
               >
                 <FormField
                   control={form.control}
@@ -415,6 +423,7 @@ export default function VenueRequestDetails({
                 isFieldsDirty={isFieldsDirty}
                 setEditField={setEditField}
                 label="Other Info"
+                reset={form.reset}
               >
                 <FormField
                   control={form.control}
@@ -464,16 +473,7 @@ export default function VenueRequestDetails({
             )}
           </form>
         </Form>
-        {cancellationReason && (
-          <Card>
-            <CardHeader>
-              <H5 className="font-semibold leading-none">
-                Cancellation Reason
-              </H5>
-              <CardDescription>{cancellationReason}</CardDescription>
-            </CardHeader>
-          </Card>
-        )}
+        <RejectionReasonCard rejectionReason={rejectionReason} />
         <Separator className="my-6" />
       </div>
     </>

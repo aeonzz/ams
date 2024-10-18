@@ -65,11 +65,12 @@ import { TagInput } from "@/components/ui/tag-input";
 import TransportEditTimeInput from "./transport-edit-time-input";
 import type { RequestStatusTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestStatusTypeSchema";
 import { socket } from "@/app/socket";
+import RejectionReasonCard from "./rejection-reason-card";
 
 interface TransportRequestDetailsProps {
   data: TransportRequestWithRelations;
   requestId: string;
-  cancellationReason: string | null;
+  rejectionReason: string | null;
   requestStatus: RequestStatusTypeType;
   isCurrentUser: boolean;
 }
@@ -77,7 +78,7 @@ interface TransportRequestDetailsProps {
 export default function TransportRequestDetails({
   data,
   requestId,
-  cancellationReason,
+  rejectionReason,
   requestStatus,
   isCurrentUser,
 }: TransportRequestDetailsProps) {
@@ -231,6 +232,7 @@ export default function TransportRequestDetails({
                 isFieldsDirty={isFieldsDirty}
                 setEditField={setEditField}
                 label="Destination"
+                reset={form.reset}
               >
                 <FormField
                   control={form.control}
@@ -283,6 +285,7 @@ export default function TransportRequestDetails({
                 isFieldsDirty={isFieldsDirty}
                 setEditField={setEditField}
                 label="Office/Dept."
+                reset={form.reset}
               >
                 <FormField
                   control={form.control}
@@ -337,6 +340,7 @@ export default function TransportRequestDetails({
                 isFieldsDirty={isFieldsDirty}
                 setEditField={setEditField}
                 label="Passengers."
+                reset={form.reset}
               >
                 <FormField
                   control={form.control}
@@ -388,6 +392,7 @@ export default function TransportRequestDetails({
                 isFieldsDirty={isFieldsDirty}
                 setEditField={setEditField}
                 label="Date of Travel"
+                reset={form.reset}
               >
                 <TransportEditTimeInput
                   form={form}
@@ -428,6 +433,7 @@ export default function TransportRequestDetails({
                 isFieldsDirty={isFieldsDirty}
                 setEditField={setEditField}
                 label="Purpose"
+                reset={form.reset}
               >
                 <FormField
                   control={form.control}
@@ -477,16 +483,7 @@ export default function TransportRequestDetails({
             )}
           </form>
         </Form>
-        {cancellationReason && (
-          <Card>
-            <CardHeader>
-              <H5 className="font-semibold leading-none">
-                Cancellation Reason
-              </H5>
-              <CardDescription>{cancellationReason}</CardDescription>
-            </CardHeader>
-          </Card>
-        )}
+        <RejectionReasonCard rejectionReason={rejectionReason} />
       </div>
       <Separator className="my-6" />
     </>

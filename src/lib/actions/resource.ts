@@ -11,6 +11,7 @@ import {
   extendedSupplyResourceRequestSchema,
   extendedSupplyResourceRequestSchemaServer,
 } from "../schema/resource/supply-resource";
+import { createNotification } from "./notification";
 
 export const createReturnableResourceRequest = authedProcedure
   .createServerAction()
@@ -30,7 +31,7 @@ export const createReturnableResourceRequest = authedProcedure
         prompt: `Create a clear and concise title for a request based on these details:
                  Notes: 
                  ${input.type} request
-                 ${rest.purpose.join(", ")}
+                 ${rest.purpose}
 
                  
                  Guidelines:
@@ -58,7 +59,7 @@ export const createReturnableResourceRequest = authedProcedure
       const requestId = `REQ-${generateId(15)}`;
       const resourceRequestId = `RRQ-${generateId(15)}`;
 
-      const createRequest = await db.request.create({
+      const createdRequest = await db.request.create({
         data: {
           id: requestId,
           userId: user.id,
@@ -69,41 +70,25 @@ export const createReturnableResourceRequest = authedProcedure
           returnableRequest: {
             create: {
               id: resourceRequestId,
-              departmentId: rest.itemDepartmentId,
               dateAndTimeNeeded: rest.dateAndTimeNeeded,
               returnDateAndTime: rest.returnDateAndTime,
-              purpose: rest.purpose.includes("other")
-                ? [
-                    ...rest.purpose.filter((p) => p !== "other"),
-                    rest.otherPurpose,
-                  ].join(", ")
-                : rest.purpose.join(", "),
+              notes: rest.notes,
+              purpose: rest.purpose,
+              location: rest.location,
               itemId: rest.itemId,
             },
           },
         },
-        include: {
-          returnableRequest: true,
-        },
       });
 
-      if (!createRequest.returnableRequest) {
-        throw "Something went wrong, please try again later.";
-      }
-
-      const newValueJson = JSON.parse(
-        JSON.stringify(createRequest.returnableRequest)
-      );
-
-      await db.genericAuditLog.create({
-        data: {
-          id: generateId(15),
-          entityId: createRequest.returnableRequest.id,
-          entityType: "RETURNABLE_REQUEST",
-          changeType: "CREATED",
-          newValue: newValueJson,
-          changedById: user.id,
-        },
+      await createNotification({
+        resourceId: `/request/${createdRequest.id}`,
+        title: `New Borrow Request: ${createdRequest.title}`,
+        resourceType: "REQUEST",
+        notificationType: "INFO",
+        message: `A new borrow request titled "${createdRequest.title}" has been submitted. Please review the request and take the necessary actions.`,
+        recepientIds: [createdRequest.departmentId],
+        userId: user.id,
       });
 
       return revalidatePath(path);

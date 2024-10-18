@@ -26,10 +26,22 @@ export const returnableResourceRequestSchemaBase = z.object({
     .refine((date) => date.getHours() !== 0 || date.getMinutes() !== 0, {
       message: "Time cannot be exactly midnight (00:00)",
     }),
-  purpose: z.array(z.string()).refine((value) => value.some((item) => item), {
-    message: "You have to select at least one item.",
-  }),
-  otherPurpose: z.string().optional(),
+  purpose: z
+    .string()
+    .min(1, { message: "This field is required" })
+    .max(700, { message: "Cannot be more than 700 characters long" }),
+  location: z
+    .string()
+    .min(1, { message: "This field is required" })
+    .max(100, { message: "Cannot be more than 100 characters long" }),
+  notes: z
+    .string()
+    .max(700, { message: "Cannot be more than 700 characters long" })
+    .optional(),
+  inProgress: z.boolean().optional(),
+  isReturned: z.boolean().optional(),
+  returnCondition: z.string().optional(),
+  itemStatus: ItemStatusSchema.optional(),
 });
 
 export const returnableResourceRequestSchema =
@@ -49,7 +61,6 @@ export type ReturnableResourceRequestSchema = z.infer<
 export const returnableResourceRequestSchemaWithPath =
   returnableResourceRequestSchemaBase.extend({
     path: z.string(),
-    itemDepartmentId: z.string(),
   });
 
 export const extendedReturnableResourceRequestSchema = requestSchemaBase.merge(
@@ -58,6 +69,23 @@ export const extendedReturnableResourceRequestSchema = requestSchemaBase.merge(
 
 export type ExtendedReturnableResourceRequestSchema = z.infer<
   typeof extendedReturnableResourceRequestSchema
+>;
+
+export const updateReturnableResourceRequestSchema =
+  returnableResourceRequestSchemaBase.partial();
+
+export type UpdateReturnableResourceRequestSchema = z.infer<
+  typeof updateReturnableResourceRequestSchema
+>;
+
+export const updateReturnableResourceRequestSchemaWithPath =
+  updateReturnableResourceRequestSchema.extend({
+    id: z.string(),
+    path: z.string(),
+  });
+
+export type UpdateReturnableResourceRequestSchemaWithPath = z.infer<
+  typeof updateReturnableResourceRequestSchemaWithPath
 >;
 
 export const createInventoryItemSchemaServer = z.object({

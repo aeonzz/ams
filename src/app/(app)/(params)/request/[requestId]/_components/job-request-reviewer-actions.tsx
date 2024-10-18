@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useQueryClient, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -89,14 +89,13 @@ export default function JobRequestReviewerActions({
 }: JobRequestReviewerActionsProps) {
   const currentUser = useSession();
   const pathname = usePathname();
-  const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = React.useState(false);
   const [selectedPerson, setSelectedPerson] = React.useState<
     string | undefined | null
   >(request.jobRequest?.assignedTo);
   const [isAlertOpen, setIsAlertOpen] = React.useState(false);
-  const [isCancelAlertOpen, setIsCancelAlertOpen] = React.useState(false);
-  const [cancellationReason, setCancellationReason] = React.useState("");
+  const [isRejectionAlertOpen, setIsRejectionAlertOpen] = React.useState(false);
+  const [rejectionReason, setRejectionReason] = React.useState("");
 
   const {
     data: personnel,
@@ -149,16 +148,15 @@ export default function JobRequestReviewerActions({
           ? currentUser.id
           : undefined,
         status: action,
-        cancellationReason:
-          action === "CANCELLED" ? cancellationReason : undefined,
+        rejectionReason: action === "REJECTED" ? rejectionReason : undefined,
       };
 
-      if (!request.jobRequest?.estimatedTime && action !== "CANCELLED") {
+      if (!request.jobRequest?.estimatedTime && action !== "REJECTED") {
         return toast.error("Please add job estimated time");
       }
 
-      if (action === "CANCELLED" && !cancellationReason.trim()) {
-        return toast.error("Please provide a cancellation reason");
+      if (action === "REJECTED" && !rejectionReason.trim()) {
+        return toast.error("Please provide a rejection reason");
       }
 
       const actionText =
@@ -184,11 +182,8 @@ export default function JobRequestReviewerActions({
           success: () => {
             socket.emit("notifications");
             socket.emit("request_update");
-            queryClient.invalidateQueries({
-              queryKey: [request.id],
-            });
-            setIsCancelAlertOpen(false);
-            setCancellationReason("");
+            setIsRejectionAlertOpen(false);
+            setRejectionReason("");
             return `Request ${successText} successfully.`;
           },
           error: `Failed to ${action.toLowerCase()} request. Please try again.`,
@@ -202,14 +197,10 @@ export default function JobRequestReviewerActions({
           });
         }
 
-        queryClient.invalidateQueries({
-          queryKey: [request.id],
-        });
         socket.emit("notifications");
         socket.emit("request_update");
-        setIsCancelAlertOpen(false);
-        setCancellationReason("");
-        console.log("fuck");
+        setIsRejectionAlertOpen(false);
+        setRejectionReason("");
       } catch (err) {
         console.error(err);
       }
@@ -219,11 +210,10 @@ export default function JobRequestReviewerActions({
       request.id,
       updateStatusMutate,
       mutateAsync,
-      queryClient,
       currentUser.id,
       currentUser.userRole,
       request.jobRequest?.estimatedTime,
-      cancellationReason,
+      rejectionReason,
     ]
   );
 
@@ -245,12 +235,6 @@ export default function JobRequestReviewerActions({
         loading: "Assigning...",
         success: () => {
           socket.emit("request_update", request.id);
-          queryClient.invalidateQueries({
-            queryKey: [request.id],
-          });
-          queryClient.invalidateQueries({
-            queryKey: ["activity", request.id],
-          });
           return "Personnel assigned successfully.";
         },
         error: (err) => {
@@ -266,11 +250,14 @@ export default function JobRequestReviewerActions({
       request.jobRequest?.id,
       request.id,
       assignPersonnelMutate,
-      queryClient,
     ]
   );
 
-  if (request.status === "COMPLETED" || request.status === "CANCELLED") {
+  if (
+    request.status === "COMPLETED" ||
+    request.status === "CANCELLED" ||
+    request.status === "REJECTED"
+  ) {
     return null;
   }
 
@@ -378,8 +365,7 @@ export default function JobRequestReviewerActions({
               </DialogDescription>
             </DialogHeader>
             <div className="scroll-bar max-h-[55vh] gap-3 space-y-1 overflow-y-auto px-4 py-1">
-              {request.status !== "APPROVED" &&
-                request.status !== "REJECTED" && <>{renderPersonnelList()}</>}
+              {request.status !== "APPROVED" && <>{renderPersonnelList()}</>}
               <AddEstimatedTime data={request} />
               {request.jobRequest?.assignedUser && (
                 <div>
@@ -426,18 +412,6 @@ export default function JobRequestReviewerActions({
                     className="flex-1"
                   >
                     Approve
-                  </Button>
-                  <Button
-                    onClick={() => handleReview("REJECTED")}
-                    variant="destructive"
-                    disabled={
-                      !selectedPerson ||
-                      isUpdateStatusPending ||
-                      isAssignPersonnelPending
-                    }
-                    className="flex-1"
-                  >
-                    Reject
                   </Button>
                 </div>
               )}
@@ -531,45 +505,45 @@ export default function JobRequestReviewerActions({
                 )}
                 {request.status === "PENDING" && (
                   <AlertDialog
-                    open={isCancelAlertOpen}
-                    onOpenChange={setIsCancelAlertOpen}
+                    open={isRejectionAlertOpen}
+                    onOpenChange={setIsRejectionAlertOpen}
                   >
                     <AlertDialogTrigger asChild>
                       <Button
                         className="w-full"
-                        variant="secondary"
+                        variant="destructive"
                         disabled={
                           isUpdateStatusPending || isAssignPersonnelPending
                         }
                       >
-                        Cancel Request
+                        Reject Request
                       </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
                         <AlertDialogTitle className="">
-                          Cancel Request
+                          Reject Request
                         </AlertDialogTitle>
                         <AlertDialogDescription>
-                          Are you sure you want to cancel this request? This
+                          Are you sure you want to reject this request? This
                           action cannot be undone. Please provide a reason for
-                          cancellation.
+                          rejection.
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <Textarea
                         maxRows={6}
                         minRows={3}
-                        placeholder="Cancellation reason..."
-                        value={cancellationReason}
-                        onChange={(e) => setCancellationReason(e.target.value)}
-                        className="placeholder:text-sm"
+                        placeholder="Rejection reason..."
+                        value={rejectionReason}
+                        onChange={(e) => setRejectionReason(e.target.value)}
+                        className="text-sm placeholder:text-sm"
                       />
                       <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction
                           className="bg-destructive hover:bg-destructive/90"
-                          onClick={() => handleReview("CANCELLED")}
-                          disabled={!cancellationReason.trim()}
+                          onClick={() => handleReview("REJECTED")}
+                          disabled={!rejectionReason.trim()}
                         >
                           Continue
                         </AlertDialogAction>

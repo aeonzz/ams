@@ -149,8 +149,8 @@ export const updateRequestStatus = authedProcedure
   .input(updateRequestStatusSchemaWithPath)
   .handler(async ({ ctx, input }) => {
     const { user } = ctx;
-    const { path, requestId, reviewerId, ...rest } =
-      input;
+    const { path, requestId, reviewerId, ...rest } = input;
+    console.log("asdasdasdsad", rest.rejectionReason)
 
     try {
       const result = await db.$transaction(async (prisma) => {
@@ -233,24 +233,24 @@ export const updateRequestStatus = authedProcedure
           }
         }
 
-        if (rest.status === "CANCELLED") {
+        if (rest.status === "REJECTED") {
           const existingNotification = await prisma.notification.findFirst({
             where: {
               resourceId: `/request/${updatedRequest.id}`,
               userId: user.id,
               resourceType: "REQUEST",
               recepientId: updatedRequest.userId,
-              title: `Request Cancelled: ${updatedRequest.title}`,
+              title: `Request Rejected: ${updatedRequest.title}`,
             },
           });
 
           if (!existingNotification) {
             await createNotification({
               resourceId: `/request/${updatedRequest.id}`,
-              title: `Request Cancelled: ${updatedRequest.title}`,
+              title: `Request Rejected: ${updatedRequest.title}`,
               resourceType: "REQUEST",
               notificationType: "WARNING",
-              message: `Your request for "${updatedRequest.title}" has been cancelled. Please check the request for further details.`,
+              message: `Your request for "${updatedRequest.title}" has been rejected. Please check the request for further details.`,
               userId: user.id,
               recepientIds: [updatedRequest.userId],
             });

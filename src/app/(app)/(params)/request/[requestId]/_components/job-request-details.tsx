@@ -102,11 +102,12 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { Textarea } from "@/components/ui/text-area";
 import { socket } from "@/app/socket";
+import RejectionReasonCard from "./rejection-reason-card";
 
 interface JobRequestDetailsProps {
   data: JobRequestWithRelations;
   requestId: string;
-  cancellationReason: string | null;
+  rejectionReason: string | null;
   requestStatus: RequestStatusTypeType;
   isCurrentUser: boolean;
 }
@@ -114,7 +115,7 @@ interface JobRequestDetailsProps {
 export default function JobRequestDetails({
   data,
   requestId,
-  cancellationReason,
+  rejectionReason,
   requestStatus,
   isCurrentUser,
 }: JobRequestDetailsProps) {
@@ -371,6 +372,7 @@ export default function JobRequestDetails({
                 isFieldsDirty={isFieldsDirty}
                 setEditField={setEditField}
                 label="Job Type"
+                reset={form.reset}
               >
                 <FormField
                   control={form.control}
@@ -469,6 +471,7 @@ export default function JobRequestDetails({
                 isFieldsDirty={isFieldsDirty}
                 setEditField={setEditField}
                 label="Location"
+                reset={form.reset}
               >
                 <FormField
                   control={form.control}
@@ -519,6 +522,7 @@ export default function JobRequestDetails({
                 isFieldsDirty={isFieldsDirty}
                 setEditField={setEditField}
                 label="Due Date"
+                reset={form.reset}
               >
                 <FormField
                   control={form.control}
@@ -687,6 +691,7 @@ export default function JobRequestDetails({
                 isFieldsDirty={isFieldsDirty}
                 setEditField={setEditField}
                 label="Job Description"
+                reset={form.reset}
               >
                 <FormField
                   control={form.control}
@@ -785,18 +790,7 @@ export default function JobRequestDetails({
             ))}
           </div>
         </PhotoProvider>
-        {cancellationReason && (
-          <Card>
-            <CardHeader>
-              <H5 className="font-semibold leading-none">
-                Cancellation Reason
-              </H5>
-              <CardDescription className="break-all">
-                {cancellationReason}
-              </CardDescription>
-            </CardHeader>
-          </Card>
-        )}
+        <RejectionReasonCard rejectionReason={rejectionReason} />
       </div>
       <Separator className="my-6" />
       {data.reworkAttempts.length > 0 && (

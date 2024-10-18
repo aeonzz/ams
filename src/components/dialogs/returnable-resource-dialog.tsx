@@ -2,7 +2,7 @@
 
 import React from "react";
 
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,10 +34,11 @@ export default function ReturnableResourceDialog() {
     resolver: zodResolver(returnableResourceRequestSchema),
     defaultValues: {
       itemId: undefined,
+      location: "",
+      notes: "",
       dateAndTimeNeeded: undefined,
       returnDateAndTime: undefined,
-      otherPurpose: "other",
-      purpose: ["Lecture/Forum/Symposium"],
+      purpose: "",
     },
   });
 
@@ -105,6 +106,9 @@ export default function ReturnableResourceDialog() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+        <DialogHeader>
+          <DialogTitle>Borrow Request</DialogTitle>
+        </DialogHeader>
         <ReturnableResourceRequestInput
           mutateAsync={mutateAsync}
           isPending={isPending}

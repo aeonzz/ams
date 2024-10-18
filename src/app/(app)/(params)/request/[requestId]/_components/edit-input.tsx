@@ -8,12 +8,17 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { P } from "@/components/typography/text";
+import { DefaultValues, KeepStateOptions } from "react-hook-form";
 
 interface EditInputProps<T extends Record<string, any>> {
   isPending: boolean;
   isFieldsDirty: boolean;
   setEditField: (value: string | null) => void;
   label: string;
+  reset: (
+    values?: DefaultValues<T>,
+    keepStateOptions?: KeepStateOptions
+  ) => void;
   children: React.ReactNode;
 }
 
@@ -22,6 +27,7 @@ export default function EditInput<T extends Record<string, any>>({
   isFieldsDirty,
   setEditField,
   label,
+  reset,
   children,
 }: EditInputProps<T>) {
   return (
@@ -40,6 +46,7 @@ export default function EditInput<T extends Record<string, any>>({
                 onClick={(e) => {
                   e.preventDefault();
                   setEditField(null);
+                  reset();
                 }}
               >
                 Cancel

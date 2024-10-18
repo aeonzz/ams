@@ -13,6 +13,7 @@ import {
   deleteInventorySubItemsSchema,
   extendedUpdateInventorySubItemItemServerSchema,
   updateInventorySubItemStatusesSchema,
+  updateReturnableResourceRequestSchemaWithPath,
 } from "../schema/resource/returnable-resource";
 
 export async function getInventorySubItems(input: GetInventorySubItemSchema) {
@@ -167,6 +168,36 @@ export const deleteInventorySubItems = authedProcedure
       return revalidatePath(path);
     } catch (error) {
       console.log(error);
+      getErrorMessage(error);
+    }
+  });
+
+export const returnableResourceActions = authedProcedure
+  .createServerAction()
+  .input(updateReturnableResourceRequestSchemaWithPath)
+  .handler(async ({ input }) => {
+    const { path, id, itemStatus, itemId, ...rest } = input;
+    try {
+      const result = await db.$transaction(async (prisma) => {
+        const updatedRequest = await prisma.returnableRequest.update({
+          where: {
+            requestId: id,
+          },
+          data: {
+            item: {
+              update: {
+                status: itemStatus,
+              },
+            },
+            ...rest,
+          },
+        });
+
+        return updatedRequest;
+      });
+
+      return revalidatePath(path);
+    } catch (error) {
       getErrorMessage(error);
     }
   });

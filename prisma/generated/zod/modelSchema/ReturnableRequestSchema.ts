@@ -1,10 +1,8 @@
 import { z } from 'zod';
 import type { InventorySubItemWithRelations } from './InventorySubItemSchema'
 import type { RequestWithRelations } from './RequestSchema'
-import type { DepartmentWithRelations } from './DepartmentSchema'
 import { InventorySubItemWithRelationsSchema } from './InventorySubItemSchema'
 import { RequestWithRelationsSchema } from './RequestSchema'
-import { DepartmentWithRelationsSchema } from './DepartmentSchema'
 
 /////////////////////////////////////////
 // RETURNABLE REQUEST SCHEMA
@@ -14,13 +12,18 @@ export const ReturnableRequestSchema = z.object({
   id: z.string(),
   itemId: z.string(),
   dateAndTimeNeeded: z.coerce.date(),
+  inProgress: z.boolean(),
   returnDateAndTime: z.coerce.date(),
+  isOverdue: z.boolean(),
+  actualReturnDate: z.coerce.date().nullable(),
+  isReturned: z.boolean(),
+  returnCondition: z.string().nullable(),
   purpose: z.string(),
-  quantity: z.number().int(),
+  location: z.string(),
+  notes: z.string().nullable(),
   requestId: z.string(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
-  departmentId: z.string(),
 })
 
 export type ReturnableRequest = z.infer<typeof ReturnableRequestSchema>
@@ -32,7 +35,6 @@ export type ReturnableRequest = z.infer<typeof ReturnableRequestSchema>
 export type ReturnableRequestRelations = {
   item: InventorySubItemWithRelations;
   request: RequestWithRelations;
-  department: DepartmentWithRelations;
 };
 
 export type ReturnableRequestWithRelations = z.infer<typeof ReturnableRequestSchema> & ReturnableRequestRelations
@@ -40,7 +42,6 @@ export type ReturnableRequestWithRelations = z.infer<typeof ReturnableRequestSch
 export const ReturnableRequestWithRelationsSchema: z.ZodType<ReturnableRequestWithRelations> = ReturnableRequestSchema.merge(z.object({
   item: z.lazy(() => InventorySubItemWithRelationsSchema),
   request: z.lazy(() => RequestWithRelationsSchema),
-  department: z.lazy(() => DepartmentWithRelationsSchema),
 }))
 
 export default ReturnableRequestSchema;

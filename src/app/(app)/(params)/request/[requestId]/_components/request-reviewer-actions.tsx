@@ -66,8 +66,8 @@ export default function RequestReviewerActions({
   const pathname = usePathname();
   const [isOpen, setIsOpen] = React.useState(false);
   const [isAlertOpen, setIsAlertOpen] = React.useState(false);
-  const [isCancelAlertOpen, setIsCancelAlertOpen] = React.useState(false);
-  const [cancellationReason, setCancellationReason] = React.useState("");
+  const [isRejectionAlertOpen, setIsRejectionAlertOpen] = React.useState(false);
+  const [rejectionReason, setRejectionReason] = React.useState("");
 
   const { mutateAsync: updateStatusMutate, isPending: isUpdateStatusPending } =
     useServerActionMutation(updateRequestStatus);
@@ -92,11 +92,10 @@ export default function RequestReviewerActions({
           ? currentUser.id
           : undefined,
         status: action,
-        cancellationReason:
-          action === "CANCELLED" ? cancellationReason : undefined,
+        rejectionReason: action === "REJECTED" ? rejectionReason : undefined,
       };
 
-      if (action === "CANCELLED" && !cancellationReason.trim()) {
+      if (action === "REJECTED" && !rejectionReason.trim()) {
         return toast.error("Please provide a cancellation reason");
       }
 
@@ -122,8 +121,8 @@ export default function RequestReviewerActions({
         success: () => {
           socket.emit("notifications");
           socket.emit("request_update");
-          setIsCancelAlertOpen(false);
-          setCancellationReason("");
+          setIsRejectionAlertOpen(false);
+          setRejectionReason("");
           return `Request ${successText} successfully.`;
         },
         error: (err) => {
@@ -138,7 +137,7 @@ export default function RequestReviewerActions({
       updateStatusMutate,
       currentUser.id,
       currentUser.userRole,
-      cancellationReason,
+      rejectionReason,
     ]
   );
 
@@ -187,14 +186,6 @@ export default function RequestReviewerActions({
                       className="flex-1"
                     >
                       Approve
-                    </Button>
-                    <Button
-                      onClick={() => handleReview("REJECTED")}
-                      variant="destructive"
-                      disabled={isUpdateStatusPending}
-                      className="flex-1"
-                    >
-                      Reject
                     </Button>
                   </div>
                 )}
@@ -280,45 +271,43 @@ export default function RequestReviewerActions({
                   )}
                   {request.status === "PENDING" && (
                     <AlertDialog
-                      open={isCancelAlertOpen}
-                      onOpenChange={setIsCancelAlertOpen}
+                      open={isRejectionAlertOpen}
+                      onOpenChange={setIsRejectionAlertOpen}
                     >
                       <AlertDialogTrigger asChild>
                         <Button
                           className="w-full"
-                          variant="secondary"
+                          variant="destructive"
                           disabled={isUpdateStatusPending}
                         >
-                          Cancel Request
+                          Reject Request
                         </Button>
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>
                           <AlertDialogTitle className="">
-                            Cancel Request
+                            Reject Request
                           </AlertDialogTitle>
                           <AlertDialogDescription>
-                            Are you sure you want to cancel this request? This
+                            Are you sure you want to reject this request? This
                             action cannot be undone. Please provide a reason for
-                            cancellation.
+                            rejection.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <Textarea
                           maxRows={6}
                           minRows={3}
-                          placeholder="Cancellation reason..."
-                          value={cancellationReason}
-                          onChange={(e) =>
-                            setCancellationReason(e.target.value)
-                          }
-                          className="placeholder:text-sm"
+                          placeholder="Rejection reason..."
+                          value={rejectionReason}
+                          onChange={(e) => setRejectionReason(e.target.value)}
+                          className="text-sm placeholder:text-sm"
                         />
                         <AlertDialogFooter>
                           <AlertDialogCancel>Cancel</AlertDialogCancel>
                           <AlertDialogAction
                             className="bg-destructive hover:bg-destructive/90"
-                            onClick={() => handleReview("CANCELLED")}
-                            disabled={!cancellationReason.trim()}
+                            onClick={() => handleReview("REJECTED")}
+                            disabled={!rejectionReason.trim()}
                           >
                             Continue
                           </AlertDialogAction>

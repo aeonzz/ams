@@ -36,10 +36,17 @@ import {
   setMonth,
 } from "date-fns";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
-import { CalendarIcon } from "lucide-react";
-import { cn, formatFullName, isDateInPast } from "@/lib/utils";
+import { CalendarIcon, CircleOff, Dot } from "lucide-react";
+import {
+  cn,
+  formatFullName,
+  getStatusColor,
+  isDateInPast,
+  textTransform,
+} from "@/lib/utils";
 import { type ReservedReturnableItemDateAndTime } from "@/lib/schema/utils";
 import { P } from "@/components/typography/text";
+import { Badge } from "@/components/ui/badge";
 
 interface DateTimePickerProps<T extends FieldValues> {
   form: UseFormReturn<T>;
@@ -48,15 +55,15 @@ interface DateTimePickerProps<T extends FieldValues> {
   disabled: boolean;
   disabledDates?: Date[];
   disabledTimeRanges?: { start: Date; end: Date }[];
-  label: string;
+  label?: string;
   reservations?: ReservedReturnableItemDateAndTime[];
 }
 
 const timePresets = [
-  { label: "4:30 AM", hours: 4, minutes: 30 },
-  { label: "5:30 AM", hours: 5, minutes: 30 },
-  { label: "6:00 AM", hours: 6, minutes: 0 },
-  { label: "6:30 AM", hours: 6, minutes: 30 },
+  // { label: "4:30 AM", hours: 4, minutes: 30 },
+  // { label: "5:30 AM", hours: 5, minutes: 30 },
+  // { label: "6:00 AM", hours: 6, minutes: 0 },
+  // { label: "6:30 AM", hours: 6, minutes: 30 },
   { label: "7:00 AM", hours: 7, minutes: 0 },
   { label: "7:30 AM", hours: 7, minutes: 30 },
   { label: "8:00 AM", hours: 8, minutes: 0 },
@@ -113,7 +120,7 @@ export default function ResourceDateTimePicker<T extends FieldValues>({
   isLoading = false,
   disabled = false,
   name,
-  label = "Select Date and Time",
+  label,
   disabledDates = [],
   disabledTimeRanges = [],
   reservations = [],
@@ -154,9 +161,7 @@ export default function ResourceDateTimePicker<T extends FieldValues>({
         name={name}
         render={({ field }) => (
           <FormItem className="flex flex-col">
-            <FormLabel className="text-left text-muted-foreground">
-              {label}
-            </FormLabel>
+            {label && <FormLabel className="text-left">{label}</FormLabel>}
             <Popover modal>
               <FormControl>
                 <PopoverTrigger asChild>
@@ -181,102 +186,27 @@ export default function ResourceDateTimePicker<T extends FieldValues>({
                   </Button>
                 </PopoverTrigger>
               </FormControl>
-              <PopoverContent align="start" className="flex h-fit w-auto p-0">
+              <PopoverContent className="flex h-fit w-auto p-0">
                 <div className="flex">
-                  <Calendar
-                    showOutsideDays={false}
-                    mode="single"
-                    month={addMonths(
-                      new Date(),
-                      selectedMonth - new Date().getMonth()
-                    )}
-                    onMonthChange={(date) => setSelectedMonth(date.getMonth())}
-                    selected={field.value}
-                    onSelect={(date) => {
-                      setSelectedDate(date || null);
-                      if (date) {
-                        const newDate = field.value
-                          ? new Date(field.value)
-                          : new Date(new Date().setHours(0, 0, 0, 0));
-                        newDate.setFullYear(
-                          date.getFullYear(),
-                          date.getMonth(),
-                          date.getDate()
-                        );
-                        field.onChange(newDate);
-                      } else {
-                        field.onChange(date);
-                      }
-                    }}
-                    initialFocus
-                  />
-                  <div className="flex">
-                    <div className="space-y-3 p-3">
-                      <Select
-                        value={selectedMonth.toString()}
-                        onValueChange={(value) => {
-                          const newMonth = parseInt(value);
-                          setSelectedMonth(newMonth);
-                          if (field.value) {
-                            field.onChange(setMonth(field.value, newMonth));
-                          }
-                        }}
-                      >
-                        <SelectTrigger className="w-[180px]">
-                          <SelectValue placeholder="Select month" />
-                        </SelectTrigger>
-                        <SelectContent className="max-h-60">
-                          {monthNames.map((month, index) => (
-                            <SelectItem key={index} value={index.toString()}>
-                              {month}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <div className="scroll-bar flex h-[250px] flex-col gap-2 overflow-y-auto">
-                        {timePresets.map((preset, index) => (
-                          <Button
-                            key={index}
-                            variant={
-                              selectedTime === preset.label
-                                ? "default"
-                                : "secondary"
-                            }
-                            onClick={() => {
-                              const newDate = field.value
-                                ? new Date(field.value)
-                                : new Date();
-                              const updatedDate = setMinutes(
-                                setHours(newDate, preset.hours),
-                                preset.minutes
-                              );
-                              field.onChange(updatedDate);
-                              setSelectedTime(preset.label);
-                            }}
-                            disabled={isTimeDisabled(
-                              preset.hours,
-                              preset.minutes
-                            )}
-                          >
-                            {preset.label}
-                          </Button>
-                        ))}
-                      </div>
-                    </div>
-                    {reservationsForSelectedDate.length > 0 && (
-                      <div className="w-48 p-3">
-                        <P className="mb-2 font-semibold">
-                          Reservations for{" "}
-                          {selectedDate
-                            ? format(selectedDate, "MMM d, yyyy")
-                            : "Selected Date"}
-                        </P>
-                        <div className="scroll-bar h-[250px] overflow-y-auto">
-                          {reservationsForSelectedDate.map(
-                            (reservation, index) => (
+                  {reservationsForSelectedDate.length > 0 ? (
+                    <div className="w-[270px] p-3">
+                      <P className="mb-2 font-medium">
+                        Reservations for{" "}
+                        {selectedDate
+                          ? format(selectedDate, "P")
+                          : "Selected Date"}
+                      </P>
+                      <div className="scroll-bar h-[250px] overflow-y-auto">
+                        {reservationsForSelectedDate.map(
+                          (reservation, index) => {
+                            const statusColor = getStatusColor(
+                              reservation.request.status
+                            );
+
+                            return (
                               <div
                                 key={index}
-                                className="border-b py-2 text-sm"
+                                className="border-y py-2 text-sm"
                               >
                                 <p>
                                   <strong>{reservation.item.name}</strong>
@@ -292,24 +222,125 @@ export default function ResourceDateTimePicker<T extends FieldValues>({
                                     "MMM d, h:mm a"
                                   )}
                                 </p>
-                                <div className="flex flex-col gap-1">
-                                  <p className="text-xs text-muted-foreground">
+                                <div className="flex flex-col">
+                                  <P className="text-xs text-muted-foreground">
                                     Requested by:
-                                  </p>
-                                  <p>
+                                  </P>
+                                  <P>
                                     {formatFullName(
                                       reservation.request.user.firstName,
                                       reservation.request.user.middleName,
                                       reservation.request.user.lastName
                                     )}
-                                  </p>
+                                  </P>
+                                  <Badge
+                                    variant={statusColor.variant}
+                                    className="mt-1 w-fit pr-3.5"
+                                  >
+                                    <Dot
+                                      className="mr-1 size-3"
+                                      strokeWidth={statusColor.stroke}
+                                      color={statusColor.color}
+                                    />
+                                    {textTransform(reservation.request.status)}
+                                  </Badge>
                                 </div>
                               </div>
-                            )
-                          )}
-                        </div>
+                            );
+                          }
+                        )}
                       </div>
+                    </div>
+                  ) : (
+                    <div className="flex h-full w-[270px] flex-col items-center justify-center">
+                      <CircleOff className="mb-2 size-6 text-muted-foreground" />
+                      <P className="text-muted-foreground">No Reservations</P>
+                    </div>
+                  )}
+                  <Calendar
+                    showOutsideDays={false}
+                    mode="single"
+                    month={addMonths(
+                      new Date(),
+                      selectedMonth - new Date().getMonth()
                     )}
+                    onMonthChange={(date) => setSelectedMonth(date.getMonth())}
+                    selected={field.value}
+                    onSelect={(date) => {
+                      setSelectedDate(date || null);
+                      setSelectedTime(timePresets[0].label);
+                      if (date) {
+                        const newDate = field.value
+                          ? new Date(field.value)
+                          : new Date(new Date().setHours(7, 0, 0, 0));
+                        newDate.setFullYear(
+                          date.getFullYear(),
+                          date.getMonth(),
+                          date.getDate()
+                        );
+                        field.onChange(newDate);
+                      } else {
+                        field.onChange(date);
+                      }
+                    }}
+                    disabled={isDateInPast}
+                    initialFocus
+                  />
+                  <div className="space-y-3 p-3">
+                    <Select
+                      value={selectedMonth.toString()}
+                      onValueChange={(value) => {
+                        const newMonth = parseInt(value);
+                        setSelectedMonth(newMonth);
+                        if (field.value) {
+                          field.onChange(setMonth(field.value, newMonth));
+                        }
+                      }}
+                    >
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Select month" />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-60">
+                        {monthNames.map((month, index) => (
+                          <SelectItem
+                            key={index}
+                            value={index.toString()}
+                            disabled={index < new Date().getMonth()}
+                          >
+                            {month}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <div className="scroll-bar flex h-[250px] flex-col gap-2 overflow-y-auto">
+                      {timePresets.map((preset, index) => (
+                        <Button
+                          key={index}
+                          variant={
+                            selectedTime === preset.label
+                              ? "default"
+                              : "secondary"
+                          }
+                          onClick={() => {
+                            const newDate = field.value
+                              ? new Date(field.value)
+                              : new Date();
+                            const updatedDate = setMinutes(
+                              setHours(newDate, preset.hours),
+                              preset.minutes
+                            );
+                            field.onChange(updatedDate);
+                            setSelectedTime(preset.label);
+                          }}
+                          disabled={isTimeDisabled(
+                            preset.hours,
+                            preset.minutes
+                          )}
+                        >
+                          {preset.label}
+                        </Button>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </PopoverContent>

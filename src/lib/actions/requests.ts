@@ -24,6 +24,7 @@ import { currentUser } from "./users";
 import { UserCheck2Icon } from "lucide-react";
 import { createNotification } from "./notification";
 import { updateRequestStatusSchemaWithPath } from "@/app/(app)/(params)/request/[requestId]/_components/schema";
+import { updateReturnableResourceRequestSchemaWithPath } from "../schema/resource/returnable-resource";
 
 const cohere = createCohere({
   apiKey: process.env.COHERE_API_KEY,
@@ -604,6 +605,28 @@ export const udpateVenueRequest = authedProcedure
     }
   });
 
+export const udpateReturnableResourceRequest = authedProcedure
+  .createServerAction()
+  .input(updateReturnableResourceRequestSchemaWithPath)
+  .handler(async ({ input }) => {
+    const { path, id, itemId, purpose, ...rest } = input;
+    try {
+      const result = await db.returnableRequest.update({
+        where: {
+          requestId: id,
+        },
+        data: {
+          purpose: purpose,
+          ...rest,
+        },
+      });
+
+      return revalidatePath(path);
+    } catch (error) {
+      getErrorMessage(error);
+    }
+  });
+
 export const updateJobRequest = authedProcedure
   .createServerAction()
   .input(updateJobRequestSchemaServerWithPath)
@@ -695,7 +718,7 @@ export const completeTransportRequest = authedProcedure
 
         await db.vehicle.update({
           where: {
-            id: updatedTransportRequest.vehicleId
+            id: updatedTransportRequest.vehicleId,
           },
           data: {
             status: "AVAILABLE",

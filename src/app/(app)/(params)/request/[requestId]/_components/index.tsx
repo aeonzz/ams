@@ -45,6 +45,8 @@ import RequestSummaryTitle from "./request-summary-title";
 import TransportRequestDetails from "./transport-request-details";
 import RequestReviewerActions from "./request-reviewer-actions";
 import CompleteVenueRequest from "./complete-venue-request";
+import CompleteTransportRequest from "./complete-transport-request";
+import ReturnableRequestActions from "./returnable-request-actions";
 
 interface RequestDetailsProps {
   params: string;
@@ -62,7 +64,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
 
   const statusColor = getStatusColor(data.status);
   const RequestTypeIcon = getRequestTypeIcon(data.type);
-
+  console.log(data);
   return (
     <div className="flex h-full w-full">
       <div className="flex-1 overflow-hidden">
@@ -121,7 +123,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
               <JobRequestDetails
                 data={data.jobRequest}
                 requestId={data.id}
-                cancellationReason={data.cancellationReason}
+                rejectionReason={data.rejectionReason}
                 requestStatus={data.status}
                 isCurrentUser={currentUser.id === data.userId}
               />
@@ -130,13 +132,19 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
               <VenueRequestDetails
                 data={data.venueRequest}
                 requestId={data.id}
-                cancellationReason={data.cancellationReason}
+                rejectionReason={data.rejectionReason}
                 requestStatus={data.status}
                 isCurrentUser={currentUser.id === data.userId}
               />
             )}
             {data.type === "RESOURCE" && data.returnableRequest && (
-              <ReturnableResourceDetails data={data.returnableRequest} />
+              <ReturnableResourceDetails
+                data={data.returnableRequest}
+                requestId={data.id}
+                rejectionReason={data.rejectionReason}
+                requestStatus={data.status}
+                isCurrentUser={currentUser.id === data.userId}
+              />
             )}
             {data.type === "RESOURCE" && data.supplyRequest && (
               <div className="space-y-4">
@@ -175,7 +183,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
               <TransportRequestDetails
                 data={data.transportRequest}
                 requestId={data.id}
-                cancellationReason={data.cancellationReason}
+                rejectionReason={data.rejectionReason}
                 requestStatus={data.status}
                 isCurrentUser={currentUser.id === data.userId}
               />
@@ -342,10 +350,10 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
               />
             )}
           {data.type === "RESOURCE" && data.returnableRequest && (
-            <JobRequestReviewerActions
+            <RequestReviewerActions
               request={data}
               allowedRoles={["REQUEST_MANAGER"]}
-              allowedDepartment={data.returnableRequest.departmentId}
+              allowedDepartment={data.departmentId}
               allowedApproverRoles={["DEPARTMENT_HEAD"]}
             />
           )}
@@ -365,12 +373,24 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
               allowedApproverRoles={["DEPARTMENT_HEAD"]}
             />
           )}
-          {data.type === "VENUE" && data.venueRequest && data.venueRequest.inProgress && (
-            <CompleteVenueRequest requestId={data.id} />
-          )}
-          {data.type === "TRANSPORT" && data.transportRequest && data.transportRequest.inProgress && (
-            <CompleteVenueRequest requestId={data.id} />
-          )}
+          {data.type === "VENUE" &&
+            data.venueRequest &&
+            data.venueRequest.inProgress && (
+              <CompleteVenueRequest requestId={data.id} />
+            )}
+          {data.type === "TRANSPORT" &&
+            data.transportRequest &&
+            data.transportRequest.inProgress && (
+              <CompleteTransportRequest requestId={data.id} />
+            )}
+          {data.status === "APPROVED" &&
+            data.type === "RESOURCE" &&
+            data.returnableRequest && (
+              <ReturnableRequestActions
+                request={data.returnableRequest}
+                requestId={data.id}
+              />
+            )}
           {/* {data.type === "VENUE" && data.venueRequest && (
             <JobRequestReviewerActions
               request={data}

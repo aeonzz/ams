@@ -46,6 +46,9 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import ResourceDateTimePicker from "./resource-date-time-picker";
 import { isOverlapping } from "@/lib/utils";
+import { InventoryItemWithRelations } from "prisma/generated/zod";
+import ReturnableResourceRequestSkeleton from "./returnable-resource-request-input-skeleton";
+import { socket } from "@/app/socket";
 
 const purpose = [
   {
@@ -101,15 +104,22 @@ export default function ReturnableResourceRequestInput({
   isFieldsDirty,
 }: ReturnableResourceRequestInputProps) {
   const pathname = usePathname();
-  const currentUser = useSession();
   const queryClient = useQueryClient();
   const itemId = form.watch("itemId");
   const [selectedDepartmentId, setSelectedDepartmentId] =
     React.useState<string>();
 
+  const { data, isLoading } = useQuery<InventoryItemWithRelations[]>({
+    queryFn: async () => {
+      const res = await axios.get("/api/input-data/resource-items/returnable");
+      return res.data.data;
+    },
+    queryKey: ["get-input-returnable-resource"],
+  });
+
   const {
     data: reservedDates,
-    isLoading,
+    isLoading: reservedDatesLoading,
     refetch,
   } = useQuery<ReservedReturnableItemDateAndTime[]>({
     queryFn: async () => {
@@ -134,11 +144,7 @@ export default function ReturnableResourceRequestInput({
   const disabledTimeRanges = React.useMemo(() => {
     return (
       reservedDates
-        ?.filter(
-          (reservation) =>
-            reservation.request.status === "APPROVED" ||
-            reservation.request.status === "REVIEWED"
-        )
+        ?.filter((reservation) => reservation.request.status === "APPROVED")
         .map(({ dateAndTimeNeeded, returnDateAndTime }) => ({
           start: new Date(dateAndTimeNeeded),
           end: new Date(returnDateAndTime),
@@ -151,6 +157,7 @@ export default function ReturnableResourceRequestInput({
   };
 
   async function onSubmit(values: ReturnableResourceRequestSchema) {
+    if (!selectedDepartmentId) return;
     const { dateAndTimeNeeded, returnDateAndTime } = values;
 
     // Check for conflicts
@@ -174,8 +181,7 @@ export default function ReturnableResourceRequestInput({
       ...values,
       priority: "LOW",
       type: type,
-      itemDepartmentId: selectedDepartmentId!,
-      departmentId: "test",
+      departmentId: selectedDepartmentId,
       path: pathname,
     };
 
@@ -185,6 +191,8 @@ export default function ReturnableResourceRequestInput({
         queryClient.invalidateQueries({
           queryKey: ["user-dashboard-overview"],
         });
+        socket.emit("notifications");
+        socket.emit("request_update");
         handleOpenChange(false);
         return "Your request has been submitted and is awaiting approval.";
       },
@@ -195,11 +203,10 @@ export default function ReturnableResourceRequestInput({
     });
   }
 
+  if (isLoading) return <ReturnableResourceRequestSkeleton />;
+
   return (
     <>
-      <DialogHeader>
-        <DialogTitle>Borrow Request</DialogTitle>
-      </DialogHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="scroll-bar flex max-h-[60vh] gap-6 overflow-y-auto px-4 py-1">
@@ -207,14 +214,33 @@ export default function ReturnableResourceRequestInput({
               <ItemsField
                 form={form}
                 name="itemId"
+                data={data}
                 isPending={isPending}
                 onDepartmentIdChange={handleDepartmentIdChange}
+              />
+              <FormField
+                control={form.control}
+                name="location"
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormLabel>Location</FormLabel>
+                    <FormControl>
+                      <Input
+                        autoComplete="off"
+                        placeholder="Comlab"
+                        disabled={isPending}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
               <ResourceDateTimePicker
                 form={form}
                 name="dateAndTimeNeeded"
                 label="Date and Time Needed"
-                isLoading={isLoading}
+                isLoading={reservedDatesLoading}
                 disabled={isPending || !itemId}
                 disabledTimeRanges={disabledTimeRanges}
                 reservations={reservedDates}
@@ -223,7 +249,7 @@ export default function ReturnableResourceRequestInput({
                 form={form}
                 name="returnDateAndTime"
                 label="Return Date and Time"
-                isLoading={isLoading}
+                isLoading={reservedDatesLoading}
                 disabled={isPending || !itemId}
                 disabledTimeRanges={disabledTimeRanges}
                 reservations={reservedDates}
@@ -232,72 +258,40 @@ export default function ReturnableResourceRequestInput({
                 control={form.control}
                 name="purpose"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-muted-foreground">
-                      Purpose
-                    </FormLabel>
-                    <div className="space-y-4">
-                      {purpose.map((item) => (
-                        <FormField
-                          key={item.id}
-                          control={form.control}
-                          name="purpose"
-                          render={({ field }) => {
-                            return (
-                              <FormItem
-                                key={item.id}
-                                className="flex flex-row items-start space-x-3 space-y-0"
-                              >
-                                <FormControl>
-                                  <Checkbox
-                                    disabled={isPending}
-                                    checked={field.value?.includes(item.id)}
-                                    onCheckedChange={(checked) => {
-                                      return checked
-                                        ? field.onChange([
-                                            ...field.value,
-                                            item.id,
-                                          ])
-                                        : field.onChange(
-                                            field.value?.filter(
-                                              (value) => value !== item.id
-                                            )
-                                          );
-                                    }}
-                                  />
-                                </FormControl>
-                                <FormLabel className="font-normal">
-                                  {item.label}
-                                </FormLabel>
-                              </FormItem>
-                            );
-                          }}
-                        />
-                      ))}
-                    </div>
+                  <FormItem className="flex flex-grow flex-col">
+                    <FormControl>
+                      <Textarea
+                        rows={1}
+                        maxRows={5}
+                        placeholder="Purpose..."
+                        className="min-h-[100px] flex-grow resize-none placeholder:text-sm text-sm"
+                        disabled={isPending}
+                        {...field}
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              {form.watch("purpose").includes("other") && (
-                <FormField
-                  control={form.control}
-                  name="otherPurpose"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Other Purpose</FormLabel>
-                      <FormControl>
-                        <Input
-                          disabled={isPending}
-                          {...field}
-                          placeholder="Specify other purpose"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
+              <FormField
+                control={form.control}
+                name="notes"
+                render={({ field }) => (
+                  <FormItem className="flex flex-grow flex-col">
+                    <FormControl>
+                      <Textarea
+                        rows={1}
+                        maxRows={5}
+                        placeholder="Other info..."
+                        className="min-h-[120px] flex-grow resize-none placeholder:text-sm text-sm"
+                        disabled={isPending}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
           </div>
           <Separator className="my-4" />

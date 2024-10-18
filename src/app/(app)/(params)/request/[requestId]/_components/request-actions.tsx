@@ -83,7 +83,7 @@ export default function RequestActions({
   }
 
   useHotkeys(
-    "ctrl+c",
+    "ctrl+shift+c",
     (event) => {
       event.preventDefault();
       setIsDialogOpen(true);
@@ -129,6 +129,7 @@ export default function RequestActions({
         <P>Cancel request</P>
         <div className="space-x-1">
           <CommandShortcut>Ctrl</CommandShortcut>
+          <CommandShortcut>Shift</CommandShortcut>
           <CommandShortcut>C</CommandShortcut>
         </div>
       </TooltipContent>

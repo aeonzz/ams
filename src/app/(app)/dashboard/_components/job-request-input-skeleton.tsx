@@ -11,7 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 export default function JobRequestInputSkeleton() {
   return (
     <>
-      <div className="scroll-bar flex max-h-[60vh] gap-6 overflow-y-auto px-4 py-1">
+      <div className="scroll-bar flex max-h-[55vh] gap-6 overflow-y-auto px-4 py-1">
         <div className="flex flex-1 flex-col space-y-2">
           <div className="space-y-2">
             <Skeleton className="h-4 w-20" />

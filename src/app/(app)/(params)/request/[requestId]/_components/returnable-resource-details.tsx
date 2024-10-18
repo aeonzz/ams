@@ -2,60 +2,188 @@
 
 import { H4, H5, P } from "@/components/typography/text";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardHeader } from "@/components/ui/card";
+import { Card, CardDescription, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  cn,
-  formatFullName,
-  getChangeTypeInfo,
-  getReturnableItemStatusIcon,
-  textTransform,
-} from "@/lib/utils";
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
+import { getReturnableItemStatusIcon, textTransform } from "@/lib/utils";
 import { format } from "date-fns";
-import { Calendar, Dot, FileText, User } from "lucide-react";
+import {
+  Book,
+  Calendar,
+  CalendarIcon,
+  Dot,
+  FileText,
+  MapPin,
+  User,
+} from "lucide-react";
 import Image from "next/image";
-import type {
-  GenericAuditLog,
-  ReturnableRequestWithRelations,
-} from "prisma/generated/zod";
+import type { ReturnableRequestWithRelations } from "prisma/generated/zod";
 import React from "react";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
+import type { RequestStatusTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestStatusTypeSchema";
+import { useForm, useFormState } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  updateReturnableResourceRequestSchema,
+  type UpdateReturnableResourceRequestSchemaWithPath,
+  type UpdateReturnableResourceRequestSchema,
+} from "@/lib/schema/resource/returnable-resource";
+import { socket } from "@/app/socket";
+import { toast } from "sonner";
+import { usePathname } from "next/navigation";
+import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
+import { udpateReturnableResourceRequest } from "@/lib/actions/requests";
+import { Button } from "@/components/ui/button";
+import EditInput from "./edit-input";
+import ResourceDateTimePicker from "@/app/(app)/dashboard/_components/resource-date-time-picker";
+import { useQuery } from "@tanstack/react-query";
+import { ReservedReturnableItemDateAndTime } from "@/lib/schema/utils";
+import axios from "axios";
+import { Textarea } from "@/components/ui/text-area";
+import { Input } from "@/components/ui/input";
+import RejectionReasonCard from "./rejection-reason-card";
+import { AlertCard } from "@/components/ui/alert-card";
 
 interface ReturnableResourceDetailsProps {
   data: ReturnableRequestWithRelations;
+  requestId: string;
+  rejectionReason: string | null;
+  requestStatus: RequestStatusTypeType;
+  isCurrentUser: boolean;
 }
 
 export default function ReturnableResourceDetails({
   data,
+  requestId,
+  rejectionReason,
+  requestStatus,
+  isCurrentUser,
 }: ReturnableResourceDetailsProps) {
+  const { itemId } = data;
+  const pathname = usePathname();
+  const [editField, setEditField] = React.useState<string | null>(null);
   const { icon: Icon, variant } = getReturnableItemStatusIcon(data.item.status);
-  const { data: logs, isLoading } = useQuery<GenericAuditLog[]>({
+
+  const form = useForm<UpdateReturnableResourceRequestSchema>({
+    resolver: zodResolver(updateReturnableResourceRequestSchema),
+    defaultValues: {
+      location: data.location,
+      dateAndTimeNeeded: data.dateAndTimeNeeded
+        ? new Date(data.dateAndTimeNeeded)
+        : undefined,
+      returnDateAndTime: data.returnDateAndTime
+        ? new Date(data.returnDateAndTime)
+        : undefined,
+      purpose: data.purpose,
+      notes: data.notes || "",
+    },
+  });
+
+  const {
+    data: reservedDates,
+    isLoading: reservedDatesLoading,
+    refetch,
+  } = useQuery<ReservedReturnableItemDateAndTime[]>({
     queryFn: async () => {
-      const res = await axios.get(`/api/audit-log/request-log/${data.id}`);
+      if (!itemId) return [];
+      const res = await axios.get(
+        `/api/reserved-dates/resource-items/returnable/${itemId}`
+      );
       return res.data.data;
     },
-    queryKey: [data.id],
+    queryKey: [requestId, itemId],
+    enabled: !!itemId,
   });
+
+  const disabledTimeRanges = React.useMemo(() => {
+    return (
+      reservedDates
+        ?.filter((reservation) => reservation.request.status === "APPROVED")
+        .map(({ dateAndTimeNeeded, returnDateAndTime }) => ({
+          start: new Date(dateAndTimeNeeded),
+          end: new Date(returnDateAndTime),
+        })) ?? []
+    );
+  }, [reservedDates]);
+
+  const { mutateAsync, isPending } = useServerActionMutation(
+    udpateReturnableResourceRequest
+  );
+  const { dirtyFields } = useFormState({ control: form.control });
+  const isFieldsDirty = Object.keys(dirtyFields).length > 0;
+
+  async function onSubmit(values: UpdateReturnableResourceRequestSchema) {
+    try {
+      if (
+        values.dateAndTimeNeeded &&
+        values.returnDateAndTime &&
+        values.dateAndTimeNeeded > values.returnDateAndTime
+      ) {
+        form.setError("dateAndTimeNeeded", {
+          type: "manual",
+          message:
+            "Date and time needed must not be later than the return date and time",
+        });
+        form.setError("returnDateAndTime", {
+          type: "manual",
+          message:
+            "The return date and time must be after the date and time needed.",
+        });
+        return;
+      }
+
+      const data: UpdateReturnableResourceRequestSchemaWithPath = {
+        path: pathname,
+        id: requestId,
+        ...values,
+      };
+      toast.promise(mutateAsync(data), {
+        loading: "Saving...",
+        success: () => {
+          socket.emit("request_update", requestId);
+          form.reset({
+            location: data.location,
+            dateAndTimeNeeded: data.dateAndTimeNeeded,
+            returnDateAndTime: data.returnDateAndTime,
+            purpose: data.purpose,
+            notes: data.notes,
+          });
+          setEditField(null);
+          return "Request updated successfully";
+        },
+        error: (err) => {
+          console.log(err);
+          return err.message;
+        },
+      });
+    } catch (error) {
+      console.error("Error during update:", error);
+      toast.error("An error occurred during update. Please try again.");
+    }
+  }
+
+  const canEdit = requestStatus === "PENDING" && isCurrentUser;
 
   return (
     <>
-      <div className="space-y-4">
-        <H4 className="font-semibold text-muted-foreground">
-          Supply Request Details
-        </H4>
-        <div className="flex items-center space-x-2">
-          <Calendar className="h-5 w-5" />
-          <P className="underline underline-offset-4">
-            Needed By: {format(new Date(data.dateAndTimeNeeded), "PPP p")}
-          </P>
-        </div>
-        <div className="flex items-center space-x-2">
-          <Calendar className="h-5 w-5" />
-          <P className="underline underline-offset-4">
-            Return By: {format(new Date(data.returnDateAndTime), "PPP p")}
-          </P>
+      <div className="space-y-4 pb-10">
+        <div className="space-y-1">
+          {data.inProgress && (
+            <AlertCard
+              variant="success"
+              title="Ready for Pickup"
+              description="The item is now ready to be picked up."
+            />
+          )}
+          <H4 className="font-semibold text-muted-foreground">
+            Supply Request Details
+          </H4>
         </div>
         <div>
           <H5 className="mb-2 font-semibold text-muted-foreground">Item:</H5>
@@ -88,43 +216,261 @@ export default function ReturnableResourceDetails({
             </CardHeader>
           </Card>
         </div>
-        <div>
-          <H5 className="mb-2 font-semibold text-muted-foreground">Purpose:</H5>
-          <P>{data.purpose}</P>
-        </div>
-      </div>
-      <Separator className="my-6" />
-      <div className="space-y-4 pb-20">
-        <H4 className="font-semibold">Activity</H4>
-        {isLoading ? (
-          <>
-            {[...Array(2)].map((_, index) => (
-              <div key={index} className="flex items-center space-x-2">
-                <Skeleton className="h-6 w-6 rounded-full" />
-                <Skeleton className="h-4 w-2/3" />
-              </div>
-            ))}
-          </>
-        ) : (
-          <div className="space-y-4">
-            {logs?.map((activity) => {
-              const {
-                color,
-                icon: Icon,
-                message,
-              } = getChangeTypeInfo(activity.changeType);
-              return (
-                <div key={activity.id} className="flex items-center space-x-2">
-                  <Icon className="size-5" color={color} />
-                  <P className="inline-flex items-center text-muted-foreground">
-                    {message}
-                    <Dot /> {format(new Date(activity.timestamp), "MMM d")}
-                  </P>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            {editField === "location" ? (
+              <EditInput
+                isPending={isPending}
+                isFieldsDirty={isFieldsDirty}
+                setEditField={setEditField}
+                reset={form.reset}
+                label="Location"
+              >
+                <FormField
+                  control={form.control}
+                  name="location"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input
+                          autoComplete="off"
+                          placeholder="Comlab"
+                          disabled={isPending}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </EditInput>
+            ) : (
+              <div className="group flex items-center justify-between">
+                <div className="flex w-full flex-col items-start">
+                  <div className="flex space-x-1 text-muted-foreground">
+                    <MapPin className="h-5 w-5" />
+                    <P className="font-semibold tracking-tight">Location:</P>
+                  </div>
+                  <div className="w-full pl-5 pt-1">
+                    <P className="text-wrap break-all">{data.location}</P>
+                  </div>
                 </div>
-              );
-            })}
-          </div>
-        )}
+                {canEdit && (
+                  <Button
+                    variant="link"
+                    className="opacity-0 group-hover:opacity-100"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setEditField("location");
+                    }}
+                  >
+                    Edit
+                  </Button>
+                )}
+              </div>
+            )}
+            {editField === "dateAndTimeNeeded" ? (
+              <EditInput
+                isPending={isPending}
+                isFieldsDirty={isFieldsDirty}
+                setEditField={setEditField}
+                label="Date and Time Needed"
+                reset={form.reset}
+              >
+                <ResourceDateTimePicker
+                  form={form}
+                  name="dateAndTimeNeeded"
+                  isLoading={reservedDatesLoading}
+                  disabled={isPending}
+                  disabledTimeRanges={disabledTimeRanges}
+                  reservations={reservedDates}
+                />
+              </EditInput>
+            ) : (
+              <div className="group flex items-center justify-between">
+                <div className="flex w-full flex-col items-start">
+                  <div className="flex space-x-1 text-muted-foreground">
+                    <CalendarIcon className="h-5 w-5" />
+                    <P className="font-semibold tracking-tight">
+                      Date and Time Needed:
+                    </P>
+                  </div>
+                  <div className="w-full pl-5 pt-1">
+                    <P>{format(new Date(data.dateAndTimeNeeded), "PPP p")}</P>
+                  </div>
+                </div>
+                {canEdit && (
+                  <Button
+                    variant="link"
+                    className="opacity-0 group-hover:opacity-100"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setEditField("dateAndTimeNeeded");
+                    }}
+                  >
+                    Edit
+                  </Button>
+                )}
+              </div>
+            )}
+            {editField === "returnDateAndTime" ? (
+              <EditInput
+                isPending={isPending}
+                isFieldsDirty={isFieldsDirty}
+                setEditField={setEditField}
+                label="Return Date and Time"
+                reset={form.reset}
+              >
+                <ResourceDateTimePicker
+                  form={form}
+                  name="returnDateAndTime"
+                  isLoading={reservedDatesLoading}
+                  disabled={isPending}
+                  disabledTimeRanges={disabledTimeRanges}
+                  reservations={reservedDates}
+                />
+              </EditInput>
+            ) : (
+              <div className="group flex items-center justify-between">
+                <div className="flex w-full flex-col items-start">
+                  <div className="flex space-x-1 text-muted-foreground">
+                    <CalendarIcon className="h-5 w-5" />
+                    <P className="font-semibold tracking-tight">
+                      Return Date and Time:
+                    </P>
+                  </div>
+                  <div className="w-full pl-5 pt-1">
+                    <P>{format(new Date(data.returnDateAndTime), "PPP p")}</P>
+                  </div>
+                </div>
+                {canEdit && (
+                  <Button
+                    variant="link"
+                    className="opacity-0 group-hover:opacity-100"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setEditField("returnDateAndTime");
+                    }}
+                  >
+                    Edit
+                  </Button>
+                )}
+              </div>
+            )}
+            {editField === "purpose" ? (
+              <EditInput
+                isPending={isPending}
+                isFieldsDirty={isFieldsDirty}
+                setEditField={setEditField}
+                label="Purpose"
+                reset={form.reset}
+              >
+                <FormField
+                  control={form.control}
+                  name="purpose"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Textarea
+                          autoComplete="off"
+                          autoFocus
+                          maxLength={700}
+                          disabled={isPending}
+                          className="text-sm"
+                          spellCheck={false}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </EditInput>
+            ) : (
+              <div className="group flex items-center justify-between">
+                <div className="flex w-full flex-col items-start">
+                  <div className="flex space-x-1 text-muted-foreground">
+                    <Book className="h-5 w-5" />
+                    <P className="font-semibold tracking-tight">Purpose:</P>
+                  </div>
+                  <div className="w-full pl-5 pt-1">
+                    <P className="text-wrap break-all">{data.purpose}</P>
+                  </div>
+                </div>
+                {canEdit && (
+                  <Button
+                    variant="link"
+                    className="opacity-0 group-hover:opacity-100"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setEditField("purpose");
+                    }}
+                  >
+                    Edit
+                  </Button>
+                )}
+              </div>
+            )}
+            {editField === "notes" ? (
+              <EditInput
+                isPending={isPending}
+                isFieldsDirty={isFieldsDirty}
+                setEditField={setEditField}
+                label="Other Info"
+                reset={form.reset}
+              >
+                <FormField
+                  control={form.control}
+                  name="notes"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Textarea
+                          autoComplete="off"
+                          autoFocus
+                          maxLength={700}
+                          disabled={isPending}
+                          className="text-sm"
+                          spellCheck={false}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </EditInput>
+            ) : (
+              <div className="group flex items-center justify-between">
+                <div className="flex w-full flex-col items-start">
+                  <div className="flex space-x-1 text-muted-foreground">
+                    <Book className="h-5 w-5" />
+                    <P className="font-semibold tracking-tight">Notes:</P>
+                  </div>
+                  <div className="w-full pl-5 pt-1">
+                    <P className="text-wrap break-all">
+                      {data.notes ? data.notes : "-"}
+                    </P>
+                  </div>
+                </div>
+                {canEdit && (
+                  <Button
+                    variant="link"
+                    className="opacity-0 group-hover:opacity-100"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setEditField("notes");
+                    }}
+                  >
+                    Edit
+                  </Button>
+                )}
+              </div>
+            )}
+          </form>
+        </Form>
+        <RejectionReasonCard rejectionReason={rejectionReason} />
+        <Separator className="my-6" />
       </div>
     </>
   );
