@@ -21,6 +21,9 @@ import { usePathname } from "next/navigation";
 import { toast } from "sonner";
 import { socket } from "@/app/socket";
 import type { ReturnableRequestWithRelations } from "prisma/generated/zod";
+import type { RequestStatusTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestStatusTypeSchema";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/text-area";
 
 interface ReturnableRequestActionsProps {
   requestId: string;
@@ -35,12 +38,19 @@ export default function ReturnableRequestActions({
   const { mutateAsync, isPending } = useServerActionMutation(
     returnableResourceActions
   );
+  const [returnCondition, setReturnCondition] = React.useState("");
 
-  async function handleUpdate(status: ItemStatusType) {
+  async function handleUpdate(values: {
+    itemStatus: ItemStatusType;
+    isReturned?: boolean;
+    returnCondition?: string;
+  }) {
     const data: UpdateReturnableResourceRequestSchemaWithPath = {
       path: pathname,
       id: requestId,
-      itemStatus: status,
+      itemStatus: values.itemStatus,
+      returnCondition: values.returnCondition,
+      isReturned: values.isReturned,
     };
 
     toast.promise(mutateAsync(data), {
@@ -48,7 +58,9 @@ export default function ReturnableRequestActions({
       success: () => {
         socket.emit("request_update");
         socket.emit("notifications");
-        return "The item has been successfully marked as picked up.";
+        return values.itemStatus === "IN_USE"
+          ? "The item has been successfully marked as picked up."
+          : "The item has been successfully marked as returned.";
       },
       error: (err) => {
         console.log(err);
@@ -59,7 +71,7 @@ export default function ReturnableRequestActions({
 
   return (
     <>
-      {request.inProgress && (
+      {request.inProgress && request.item.status !== "IN_USE" && (
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button disabled={isPending}>Mark as Picked Up</Button>
@@ -74,10 +86,54 @@ export default function ReturnableRequestActions({
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
               <AlertDialogAction
-                onClick={() => handleUpdate("IN_USE")}
+                onClick={() => handleUpdate({ itemStatus: "IN_USE" })}
                 disabled={isPending}
               >
                 Confirm
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
+      {request.inProgress && request.item.status === "IN_USE" && (
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button disabled={isPending}>Mark as Returned</Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Mark Item as Returned</AlertDialogTitle>
+              <AlertDialogDescription>
+                Please provide the return condition of the item.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <div>
+              <Label htmlFor="returnCondition" className="text-right">
+                Return Condition
+              </Label>
+              <Textarea
+                id="returnCondition"
+                maxRows={6}
+                minRows={3}
+                value={returnCondition}
+                onChange={(e) => setReturnCondition(e.target.value)}
+                placeholder="Describe the condition of the returned item..."
+                className="text-sm placeholder:text-sm"
+              />
+            </div>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() =>
+                  handleUpdate({
+                    itemStatus: "AVAILABLE",
+                    isReturned: true,
+                    returnCondition,
+                  })
+                }
+                disabled={isPending || !returnCondition.trim()}
+              >
+                Confirm Return
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

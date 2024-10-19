@@ -11,7 +11,7 @@ const alertCardVariants = cva(
       variant: {
         default: "bg-secondary text-foreground",
         destructive:
-          "border-destructive/50 bg-destructive/30 text-destructive dark:bg-destructive/20 [&>svg]:text-destructive",
+        "border-red-500/20 bg-red-100 text-red-500 dark:bg-red-900/20 [&>svg]:text-red-500",
         success:
           "border-green-500/20 bg-green-100 text-green-500 dark:bg-green-900/20 [&>svg]:text-green-500",
         warning:
@@ -65,7 +65,7 @@ const AlertCard = React.forwardRef<HTMLDivElement, AlertCardProps>(
               </P>
             )}
             {description && (
-              <div className="text-sm [&_p]:leading-relaxed">{description}</div>
+              <P className="[&_p]:leading-relaxed">{description}</P>
             )}
           </div>
           {onDismiss && (

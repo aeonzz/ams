@@ -68,7 +68,6 @@ export default function CreateDepartmentForm({
   async function onSubmit(values: CreateDepartmentSchema) {
     const data = {
       ...values,
-      path: pathname,
     };
 
     toast.promise(mutateAsync(data), {
@@ -114,9 +113,11 @@ export default function CreateDepartmentForm({
                 <FormItem>
                   <FormLabel>Description</FormLabel>
                   <FormControl>
-                    <Input
-                      autoComplete="off"
+                    <Textarea
+                      rows={1}
+                      maxRows={10}
                       placeholder="Description..."
+                      className="min-h-[100px] flex-grow resize-none text-sm"
                       disabled={isPending}
                       {...field}
                     />
@@ -125,7 +126,7 @@ export default function CreateDepartmentForm({
                 </FormItem>
               )}
             />
-            <FormField
+            {/* <FormField
               control={form.control}
               name="responsibilities"
               render={({ field }) => (
@@ -144,7 +145,7 @@ export default function CreateDepartmentForm({
                   <FormMessage />
                 </FormItem>
               )}
-            />
+            /> */}
             <FormField
               control={form.control}
               name="departmentType"
@@ -273,6 +274,145 @@ export default function CreateDepartmentForm({
                 </FormItem>
               )}
             />
+            {form.watch("managesBorrowRequest") && (
+              <>
+                <FormField
+                  control={form.control}
+                  name="maxBorrowDuration"
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel>Max Borrow Duration (Hours)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          placeholder="Borrow Duration"
+                          autoComplete="off"
+                          {...field}
+                          min={0}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            if (
+                              value === "" ||
+                              (parseInt(value, 10) >= 0 &&
+                                parseInt(value, 10) <= 99)
+                            ) {
+                              field.onChange(parseInt(e.target.value, 10));
+                            }
+                          }}
+                          onWheel={(e) => e.currentTarget.blur()}
+                          onKeyDown={(e) => {
+                            if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+                              e.preventDefault();
+                            }
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="gracePeriod"
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel>Grace Period (Hours)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          placeholder="Period"
+                          autoComplete="off"
+                          {...field}
+                          min={0}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            if (
+                              value === "" ||
+                              (parseInt(value, 10) >= 0 &&
+                                parseInt(value, 10) <= 99)
+                            ) {
+                              field.onChange(parseInt(e.target.value, 10));
+                            }
+                          }}
+                          onWheel={(e) => e.currentTarget.blur()}
+                          onKeyDown={(e) => {
+                            if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+                              e.preventDefault();
+                            }
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="penaltyBorrowBanDuration"
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel>
+                        Penalty Borrow Ban Duration (Hours){" "}
+                        <span className="text-xs text-muted-foreground">
+                          (Optional)
+                        </span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          placeholder="Ban Duration"
+                          autoComplete="off"
+                          {...field}
+                          min={0}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            if (
+                              value === "" ||
+                              (parseInt(value, 10) >= 0 &&
+                                parseInt(value, 10) <= 99)
+                            ) {
+                              field.onChange(parseInt(e.target.value, 10));
+                            }
+                          }}
+                          onWheel={(e) => e.currentTarget.blur()}
+                          onKeyDown={(e) => {
+                            if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+                              e.preventDefault();
+                            }
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="other"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Other Info.{" "}
+                        <span className="text-xs text-muted-foreground">
+                          (Optional)
+                        </span>
+                      </FormLabel>
+                      <FormControl>
+                        <Textarea
+                          rows={1}
+                          maxRows={10}
+                          placeholder="Info..."
+                          className="min-h-[100px] flex-grow resize-none text-sm"
+                          disabled={isPending}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </>
+            )}
             <FormField
               control={form.control}
               name="managesSupplyRequest"

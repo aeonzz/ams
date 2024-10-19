@@ -33,9 +33,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
 import { type Department } from "prisma/generated/zod";
 import axios from "axios";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface CreateInventoryFormProps {
   setAlertOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -150,50 +165,70 @@ export default function CreateInventoryForm({
               </FormItem>
             )}
           />
+
           <FormField
             control={form.control}
             name="departmentId"
             render={({ field }) => (
               <FormItem className="flex-1">
                 <FormLabel>Department</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger
-                      className="bg-secondary capitalize"
-                      disabled={isPending || isLoading}
-                    >
-                      <SelectValue
-                        placeholder={
-                          isLoading ? <LoadingSpinner /> : "Select a department"
-                        }
-                      />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent className="bg-secondary">
-                    <SelectGroup>
-                      {data?.length === 0 ? (
-                        <p className="p-4 text-center text-sm">
-                          No departments yet
-                        </p>
-                      ) : (
-                        <>
-                          {data?.map((item) => (
-                            <SelectItem
-                              key={item.id}
-                              value={item.id}
-                              className="capitalize"
+                <Popover modal>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant="outline"
+                        disabled={isUploading || isPending}
+                        role="combobox"
+                        className="w-full flex-1 justify-between text-muted-foreground"
+                      >
+                        {field.value ? (
+                          <p className="truncate">
+                            {
+                              data?.find((department) => department.id === field.value)
+                                ?.name
+                            }
+                          </p>
+                        ) : (
+                          "Select managing department"
+                        )}
+                        {isLoading ? (
+                          <LoadingSpinner />
+                        ) : (
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        )}
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="p-0">
+                    <Command className="max-h-72">
+                      <CommandInput placeholder="Search type..." />
+                      <CommandList>
+                        <CommandEmpty>No type found.</CommandEmpty>
+                        <CommandGroup>
+                          {data?.map((department, index) => (
+                            <CommandItem
+                              value={department.id}
+                              key={index}
+                              onSelect={() => {
+                                field.onChange(department.id);
+                              }}
                             >
-                              {item.name}
-                            </SelectItem>
+                              {department.name}
+                              <Check
+                                className={cn(
+                                  "ml-auto h-4 w-4",
+                                  department.id === field.value
+                                    ? "opacity-100"
+                                    : "opacity-0"
+                                )}
+                              />
+                            </CommandItem>
                           ))}
-                        </>
-                      )}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                </PopoverContent>
+                </Popover>
                 <FormMessage />
               </FormItem>
             )}
@@ -209,7 +244,7 @@ export default function CreateInventoryForm({
                     rows={1}
                     maxRows={5}
                     placeholder="description..."
-                    className="min-h-[100px] flex-grow resize-none"
+                    className="min-h-[100px] flex-grow resize-none text-sm"
                     disabled={isPending}
                     {...field}
                   />

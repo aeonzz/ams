@@ -11,6 +11,7 @@ import {
   Book,
   Calendar,
   CalendarIcon,
+  ClipboardCheck,
   Dot,
   FileText,
   MapPin,
@@ -146,6 +147,7 @@ export default function ReturnableResourceDetails({
       toast.promise(mutateAsync(data), {
         loading: "Saving...",
         success: () => {
+          socket.emit("notifications");
           socket.emit("request_update", requestId);
           form.reset({
             location: data.location,
@@ -174,13 +176,27 @@ export default function ReturnableResourceDetails({
     <>
       <div className="space-y-4 pb-10">
         <div className="space-y-1">
-          {data.inProgress && (
-            <AlertCard
-              variant="success"
-              title="Ready for Pickup"
-              description="The item is now ready to be picked up."
-            />
+          {data.inProgress && data.item.status !== "IN_USE" && (
+            <div>
+              <AlertCard
+                variant="success"
+                title="Ready for Pickup"
+                description="The item is now ready to be picked up."
+              />
+              <Separator className="my-3" />
+            </div>
           )}
+          {data.inProgress && data.isOverdue && (
+            <div>
+              <AlertCard
+                variant="warning"
+                title="Request Overdue"
+                description="This request is overdue. The item has not been returned yet. Please return it as soon as possible."
+              />
+              <Separator className="my-6" />
+            </div>
+          )}
+          <RejectionReasonCard rejectionReason={rejectionReason} />
           <H4 className="font-semibold text-muted-foreground">
             Supply Request Details
           </H4>
@@ -469,8 +485,43 @@ export default function ReturnableResourceDetails({
             )}
           </form>
         </Form>
-        <RejectionReasonCard rejectionReason={rejectionReason} />
         <Separator className="my-6" />
+        {requestStatus === "COMPLETED" && (
+          <>
+            {data.isOverdue && <Badge variant="destructive">Overdue</Badge>}
+            <div className="group flex items-center justify-between">
+              <div className="flex w-full flex-col items-start">
+                <div className="flex space-x-1 text-muted-foreground">
+                  <CalendarIcon className="h-5 w-5" />
+                  <P className="font-semibold tracking-tight">
+                    Actual Return Time:
+                  </P>
+                </div>
+                <div className="w-full pl-5 pt-1">
+                  <P>
+                    {data.actualReturnDate
+                      ? format(new Date(data.actualReturnDate), "PPP p")
+                      : "-"}
+                  </P>
+                </div>
+              </div>
+            </div>
+            <div className="group flex items-center justify-between">
+              <div className="flex w-full flex-col items-start">
+                <div className="flex space-x-1 text-muted-foreground">
+                  <ClipboardCheck className="h-5 w-5" />
+                  <P className="font-semibold tracking-tight">
+                    Return Condition:
+                  </P>
+                </div>
+                <div className="w-full pl-5 pt-1">
+                  <P>{data.returnCondition}</P>
+                </div>
+              </div>
+            </div>
+            <Separator className="my-6" />
+          </>
+        )}
       </div>
     </>
   );

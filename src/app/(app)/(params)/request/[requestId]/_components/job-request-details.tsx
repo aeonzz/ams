@@ -295,54 +295,60 @@ export default function JobRequestDetails({
   return (
     <div className="pb-10">
       <div className="space-y-4">
-        <div className="flex h-7 items-center justify-between">
-          <H4 className="font-semibold text-muted-foreground">
-            Job Request Details
-          </H4>
-          <div className="space-x-2">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost2"
-                  size="icon"
-                  className="size-7"
-                  onClick={handleDownloadJobRequestForm}
-                >
-                  <Download className="size-4 text-muted-foreground" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent className="flex items-center gap-3" side="bottom">
-                <CommandTooltip text="Download job request form">
-                  <CommandShortcut>Ctrl</CommandShortcut>
-                  <CommandShortcut>Shift</CommandShortcut>
-                  <CommandShortcut>D</CommandShortcut>
-                </CommandTooltip>
-              </TooltipContent>
-            </Tooltip>
-            {isEvaluated && (
+        <div className="">
+          <RejectionReasonCard rejectionReason={rejectionReason} />
+          <div className="flex h-7 items-center justify-between">
+            <H4 className="font-semibold text-muted-foreground">
+              Job Request Details
+            </H4>
+            <div className="space-x-2">
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
                     variant="ghost2"
                     size="icon"
                     className="size-7"
-                    onClick={handleDownloadEvaluation}
+                    onClick={handleDownloadJobRequestForm}
                   >
-                    <FileCheck className="size-4 text-muted-foreground" />
+                    <Download className="size-4 text-muted-foreground" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent
                   className="flex items-center gap-3"
                   side="bottom"
                 >
-                  <CommandTooltip text="Download evaluation form">
+                  <CommandTooltip text="Download job request form">
                     <CommandShortcut>Ctrl</CommandShortcut>
                     <CommandShortcut>Shift</CommandShortcut>
-                    <CommandShortcut>E</CommandShortcut>
+                    <CommandShortcut>D</CommandShortcut>
                   </CommandTooltip>
                 </TooltipContent>
               </Tooltip>
-            )}
+              {isEvaluated && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost2"
+                      size="icon"
+                      className="size-7"
+                      onClick={handleDownloadEvaluation}
+                    >
+                      <FileCheck className="size-4 text-muted-foreground" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent
+                    className="flex items-center gap-3"
+                    side="bottom"
+                  >
+                    <CommandTooltip text="Download evaluation form">
+                      <CommandShortcut>Ctrl</CommandShortcut>
+                      <CommandShortcut>Shift</CommandShortcut>
+                      <CommandShortcut>E</CommandShortcut>
+                    </CommandTooltip>
+                  </TooltipContent>
+                </Tooltip>
+              )}
+            </div>
           </div>
         </div>
         <Form {...form}>
@@ -790,7 +796,6 @@ export default function JobRequestDetails({
             ))}
           </div>
         </PhotoProvider>
-        <RejectionReasonCard rejectionReason={rejectionReason} />
       </div>
       <Separator className="my-6" />
       {data.reworkAttempts.length > 0 && (

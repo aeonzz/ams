@@ -14,9 +14,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { PlusIcon, X } from "lucide-react";
-import {
-  useServerActionMutation,
-} from "@/lib/hooks/server-action-hooks";
+import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -31,15 +29,23 @@ import {
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useFormState } from "react-hook-form";
-import { createDepartmentSchema, CreateDepartmentSchema } from "@/lib/schema/department";
+import {
+  createDepartmentSchema,
+  CreateDepartmentSchema,
+} from "@/lib/schema/department";
 import { createDepartment } from "@/lib/actions/department";
 import CreateDepartmentForm from "./create-department-form";
+import { usePathname } from "next/navigation";
 
 export default function CreateDepartmentDialog() {
+  const pathname = usePathname();
   const [open, setOpen] = React.useState(false);
   const [alertOpen, setAlertOpen] = React.useState(false);
   const form = useForm<CreateDepartmentSchema>({
     resolver: zodResolver(createDepartmentSchema),
+    defaultValues: {
+      path: pathname,
+    },
   });
   const { dirtyFields } = useFormState({ control: form.control });
   const isFieldsDirty = Object.keys(dirtyFields).length > 0;

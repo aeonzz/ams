@@ -36,12 +36,6 @@ export function DataTableColumnHeader<TData, TValue>({
   title,
   className,
 }: DataTableColumnHeaderProps<TData, TValue>) {
-  const [isFiltering, setIsFiltering] = React.useState(false);
-
-  const handleFilterChange = (value: string) => {
-    column.setFilterValue(value);
-  };
-
   return (
     <div className={cn("flex flex-col space-y-1", className)}>
       <div className="flex items-center space-x-2">
@@ -83,39 +77,6 @@ export function DataTableColumnHeader<TData, TValue>({
                 Hide
               </DropdownMenuItem>
             )}
-            <DropdownMenuSeparator />
-            <Popover modal open={isFiltering} onOpenChange={setIsFiltering}>
-              <PopoverTrigger asChild>
-                <DropdownMenuItem
-                  onSelect={(e) => {
-                    e.preventDefault();
-                    setIsFiltering(true);
-                  }}
-                >
-                  <FilterIcon className="mr-2 size-3.5 text-muted-foreground/70" />
-                  {/* {isFiltering ? "Hide Filter" : "Show Filter"} */}
-                  Filter
-                </DropdownMenuItem>
-              </PopoverTrigger>
-              <PopoverContent className="w-[220px] space-y-3" side="right">
-                <P>Filter by {title}</P>
-                <Input
-                  placeholder={`Filter ${title}...`}
-                  value={(column.getFilterValue() as string) ?? ""}
-                  onChange={(event) => handleFilterChange(event.target.value)}
-                  className="h-8 w-full max-w-sm"
-                />
-                <div>
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    onClick={() => setIsFiltering(false)}
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </PopoverContent>
-            </Popover>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

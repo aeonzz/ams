@@ -53,7 +53,7 @@ const management: {
   },
   {
     title: "Facilities Management",
-    href: "facilities?page=1&per_page=10&sort=createdAt.desc",
+    href: "facilities",
     description:
       "Manage department facilities, ensuring that resources are available and properly maintained for effective operations.",
     condition: true,
@@ -65,32 +65,39 @@ const management: {
       "Coordinate transport services for the department, managing vehicle assignments, schedules, and user requests.",
     condition: true,
   },
+  {
+    title: "Managing Borrow Requests",
+    href: "borrow-requests?page=1&per_page=10&sort=createdAt.desc",
+    description:
+      "Manage all borrow requests submitted to the department. Ensure items are available, and track returns and overdue requests.",
+    condition: true,
+  },
 ];
 
-const resources: { title: string; href: string; description: string }[] = [
+const insights: { title: string; href: string; description: string }[] = [
   {
-    title: "Job Requests",
-    href: "/department/job-requests",
+    title: "Borrow Service",
+    href: "overview/borrow",
     description:
-      "View and manage job requests assigned to your department. Track progress and updates.",
+      "Get a comprehensive overview of all borrow requests made by your department. Analyze trends and borrowing patterns.",
   },
   {
-    title: "Transport Requests",
-    href: "/department/transport-requests",
+    title: "Borrow Requests Insights",
+    href: "/department/borrow-requests/insights",
     description:
-      "Manage vehicle and transport requests for departmental use or official travel.",
+      "Dive deeper into the data of borrow requests. Explore metrics, user engagement, and item demand.",
   },
   {
-    title: "Inventory Management",
-    href: "/department/inventory",
+    title: "Pending Borrow Requests",
+    href: "/department/borrow-requests/pending",
     description:
-      "Track, add, and update inventory items belonging to your department. Manage resources efficiently.",
+      "View all pending borrow requests. Ensure timely processing and resolution of outstanding requests.",
   },
   {
-    title: "Returnable Items",
-    href: "/department/returnable-items",
+    title: "Borrowing Policy Review",
+    href: "/department/borrow-requests/policy",
     description:
-      "Manage and track items that have been loaned out and are expected to be returned.",
+      "Review the current borrowing policies and guidelines for your department. Ensure compliance and effective resource management.",
   },
 ];
 
@@ -200,8 +207,8 @@ export default function OverviewNavigationMenu({
           </NavigationMenuContent>
         </NavigationMenuItem>
         <NavigationMenuItem>
-          <NavigationMenuTrigger>
-            <P>Resources</P>
+          <NavigationMenuTrigger> 
+            <P>Overview</P>
           </NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
@@ -222,10 +229,10 @@ export default function OverviewNavigationMenu({
                   </p>
                 </NavigationMenuLink>
               </Link>
-              {resources.map((resource) => (
+              {insights.map((insight) => (
                 <Link
-                  key={resource.title}
-                  href={`/department/${departmentId}/${resource.href}`}
+                  key={insight.title}
+                  href={`/department/${departmentId}/${insight.href}`}
                   legacyBehavior
                   passHref
                   prefetch
@@ -236,10 +243,10 @@ export default function OverviewNavigationMenu({
                     )}
                   >
                     <div className="text-sm font-medium leading-none">
-                      {resource.title}
+                      {insight.title}
                     </div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                      {resource.description}
+                      {insight.description}
                     </p>
                   </NavigationMenuLink>
                 </Link>

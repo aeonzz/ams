@@ -6,8 +6,8 @@ import { GetDepartmentsSchema, GetUsersSchema } from "../schema";
 import { checkAuth } from "../auth/utils";
 import { authedProcedure, getErrorMessage } from "./utils";
 import {
+  createDepartmentSchema,
   deleteDepartmentsSchema,
-  extendedCreateDepartmentSchema,
   extendedUpdateDepartmentSchema,
 } from "../schema/department";
 import { revalidatePath } from "next/cache";
@@ -82,15 +82,42 @@ export async function getDepartments(input: GetDepartmentsSchema) {
 
 export const createDepartment = authedProcedure
   .createServerAction()
-  .input(extendedCreateDepartmentSchema)
+  .input(createDepartmentSchema)
   .handler(async ({ input }) => {
-    const { path, ...rest } = input;
+    const {
+      path,
+      maxBorrowDuration,
+      gracePeriod,
+      penaltyBorrowBanDuration,
+      other,
+      managesBorrowRequest,
+      ...rest
+    } = input;
+
+    console.log(rest);
+
     try {
       const departmentId = generateId(15);
+
+      const departmentBorrowingPolicyData = managesBorrowRequest
+        ? {
+            create: {
+              id: generateId(15),
+              maxBorrowDuration: maxBorrowDuration!,
+              penaltyBorrowBanDuration: penaltyBorrowBanDuration,
+              gracePeriod: gracePeriod!,
+              other,
+            },
+          }
+        : undefined;
 
       await db.department.create({
         data: {
           id: departmentId,
+          ...(departmentBorrowingPolicyData && {
+            departmentBorrowingPolicy: departmentBorrowingPolicyData,
+          }),
+          managesBorrowRequest: managesBorrowRequest,
           ...rest,
         },
       });
@@ -98,7 +125,7 @@ export const createDepartment = authedProcedure
       return revalidatePath(path);
     } catch (error) {
       console.log(error);
-      getErrorMessage(error);
+      return getErrorMessage(error);
     }
   });
 

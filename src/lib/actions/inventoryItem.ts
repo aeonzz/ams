@@ -176,7 +176,15 @@ export const returnableResourceActions = authedProcedure
   .createServerAction()
   .input(updateReturnableResourceRequestSchemaWithPath)
   .handler(async ({ input }) => {
-    const { path, id, itemStatus, itemId, ...rest } = input;
+    const {
+      path,
+      id,
+      itemStatus,
+      itemId,
+      isReturned,
+      returnCondition,
+      ...rest
+    } = input;
     try {
       const result = await db.$transaction(async (prisma) => {
         const updatedRequest = await prisma.returnableRequest.update({
@@ -189,6 +197,19 @@ export const returnableResourceActions = authedProcedure
                 status: itemStatus,
               },
             },
+            ...(isReturned !== undefined && isReturned
+              ? {
+                  isReturned: true,
+                  inProgress: false,
+                  actualReturnDate: new Date(),
+                  returnCondition: returnCondition,
+                  request: {
+                    update: {
+                      status: "COMPLETED",
+                    },
+                  },
+                }
+              : {}),
             ...rest,
           },
         });

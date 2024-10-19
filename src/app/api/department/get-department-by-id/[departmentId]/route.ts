@@ -28,6 +28,19 @@ export async function GET(req: Request, context: Context) {
             user: true,
           },
         },
+        inventoryItem: {
+          include: {
+            inventorySubItems: {
+              include: {
+                returnableRequest: {
+                  include: {
+                    request: true,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     });
 

@@ -43,10 +43,12 @@ export function useRequest(id: string): UseQueryResult<
 
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      console.log(data.queryKey);
+      console.log("yawa",data.queryKey);
       if (data.type === "INVALIDATE_QUERIES") {
         if (data.queryKey.includes(id)) {
           queryClient.invalidateQueries({ queryKey: [id] });
+          socket.emit("notifications");
+          socket.emit("request_update");
         }
       }
     };

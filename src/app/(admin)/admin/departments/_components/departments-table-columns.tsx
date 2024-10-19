@@ -5,7 +5,7 @@ import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { type ColumnDef } from "@tanstack/react-table";
 import { toast } from "sonner";
 
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
@@ -15,7 +15,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
-
 import { P } from "@/components/typography/text";
 import { usePathname } from "next/navigation";
 import { UpdateDepartmentSheet } from "./update-department-sheet";
@@ -29,9 +28,10 @@ import {
 } from "lucide-react";
 import type { DepartmentsTableType } from "./types";
 import { formatDate } from "date-fns";
-import { textTransform } from "@/lib/utils";
+import { cn, textTransform } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import DataTableExpand from "@/components/data-table/data-table-expand";
+import Link from "next/link";
 
 export function getDepartmentsColumns(): ColumnDef<DepartmentsTableType>[] {
   return [
@@ -81,7 +81,15 @@ export function getDepartmentsColumns(): ColumnDef<DepartmentsTableType>[] {
       cell: ({ row }) => {
         return (
           <div className="flex items-center">
-            <P>{row.original.name}</P>
+            <Link
+              href={`/admin/departments/${row.original.id}/overview`}
+              className={cn(
+                buttonVariants({ variant: "link" }),
+                "p-0 text-foreground"
+              )}
+            >
+              <P className="truncate font-medium">{row.original.name}</P>
+            </Link>
           </div>
         );
       },
@@ -138,7 +146,7 @@ export function getDepartmentsColumns(): ColumnDef<DepartmentsTableType>[] {
       },
     },
     {
-      accessorKey: "acceptsTransport",
+      accessorKey: "managesTransport",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Transport Services" />
       ),
@@ -155,22 +163,73 @@ export function getDepartmentsColumns(): ColumnDef<DepartmentsTableType>[] {
       },
     },
     {
-      accessorKey: "responsibilities",
+      accessorKey: "managesBorrowRequest",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Responsibilities" />
+        <DataTableColumnHeader column={column} title="Borrow Services" />
       ),
       cell: ({ row }) => {
         return (
-          <div className="flex space-x-2">
-            <P className="truncate font-medium">
-              {row.original.responsibilities
-                ? row.original.responsibilities
-                : "-"}
-            </P>
+          <div className="flex justify-center space-x-2">
+            {row.original.managesBorrowRequest ? (
+              <CircleCheck className="size-5 text-green-500" />
+            ) : (
+              <CircleX className="size-5 text-red-500" />
+            )}
           </div>
         );
       },
     },
+    {
+      accessorKey: "managesSupplyRequest",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Supply Services" />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="flex justify-center space-x-2">
+            {row.original.managesSupplyRequest ? (
+              <CircleCheck className="size-5 text-green-500" />
+            ) : (
+              <CircleX className="size-5 text-red-500" />
+            )}
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "managesFacility",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Venue Services" />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="flex justify-center space-x-2">
+            {row.original.managesFacility ? (
+              <CircleCheck className="size-5 text-green-500" />
+            ) : (
+              <CircleX className="size-5 text-red-500" />
+            )}
+          </div>
+        );
+      },
+    },
+    // {
+    //   accessorKey: "responsibilities",
+    //   header: ({ column }) => (
+    //     <DataTableColumnHeader column={column} title="Responsibilities" />
+    //   ),
+    //   cell: ({ row }) => {
+    //     return (
+    //       <div className="flex space-x-2">
+    //         <P className="truncate font-medium">
+    //           {row.original.responsibilities
+    //             ? row.original.responsibilities
+    //             : "-"}
+    //         </P>
+    //       </div>
+    //     );
+    //   },
+    // },
     {
       id: "users",
       header: () => <P>Users</P>,
@@ -182,14 +241,22 @@ export function getDepartmentsColumns(): ColumnDef<DepartmentsTableType>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Date Created" />
       ),
-      cell: ({ cell }) => formatDate(cell.getValue() as Date, "PPP p"),
+      cell: ({ cell }) => (
+        <P className="text-muted-foreground">
+          {formatDate(cell.getValue() as Date, "PP p")}
+        </P>
+      ),
     },
     {
       accessorKey: "updatedAt",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Last Modified" />
       ),
-      cell: ({ cell }) => formatDate(cell.getValue() as Date, "PPP p"),
+      cell: ({ cell }) => (
+        <P className="text-muted-foreground">
+          {formatDate(cell.getValue() as Date, "PP p")}
+        </P>
+      ),
     },
     {
       id: "actions",

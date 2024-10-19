@@ -363,7 +363,6 @@ export default function JobRequestEvaluationForm({
                       </FormItem>
                     )}
                   />
-
                   <FormField
                     control={form.control}
                     name="regionOfResidence"

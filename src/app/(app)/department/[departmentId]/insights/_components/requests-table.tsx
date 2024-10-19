@@ -120,19 +120,19 @@ export default function DepartmentRequestsTable({
           );
         },
       },
-      {
-        accessorKey: "completedAt",
-        header: "Completed",
-        cell: ({ row }) => {
-          return (
-            <P className="text-muted-foreground">
-              {row.original.completedAt
-                ? format(row.original.completedAt, "PP p")
-                : "-"}
-            </P>
-          );
-        },
-      },
+      // {
+      //   accessorKey: "completedAt",
+      //   header: "Completed",
+      //   cell: ({ row }) => {
+      //     return (
+      //       <P className="text-muted-foreground">
+      //         {row.original.completedAt
+      //           ? format(row.original.completedAt, "PP p")
+      //           : "-"}
+      //       </P>
+      //     );
+      //   },
+      // },
     ],
     []
   );

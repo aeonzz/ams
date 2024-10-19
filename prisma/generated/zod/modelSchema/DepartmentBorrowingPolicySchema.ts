@@ -11,7 +11,10 @@ export const DepartmentBorrowingPolicySchema = z.object({
   departmentId: z.string(),
   maxBorrowDuration: z.number().int(),
   penaltyBorrowBanDuration: z.number().int().nullable(),
+  gracePeriod: z.number().int(),
   other: z.string().nullable(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
 })
 
 export type DepartmentBorrowingPolicy = z.infer<typeof DepartmentBorrowingPolicySchema>

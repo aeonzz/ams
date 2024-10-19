@@ -128,19 +128,19 @@ export function getMenuList({
             },
           ],
         },
-        {
-          href: "/reservation/my-reservations",
-          label: "Reservations",
-          active: pathname.includes("/reservations"),
-          icon: Calendar,
-          submenus: [
-            {
-              href: "/reservations/my-reservations",
-              label: "All Reservations",
-              active: pathname === "/reservations/my-reservations",
-            },
-          ],
-        },
+        // {
+        //   href: "/reservation/my-reservations",
+        //   label: "Reservations",
+        //   active: pathname.includes("/reservations"),
+        //   icon: Calendar,
+        //   submenus: [
+        //     {
+        //       href: "/reservations/my-reservations",
+        //       label: "All Reservations",
+        //       active: pathname === "/reservations/my-reservations",
+        //     },
+        //   ],
+        // },
       ],
     },
     // {

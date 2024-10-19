@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { CronJob } from "cron";
 import WebSocket, { WebSocketServer } from "ws";
+import crypto from "crypto";
 
 const prisma = new PrismaClient();
 const wss = new WebSocketServer({ port: 8080 });
@@ -9,6 +10,12 @@ wss.on("connection", (ws) => {
   console.log("Client connected");
   ws.on("close", () => console.log("Client disconnected"));
 });
+
+function generateId(length) {
+  return Math.random()
+    .toString(36)
+    .substring(2, 2 + length);
+}
 
 async function updateInProgressStatus() {
   const now = new Date();
@@ -129,27 +136,91 @@ async function updateInProgressStatus() {
           },
         });
 
+      const overdueReturnableRequests =
+        await prisma.returnableRequest.updateMany({
+          where: {
+            returnDateAndTime: {
+              lt: now,
+            },
+            isReturned: false,
+            inProgress: true,
+            isOverdue: false,
+            request: {
+              status: "APPROVED",
+            },
+          },
+          data: {
+            isOverdue: true,
+          },
+        });
+
+      if (overdueReturnableRequests.count > 0) {
+        const updatedRequests = await prisma.returnableRequest.findMany({
+          where: {
+            isOverdue: true,
+            isReturned: false,
+            inProgress: true,
+          },
+          include: {
+            request: {
+              include: {
+                user: true,
+              },
+            },
+          },
+        });
+
+        for (const updatedRequest of updatedRequests) {
+          if (updatedRequest.request.reviewedBy) {
+            await prisma.notification.create({
+              data: {
+                id: generateId(15),
+                userId: updatedRequest.request.reviewedBy,
+                recepientId: updatedRequest.request.user.id,
+                resourceId: `/request/${updatedRequest.requestId}`,
+                title: `Overdue Request: ${updatedRequest.request.title}`,
+                resourceType: "REQUEST",
+                notificationType: "WARNING",
+                message: `The borrow request titled "${updatedRequest.request.title}" is overdue. Please return the item as soon as possible.`,
+              },
+            });
+
+            await prisma.notification.create({
+              data: {
+                id: generateId(15),
+                userId: updatedRequest.request.reviewedBy,
+                recepientId: updatedRequest.request.departmentId, 
+                resourceId: `/request/${updatedRequest.requestId}`,
+                title: `Overdue Request: ${updatedRequest.request.title}`,
+                resourceType: "REQUEST",
+                notificationType: "REMINDER",
+                message: `The borrow request titled "${updatedRequest.request.title}" is overdue. Please take immediate action to ensure the item is returned promptly.`,
+              },
+            });
+          }
+        }
+      }
+
       return {
         transportRequests: updatedTransportRequests,
         venueRequests: updatedVenueRequests,
-        returnableRequest: updatedReturnableRequests,
+        returnableRequests: updatedReturnableRequests,
+        overdueReturnableRequests: overdueReturnableRequests,
       };
     });
 
     console.log(
-      `Successfully updated ${result.transportRequests.count} transport requests, ${result.venueRequests.count} venue requests and ${result.returnableRequest.count} returnable requests.`
+      `Successfully updated ${result.transportRequests.count} transport requests, ${result.venueRequests.count} venue requests, ${result.returnableRequests.count} returnable requests, and ${result.overdueReturnableRequests.count} overdue returnable requests.`
     );
 
-    // Fetch updated requests for WebSocket notifications
+    // WebSocket notifications for updated requests
     const updatedRequests = await prisma.$transaction([
       prisma.transportRequest.findMany({
         where: {
           dateAndTimeNeeded: {
             lte: now,
           },
-          inProgress: {
-            equals: true,
-          },
+          inProgress: true,
           request: {
             status: "APPROVED",
           },
@@ -166,9 +237,7 @@ async function updateInProgressStatus() {
           endTime: {
             gt: now,
           },
-          inProgress: {
-            equals: true,
-          },
+          inProgress: true,
           request: {
             status: "APPROVED",
           },
@@ -185,9 +254,23 @@ async function updateInProgressStatus() {
           returnDateAndTime: {
             gt: now,
           },
-          inProgress: {
-            equals: true,
+          inProgress: true,
+          request: {
+            status: "APPROVED",
           },
+        },
+        select: {
+          requestId: true,
+        },
+      }),
+      prisma.returnableRequest.findMany({
+        where: {
+          returnDateAndTime: {
+            lt: now,
+          },
+          inProgress: true,
+          isReturned: false,
+          isOverdue: true,
           request: {
             status: "APPROVED",
           },
@@ -202,6 +285,7 @@ async function updateInProgressStatus() {
       ...updatedRequests[0].map((request) => request.requestId),
       ...updatedRequests[1].map((request) => request.requestId),
       ...updatedRequests[2].map((request) => request.requestId),
+      ...updatedRequests[3].map((request) => request.requestId),
     ];
 
     wss.clients.forEach((client) => {
@@ -215,7 +299,7 @@ async function updateInProgressStatus() {
       }
     });
   } catch (error) {
-    console.error("Error updating inProgress status:", error);
+    console.error("Error updating inProgress and overdue status:", error);
   }
 }
 

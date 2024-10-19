@@ -40,7 +40,7 @@ const chartConfig = {
   },
   completed: {
     label: "Completed Requests",
-    color: "hsl(var(--chart-5))",
+    color: "hsl(var(--chart-4))",
   },
 } satisfies ChartConfig;
 
@@ -269,7 +269,7 @@ export default function RequestChart({
                 ? "weekly"
                 : "monthly"}{" "}
             trends of requests created versus completed, providing insights into
-            the department's workload and efficiency in handling requests over
+            the department&apos;s workload and efficiency in handling requests over
             time.
           </P>
         </div>

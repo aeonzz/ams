@@ -1,11 +1,11 @@
 import { DepartmentTypeSchema } from "prisma/generated/zod";
 import { z } from "zod";
 
-export const createDepartmentSchema = z.object({
+const baseDepartmentSchema = z.object({
   name: z
     .string()
     .min(1, "name is required")
-    .max(30, "Cannot be more than 15 characters long"),
+    .max(30, "Cannot be more than 30 characters long"),
   description: z.string().optional(),
   acceptsJobs: z.boolean().default(false).optional(),
   managesTransport: z.boolean().default(false).optional(),
@@ -13,14 +13,42 @@ export const createDepartmentSchema = z.object({
   managesSupplyRequest: z.boolean().default(false).optional(),
   managesFacility: z.boolean().default(false).optional(),
   responsibilities: z.string().optional(),
+  maxBorrowDuration: z.number().int().optional(),
+  penaltyBorrowBanDuration: z.number().int().optional(),
+  gracePeriod: z.number().int().optional(),
+  other: z.string().optional(),
   departmentType: DepartmentTypeSchema,
-});
-
-export type CreateDepartmentSchema = z.infer<typeof createDepartmentSchema>;
-
-export const extendedCreateDepartmentSchema = createDepartmentSchema.extend({
   path: z.string(),
 });
+
+export const createDepartmentSchema = baseDepartmentSchema
+  .refine(
+    (data) =>
+      !data.acceptsJobs ||
+      (data.responsibilities && data.responsibilities.length > 0),
+    {
+      path: ["responsibilities"],
+      message: "Responsibilities are required if acceptsJobs is true",
+    }
+  )
+  .refine(
+    (data) =>
+      !data.managesBorrowRequest || data.maxBorrowDuration !== undefined,
+    {
+      path: ["maxBorrowDuration"],
+      message: "Max Borrow Duration is required",
+    }
+  )
+  .refine(
+    (data) =>
+      !data.managesBorrowRequest || data.gracePeriod !== undefined,
+    {
+      path: ["gracePeriod"],
+      message: "Grace Period is required",
+    }
+  );
+
+export type CreateDepartmentSchema = z.infer<typeof createDepartmentSchema>;
 
 export const updateDepartmentSchema = z.object({
   name: z.string().optional(),
@@ -44,3 +72,26 @@ export const deleteDepartmentsSchema = z.object({
 });
 
 export type DeleteDepartmentsSchema = z.infer<typeof deleteDepartmentsSchema>;
+
+export const createDepartmentBorrowingPolicySchema = z.object({
+  maxBorrowDuration: z
+    .number()
+    .int()
+    .min(1, "Maximum borrow duration is required"),
+  penaltyBorrowBanDuration: z.number().int().optional(),
+  gracePeriod: z.number().int().min(1, "Grace period duration is required"),
+  other: z.string().optional(),
+});
+
+export type CreateDepartmentBorrowingPolicySchema = z.infer<
+  typeof createDepartmentBorrowingPolicySchema
+>;
+
+export const createDepartmentBorrowingPolicySchemaWithPath =
+  createDepartmentBorrowingPolicySchema.extend({
+    path: z.string(),
+  });
+
+export type CreateDepartmentBorrowingPolicySchemaWithPath = z.infer<
+  typeof createDepartmentBorrowingPolicySchemaWithPath
+>;
