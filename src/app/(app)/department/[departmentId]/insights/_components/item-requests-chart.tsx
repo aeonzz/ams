@@ -112,18 +112,16 @@ export function ItemRequestsChart({
   return (
     <Card className={cn("bg-transparent", className)}>
       <CardHeader>
-        <CardTitle>
-          Item Requests by Category (Including Zero Requests)
-        </CardTitle>
+        <CardTitle>Borrow Requests by Item</CardTitle>
         <CardDescription>
           {dateRange
             ? `${dateRange.from.toLocaleDateString()} - ${dateRange.to.toLocaleDateString()}`
-            : "All time"}
+            : "Overall borrow requests by item"}
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig} className="max-h-60 w-full">
-          <ResponsiveContainer width="100%" height={350}>
+        <ChartContainer config={chartConfig} className="h-60 w-full">
+          <ResponsiveContainer width="100%">
             <BarChart data={chartData} accessibilityLayer>
               <CartesianGrid vertical={false} />
               <XAxis
@@ -135,27 +133,26 @@ export function ItemRequestsChart({
                   value.length > 10 ? `${value.slice(0, 10)}...` : value
                 }
               />
-              <YAxis tickLine={false} axisLine={false} />
-              <ChartTooltip content={<ChartTooltipContent hideLabel />} />
-              <Bar dataKey="requests" fill="var(--color-requests)" radius={8} maxBarSize={200} />
+              {/* <YAxis tickLine={false} axisLine={false}  /> */}
+              <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+              <Bar dataKey="requests" fill="var(--color-requests)" radius={8} />
             </BarChart>
           </ResponsiveContainer>
         </ChartContainer>
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">
-        <div className="flex gap-2 font-medium leading-none">
+        <div className="flex gap-2 text-center font-medium leading-none">
           {totalRequests > 0 ? (
             <>
               {topCategory.name} has the highest active request share at{" "}
-              {percentageShare}% <TrendingUp className="h-4 w-4" />
+              {percentageShare}% 
             </>
           ) : (
             "No active requests for any items"
           )}
         </div>
-        <div className="leading-none text-muted-foreground">
-          Showing item request counts for {chartData.length} categories
-          (including zero requests)
+        <div className="w-full text-center leading-none text-muted-foreground">
+          Showing item request counts for {chartData.length} items
         </div>
       </CardFooter>
     </Card>

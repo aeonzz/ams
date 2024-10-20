@@ -13,12 +13,25 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon, X } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { CalendarIcon, Check, ChevronsUpDown, X } from "lucide-react";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import { cn, textTransform } from "@/lib/utils";
 import { DateRange } from "react-day-picker";
 import { addDays, format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import DepartmentInsightsSkeleton from "./department-insights-skeleton";
+import { ItemRequestsChart } from "./item-requests-chart";
+import { OverdueItemsChart } from "./overdue-items-chart";
+import { RequestTypeSchema } from "prisma/generated/zod";
+import { P } from "@/components/typography/text";
+import type { RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTypeSchema";
 
 interface DepartmentInsightsScreenProps {
   departmentId: string;
@@ -27,6 +40,10 @@ interface DepartmentInsightsScreenProps {
 export default function DepartmentInsightsScreen({
   departmentId,
 }: DepartmentInsightsScreenProps) {
+  const [requestType, setRequestType] = React.useState<RequestTypeType | "">(
+    ""
+  );
+  const [open, setOpen] = React.useState(false);
   const [date, setDate] = React.useState<DateRange | undefined>({
     from: undefined,
     to: undefined,
@@ -53,10 +70,12 @@ export default function DepartmentInsightsScreen({
     <div className="space-y-3">
       <div className="flex justify-between">
         <div></div>
+
         <div className="flex gap-2">
           {date?.from !== undefined && (
             <Button
               variant="ghost2"
+              size="sm"
               onClick={() => setDate(undefined)}
               className="flex items-center"
             >
@@ -64,11 +83,67 @@ export default function DepartmentInsightsScreen({
               <X className="ml-1 size-4" />
             </Button>
           )}
+          <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="secondary"
+                role="combobox"
+                size="sm"
+                aria-expanded={open}
+                className={cn(
+                  "w-[200px] justify-between",
+                  !requestType && "text-muted-foreground"
+                )}
+              >
+                {requestType ? (
+                  <P>{textTransform(requestType)}</P>
+                ) : (
+                  "Select service..."
+                )}
+                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[200px] p-0">
+              <Command>
+                <CommandInput placeholder="Search service..." />
+                <CommandList>
+                  <CommandEmpty>No service found.</CommandEmpty>
+                  <CommandGroup>
+                    {RequestTypeSchema.options.map((service) => (
+                      <CommandItem
+                        key={service}
+                        value={service}
+                        onSelect={(currentValue) => {
+                          setRequestType(
+                            currentValue === requestType
+                              ? ""
+                              : (currentValue as RequestTypeType)
+                          );
+                          setOpen(false);
+                        }}
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            requestType === service
+                              ? "opacity-100"
+                              : "opacity-0"
+                          )}
+                        />
+                        {textTransform(service)}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
           <Popover>
             <PopoverTrigger asChild>
               <Button
                 id="date"
                 variant="secondary"
+                size="sm"
                 className={cn(
                   "w-[300px] justify-start text-left font-normal",
                   !date && "text-muted-foreground"
@@ -102,17 +177,36 @@ export default function DepartmentInsightsScreen({
           </Popover>
         </div>
       </div>
-      <div className="grid h-fit grid-flow-row grid-cols-3 gap-3">
+      <div className="grid h-fit grid-flow-row grid-cols-3 gap-3 pb-3">
         <DepartmentKPICards
           data={data}
           className="col-span-3"
           dateRange={date}
+          requestType={requestType}
         />
         <RequestStatusOverview data={data} className="h-[400px]" />
         <RequestChart
           data={data}
           className="col-span-2 h-[400px]"
           dateRange={date}
+        />
+        <OverdueItemsChart
+          data={data}
+          className="col-span-2 h-[400px]"
+          dateRange={
+            date?.from && date?.to
+              ? { from: date.from, to: date.to }
+              : undefined
+          }
+        />
+        <ItemRequestsChart
+          data={data}
+          className="h-[400px]"
+          dateRange={
+            date?.from && date?.to
+              ? { from: date.from, to: date.to }
+              : undefined
+          }
         />
         <DepartmentRequestsTable data={data.request} className="col-span-3" />
       </div>

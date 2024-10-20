@@ -6,55 +6,58 @@ import { cn } from "@/lib/utils";
 import { Clock, Users, FileText, CheckCircle } from "lucide-react";
 import type { DepartmentWithRelations } from "prisma/generated/zod";
 import { DateRange } from "react-day-picker";
+import type { RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTypeSchema";
 
 interface DepartmentKPICardsProps {
   data: DepartmentWithRelations;
   className?: string;
   dateRange: DateRange | undefined;
+  requestType: RequestTypeType | "";
 }
 
 export default function DepartmentKPICards({
   data,
   className,
   dateRange,
+  requestType,
 }: DepartmentKPICardsProps) {
   const { request, userDepartments } = data;
 
   const filteredData = React.useMemo(() => {
-    if (!dateRange || !dateRange.from || !dateRange.to) return request;
+    let filtered = request;
 
-    return request.filter((r) => {
-      const createdAt = new Date(r.createdAt);
-      //@ts-ignore
-      return createdAt >= dateRange.from && createdAt <= dateRange.to;
-    });
-  }, [request, dateRange]);
-
-  const filteredCompletedTasks = React.useMemo(() => {
-    if (!dateRange || !dateRange.from || !dateRange.to) {
-      return request.filter((r) => r.status === "COMPLETED");
+    if (dateRange?.from && dateRange?.to) {
+      filtered = filtered.filter((r) => {
+        const createdAt = new Date(r.createdAt);
+        return createdAt >= dateRange.from! && createdAt <= dateRange.to!;
+      });
     }
 
-    return request.filter((r) => {
+    if (requestType) {
+      filtered = filtered.filter((r) => r.type === requestType);
+    }
+
+    return filtered;
+  }, [request, dateRange, requestType]);
+
+  const filteredCompletedTasks = React.useMemo(() => {
+    return filteredData.filter((r) => {
       const completedAt = r.completedAt ? new Date(r.completedAt) : null;
       return (
         completedAt &&
-        //@ts-ignore
-        completedAt >= dateRange.from &&
-        //@ts-ignore
-        completedAt <= dateRange.to &&
-        r.status === "COMPLETED"
+        r.status === "COMPLETED" &&
+        (!dateRange?.from || completedAt >= dateRange.from) &&
+        (!dateRange?.to || completedAt <= dateRange.to)
       );
     });
-  }, [request, dateRange]);
+  }, [filteredData, dateRange]);
 
   const filteredUserDepartments = React.useMemo(() => {
-    if (!dateRange || !dateRange.from || !dateRange.to) return userDepartments;
+    if (!dateRange?.from || !dateRange?.to) return userDepartments;
 
     return userDepartments.filter((ud) => {
       const createdAt = new Date(ud.createdAt);
-      //@ts-ignore
-      return createdAt >= dateRange.from && createdAt <= dateRange.to;
+      return createdAt >= dateRange.from! && createdAt <= dateRange.to!;
     });
   }, [userDepartments, dateRange]);
 
@@ -70,7 +73,7 @@ export default function DepartmentKPICards({
     const createdAt = r.createdAt ? new Date(r.createdAt) : null;
 
     if (!completedAt || !createdAt) {
-      return sum; // Skip if either date is invalid
+      return sum;
     }
 
     const completionTime = completedAt.getTime() - createdAt.getTime();
@@ -79,13 +82,13 @@ export default function DepartmentKPICards({
 
   const averageCompletionTime =
     filteredCompletedTasks.length > 0
-      ? totalCompletionTime / filteredCompletedTasks.length / (1000 * 60 * 60) // Convert to hours
+      ? totalCompletionTime / filteredCompletedTasks.length / (1000 * 60 * 60)
       : 0;
 
-  // Round the average completion time to 2 decimal places
   const roundedAverageCompletionTime = Number(averageCompletionTime.toFixed(2));
 
   const periodText = dateRange ? "in selected period" : "overall";
+  const typeText = requestType ? `for ${requestType} requests` : "";
 
   return (
     <div className={cn("grid gap-3 md:grid-cols-2 lg:grid-cols-4", className)}>
@@ -97,7 +100,7 @@ export default function DepartmentKPICards({
         <CardContent>
           <div className="text-2xl font-bold">{totalRequests}</div>
           <p className="text-xs text-muted-foreground">
-            All submitted requests {periodText}
+            All submitted requests {periodText} {typeText}
           </p>
         </CardContent>
       </Card>
@@ -109,7 +112,7 @@ export default function DepartmentKPICards({
         <CardContent>
           <div className="text-2xl font-bold">{completedTasks}</div>
           <p className="text-xs text-muted-foreground">
-            Successfully completed requests {periodText}
+            Successfully completed requests {periodText} {typeText}
           </p>
         </CardContent>
       </Card>
@@ -125,7 +128,7 @@ export default function DepartmentKPICards({
             {roundedAverageCompletionTime} hours
           </div>
           <p className="text-xs text-muted-foreground">
-            Average time to complete requests {periodText}
+            Average time to complete requests {periodText} {typeText}
           </p>
         </CardContent>
       </Card>
