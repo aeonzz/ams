@@ -94,7 +94,7 @@ export function StatusFilter({
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[200px] p-0">
+      <PopoverContent className="w-[200px] p-0" align="start">
         <Command>
           <CommandInput placeholder={`Search ${title.toLowerCase()}...`} />
           <CommandList>

@@ -39,17 +39,24 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTypeSchema";
 
 interface DepartmentRequestsTableProps {
   data: Request[];
   className?: string;
+  requestType: RequestTypeType | "";
 }
 
 export default function DepartmentRequestsTable({
   data,
   className,
+  requestType,
 }: DepartmentRequestsTableProps) {
   const [statusFilter, setStatusFilter] = React.useState<string[]>([]);
+
+  const filteredData = React.useMemo(() => {
+    return requestType ? data.filter((req) => req.type === requestType) : data;
+  }, [requestType, data]);
 
   const columns: ColumnDef<Request>[] = React.useMemo(
     () => [
@@ -138,7 +145,7 @@ export default function DepartmentRequestsTable({
   );
 
   const table = useReactTable({
-    data,
+    data: filteredData,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -168,7 +175,7 @@ export default function DepartmentRequestsTable({
         <div className="flex space-x-3">
           <H3 className="font-semibold tracking-tight">All Requests</H3>
           <Input
-            placeholder="Filter titles..."
+            placeholder="Search titles..."
             value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
             onChange={(event) =>
               table.getColumn("title")?.setFilterValue(event.target.value)

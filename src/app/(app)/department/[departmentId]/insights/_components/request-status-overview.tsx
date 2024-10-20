@@ -18,7 +18,8 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { DepartmentWithRelations } from "prisma/generated/zod";
-import { cn } from "@/lib/utils";
+import { cn, textTransform } from "@/lib/utils";
+import { RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTypeSchema";
 
 const chartConfig = {
   requests: {
@@ -53,13 +54,21 @@ const chartConfig = {
 interface RequestStatusOverviewProps {
   data: DepartmentWithRelations;
   className?: string;
+  requestType: RequestTypeType | "";
 }
 
 export default function RequestStatusOverview({
   data,
   className,
+  requestType,
 }: RequestStatusOverviewProps) {
   const { request, name } = data;
+
+  const filteredRequests = React.useMemo(() => {
+    return requestType
+      ? request.filter((req) => req.type === requestType)
+      : request;
+  }, [request, requestType]);
 
   const requestStatusCounts = React.useMemo(() => {
     const counts = {
@@ -70,11 +79,11 @@ export default function RequestStatusOverview({
       rejected: 0,
       cancelled: 0,
     };
-    request.forEach((request) => {
+    filteredRequests.forEach((request) => {
       counts[request.status.toLowerCase() as keyof typeof counts]++;
     });
     return counts;
-  }, [data]);
+  }, [filteredRequests]);
 
   const chartData = React.useMemo(
     () =>
@@ -98,7 +107,9 @@ export default function RequestStatusOverview({
     <Card className={cn("flex flex-col bg-transparent", className)}>
       <CardHeader className="items-center pb-0">
         <CardTitle>Request Status Overview</CardTitle>
-        <CardDescription>{name} - Overall</CardDescription>
+        <CardDescription>
+          {name} - {requestType ? textTransform(requestType) : "Overall"}
+        </CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
         <ChartContainer
@@ -153,10 +164,14 @@ export default function RequestStatusOverview({
       <CardFooter className="flex-col gap-2 text-sm">
         <div className="flex items-center gap-2 font-medium leading-none">
           Completion Rate:{" "}
-          {((completedRequests / totalRequests) * 100).toFixed(1)}%
+          {totalRequests > 0
+            ? ((completedRequests / totalRequests) * 100).toFixed(1)
+            : "0"}
+          %
         </div>
         <div className="text-center leading-none text-muted-foreground">
           Showing request status breakdown for {name}
+          {requestType && ` - ${textTransform(requestType)} requests`}
         </div>
       </CardFooter>
     </Card>

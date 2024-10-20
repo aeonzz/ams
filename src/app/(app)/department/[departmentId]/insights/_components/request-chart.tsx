@@ -18,7 +18,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { cn } from "@/lib/utils";
+import { cn, textTransform } from "@/lib/utils";
 import type {
   DepartmentWithRelations,
   RequestWithRelations,
@@ -32,6 +32,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DateRange } from "react-day-picker";
+import { RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTypeSchema";
 
 const chartConfig = {
   created: {
@@ -48,11 +49,16 @@ type TimeRange = "day" | "week" | "month";
 
 const processChartData = (
   requests: RequestWithRelations[],
-  range: TimeRange
+  range: TimeRange,
+  requestType: RequestTypeType | ""
 ) => {
   const data: { [key: string]: { created: number; completed: number } } = {};
 
-  requests.forEach((request) => {
+  const filteredRequests = requestType
+    ? requests.filter((request) => request.type === requestType)
+    : requests;
+
+  filteredRequests.forEach((request) => {
     let key: string;
     const createdDate = new Date(request.createdAt);
     const completedDate = request.completedAt
@@ -109,18 +115,20 @@ interface RequestChartProps {
   data: DepartmentWithRelations;
   className?: string;
   dateRange: DateRange | undefined;
+  requestType: RequestTypeType | "";
 }
 
 export default function RequestChart({
   data,
   className,
   dateRange,
+  requestType,
 }: RequestChartProps) {
   const [timeRange, setTimeRange] = useState<TimeRange>("day");
 
   const chartData = useMemo(
-    () => processChartData(data.request, timeRange),
-    [data.request, timeRange]
+    () => processChartData(data.request, timeRange, requestType),
+    [data.request, timeRange, requestType]
   );
 
   const latestPeriod = chartData[chartData.length - 1];
@@ -166,6 +174,7 @@ export default function RequestChart({
                 ? "Weekly"
                 : "Monthly"}{" "}
             requests created and completed
+            {requestType && ` for ${textTransform(requestType)} requests`}
           </CardDescription>
         </div>
         <Select
@@ -250,27 +259,19 @@ export default function RequestChart({
         </ChartContainer>
       </CardContent>
       <CardFooter>
-        <div className="flex w-full flex-col text-sm">
+        <div className="flex w-full flex-col text-sm gap-2">
           <P className="font-medium leading-none">Requests</P>
-          {/* <div className="flex items-center gap-2 font-medium leading-none">
-            Completed requests {completedTrend > 0 ? "up" : "down"} by{" "}
-            {Math.abs(completedTrend).toFixed(1)}% this {timeRange}
-            {completedTrend > 0 ? (
-              <TrendingUp className="h-4 w-4 text-green-500" />
-            ) : (
-              <TrendingDown className="h-4 w-4 text-red-500" />
-            )}
-          </div> */}
-          <P className="text-muted-foreground">
+          <P className="leading-none text-muted-foreground">
             This chart tracks the{" "}
             {timeRange === "day"
               ? "daily"
               : timeRange === "week"
                 ? "weekly"
                 : "monthly"}{" "}
-            trends of requests created versus completed, providing insights into
-            the department&apos;s workload and efficiency in handling requests over
-            time.
+            trends of requests created versus completed
+            {requestType && ` for ${textTransform(requestType)} requests`},
+            providing insights into the department&apos;s workload and
+            efficiency in handling requests over time.
           </P>
         </div>
       </CardFooter>

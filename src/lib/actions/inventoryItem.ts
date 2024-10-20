@@ -206,6 +206,7 @@ export const returnableResourceActions = authedProcedure
                   request: {
                     update: {
                       status: "COMPLETED",
+                      completedAt: new Date(),
                     },
                   },
                 }

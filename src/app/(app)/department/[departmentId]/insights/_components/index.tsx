@@ -70,13 +70,15 @@ export default function DepartmentInsightsScreen({
     <div className="space-y-3">
       <div className="flex justify-between">
         <div></div>
-
         <div className="flex gap-2">
-          {date?.from !== undefined && (
+          {(date?.from !== undefined || requestType !== "") && (
             <Button
               variant="ghost2"
               size="sm"
-              onClick={() => setDate(undefined)}
+              onClick={() => {
+                setDate(undefined);
+                setRequestType("");
+              }}
               className="flex items-center"
             >
               Clear
@@ -109,30 +111,39 @@ export default function DepartmentInsightsScreen({
                 <CommandList>
                   <CommandEmpty>No service found.</CommandEmpty>
                   <CommandGroup>
-                    {RequestTypeSchema.options.map((service) => (
-                      <CommandItem
-                        key={service}
-                        value={service}
-                        onSelect={(currentValue) => {
-                          setRequestType(
-                            currentValue === requestType
-                              ? ""
-                              : (currentValue as RequestTypeType)
-                          );
-                          setOpen(false);
-                        }}
-                      >
-                        <Check
-                          className={cn(
-                            "mr-2 h-4 w-4",
-                            requestType === service
-                              ? "opacity-100"
-                              : "opacity-0"
-                          )}
-                        />
-                        {textTransform(service)}
-                      </CommandItem>
-                    ))}
+                    {RequestTypeSchema.options
+                      .filter(
+                        (service) =>
+                          (service !== "JOB" || data.acceptsJobs) &&
+                          (service !== "TRANSPORT" || data.managesTransport) &&
+                          (service !== "RESOURCE" ||
+                            data.managesBorrowRequest) &&
+                          (service !== "VENUE" || data.managesFacility)
+                      )
+                      .map((service) => (
+                        <CommandItem
+                          key={service}
+                          value={service}
+                          onSelect={(currentValue) => {
+                            setRequestType(
+                              currentValue === requestType
+                                ? ""
+                                : (currentValue as RequestTypeType)
+                            );
+                            setOpen(false);
+                          }}
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              requestType === service
+                                ? "opacity-100"
+                                : "opacity-0"
+                            )}
+                          />
+                          {textTransform(service)}
+                        </CommandItem>
+                      ))}
                   </CommandGroup>
                 </CommandList>
               </Command>
@@ -184,31 +195,44 @@ export default function DepartmentInsightsScreen({
           dateRange={date}
           requestType={requestType}
         />
-        <RequestStatusOverview data={data} className="h-[400px]" />
+        <RequestStatusOverview
+          data={data}
+          requestType={requestType}
+          className="h-[400px]"
+        />
         <RequestChart
           data={data}
           className="col-span-2 h-[400px]"
+          requestType={requestType}
           dateRange={date}
         />
-        <OverdueItemsChart
-          data={data}
-          className="col-span-2 h-[400px]"
-          dateRange={
-            date?.from && date?.to
-              ? { from: date.from, to: date.to }
-              : undefined
-          }
+        {requestType === "RESOURCE" && (
+          <>
+            <OverdueItemsChart
+              data={data}
+              className="col-span-2 h-[400px]"
+              dateRange={
+                date?.from && date?.to
+                  ? { from: date.from, to: date.to }
+                  : undefined
+              }
+            />
+            <ItemRequestsChart
+              data={data}
+              className="h-[400px]"
+              dateRange={
+                date?.from && date?.to
+                  ? { from: date.from, to: date.to }
+                  : undefined
+              }
+            />
+          </>
+        )}
+        <DepartmentRequestsTable
+          data={data.request}
+          requestType={requestType}
+          className="col-span-3"
         />
-        <ItemRequestsChart
-          data={data}
-          className="h-[400px]"
-          dateRange={
-            date?.from && date?.to
-              ? { from: date.from, to: date.to }
-              : undefined
-          }
-        />
-        <DepartmentRequestsTable data={data.request} className="col-span-3" />
       </div>
     </div>
   );

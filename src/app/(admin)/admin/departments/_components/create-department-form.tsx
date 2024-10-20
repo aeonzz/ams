@@ -39,6 +39,7 @@ import {
 } from "@/components/ui/command";
 import { DepartmentTypeSchema } from "prisma/generated/zod";
 import { cn, textTransform } from "@/lib/utils";
+import { Card } from "@/components/ui/card";
 
 interface CreateDepartmentFormProps {
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -275,7 +276,7 @@ export default function CreateDepartmentForm({
               )}
             />
             {form.watch("managesBorrowRequest") && (
-              <>
+              <Card className="bg-secondary p-3 space-y-3">
                 <FormField
                   control={form.control}
                   name="maxBorrowDuration"
@@ -411,7 +412,7 @@ export default function CreateDepartmentForm({
                     </FormItem>
                   )}
                 />
-              </>
+              </Card>
             )}
             <FormField
               control={form.control}
