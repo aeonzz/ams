@@ -8,7 +8,7 @@ import { authedProcedure, getErrorMessage } from "./utils";
 import {
   createDepartmentSchema,
   deleteDepartmentsSchema,
-  extendedUpdateDepartmentSchema,
+  updateDepartmentSchema,
 } from "../schema/department";
 import { revalidatePath } from "next/cache";
 import { generateId } from "lucia";
@@ -56,6 +56,7 @@ export async function getDepartments(input: GetDepartmentsSchema) {
               role: true,
             },
           },
+          departmentBorrowingPolicy: true,
         },
       }),
       db.department.count({ where }),
@@ -94,8 +95,6 @@ export const createDepartment = authedProcedure
       ...rest
     } = input;
 
-    console.log(rest);
-
     try {
       const departmentId = generateId(15);
 
@@ -131,22 +130,55 @@ export const createDepartment = authedProcedure
 
 export const updateDepartment = authedProcedure
   .createServerAction()
-  .input(extendedUpdateDepartmentSchema)
-  .handler(async ({ ctx, input }) => {
-    const { path, id, ...rest } = input;
+  .input(updateDepartmentSchema)
+  .handler(async ({ input }) => {
+    const {
+      departmentId,
+      path,
+      maxBorrowDuration,
+      gracePeriod,
+      penaltyBorrowBanDuration,
+      other,
+      managesBorrowRequest,
+      ...rest
+    } = input;
+
     try {
+      const departmentBorrowingPolicyData = managesBorrowRequest
+        ? {
+            upsert: {
+              create: {
+                id: generateId(15),
+                maxBorrowDuration: maxBorrowDuration!,
+                penaltyBorrowBanDuration: penaltyBorrowBanDuration,
+                gracePeriod: gracePeriod!,
+                other,
+              },
+              update: {
+                maxBorrowDuration: maxBorrowDuration!,
+                penaltyBorrowBanDuration: penaltyBorrowBanDuration,
+                gracePeriod: gracePeriod!,
+                other,
+              },
+            },
+          }
+        : undefined;
+
       await db.department.update({
-        where: {
-          id: id,
-        },
+        where: { id: departmentId },
         data: {
+          ...(departmentBorrowingPolicyData && {
+            departmentBorrowingPolicy: departmentBorrowingPolicyData,
+          }),
+          managesBorrowRequest: managesBorrowRequest,
           ...rest,
         },
       });
 
-      return revalidatePath(path);
+      return revalidatePath(path || "");
     } catch (error) {
-      getErrorMessage(error);
+      console.log(error);
+      return getErrorMessage(error);
     }
   });
 

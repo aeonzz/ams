@@ -46,30 +46,24 @@ const management: {
     condition: true,
   },
   {
-    title: "Request Escalations",
-    href: "/management/request-escalations",
+    title: "Manage Borrowable Items",
+    href: "resources/borrowable-items",
     description:
-      "Manage escalations for urgent requests within the department. Prioritize critical tasks and ensure they are addressed promptly.",
+      "Manage the list of items available for borrowing within your department. Add, update, or remove items to ensure accurate inventory for borrowing requests.",
+    condition: true,
   },
   {
     title: "Facilities Management",
-    href: "facilities",
+    href: "resources/facilities",
     description:
       "Manage department facilities, ensuring that resources are available and properly maintained for effective operations.",
     condition: true,
   },
   {
     title: "Transport Services",
-    href: "transport?page=1&per_page=10&sort=createdAt.desc",
+    href: "resources/transport?page=1&per_page=10&sort=createdAt.desc",
     description:
       "Coordinate transport services for the department, managing vehicle assignments, schedules, and user requests.",
-    condition: true,
-  },
-  {
-    title: "Managing Borrow Requests",
-    href: "borrow-requests?page=1&per_page=10&sort=createdAt.desc",
-    description:
-      "Manage all borrow requests submitted to the department. Ensure items are available, and track returns and overdue requests.",
     condition: true,
   },
 ];
@@ -207,8 +201,8 @@ export default function OverviewNavigationMenu({
           </NavigationMenuContent>
         </NavigationMenuItem>
         <NavigationMenuItem>
-          <NavigationMenuTrigger> 
-            <P>Overview</P>
+          <NavigationMenuTrigger>
+            <P>Insights</P>
           </NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">

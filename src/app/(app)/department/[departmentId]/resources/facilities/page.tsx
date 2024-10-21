@@ -1,6 +1,6 @@
 import ContentLayout from "@/components/layouts/content-layout";
 import ManageVenueScreen from "./_components";
-import DepartmentLayout from "../_components/department-layout";
+import DepartmentLayout from "../../_components/department-layout";
 
 export interface DepartmentVenuesPage {
   params: {

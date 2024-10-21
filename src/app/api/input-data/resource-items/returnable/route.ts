@@ -10,7 +10,11 @@ export async function GET(req: Request) {
     const inventoryItems = await db.inventoryItem.findMany({
       include: {
         inventorySubItems: true,
-        department: true,
+        department: {
+          include: {
+            departmentBorrowingPolicy: true,
+          },
+        },
       },
     });
 

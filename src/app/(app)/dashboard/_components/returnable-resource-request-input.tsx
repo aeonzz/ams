@@ -49,6 +49,7 @@ import { isOverlapping } from "@/lib/utils";
 import { InventoryItemWithRelations } from "prisma/generated/zod";
 import ReturnableResourceRequestSkeleton from "./returnable-resource-request-input-skeleton";
 import { socket } from "@/app/socket";
+import DepartmentBorrowingPolicyCard from "./department-borrowing-policy-card";
 
 const purpose = [
   {
@@ -210,7 +211,7 @@ export default function ReturnableResourceRequestInput({
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="scroll-bar flex max-h-[60vh] gap-6 overflow-y-auto px-4 py-1">
-            <div className="flex w-full flex-col space-y-2">
+            <div className="flex flex-1 scroll-m-10 scroll-p-10 flex-col space-y-2">
               <ItemsField
                 form={form}
                 name="itemId"
@@ -264,7 +265,7 @@ export default function ReturnableResourceRequestInput({
                         rows={1}
                         maxRows={5}
                         placeholder="Purpose..."
-                        className="min-h-[100px] flex-grow resize-none placeholder:text-sm text-sm"
+                        className="min-h-[100px] flex-grow resize-none text-sm placeholder:text-sm"
                         disabled={isPending}
                         {...field}
                       />
@@ -283,7 +284,7 @@ export default function ReturnableResourceRequestInput({
                         rows={1}
                         maxRows={5}
                         placeholder="Other info..."
-                        className="min-h-[120px] flex-grow resize-none placeholder:text-sm text-sm"
+                        className="min-h-[120px] flex-grow resize-none text-sm placeholder:text-sm"
                         disabled={isPending}
                         {...field}
                       />
@@ -293,6 +294,17 @@ export default function ReturnableResourceRequestInput({
                 )}
               />
             </div>
+            {itemId && selectedDepartmentId && (
+              <div className="flex-1">
+                <DepartmentBorrowingPolicyCard
+                  data={
+                    data?.find(
+                      (item) => item.departmentId === selectedDepartmentId
+                    )?.department
+                  }
+                />
+              </div>
+            )}
           </div>
           <Separator className="my-4" />
           <DialogFooter>

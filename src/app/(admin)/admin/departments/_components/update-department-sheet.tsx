@@ -25,7 +25,10 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 
-import { Department, DepartmentTypeSchema } from "prisma/generated/zod";
+import {
+  DepartmentTypeSchema,
+  type DepartmentWithRelations,
+} from "prisma/generated/zod";
 import { Input } from "@/components/ui/input";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
 import { usePathname } from "next/navigation";
@@ -53,10 +56,11 @@ import { Check, ChevronsUpDown } from "lucide-react";
 import { cn, textTransform } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { useQueryClient } from "@tanstack/react-query";
+import { Card } from "@/components/ui/card";
 
 interface UpdateDepartmentSheetProps
   extends React.ComponentPropsWithRef<typeof Sheet> {
-  department: Department;
+  department: DepartmentWithRelations;
   queryKey?: string[];
   removeField?: boolean;
 }
@@ -79,6 +83,17 @@ export function UpdateDepartmentSheet({
       description: department.description ?? "",
       responsibilities: department.responsibilities ?? "",
       managesTransport: department.managesTransport,
+      managesBorrowRequest: department.managesBorrowRequest,
+      managesFacility: department.managesFacility,
+      managesSupplyRequest: department.managesSupplyRequest,
+      path: pathname,
+      departmentId: department.id,
+      gracePeriod: department.departmentBorrowingPolicy?.gracePeriod,
+      maxBorrowDuration:
+        department.departmentBorrowingPolicy?.maxBorrowDuration,
+      penaltyBorrowBanDuration:
+        department.departmentBorrowingPolicy?.penaltyBorrowBanDuration || 0,
+      other: department.departmentBorrowingPolicy?.other || "",
     },
   });
 
@@ -94,14 +109,23 @@ export function UpdateDepartmentSheet({
       description: department.description ?? "",
       responsibilities: department.responsibilities ?? "",
       managesTransport: department.managesTransport,
+      managesBorrowRequest: department.managesBorrowRequest,
+      managesFacility: department.managesFacility,
+      managesSupplyRequest: department.managesSupplyRequest,
+      path: pathname,
+      departmentId: department.id,
+      gracePeriod: department.departmentBorrowingPolicy?.gracePeriod,
+      maxBorrowDuration:
+        department.departmentBorrowingPolicy?.maxBorrowDuration,
+      penaltyBorrowBanDuration:
+        department.departmentBorrowingPolicy?.penaltyBorrowBanDuration || 0,
+      other: department.departmentBorrowingPolicy?.other || "",
     });
-  }, [department, form]);
+  }, [department, form, props.open]);
 
   function onSubmit(values: UpdateDepartmentSchema) {
-    const data = {
+    const data: UpdateDepartmentSchema = {
       ...values,
-      path: pathname,
-      id: department.id,
     };
 
     toast.promise(mutateAsync(data), {
@@ -119,6 +143,8 @@ export function UpdateDepartmentSheet({
       },
     });
   }
+
+  console.log(form.formState.errors);
 
   return (
     <Sheet {...props}>
@@ -177,7 +203,7 @@ export function UpdateDepartmentSheet({
                   </FormItem>
                 )}
               />
-              <FormField
+              {/* <FormField
                 control={form.control}
                 name="responsibilities"
                 render={({ field }) => (
@@ -196,7 +222,7 @@ export function UpdateDepartmentSheet({
                     <FormMessage />
                   </FormItem>
                 )}
-              />
+              /> */}
               <FormField
                 control={form.control}
                 name="departmentType"
@@ -294,6 +320,223 @@ export function UpdateDepartmentSheet({
                       <FormDescription className="text-xs">
                         Indicates whether this department offers or manages
                         transport services.
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="managesBorrowRequest"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-sm">
+                        Borrow Request Management
+                      </FormLabel>
+                      <FormDescription className="text-xs">
+                        Indicates whether this department manages or handles
+                        borrow requests.
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              {form.watch("managesBorrowRequest") && (
+                <Card className="space-y-3 bg-transparent p-3">
+                  <FormField
+                    control={form.control}
+                    name="maxBorrowDuration"
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormLabel>Max Borrow Duration (Hours)</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            placeholder="Borrow Duration"
+                            autoComplete="off"
+                            {...field}
+                            min={0}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              if (
+                                value === "" ||
+                                (parseInt(value, 10) >= 0 &&
+                                  parseInt(value, 10) <= 99)
+                              ) {
+                                field.onChange(parseInt(e.target.value, 10));
+                              }
+                            }}
+                            onWheel={(e) => e.currentTarget.blur()}
+                            onKeyDown={(e) => {
+                              if (
+                                e.key === "ArrowUp" ||
+                                e.key === "ArrowDown"
+                              ) {
+                                e.preventDefault();
+                              }
+                            }}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="gracePeriod"
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormLabel>Grace Period (Hours)</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            placeholder="Period"
+                            autoComplete="off"
+                            {...field}
+                            min={0}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              if (
+                                value === "" ||
+                                (parseInt(value, 10) >= 0 &&
+                                  parseInt(value, 10) <= 99)
+                              ) {
+                                field.onChange(parseInt(e.target.value, 10));
+                              }
+                            }}
+                            onWheel={(e) => e.currentTarget.blur()}
+                            onKeyDown={(e) => {
+                              if (
+                                e.key === "ArrowUp" ||
+                                e.key === "ArrowDown"
+                              ) {
+                                e.preventDefault();
+                              }
+                            }}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="penaltyBorrowBanDuration"
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormLabel>
+                          Penalty Borrow Ban Duration (Hours){" "}
+                          <span className="text-xs text-muted-foreground">
+                            (Optional)
+                          </span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            placeholder="Ban Duration"
+                            autoComplete="off"
+                            {...field}
+                            min={0}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              if (
+                                value === "" ||
+                                (parseInt(value, 10) >= 0 &&
+                                  parseInt(value, 10) <= 99)
+                              ) {
+                                field.onChange(parseInt(e.target.value, 10));
+                              }
+                            }}
+                            onWheel={(e) => e.currentTarget.blur()}
+                            onKeyDown={(e) => {
+                              if (
+                                e.key === "ArrowUp" ||
+                                e.key === "ArrowDown"
+                              ) {
+                                e.preventDefault();
+                              }
+                            }}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="other"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Other Info.{" "}
+                          <span className="text-xs text-muted-foreground">
+                            (Optional)
+                          </span>
+                        </FormLabel>
+                        <FormControl>
+                          <Textarea
+                            rows={1}
+                            maxRows={10}
+                            placeholder="Info..."
+                            className="min-h-[100px] flex-grow resize-none bg-transparent text-sm"
+                            disabled={isPending}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </Card>
+              )}
+              <FormField
+                control={form.control}
+                name="managesSupplyRequest"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-sm">
+                        Supply Request Management
+                      </FormLabel>
+                      <FormDescription className="text-xs">
+                        Indicates whether this department manages or handles
+                        supply requests.
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="managesFacility"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-sm">
+                        Facility Management
+                      </FormLabel>
+                      <FormDescription className="text-xs">
+                        Indicates whether this department manages or handles
+                        facilities.
                       </FormDescription>
                     </div>
                     <FormControl>

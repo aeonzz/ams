@@ -40,8 +40,7 @@ export const createDepartmentSchema = baseDepartmentSchema
     }
   )
   .refine(
-    (data) =>
-      !data.managesBorrowRequest || data.gracePeriod !== undefined,
+    (data) => !data.managesBorrowRequest || data.gracePeriod !== undefined,
     {
       path: ["gracePeriod"],
       message: "Grace Period is required",
@@ -50,21 +49,55 @@ export const createDepartmentSchema = baseDepartmentSchema
 
 export type CreateDepartmentSchema = z.infer<typeof createDepartmentSchema>;
 
-export const updateDepartmentSchema = z.object({
-  name: z.string().optional(),
-  description: z.string().optional(),
-  acceptsJobs: z.boolean().optional(),
-  managesTransport: z.boolean().optional(),
-  responsibilities: z.string().optional(),
-  departmentType: DepartmentTypeSchema.optional(),
-});
+const baseUpdateDepartmentSchema = baseDepartmentSchema.partial();
+
+export const updateDepartmentSchema = baseUpdateDepartmentSchema
+  .extend({
+    departmentId: z.string().min(1, "Department id is required"),
+  })
+  .refine(
+    (data) =>
+      !data.acceptsJobs ||
+      (data.responsibilities && data.responsibilities.length > 0),
+    {
+      path: ["responsibilities"],
+      message: "Responsibilities are required if acceptsJobs is true",
+    }
+  )
+  .refine(
+    (data) =>
+      !data.managesBorrowRequest || data.maxBorrowDuration !== undefined,
+    {
+      path: ["maxBorrowDuration"],
+      message:
+        "Max Borrow Duration is required if managesBorrowRequest is true",
+    }
+  )
+  .refine(
+    (data) => !data.managesBorrowRequest || data.gracePeriod !== undefined,
+    {
+      path: ["gracePeriod"],
+      message: "Grace Period is required if managesBorrowRequest is true",
+    }
+  );
 
 export type UpdateDepartmentSchema = z.infer<typeof updateDepartmentSchema>;
 
-export const extendedUpdateDepartmentSchema = updateDepartmentSchema.extend({
-  path: z.string(),
-  id: z.string().optional(),
-});
+// export const updateDepartmentSchema = z.object({
+//   name: z.string().optional(),
+//   description: z.string().optional(),
+//   acceptsJobs: z.boolean().optional(),
+//   managesTransport: z.boolean().optional(),
+//   responsibilities: z.string().optional(),
+//   departmentType: DepartmentTypeSchema.optional(),
+// });
+
+// export type UpdateDepartmentSchema = z.infer<typeof updateDepartmentSchema>;
+
+// export const extendedUpdateDepartmentSchema = updateDepartmentSchema.extend({
+//   path: z.string(),
+//   id: z.string().optional(),
+// });
 
 export const deleteDepartmentsSchema = z.object({
   ids: z.string().array(),

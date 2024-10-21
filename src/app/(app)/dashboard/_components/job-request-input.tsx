@@ -306,8 +306,8 @@ export default function JobRequestInput({
                 />
               </div>
               <div className="rounded-md border p-3">
-                <GenerateDescription form={form} />
-                {/* <FormField
+                {/* <GenerateDescription form={form} /> */}
+                <FormField
                   control={form.control}
                   name="description"
                   render={({ field }) => (
@@ -326,7 +326,7 @@ export default function JobRequestInput({
                       <FormMessage />
                     </FormItem>
                   )}
-                /> */}
+                />
                 <FormField
                   control={form.control}
                   name="images"

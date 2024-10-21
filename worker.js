@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import { CronJob } from "cron";
 import WebSocket, { WebSocketServer } from "ws";
 import crypto from "crypto";
+import { addHours } from "date-fns";
 
 const prisma = new PrismaClient();
 const wss = new WebSocketServer({ port: 8080 });
@@ -136,30 +137,60 @@ async function updateInProgressStatus() {
           },
         });
 
-      const overdueReturnableRequests =
+      const returnableRequests = await prisma.returnableRequest.findMany({
+        where: {
+          returnDateAndTime: {
+            lt: now,
+          },
+          isReturned: false,
+          inProgress: true,
+          isOverdue: false,
+          request: {
+            status: "APPROVED",
+          },
+        },
+        include: {
+          request: {
+            include: {
+              department: {
+                include: {
+                  departmentBorrowingPolicy: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      const overdueRequestIds = returnableRequests
+        .filter((request) => {
+          const {
+            returnDateAndTime,
+            request: {
+              department: { departmentBorrowingPolicy },
+            },
+          } = request;
+          const gracePeriodEnd = addHours(
+            returnDateAndTime,
+            departmentBorrowingPolicy.gracePeriod
+          );
+          return now > gracePeriodEnd;
+        })
+        .map((request) => request.id);
+
+      if (overdueRequestIds.length > 0) {
         await prisma.returnableRequest.updateMany({
           where: {
-            returnDateAndTime: {
-              lt: now,
-            },
-            isReturned: false,
-            inProgress: true,
-            isOverdue: false,
-            request: {
-              status: "APPROVED",
-            },
+            id: { in: overdueRequestIds },
           },
           data: {
             isOverdue: true,
           },
         });
 
-      if (overdueReturnableRequests.count > 0) {
         const updatedRequests = await prisma.returnableRequest.findMany({
           where: {
-            isOverdue: true,
-            isReturned: false,
-            inProgress: true,
+            id: { in: overdueRequestIds },
           },
           include: {
             request: {
@@ -189,7 +220,7 @@ async function updateInProgressStatus() {
               data: {
                 id: generateId(15),
                 userId: updatedRequest.request.reviewedBy,
-                recepientId: updatedRequest.request.departmentId, 
+                recepientId: updatedRequest.request.departmentId,
                 resourceId: `/request/${updatedRequest.requestId}`,
                 title: `Overdue Request: ${updatedRequest.request.title}`,
                 resourceType: "REQUEST",
@@ -205,7 +236,7 @@ async function updateInProgressStatus() {
         transportRequests: updatedTransportRequests,
         venueRequests: updatedVenueRequests,
         returnableRequests: updatedReturnableRequests,
-        overdueReturnableRequests: overdueReturnableRequests,
+        overdueReturnableRequests: overdueRequestIds.length,
       };
     });
 

@@ -32,7 +32,15 @@ import {
 import { createInventory } from "@/lib/actions/inventory";
 import CreateInventoryForm from "./create-inventory-form";
 
-export default function CreateInventoryDialog() {
+interface CreateInventoryDialogProps {
+  queryKey?: string[];
+  departmentId?: string;
+}
+
+export default function CreateInventoryDialog({
+  queryKey,
+  departmentId,
+}: CreateInventoryDialogProps) {
   const dialogManager = useDialogManager();
   const [alertOpen, setAlertOpen] = React.useState(false);
 
@@ -42,8 +50,8 @@ export default function CreateInventoryDialog() {
       name: "",
       description: "",
       imageUrl: undefined,
-      departmentId: undefined,
       inventoryCount: 0,
+      departmentId: departmentId ? departmentId : undefined,
     },
   });
 
@@ -116,6 +124,7 @@ export default function CreateInventoryDialog() {
           </DialogDescription>
         </DialogHeader>
         <CreateInventoryForm
+          queryKey={queryKey}
           mutateAsync={mutateAsync}
           isPending={isPending}
           setAlertOpen={setAlertOpen}

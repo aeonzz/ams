@@ -2,7 +2,12 @@
 
 import React from "react";
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,6 +30,7 @@ import {
 } from "@/lib/schema/resource/returnable-resource";
 import ReturnableResourceRequestInput from "@/app/(app)/dashboard/_components/returnable-resource-request-input";
 import { createReturnableResourceRequest } from "@/lib/actions/resource";
+import { cn } from "@/lib/utils";
 
 export default function ReturnableResourceDialog() {
   const dialogManager = useDialogManager();
@@ -42,6 +48,7 @@ export default function ReturnableResourceDialog() {
     },
   });
 
+  const itemid = form.watch("itemId");
   const { dirtyFields } = useFormState({ control: form.control });
   const isFieldsDirty = Object.keys(dirtyFields).length > 0;
 
@@ -74,6 +81,7 @@ export default function ReturnableResourceDialog() {
             setAlertOpen(true);
           }
         }}
+        className={cn(itemid ? "max-w-4xl" : "")}
         isLoading={isPending}
       >
         <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
