@@ -84,7 +84,6 @@ export const inventorySubItemSearchParamsSchema = z.object({
   page: z.coerce.number().default(1),
   per_page: z.coerce.number().default(10),
   sort: z.string().optional(),
-  id: z.string().optional(),
   subName: z.string().optional(),
   from: z.string().optional(),
   to: z.string().optional(),

@@ -121,7 +121,9 @@ export default function SubItemsTable({
             value={statusFilter || "all"}
             onValueChange={(value) => {
               setStatusFilter(value === "all" ? null : value);
-              table.getColumn("status")?.setFilterValue(value === "all" ? "" : value);
+              table
+                .getColumn("status")
+                ?.setFilterValue(value === "all" ? "" : value);
             }}
           >
             <SelectTrigger className="w-[180px]">
@@ -130,7 +132,9 @@ export default function SubItemsTable({
             <SelectContent>
               <SelectItem value="all">All</SelectItem>
               {ItemStatusSchema.options.map((status) => (
-                <SelectItem key={status} value={status}>{textTransform(status)}</SelectItem>
+                <SelectItem key={status} value={status}>
+                  {textTransform(status)}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -138,7 +142,7 @@ export default function SubItemsTable({
         <div className="flex items-center space-x-3">
           <P>Total: {filteredSubItems.length} Items</P>
           <Link
-            href={`/admin/inventory-items?page=1&per_page=10&sort=createdAt.desc&id=${inventoryId}`}
+            href={`/admin/inventory/${inventoryId}?page=1&per_page=10&sort=createdAt.desc`}
             className={cn(buttonVariants({ variant: "link", size: "sm" }))}
           >
             See all
@@ -166,17 +170,26 @@ export default function SubItemsTable({
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id} className="border-r">
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
                   No results.
                 </TableCell>
               </TableRow>

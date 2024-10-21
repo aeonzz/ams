@@ -144,19 +144,6 @@ export type DeleteInventoryItemsSchema = z.infer<
   typeof deleteInventoryItemsSchema
 >;
 
-export const createInventorySubItemSchemaServer = z.object({
-  inventoryId: z.string(),
-});
-
-export const createInventorySubItemSchemaWithPath =
-  createInventorySubItemSchemaServer.extend({
-    path: z.string(),
-  });
-
-export type CreateInventorySubItemtSchemaWithPath = z.infer<
-  typeof createInventorySubItemSchemaWithPath
->;
-
 export const updateInventorySubItemItemSchemaServer = z.object({
   status: ItemStatusSchema.optional(),
 });
@@ -188,4 +175,47 @@ export const deleteInventorySubItemsSchema = z.object({
 
 export type DeleteInventorySubItemsSchema = z.infer<
   typeof deleteInventorySubItemsSchema
+>;
+
+export const createInventorySubItemSchemaServer = z.object({
+  subName: z
+    .string()
+    .min(1, "returnableItemId is required")
+    .max(100, "Name must be 100 characters or less"),
+  serialNumber: z
+    .string()
+    .min(1, "returnableItemId is required")
+    .max(100, "Name must be 100 characters or less"),
+  imageUrl: z.array(
+    z.string({
+      required_error: "Image is required",
+    })
+  ),
+});
+
+export const extendCreateInventoryItemSchema =
+  createInventorySubItemSchemaServer.extend({
+    path: z.string(),
+    inventoryId: z.string(),
+  });
+
+export type ExtendCreateInventoryItemSchema = z.infer<
+  typeof extendCreateInventoryItemSchema
+>;
+
+export const updateInventoryItemSchema =
+  createInventorySubItemSchemaServer.partial();
+
+export type UpdateInventoryItemSchema = z.infer<
+  typeof updateInventoryItemSchema
+>;
+
+export const extendedUpdateInventoryItemSchema =
+  updateInventoryItemSchema.extend({
+    path: z.string(),
+    inventoryId: z.string(),
+  });
+
+export type ExtendedUpdateInventoryItemSchema = z.infer<
+  typeof extendedUpdateInventoryItemSchema
 >;

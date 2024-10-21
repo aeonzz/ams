@@ -17,6 +17,7 @@ export type InventoryItemType = {
 
 export type InventorySubItemType = {
   id: string;
+  inventoryId: string;
   name: string;
   subName: string;
   serialNumber: string | null;

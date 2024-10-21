@@ -23,6 +23,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { cn, getReturnableItemStatusIcon, textTransform } from "@/lib/utils";
+import { format } from "date-fns";
 
 interface DepartmentBorrowableItemsScreen {
   departmentId: string;
@@ -61,6 +62,8 @@ export default function DepartmentBorrowableItemsScreen({
   if (isError && axios.isAxiosError(error) && error.response?.status === 404) {
     return <NotFound />;
   }
+
+  console.log(filteredItems);
 
   return (
     <div className="container flex-col space-y-2 p-0">
@@ -106,7 +109,7 @@ export default function DepartmentBorrowableItemsScreen({
                   return (
                     <Link
                       key={item.id}
-                      href={`/department/${departmentId}/transport/${item.id}`}
+                      href={`/department/${departmentId}/resources/borrowable-items/${item.id}?page=1&per_page=10&sort=createdAt.desc`}
                       className="flex h-auto w-full justify-between gap-3 overflow-hidden rounded-md p-3 transition-colors hover:bg-secondary-accent hover:text-secondary-accent-foreground"
                     >
                       <div className="relative aspect-square min-w-24 rounded-md">
@@ -129,9 +132,14 @@ export default function DepartmentBorrowableItemsScreen({
                               : item.description}
                           </P>
                         </div>
-                        <span className="ml-auto mt-auto text-xs text-muted-foreground">
-                          {item.inventorySubItems.length} items
-                        </span>
+                        <div className="mt-auto flex justify-between">
+                          <p className="text-xs text-muted-foreground">
+                            {format(new Date(item.createdAt), "PP")}
+                          </p>
+                          <span className="text-xs text-muted-foreground">
+                            {item.inventorySubItems.length} items
+                          </span>
+                        </div>
                       </div>
                     </Link>
                   );
@@ -143,19 +151,4 @@ export default function DepartmentBorrowableItemsScreen({
       </div>
     </div>
   );
-}
-
-{
-  /* <Link
-                          href={`/department/${departmentId}/transport/${item.id}`}
-                          className={cn(
-                            buttonVariants({
-                              variant: "ghost2",
-                              size: "icon",
-                            })
-                          )}
-                          prefetch
-                        >
-                          <ExternalLink className="size-5" />
-                        </Link> */
 }

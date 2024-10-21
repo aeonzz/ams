@@ -10,13 +10,21 @@ import { InventorySubItemsTable } from "./inventory-sub-items-table";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
 
 interface InventorySubItemsScreenProps {
-  params: GetInventorySubItemSchema;
+  params: {
+    inventoryId: string;
+  };
+  searchParams: GetInventorySubItemSchema;
 }
 
 export default function InventorySubItemsScreen({
   params,
+  searchParams,
 }: InventorySubItemsScreenProps) {
-  const inventorySubItemsPromise = getInventorySubItems(params);
+  const inventorySubItemsPromise = getInventorySubItems({
+    ...searchParams,
+    inventoryId: params.inventoryId,
+  });
+  
   return (
     <div className="flex h-full w-full">
       <div className="flex-1">

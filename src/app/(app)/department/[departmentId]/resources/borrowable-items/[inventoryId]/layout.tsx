@@ -10,7 +10,7 @@ import { db } from "@/lib/db/index";
 import NotFound from "@/app/not-found";
 import CreateInventoryDialog from "@/app/(admin)/admin/inventory/_components/create-inventory-dialog";
 
-interface Props {
+export interface Props {
   params: {
     departmentId: string;
   };
@@ -41,10 +41,10 @@ export default async function CommandLayout({ children, params }: Props) {
         <CommandSearchDialog>
           <ThemeDialog />
           <SettingsDialog />
-          <CreateInventoryDialog
+          {/* <CreateInventoryDialog
             queryKey={["department-returnable-items", params.departmentId]}
             departmentId={params.departmentId}
-          />
+          /> */}
         </CommandSearchDialog>
         <RequestOption />
         {children}

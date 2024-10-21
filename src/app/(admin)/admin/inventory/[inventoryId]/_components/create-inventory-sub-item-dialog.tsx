@@ -29,10 +29,16 @@ import {
   createInventoryItemSchema,
   type CreateInventoryItemSchema,
 } from "@/lib/db/schema/inventory-item";
-import CreateInventoryItemForm from "@/components/forms/create-inventory-item-form";
+import CreateInventoryItemForm from "./create-inventory-item-form";
 import { createInventorySubItem } from "@/lib/actions/inventoryItem";
 
-export default function CreateInventorySubItemDialog() {
+interface CreateInventorySubItemDialogProps {
+  inventoryId: string;
+}
+
+export default function CreateInventorySubItemDialog({
+  inventoryId,
+}: CreateInventorySubItemDialogProps) {
   const dialogManager = useDialogManager();
   const [alertOpen, setAlertOpen] = React.useState(false);
 
@@ -43,7 +49,9 @@ export default function CreateInventorySubItemDialog() {
   const { dirtyFields } = useFormState({ control: form.control });
   const isFieldsDirty = Object.keys(dirtyFields).length > 0;
 
-  const { mutateAsync, isPending } = useServerActionMutation(createInventorySubItem);
+  const { mutateAsync, isPending } = useServerActionMutation(
+    createInventorySubItem
+  );
 
   const handleOpenChange = (open: boolean) => {
     if (!open) {
@@ -57,7 +65,7 @@ export default function CreateInventorySubItemDialog() {
 
   return (
     <Dialog
-      open={dialogManager.activeDialog === "adminCreateInventoryItemDialog"}
+      open={dialogManager.activeDialog === "adminCreateInventorySubItemDialog"}
       onOpenChange={handleOpenChange}
     >
       <DialogContent
@@ -115,6 +123,7 @@ export default function CreateInventorySubItemDialog() {
           form={form}
           isFieldsDirty={isFieldsDirty}
           dialogManager={dialogManager}
+          inventoryId={inventoryId}
         />
       </DialogContent>
     </Dialog>

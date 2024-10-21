@@ -3,10 +3,7 @@
 import * as React from "react";
 import { type ColumnDef } from "@tanstack/react-table";
 
-import {
-  getReturnableItemStatusIcon,
-  textTransform,
-} from "@/lib/utils";
+import { getReturnableItemStatusIcon, textTransform } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
 
 import { P } from "@/components/typography/text";
@@ -37,7 +34,8 @@ import { updateInventorySubItem } from "@/lib/actions/inventoryItem";
 import ItemStatusSchema, {
   type ItemStatusType,
 } from "prisma/generated/zod/inputTypeSchemas/ItemStatusSchema";
-import { formatDate } from "date-fns";
+import { format, formatDate } from "date-fns";
+import { UpdateInventorySubItemSheet } from "./update-sub-inventory-item-sheet";
 
 export function getInventorySubItemsColumns(): ColumnDef<InventorySubItemType>[] {
   return [
@@ -126,7 +124,7 @@ export function getInventorySubItemsColumns(): ColumnDef<InventorySubItemType>[]
         return (
           <div className="flex space-x-2">
             <P className="truncate font-medium">
-              {row.original.serialNumber ? row.original.serialNumber : "N/A"}
+              {row.original.serialNumber ? row.original.serialNumber : "-"}
             </P>
           </div>
         );
@@ -159,14 +157,26 @@ export function getInventorySubItemsColumns(): ColumnDef<InventorySubItemType>[]
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Date Created" />
       ),
-      cell: ({ cell }) => formatDate(cell.getValue() as Date, "PPP p"),
+      cell: ({ cell }) => {
+        return (
+          <P className="text-muted-foreground">
+            {format(cell.getValue() as Date, "PP")}
+          </P>
+        );
+      },
     },
     {
       accessorKey: "updatedAt",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Last Modified" />
       ),
-      cell: ({ cell }) => formatDate(cell.getValue() as Date, "PPP p"),
+      cell: ({ cell }) => {
+        return (
+          <P className="text-muted-foreground">
+            {format(cell.getValue() as Date, "PP")}
+          </P>
+        );
+      },
       size: 0,
     },
     {
@@ -190,14 +200,14 @@ export function getInventorySubItemsColumns(): ColumnDef<InventorySubItemType>[]
             dialogManager.setActiveDialog(null);
           }
         }, [showUpdateTaskSheet]);
-        console.log(row.original.id);
+        
         return (
           <div className="grid place-items-center">
-            {/* <UpdateEquipmentSheet
-              open={showUpdateTaskSheet}
-              onOpenChange={setShowUpdateTaskSheet}
-              equipment={row.original}
-            /> */}
+          <UpdateInventorySubItemSheet
+            open={showUpdateTaskSheet}
+            onOpenChange={setShowUpdateTaskSheet}
+            inventory={row.original}
+          />
             {/* <DeleteEquipmentsDialog
               open={showDeleteTaskDialog}
               onOpenChange={setShowDeleteTaskDialog}

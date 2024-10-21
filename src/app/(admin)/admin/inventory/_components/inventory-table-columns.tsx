@@ -39,7 +39,7 @@ import {
   CirclePlus,
   RotateCw,
 } from "lucide-react";
-import { formatDate } from "date-fns";
+import { format, formatDate } from "date-fns";
 import DataTableExpand from "@/components/data-table/data-table-expand";
 import { PhotoProvider, PhotoView } from "react-photo-view";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
@@ -174,7 +174,13 @@ export function getInventoryColumns(): ColumnDef<InventoryItemType>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Date Created" />
       ),
-      cell: ({ cell }) => formatDate(cell.getValue() as Date, "PPP p"),
+      cell: ({ cell }) => {
+        return (
+          <P className="text-muted-foreground">
+            {format(cell.getValue() as Date, "PP")}
+          </P>
+        );
+      },
       size: 0,
     },
     {
@@ -182,7 +188,13 @@ export function getInventoryColumns(): ColumnDef<InventoryItemType>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Last Modified" />
       ),
-      cell: ({ cell }) => formatDate(cell.getValue() as Date, "PPP p"),
+      cell: ({ cell }) => {
+        return (
+          <P className="text-muted-foreground">
+            {format(cell.getValue() as Date, "PP")}
+          </P>
+        );
+      },
       size: 0,
     },
     {

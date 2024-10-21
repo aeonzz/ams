@@ -9,16 +9,18 @@ import { generateId } from "lucia";
 import { revalidatePath } from "next/cache";
 import { GetInventorySubItemSchema } from "../schema";
 import {
-  createInventorySubItemSchemaWithPath,
   deleteInventorySubItemsSchema,
+  extendCreateInventoryItemSchema,
   extendedUpdateInventorySubItemItemServerSchema,
   updateInventorySubItemStatusesSchema,
   updateReturnableResourceRequestSchemaWithPath,
 } from "../schema/resource/returnable-resource";
 
-export async function getInventorySubItems(input: GetInventorySubItemSchema) {
+export async function getInventorySubItems(
+  input: GetInventorySubItemSchema & { inventoryId: string }
+) {
   await checkAuth();
-  const { page, per_page, sort, subName, id, from, to } = input;
+  const { page, per_page, sort, subName, from, to, inventoryId } = input;
 
   try {
     const skip = (page - 1) * per_page;
@@ -30,7 +32,7 @@ export async function getInventorySubItems(input: GetInventorySubItemSchema) {
 
     const where: any = {
       isArchived: false,
-      inventoryId: id,
+      inventoryId: inventoryId,
     };
 
     if (subName) {
@@ -65,12 +67,13 @@ export async function getInventorySubItems(input: GetInventorySubItemSchema) {
       data.map(async (item) => {
         return {
           id: item.id,
-          name: item.inventory.name,
+          inventoryId: item.inventoryId,
+          name: item.subName,
           subName: item.subName,
           serialNumber: item.serialNumber,
           description: item.inventory.description,
           status: item.status,
-          imageUrl: item.inventory.imageUrl,
+          imageUrl: item.imageUrl,
           createdAt: item.createdAt,
           updatedAt: item.updatedAt,
         };
@@ -86,16 +89,15 @@ export async function getInventorySubItems(input: GetInventorySubItemSchema) {
 
 export const createInventorySubItem = authedProcedure
   .createServerAction()
-  .input(createInventorySubItemSchemaWithPath)
+  .input(extendCreateInventoryItemSchema)
   .handler(async ({ input, ctx }) => {
-    const { path, ...rest } = input;
+    const { path, imageUrl, ...rest } = input;
     try {
       const itemId = generateId(15);
-      const item = await db.inventorySubItem.create({
+      const result = await db.inventorySubItem.create({
         data: {
-          imageUrl: "test",
           id: itemId,
-          subName: "test",
+          imageUrl: imageUrl[0],
           ...rest,
         },
       });
