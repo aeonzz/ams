@@ -236,7 +236,7 @@ export function InventorySubItemsTableFloatingBar({
                     </AlertDialogTitle>
                     <AlertDialogDescription>
                       This action cannot be undone. This will permanently delete
-                      the selected inventory/s and all related records from our
+                      the selected item/s and all related records from our
                       servers.
                     </AlertDialogDescription>
                   </AlertDialogHeader>

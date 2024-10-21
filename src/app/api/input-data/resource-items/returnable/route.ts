@@ -8,6 +8,9 @@ export async function GET(req: Request) {
   await checkAuth();
   try {
     const inventoryItems = await db.inventoryItem.findMany({
+      where: {
+        isArchived: false,
+      },
       include: {
         inventorySubItems: true,
         department: {

@@ -8,11 +8,12 @@ import CreateVenueDialog from "@/app/(admin)/admin/venues/_components/create-ven
 import { RoleGuard } from "@/components/role-guard";
 import { db } from "@/lib/db/index";
 import NotFound from "@/app/not-found";
-import CreateInventoryDialog from "@/app/(admin)/admin/inventory/_components/create-inventory-dialog";
+import CreateInventorySubItemDialog from "@/app/(admin)/admin/inventory/[inventoryId]/_components/create-inventory-sub-item-dialog";
 
 export interface Props {
   params: {
     departmentId: string;
+    inventoryId: string;
   };
   children: React.ReactNode;
 }
@@ -41,10 +42,7 @@ export default async function CommandLayout({ children, params }: Props) {
         <CommandSearchDialog>
           <ThemeDialog />
           <SettingsDialog />
-          {/* <CreateInventoryDialog
-            queryKey={["department-returnable-items", params.departmentId]}
-            departmentId={params.departmentId}
-          /> */}
+          <CreateInventorySubItemDialog inventoryId={params.inventoryId} />
         </CommandSearchDialog>
         <RequestOption />
         {children}

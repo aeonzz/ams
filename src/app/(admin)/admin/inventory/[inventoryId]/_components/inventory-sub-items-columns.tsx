@@ -30,12 +30,13 @@ import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { toast } from "sonner";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import type { InventorySubItemType } from "@/lib/types/item";
-import { updateInventorySubItem } from "@/lib/actions/inventoryItem";
+import { updateInventorySubItemStatuses } from "@/lib/actions/inventoryItem";
 import ItemStatusSchema, {
   type ItemStatusType,
 } from "prisma/generated/zod/inputTypeSchemas/ItemStatusSchema";
 import { format, formatDate } from "date-fns";
 import { UpdateInventorySubItemSheet } from "./update-sub-inventory-item-sheet";
+import { DeleteInventorySubItemsDialog } from "./delete-inventory-sub-items-dialog";
 
 export function getInventorySubItemsColumns(): ColumnDef<InventorySubItemType>[] {
   return [
@@ -190,7 +191,7 @@ export function getInventorySubItemsColumns(): ColumnDef<InventorySubItemType>[]
           React.useState(false);
 
         const { isPending, mutateAsync } = useServerActionMutation(
-          updateInventorySubItem
+          updateInventorySubItemStatuses
         );
 
         React.useEffect(() => {
@@ -200,21 +201,22 @@ export function getInventorySubItemsColumns(): ColumnDef<InventorySubItemType>[]
             dialogManager.setActiveDialog(null);
           }
         }, [showUpdateTaskSheet]);
-        
+
         return (
           <div className="grid place-items-center">
-          <UpdateInventorySubItemSheet
-            open={showUpdateTaskSheet}
-            onOpenChange={setShowUpdateTaskSheet}
-            inventory={row.original}
-          />
-            {/* <DeleteEquipmentsDialog
+            <UpdateInventorySubItemSheet
+              open={showUpdateTaskSheet}
+              onOpenChange={setShowUpdateTaskSheet}
+              inventory={row.original}
+            />
+
+            <DeleteInventorySubItemsDialog
               open={showDeleteTaskDialog}
               onOpenChange={setShowDeleteTaskDialog}
-              equipments={[row.original]}
+              items={[row.original]}
               showTrigger={false}
               onSuccess={() => row.toggleSelected(false)}
-            /> */}
+            />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -237,7 +239,7 @@ export function getInventorySubItemsColumns(): ColumnDef<InventorySubItemType>[]
                       onValueChange={(value) => {
                         toast.promise(
                           mutateAsync({
-                            id: row.original.id,
+                            ids: [row.original.id],
                             status: value as ItemStatusType,
                             path: pathname,
                           }),

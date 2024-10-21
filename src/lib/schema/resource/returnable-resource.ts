@@ -182,10 +182,7 @@ export const createInventorySubItemSchemaServer = z.object({
     .string()
     .min(1, "returnableItemId is required")
     .max(100, "Name must be 100 characters or less"),
-  serialNumber: z
-    .string()
-    .min(1, "returnableItemId is required")
-    .max(100, "Name must be 100 characters or less"),
+  serialNumber: z.string().optional(),
   imageUrl: z.array(
     z.string({
       required_error: "Image is required",
@@ -213,7 +210,7 @@ export type UpdateInventoryItemSchema = z.infer<
 export const extendedUpdateInventoryItemSchema =
   updateInventoryItemSchema.extend({
     path: z.string(),
-    inventoryId: z.string(),
+    id: z.string(),
   });
 
 export type ExtendedUpdateInventoryItemSchema = z.infer<

@@ -11,6 +11,7 @@ import { GetInventorySubItemSchema } from "../schema";
 import {
   deleteInventorySubItemsSchema,
   extendCreateInventoryItemSchema,
+  extendedUpdateInventoryItemSchema,
   extendedUpdateInventorySubItemItemServerSchema,
   updateInventorySubItemStatusesSchema,
   updateReturnableResourceRequestSchemaWithPath,
@@ -67,7 +68,6 @@ export async function getInventorySubItems(
       data.map(async (item) => {
         return {
           id: item.id,
-          inventoryId: item.inventoryId,
           name: item.subName,
           subName: item.subName,
           serialNumber: item.serialNumber,
@@ -110,15 +110,16 @@ export const createInventorySubItem = authedProcedure
 
 export const updateInventorySubItem = authedProcedure
   .createServerAction()
-  .input(extendedUpdateInventorySubItemItemServerSchema)
+  .input(extendedUpdateInventoryItemSchema)
   .handler(async ({ ctx, input }) => {
-    const { path, id, ...rest } = input;
+    const { path, id, imageUrl, ...rest } = input;
     try {
       await db.inventorySubItem.update({
         where: {
           id: id,
         },
         data: {
+          imageUrl: imageUrl && imageUrl[0],
           ...rest,
         },
       });

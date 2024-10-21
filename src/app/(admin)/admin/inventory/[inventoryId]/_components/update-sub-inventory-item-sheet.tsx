@@ -85,7 +85,7 @@ export function UpdateInventorySubItemSheet({
 
       const data: ExtendedUpdateInventoryItemSchema = {
         ...rest,
-        inventoryId: inventory.inventoryId,
+        id: inventory.id,
         path: pathname,
         imageUrl: uploadedFilesResult.map(
           (result: { filePath: string }) => result.filePath
