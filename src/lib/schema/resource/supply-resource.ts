@@ -1,4 +1,4 @@
-import { SupplyItemSchema } from "prisma/generated/zod";
+import { SupplyItemSchema, SupplyItemStatusSchema } from "prisma/generated/zod";
 import { z } from "zod";
 import { requestSchemaBase } from "../request";
 
@@ -72,4 +72,62 @@ export const extendedSupplyResourceRequestSchemaServer =
 
 export type ExtendedSupplyResourceRequestSchemaServer = z.infer<
   typeof extendedSupplyResourceRequestSchema
+>;
+
+export const createSupplyItemSchemaServer = z.object({
+  name: z.string().min(1, "Name is required"),
+  description: z.string().optional(),
+  imageUrl: z.array(
+    z.string({
+      required_error: "Image is required",
+    })
+  ),
+  quantity: z.number().int().min(1, "Low stock threshold must be at least 1"),
+  unit: z.string().min(1, "Unit is required"),
+  lowStockThreshold: z
+    .number()
+    .int()
+    .min(1, "Low stock threshold must be at least 1"),
+  expirationDate: z.date().optional(),
+  categoryId: z.string().min(1, "Category is required"),
+  departmentId: z.string().min(1, "Department is required"),
+});
+
+export const createSupplyItemSchemaServerWithPath =
+  createSupplyItemSchemaServer.extend({
+    path: z.string(),
+  });
+
+export type CreateSupplyItemSchemaServerWithPath = z.infer<
+  typeof createSupplyItemSchemaServerWithPath
+>;
+
+export const updateSupplyItemItemStatusesSchema = z.object({
+  ids: z.string().array(),
+  status: SupplyItemStatusSchema,
+  path: z.string(),
+});
+
+export type UpdateSupplyItemItemStatusesSchema = z.infer<
+  typeof updateSupplyItemItemStatusesSchema
+>;
+
+export const deleteSupplyItemsSchema = z.object({
+  ids: z.string().array(),
+  path: z.string(),
+});
+
+export type DeleteSupplyItemsSchema = z.infer<typeof deleteSupplyItemsSchema>;
+
+export const updateSupplyItemSchema = createSupplyItemSchemaServer.partial();
+
+export type UpdateSupplyItemSchema = z.infer<typeof updateSupplyItemSchema>;
+
+export const extendedUpdateSupplyItemSchema = updateSupplyItemSchema.extend({
+  path: z.string(),
+  id: z.string(),
+});
+
+export type ExtendedUpdateSupplyItemSchema = z.infer<
+  typeof extendedUpdateSupplyItemSchema
 >;

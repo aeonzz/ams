@@ -1,5 +1,6 @@
 import type { Department, InventorySubItem } from "prisma/generated/zod";
-import { type ItemStatusType } from "prisma/generated/zod/inputTypeSchemas/ItemStatusSchema";
+import type { ItemStatusType } from "prisma/generated/zod/inputTypeSchemas/ItemStatusSchema";
+import type { SupplyItemStatusType } from "prisma/generated/zod/inputTypeSchemas/SupplyItemStatusSchema";
 
 export type InventoryItemType = {
   id: string;
@@ -23,6 +24,25 @@ export type InventorySubItemType = {
   description: string;
   status: ItemStatusType;
   imageUrl: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type SupplyItemType = {
+  id: string;
+  name: string;
+  description: string | null;
+  status: SupplyItemStatusType;
+  imageUrl: string;
+  quantity: number;
+  unit: string;
+  lowStockThreshold: number;
+  expirationDate: Date | null;
+  categoryName: string;
+  categoryId: string;
+  departmentId: string;
+  departmentName: string;
+  department: Department;
   createdAt: Date;
   updatedAt: Date;
 };

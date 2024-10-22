@@ -26,7 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { type InventorySubItem, ItemStatusSchema } from "prisma/generated/zod";
-import { formatDate } from "date-fns";
+import { format, formatDate } from "date-fns";
 import { Input } from "@/components/ui/input";
 import { cn, getReturnableItemStatusIcon, textTransform } from "@/lib/utils";
 import Link from "next/link";
@@ -58,7 +58,7 @@ export default function SubItemsTable({
       {
         accessorKey: "serialNumber",
         header: "Serial Number",
-        cell: ({ row }) => <div>{row.getValue("serialNumber") || "N/A"}</div>,
+        cell: ({ row }) => <div>{row.getValue("serialNumber") || "-"}</div>,
       },
       {
         accessorKey: "status",
@@ -77,12 +77,24 @@ export default function SubItemsTable({
       {
         accessorKey: "createdAt",
         header: "Date Created",
-        cell: ({ row }) => formatDate(row.getValue("createdAt"), "PPP p"),
+        cell: ({ cell }) => {
+          return (
+            <P className="text-muted-foreground">
+              {format(cell.getValue() as Date, "PP")}
+            </P>
+          );
+        },
       },
       {
         accessorKey: "updatedAt",
         header: "Last Modified",
-        cell: ({ row }) => formatDate(row.getValue("updatedAt"), "PPP p"),
+        cell: ({ cell }) => {
+          return (
+            <P className="text-muted-foreground">
+              {format(cell.getValue() as Date, "PP")}
+            </P>
+          );
+        },
       },
     ],
     []
@@ -142,7 +154,7 @@ export default function SubItemsTable({
         <div className="flex items-center space-x-3">
           <P>Total: {filteredSubItems.length} Items</P>
           <Link
-            href={`/admin/inventory/${inventoryId}?page=1&per_page=10&sort=createdAt.desc`}
+            href={`/admin/inventory/lendable-items/${inventoryId}?page=1&per_page=10&sort=createdAt.desc`}
             className={cn(buttonVariants({ variant: "link", size: "sm" }))}
           >
             See all

@@ -7,6 +7,7 @@ import type { RequestWithRelations } from './RequestSchema'
 import type { VenueWithRelations } from './VenueSchema'
 import type { VehicleWithRelations } from './VehicleSchema'
 import type { DepartmentBorrowingPolicyWithRelations } from './DepartmentBorrowingPolicySchema'
+import type { SupplyItemWithRelations } from './SupplyItemSchema'
 import { UserRoleWithRelationsSchema } from './UserRoleSchema'
 import { InventoryItemWithRelationsSchema } from './InventoryItemSchema'
 import { UserDepartmentWithRelationsSchema } from './UserDepartmentSchema'
@@ -14,6 +15,7 @@ import { RequestWithRelationsSchema } from './RequestSchema'
 import { VenueWithRelationsSchema } from './VenueSchema'
 import { VehicleWithRelationsSchema } from './VehicleSchema'
 import { DepartmentBorrowingPolicyWithRelationsSchema } from './DepartmentBorrowingPolicySchema'
+import { SupplyItemWithRelationsSchema } from './SupplyItemSchema'
 
 /////////////////////////////////////////
 // DEPARTMENT SCHEMA
@@ -49,6 +51,7 @@ export type DepartmentRelations = {
   venue: VenueWithRelations[];
   vehicle: VehicleWithRelations[];
   departmentBorrowingPolicy?: DepartmentBorrowingPolicyWithRelations | null;
+  supplyItem: SupplyItemWithRelations[];
 };
 
 export type DepartmentWithRelations = z.infer<typeof DepartmentSchema> & DepartmentRelations
@@ -61,6 +64,7 @@ export const DepartmentWithRelationsSchema: z.ZodType<DepartmentWithRelations> =
   venue: z.lazy(() => VenueWithRelationsSchema).array(),
   vehicle: z.lazy(() => VehicleWithRelationsSchema).array(),
   departmentBorrowingPolicy: z.lazy(() => DepartmentBorrowingPolicyWithRelationsSchema).nullable(),
+  supplyItem: z.lazy(() => SupplyItemWithRelationsSchema).array(),
 }))
 
 export default DepartmentSchema;

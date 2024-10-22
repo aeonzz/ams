@@ -209,7 +209,6 @@ export function getInventorySubItemsColumns(): ColumnDef<InventorySubItemType>[]
               onOpenChange={setShowUpdateTaskSheet}
               inventory={row.original}
             />
-
             <DeleteInventorySubItemsDialog
               open={showDeleteTaskDialog}
               onOpenChange={setShowDeleteTaskDialog}

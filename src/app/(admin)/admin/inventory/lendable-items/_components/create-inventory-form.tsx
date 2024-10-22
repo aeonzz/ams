@@ -162,7 +162,7 @@ export default function CreateInventoryForm({
                   <Input
                     autoComplete="off"
                     type="number"
-                    placeholder="24"
+                    placeholder="1"
                     disabled={isPending || isUploading}
                     {...field}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -189,7 +189,7 @@ export default function CreateInventoryForm({
                           variant="outline"
                           disabled={isUploading || isPending}
                           role="combobox"
-                          className="w-full flex-1 justify-between text-muted-foreground"
+                          className="w-full flex-1 justify-between"
                         >
                           {field.value ? (
                             <p className="truncate">

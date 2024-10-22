@@ -22,6 +22,7 @@ export { InventorySubItemScalarFieldEnumSchema } from './InventorySubItemScalarF
 export { InventoryItemScalarFieldEnumSchema } from './InventoryItemScalarFieldEnumSchema';
 export { SupplyRequestScalarFieldEnumSchema } from './SupplyRequestScalarFieldEnumSchema';
 export { SupplyItemScalarFieldEnumSchema } from './SupplyItemScalarFieldEnumSchema';
+export { SupplyItemCategoryScalarFieldEnumSchema } from './SupplyItemCategoryScalarFieldEnumSchema';
 export { SupplyRequestItemScalarFieldEnumSchema } from './SupplyRequestItemScalarFieldEnumSchema';
 export { TransportRequestScalarFieldEnumSchema } from './TransportRequestScalarFieldEnumSchema';
 export { VehicleScalarFieldEnumSchema } from './VehicleScalarFieldEnumSchema';
@@ -41,7 +42,6 @@ export { ResourceTypeSchema } from './ResourceTypeSchema';
 export { VenueTypeSchema } from './VenueTypeSchema';
 export { ClientTypeSchema } from './ClientTypeSchema';
 export { ItemStatusSchema } from './ItemStatusSchema';
-export { SupplyItemCategorySchema } from './SupplyItemCategorySchema';
 export { SupplyItemStatusSchema } from './SupplyItemStatusSchema';
 export { DepartmentTypeSchema } from './DepartmentTypeSchema';
 export { VenueStatusSchema } from './VenueStatusSchema';

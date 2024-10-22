@@ -21,6 +21,7 @@ export * from './InventorySubItemSchema';
 export * from './InventoryItemSchema';
 export * from './SupplyRequestSchema';
 export * from './SupplyItemSchema';
+export * from './SupplyItemCategorySchema';
 export * from './SupplyRequestItemSchema';
 export * from './TransportRequestSchema';
 export * from './VehicleSchema';

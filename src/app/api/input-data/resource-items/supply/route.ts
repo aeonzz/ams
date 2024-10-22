@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db/index";
-import { errorMonitor } from "stream";
 import { checkAuth } from "@/lib/auth/utils";
 import placeholder from "public/placeholder.svg";
 import { convertToBase64 } from "@/lib/actions/utils";
@@ -8,7 +7,11 @@ import { convertToBase64 } from "@/lib/actions/utils";
 export async function GET(req: Request) {
   await checkAuth();
   try {
-    const supplyItems = await db.supplyItem.findMany({});
+    const supplyItems = await db.supplyItem.findMany({
+      where: {
+        isArchived: false,
+      },
+    });
 
     const dataWithBase64Images = await Promise.all(
       supplyItems.map(async (item) => {
@@ -34,9 +37,9 @@ export async function GET(req: Request) {
 
     return NextResponse.json({ data: dataWithBase64Images }, { status: 200 });
   } catch (error) {
-    console.log(errorMonitor);
+    console.log(error);
     return NextResponse.json(
-      { error: "Form submission failed" },
+      { error: "Something went wrong! try again later" },
       { status: 500 }
     );
   }

@@ -128,25 +128,29 @@ export function getAdminMenuList(pathname: string): Group[] {
           submenus: [],
         },
         {
-          href: "/admin/inventory",
-          label: "Inventory",
-          active: pathname.includes("/admin/inventory"),
-          icon: Briefcase,
-          submenus: [],
-        },
-        {
-          href: "/admin/job-sections",
-          label: "Job Sections",
-          active: pathname.includes("/admin/job-sections"),
-          icon: BookOpen,
-          submenus: [],
-        },
-        {
           href: "/admin/vehicles",
           label: "Vehicles",
           active: pathname.includes("/admin/vehicles"),
           icon: Truck,
           submenus: [],
+        },
+        {
+          href: "/admin/inventory",
+          label: "Inventory",
+          active: pathname.includes("/admin/inventory"),
+          icon: Briefcase,
+          submenus: [
+            {
+              href: "/admin/inventory/lendable-items?page=1&per_page=10&sort=createdAt.desc",
+              label: "Lendable Items",
+              active: pathname === "/admin/inventory/lendable-items",
+            },
+            {
+              href: "/admin/inventory/supply-items?page=1&per_page=10&sort=createdAt.desc",
+              label: "Supply Items",
+              active: pathname === "/admin/inventory/supply-items",
+            },
+          ],
         },
       ],
     },

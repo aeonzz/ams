@@ -3,36 +3,35 @@
 import { checkAuth } from "../auth/utils";
 import { db } from "@/lib/db/index";
 import { authedProcedure, convertToBase64, getErrorMessage } from "./utils";
-import placeholder from "public/placeholder.svg";
-import {
-  createInventoryItemSchemaWithPath,
-  deleteInventoryItemsSchema,
-  extendedUpdateInventoryItemServerSchema,
-  updateInventoryItemStatusesSchema,
-} from "../schema/resource/returnable-resource";
+import type { GetSupplyItemSchema } from "../schema";
+import type { SupplyItem } from "prisma/generated/zod";
 import { generateId } from "lucia";
+import {
+  createSupplyItemSchemaServerWithPath,
+  deleteSupplyItemsSchema,
+  extendedUpdateSupplyItemSchema,
+  updateSupplyItemItemStatusesSchema,
+} from "../schema/resource/supply-resource";
 import { revalidatePath } from "next/cache";
-import { Prisma } from "@prisma/client";
-import { type InventoryItem } from "prisma/generated/zod";
-import { type GetInventoryItemSchema } from "../schema";
 
-export async function getInventory(input: GetInventoryItemSchema) {
+export async function getSupply(input: GetSupplyItemSchema) {
   await checkAuth();
   const {
     page,
     per_page,
     sort,
     name,
+    status,
+    departmentName: deptName,
     from,
     to,
-    departmentName: deptName,
   } = input;
 
   try {
     const skip = (page - 1) * per_page;
 
     const [column, order] = (sort?.split(".") ?? ["createdAt", "desc"]) as [
-      keyof InventoryItem | undefined,
+      keyof SupplyItem | undefined,
       "asc" | "desc" | undefined,
     ];
 
@@ -42,6 +41,10 @@ export async function getInventory(input: GetInventoryItemSchema) {
 
     if (name) {
       where.name = { contains: name, mode: "insensitive" };
+    }
+
+    if (status) {
+      where.status = { in: status.split(".") };
     }
 
     if (deptName) {
@@ -65,7 +68,7 @@ export async function getInventory(input: GetInventoryItemSchema) {
     }
 
     const [data, total, department] = await db.$transaction([
-      db.inventoryItem.findMany({
+      db.supplyItem.findMany({
         where,
         take: per_page,
         skip,
@@ -73,39 +76,28 @@ export async function getInventory(input: GetInventoryItemSchema) {
           [column || "createdAt"]: order || "desc",
         },
         include: {
-          inventorySubItems: {
-            orderBy: {
-              createdAt: "desc",
-            },
-          },
           department: true,
+          category: true,
         },
       }),
-      db.inventoryItem.count({ where }),
+      db.supplyItem.count({ where }),
       db.department.findMany(),
     ]);
 
     const pageCount = Math.ceil(total / per_page);
 
-    const dataWithInventoryAndImages = await Promise.all(
+    const modifiedData = await Promise.all(
       data.map(async (item) => {
-        const inventoryCount = item.inventorySubItems.length;
-        const availableCount = item.inventorySubItems.filter(
-          (inv) => inv.status === "AVAILABLE"
-        ).length;
-
         return {
           ...item,
-          inventoryCount,
-          availableCount,
           departmentName: item.department.name,
-          inventorySubItems: item.inventorySubItems,
+          categoryName: item.category.name,
         };
       })
     );
 
     return {
-      data: dataWithInventoryAndImages,
+      data: modifiedData,
       pageCount,
       departments: department,
     };
@@ -115,51 +107,34 @@ export async function getInventory(input: GetInventoryItemSchema) {
   }
 }
 
-export const createInventory = authedProcedure
+export const createSupplyitem = authedProcedure
   .createServerAction()
-  .input(createInventoryItemSchemaWithPath)
+  .input(createSupplyItemSchemaServerWithPath)
   .handler(async ({ input, ctx }) => {
-    const { path, imageUrl, inventoryCount, ...rest } = input;
+    const { path, imageUrl, ...rest } = input;
 
     try {
-      const itemId = generateId(15);
-
-      const inventoryItem = await db.inventoryItem.create({
+      const result = await db.supplyItem.create({
         data: {
-          id: itemId,
+          id: generateId(15),
           imageUrl: imageUrl[0],
           ...rest,
         },
       });
 
-      const inventorySubItems = [];
-      for (let i = 0; i < inventoryCount; i++) {
-        const subItem = await db.inventorySubItem.create({
-          data: {
-            id: generateId(15),
-            imageUrl: inventoryItem.imageUrl,
-            inventoryId: inventoryItem.id,
-            subName: `${rest.name}-${generateId(5)}`,
-          },
-        });
-        inventorySubItems.push(subItem);
-      }
-
-      revalidatePath(path);
-
-      return { inventoryItem, inventorySubItems };
+      return revalidatePath(path);
     } catch (error) {
       getErrorMessage(error);
     }
   });
 
-export const updateInventory = authedProcedure
+export const updateSupplyItem = authedProcedure
   .createServerAction()
-  .input(extendedUpdateInventoryItemServerSchema)
+  .input(extendedUpdateSupplyItemSchema)
   .handler(async ({ ctx, input }) => {
     const { path, id, imageUrl, ...rest } = input;
     try {
-      await db.inventoryItem.update({
+      await db.supplyItem.update({
         where: {
           id: id,
         },
@@ -175,20 +150,20 @@ export const updateInventory = authedProcedure
     }
   });
 
-export const updateInventoryStatuses = authedProcedure
+export const updateSupplyItemStatuses = authedProcedure
   .createServerAction()
-  .input(updateInventoryItemStatusesSchema)
+  .input(updateSupplyItemItemStatusesSchema)
   .handler(async ({ input }) => {
-    const { path, ...rest } = input;
+    const { path, ids, ...rest } = input;
     try {
-      await db.inventoryItem.updateMany({
+      await db.supplyItem.updateMany({
         where: {
           id: {
-            in: rest.ids,
+            in: ids,
           },
         },
         data: {
-          ...(rest.status !== undefined && { status: rest.status }),
+          ...rest,
         },
       });
 
@@ -198,14 +173,14 @@ export const updateInventoryStatuses = authedProcedure
     }
   });
 
-export const deleteInventories = authedProcedure
+export const deleteSupplyItems = authedProcedure
   .createServerAction()
-  .input(deleteInventoryItemsSchema)
+  .input(deleteSupplyItemsSchema)
   .handler(async ({ input }) => {
     const { path, ...rest } = input;
 
     try {
-      await db.inventoryItem.updateMany({
+      await db.supplyItem.updateMany({
         where: {
           id: {
             in: rest.ids,
@@ -222,3 +197,5 @@ export const deleteInventories = authedProcedure
       getErrorMessage(error);
     }
   });
+
+  

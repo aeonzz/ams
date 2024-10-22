@@ -56,6 +56,7 @@ import { type ItemStatusType } from "prisma/generated/zod/inputTypeSchemas/ItemS
 import { ChangeTypeType } from "prisma/generated/zod/inputTypeSchemas/ChangeTypeSchema";
 import { User as UserType, type UserWithRelations } from "prisma/generated/zod";
 import { JobStatusType } from "prisma/generated/zod/inputTypeSchemas/JobStatusSchema";
+import { SupplyItemStatusType } from "prisma/generated/zod/inputTypeSchemas/SupplyItemStatusSchema";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -365,6 +366,56 @@ export function getVehicleStatusColor(
   return (
     vehicleStatusColors[status] || {
       color: "#64748b",
+      variant: "gray",
+      stroke: 10,
+    }
+  );
+}
+
+type SupplyStatusColorConfig = {
+  color: string;
+  variant: BadgeVariant;
+  stroke: number;
+};
+
+type SupplyStatusColorMap = {
+  [key in SupplyItemStatusType]: SupplyStatusColorConfig;
+};
+
+export function getSupplyStatusColor(
+  status: SupplyItemStatusType
+): SupplyStatusColorConfig {
+  const supplyStatusColors: SupplyStatusColorMap = {
+    IN_STOCK: {
+      color: "#22c55e",
+      variant: "green",
+      stroke: 10,
+    },
+    LOW_STOCK: {
+      color: "#eab308",
+      variant: "yellow",
+      stroke: 10,
+    },
+    OUT_OF_STOCK: {
+      color: "#ef4444",
+      variant: "red",
+      stroke: 10,
+    },
+    ORDERED: {
+      color: "#a855f7",
+      variant: "purple",
+      stroke: 10,
+    },
+    EXPIRED: {
+      color: "#64748b", 
+      variant: "gray",
+      stroke: 10,
+    },
+  };
+
+  return (
+    supplyStatusColors[status] || {
+      color: "#64748b", 
       variant: "gray",
       stroke: 10,
     }

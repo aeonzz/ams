@@ -68,6 +68,7 @@ model Department {
   venue                     Venue[]
   vehicle                   Vehicle[]
   departmentBorrowingPolicy DepartmentBorrowingPolicy?
+  supplyItem                SupplyItem[]
 }
 
 model UserDepartment {
@@ -362,10 +363,23 @@ model SupplyItem {
   unit               String
   lowStockThreshold  Int
   expirationDate     DateTime?
-  category           SupplyItemCategory
+  categoryId         String
+  category           SupplyItemCategory  @relation(fields: [categoryId], references: [id])
+  departmentId       String
+  department         Department          @relation(fields: [departmentId], references: [id])
   createdAt          DateTime            @default(now())
+  isArchived         Boolean             @default(false)
   updatedAt          DateTime            @updatedAt
   supplyRequestItems SupplyRequestItem[]
+}
+
+model SupplyItemCategory {
+  id         String       @id
+  name       String
+  createdAt  DateTime     @default(now())
+  isArchived Boolean      @default(false)
+  updatedAt  DateTime     @updatedAt
+  supplyItem SupplyItem[]
 }
 
 model SupplyRequestItem {
@@ -532,16 +546,6 @@ enum ItemStatus {
   LOST
   RETURNED
   PENDING_RETURN
-}
-
-enum SupplyItemCategory {
-  OFFICE_SUPPLIES
-  ELECTRONICS
-  FURNITURE
-  CLEANING
-  MEDICAL
-  EDUCATIONAL
-  OTHER
 }
 
 enum SupplyItemStatus {

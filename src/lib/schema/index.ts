@@ -93,6 +93,19 @@ export type GetInventorySubItemSchema = z.infer<
   typeof inventorySubItemSearchParamsSchema
 >;
 
+export const SupplyItemSearchParamsSchema = z.object({
+  page: z.coerce.number().default(1),
+  per_page: z.coerce.number().default(10),
+  sort: z.string().optional(),
+  name: z.string().optional(),
+  status: z.string().optional(),
+  departmentName: z.string().optional(),
+  from: z.string().optional(),
+  to: z.string().optional(),
+});
+
+export type GetSupplyItemSchema = z.infer<typeof SupplyItemSearchParamsSchema>;
+
 export const reservationSearchParamsSchema = z.object({
   page: z.coerce.number().default(1),
   per_page: z.coerce.number().default(10),
