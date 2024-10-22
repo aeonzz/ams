@@ -1,10 +1,5 @@
 "use client";
 
-import { createVenueRequest } from "@/lib/actions/requests";
-import {
-  type ExtendedVenueRequestSchema,
-  VenueRequestSchema,
-} from "@/lib/schema/request";
 import {
   UseMutateAsyncFunction,
   useQuery,
@@ -50,37 +45,6 @@ import { InventoryItemWithRelations } from "prisma/generated/zod";
 import ReturnableResourceRequestSkeleton from "./returnable-resource-request-input-skeleton";
 import { socket } from "@/app/socket";
 import DepartmentBorrowingPolicyCard from "./department-borrowing-policy-card";
-
-const purpose = [
-  {
-    id: "Classroom Instruction",
-    label: "Classroom Instruction",
-  },
-  {
-    id: "Student Presentation",
-    label: "Student Presentation",
-  },
-  {
-    id: "Research Project",
-    label: "Research Project",
-  },
-  {
-    id: "School Event",
-    label: "School Event",
-  },
-  {
-    id: "Extracurricular Activity",
-    label: "Extracurricular Activity",
-  },
-  {
-    id: "Faculty Meeting",
-    label: "Faculty Meeting",
-  },
-  {
-    id: "other",
-    label: "Other",
-  },
-] as const;
 
 interface ReturnableResourceRequestInputProps {
   mutateAsync: UseMutateAsyncFunction<

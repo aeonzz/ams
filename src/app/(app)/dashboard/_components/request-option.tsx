@@ -25,7 +25,7 @@ import TransportDialog from "@/components/dialogs/transport-dialog";
 import ResourceOption from "./resource-option";
 
 type ReqType = {
-  value: RequestTypeType;
+  value: "JOB" | "VENUE" | "RESOURCE" | "TRANSPORT";
   label: string;
   icon: LucideIcon;
   dialog: DialogType;

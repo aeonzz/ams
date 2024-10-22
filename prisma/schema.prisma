@@ -579,7 +579,8 @@ enum VehicleStatus {
 
 enum RequestType {
   JOB
-  RESOURCE
+  BORROW
+  SUPPLY
   VENUE
   TRANSPORT
 }

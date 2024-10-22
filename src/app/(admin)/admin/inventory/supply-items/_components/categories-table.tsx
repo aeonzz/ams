@@ -58,6 +58,7 @@ import { usePathname } from "next/navigation";
 import { toast } from "sonner";
 import CategoriesTableSkeleton from "./categories-table-skeleton";
 import FetchDataError from "@/components/card/fetch-data-error";
+import { useSupplyItemCategory } from "@/lib/hooks/use-supply-item-category";
 
 interface CategoriesTableProps {
   mutateAsync: UseMutateAsyncFunction<
@@ -79,13 +80,7 @@ export default function CategoriesTable({
 }: CategoriesTableProps) {
   const pathname = usePathname();
   const [open, setOpen] = React.useState(false);
-  const { data, isLoading, isError, refetch } = useQuery<SupplyItemCategory[]>({
-    queryFn: async () => {
-      const res = await axios.get("/api/supply-category");
-      return res.data.data;
-    },
-    queryKey: ["get-supply-categories"],
-  });
+  const { data, isLoading, refetch, isError } = useSupplyItemCategory();
 
   const columns: ColumnDef<SupplyItemCategory>[] = React.useMemo(
     () => [

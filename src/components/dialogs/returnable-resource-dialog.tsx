@@ -121,7 +121,7 @@ export default function ReturnableResourceDialog() {
           mutateAsync={mutateAsync}
           isPending={isPending}
           form={form}
-          type="RESOURCE"
+          type="BORROW"
           handleOpenChange={handleOpenChange}
           isFieldsDirty={isFieldsDirty}
         />

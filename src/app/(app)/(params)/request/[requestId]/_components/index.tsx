@@ -137,7 +137,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                 isCurrentUser={currentUser.id === data.userId}
               />
             )}
-            {data.type === "RESOURCE" && data.returnableRequest && (
+            {data.type === "BORROW" && data.returnableRequest && (
               <ReturnableResourceDetails
                 data={data.returnableRequest}
                 requestId={data.id}
@@ -146,7 +146,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                 isCurrentUser={currentUser.id === data.userId}
               />
             )}
-            {data.type === "RESOURCE" && data.supplyRequest && (
+            {data.type === "SUPPLY" && data.supplyRequest && (
               <div className="space-y-4">
                 <H4 className="font-semibold text-muted-foreground">
                   Supply Request Details
@@ -349,7 +349,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                 data={data.jobRequest}
               />
             )}
-          {data.type === "RESOURCE" && data.returnableRequest && (
+          {data.type === "BORROW" && data.returnableRequest && (
             <RequestReviewerActions
               request={data}
               allowedRoles={["REQUEST_MANAGER"]}
@@ -384,7 +384,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
               <CompleteTransportRequest requestId={data.id} />
             )}
           {data.status === "APPROVED" &&
-            data.type === "RESOURCE" &&
+            data.type === "BORROW" &&
             data.returnableRequest && (
               <ReturnableRequestActions
                 request={data.returnableRequest}

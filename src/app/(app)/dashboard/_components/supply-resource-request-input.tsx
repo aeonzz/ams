@@ -55,6 +55,9 @@ import {
   type SupplyResourceRequestSchema,
 } from "@/lib/schema/resource/supply-resource";
 import SupplyItemsField from "./supply-items-field";
+import type { SupplyItemWithRelations } from "prisma/generated/zod";
+import { useSupplyItemCategory } from "@/lib/hooks/use-supply-item-category";
+import SupplyResourceRequestSkeleton from "./supply-resource-request-skeleton";
 
 const purpose = [
   {
@@ -110,9 +113,20 @@ export default function SupplyResourceRequestInput({
   isFieldsDirty,
 }: SupplyResourceRequestInputProps) {
   const pathname = usePathname();
-  const currentUser = useSession();
   const queryClient = useQueryClient();
-  const items = form.watch("items");
+
+  const { data: items, isLoading: isItemsLoading } = useQuery<
+    SupplyItemWithRelations[]
+  >({
+    queryKey: ["get-input-supply-resource"],
+    queryFn: async () => {
+      const response = await axios.get("/api/input-data/resource-items/supply");
+      return response.data.data;
+    },
+  });
+
+  const { data: categories, isLoading: isCategoriesLoading } =
+    useSupplyItemCategory();
 
   const handleItemsChange = (
     newItems: { supplyItemId: string; quantity: number }[]
@@ -145,17 +159,20 @@ export default function SupplyResourceRequestInput({
     });
   }
 
+  const isLoading = isItemsLoading || isCategoriesLoading;
+
+  if (isLoading) return <SupplyResourceRequestSkeleton />;
+
   return (
     <>
-      <DialogHeader>
-        <DialogTitle>Supplies Request</DialogTitle>
-      </DialogHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="scroll-bar flex max-h-[60vh] gap-6 overflow-y-auto px-4 py-1">
             <div className="flex w-full flex-col space-y-2">
               <SupplyItemsField
                 onItemsChange={handleItemsChange}
+                items={items}
+                categories={categories}
                 isPending={isPending}
               />
               <DateTimePicker

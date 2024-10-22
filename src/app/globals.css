@@ -131,4 +131,15 @@
   .scroll-bar {
     @apply scrollbar-thin scrollbar-track-transparent scrollbar-thumb-black/20 dark:scrollbar-thumb-white/20;
   }
+  .spin-hide {
+    appearance: textfield;
+    &::-webkit-inner-spin-button {
+      appearance: none;
+      margin: 0;
+    }
+    &::-webkit-outer-spin-button {
+      appearance: none;
+      margin: 0;
+    }
+  }
 }

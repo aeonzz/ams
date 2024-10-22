@@ -2,7 +2,7 @@
 
 import React from "react";
 
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -104,11 +104,14 @@ export default function SupplyResourceDialog() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+        <DialogHeader>
+          <DialogTitle>Supplies Request</DialogTitle>
+        </DialogHeader>
         <SupplyResourceRequestInput
           mutateAsync={mutateAsync}
           isPending={isPending}
           form={form}
-          type="RESOURCE"
+          type="SUPPLY"
           handleOpenChange={handleOpenChange}
           isFieldsDirty={isFieldsDirty}
         />
