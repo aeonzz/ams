@@ -47,6 +47,7 @@ import RequestReviewerActions from "./request-reviewer-actions";
 import CompleteVenueRequest from "./complete-venue-request";
 import CompleteTransportRequest from "./complete-transport-request";
 import ReturnableRequestActions from "./returnable-request-actions";
+import SupplyResourceDetails from "./supply-resource-details";
 
 interface RequestDetailsProps {
   params: string;
@@ -147,37 +148,13 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
               />
             )}
             {data.type === "SUPPLY" && data.supplyRequest && (
-              <div className="space-y-4">
-                <H4 className="font-semibold text-muted-foreground">
-                  Supply Request Details
-                </H4>
-                <div className="flex items-center space-x-2">
-                  <Calendar className="h-5 w-5" />
-                  <P className="underline underline-offset-4">
-                    Needed By:{" "}
-                    {format(
-                      new Date(data.supplyRequest.dateAndTimeNeeded),
-                      "PPP p"
-                    )}
-                  </P>
-                </div>
-                <div>
-                  <H5 className="mb-2 font-semibold text-muted-foreground">
-                    Items:
-                  </H5>
-                  <ul className="list-inside list-disc">
-                    {data.supplyRequest.items.map((item) => (
-                      <SupplyItemCard key={item.id} supplyRequest={item} />
-                    ))}
-                  </ul>
-                </div>
-                <div>
-                  <H5 className="mb-2 font-semibold text-muted-foreground">
-                    Purpose:
-                  </H5>
-                  <P>{data.supplyRequest.purpose}</P>
-                </div>
-              </div>
+              <SupplyResourceDetails
+                data={data.supplyRequest}
+                requestId={data.id}
+                rejectionReason={data.rejectionReason}
+                requestStatus={data.status}
+                isCurrentUser={currentUser.id === data.userId}
+              />
             )}
             {data.type === "TRANSPORT" && data.transportRequest && (
               <TransportRequestDetails

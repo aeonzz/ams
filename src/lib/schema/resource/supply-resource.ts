@@ -46,32 +46,21 @@ export type ExtendedSupplyResourceRequestSchema = z.infer<
   typeof extendedSupplyResourceRequestSchema
 >;
 
-export const supplyResourceRequestSchemaServer = z.object({
-  items: z.array(
-    z.object({
-      supplyItemId: z.string().refine((val) => val !== ""),
-      quantity: z.number(),
-    })
-  ),
-  dateAndTimeNeeded: z.date(),
-  purpose: z.array(z.string()),
-  otherPurpose: z.string().optional(),
-});
+export const updateSupplyResourceRequestSchema =
+  supplyResourceRequestSchema.partial();
 
-export type SupplyResourceRequestSchemaServer = z.infer<
-  typeof supplyResourceRequestSchemaServer
+export type UpdateSupplyResourceRequestSchema = z.infer<
+  typeof updateSupplyResourceRequestSchema
 >;
 
-export const supplyResourceRequestSchemaServerWithPath =
-  supplyResourceRequestSchemaServer.extend({
+export const updateSupplyResourceRequestSchemaWithPath =
+  updateSupplyResourceRequestSchema.extend({
+    id: z.string(),
     path: z.string(),
   });
 
-export const extendedSupplyResourceRequestSchemaServer =
-  requestSchemaBase.merge(supplyResourceRequestSchemaServerWithPath);
-
-export type ExtendedSupplyResourceRequestSchemaServer = z.infer<
-  typeof extendedSupplyResourceRequestSchema
+export type UpdateSupplyResourceRequestSchemaWithPath = z.infer<
+  typeof updateSupplyResourceRequestSchemaWithPath
 >;
 
 export const createSupplyItemSchemaServer = z.object({

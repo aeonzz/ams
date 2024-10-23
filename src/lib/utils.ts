@@ -45,6 +45,7 @@ import {
   Edit,
   Lock,
   Map,
+  Box,
 } from "lucide-react";
 import { type RequestStatusTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestStatusTypeSchema";
 import { type PriorityTypeType } from "prisma/generated/zod/inputTypeSchemas/PriorityTypeSchema";
@@ -407,7 +408,7 @@ export function getSupplyStatusColor(
       stroke: 10,
     },
     EXPIRED: {
-      color: "#64748b", 
+      color: "#64748b",
       variant: "gray",
       stroke: 10,
     },
@@ -415,7 +416,7 @@ export function getSupplyStatusColor(
 
   return (
     supplyStatusColors[status] || {
-      color: "#64748b", 
+      color: "#64748b",
       variant: "gray",
       stroke: 10,
     }
@@ -439,8 +440,12 @@ export function getRequestTypeIcon(
       icon: Briefcase,
       variant: "teal",
     },
-    RESOURCE: {
-      icon: Package,
+    BORROW: {
+      icon: Box,
+      variant: "purple",
+    },
+    SUPPLY: {
+      icon: Package, 
       variant: "blue",
     },
     VENUE: {

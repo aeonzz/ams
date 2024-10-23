@@ -43,11 +43,7 @@ import { useSupplyItemCategory } from "@/lib/hooks/use-supply-item-category";
 import SupplyResourceRequestSkeleton from "./supply-resource-request-skeleton";
 import SupplyItemsField from "./supply-items-field";
 import FetchDataError from "@/components/card/fetch-data-error";
-
-type SupplyItemData = {
-  items: SupplyItemWithRelations[];
-  departments: DepartmentWithRelations[];
-};
+import { useSupplyResourceData } from "@/lib/hooks/use-supply-resource-data";
 
 interface SupplyResourceRequestInputProps {
   mutateAsync: UseMutateAsyncFunction<
@@ -77,23 +73,14 @@ export default function SupplyResourceRequestInput({
     React.useState<string>();
 
   const {
-    data: supplyData,
-    isLoading: isSupplyDataLoading,
-    isError: isErrorSupplyData,
-    refetch,
-  } = useQuery<SupplyItemData>({
-    queryKey: ["get-input-supply-resource"],
-    queryFn: async () => {
-      const response = await axios.get("/api/input-data/resource-items/supply");
-      return response.data.data;
-    },
-  });
-
-  const {
-    data: categories,
-    isLoading: isCategoriesLoading,
-    isError: isErrorCategories,
-  } = useSupplyItemCategory();
+    supplyData,
+    isSupplyDataLoading,
+    isErrorSupplyData,
+    refetchSupplyData,
+    categories,
+    isCategoriesLoading,
+    isErrorCategories,
+  } = useSupplyResourceData();
 
   const handleDepartmentIdChange = (departmentId: string) => {
     setSelectedDepartmentId(departmentId);
@@ -132,7 +119,7 @@ export default function SupplyResourceRequestInput({
   if (isError || !supplyData) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
-        <FetchDataError refetch={refetch} />
+        <FetchDataError refetch={refetchSupplyData} />
       </div>
     );
   }

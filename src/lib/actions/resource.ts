@@ -9,7 +9,7 @@ import { revalidatePath } from "next/cache";
 import { extendedReturnableResourceRequestSchema } from "../schema/resource/returnable-resource";
 import {
   extendedSupplyResourceRequestSchema,
-  extendedSupplyResourceRequestSchemaServer,
+  updateSupplyResourceRequestSchemaWithPath,
 } from "../schema/resource/supply-resource";
 import { createNotification } from "./notification";
 
@@ -171,5 +171,52 @@ export const createSupplyResourceRequest = authedProcedure
       return revalidatePath(path);
     } catch (error) {
       getErrorMessage(error);
+    }
+  });
+
+export const updateSupplyRequest = authedProcedure
+  .createServerAction()
+  .input(updateSupplyResourceRequestSchemaWithPath)
+  .handler(async ({ input }) => {
+    const { path, id, items = [], ...rest } = input; 
+
+    try {
+      const updatedSupplyRequest = await db.supplyRequest.update({
+        where: {
+          requestId: id,
+        },
+        data: {
+          ...rest, 
+        },
+      });
+
+      if (items.length > 0) {
+        const itemUpdates = items.map((item) =>
+          db.supplyRequestItem.upsert({
+            where: {
+              supplyRequestId_supplyItemId: {
+                supplyRequestId: updatedSupplyRequest.id,
+                supplyItemId: item.supplyItemId,
+              },
+            },
+            update: {
+              quantity: item.quantity, 
+            },
+            create: {
+              id: generateId(15),
+              supplyRequestId: updatedSupplyRequest.id,
+              supplyItemId: item.supplyItemId,
+              quantity: item.quantity, 
+            },
+          })
+        );
+
+        await Promise.all(itemUpdates);
+      }
+
+      // Revalidate the path to refresh the updated data
+      return revalidatePath(path);
+    } catch (error) {
+      return getErrorMessage(error);
     }
   });

@@ -198,7 +198,7 @@ export default function ReturnableResourceDetails({
           )}
           <RejectionReasonCard rejectionReason={rejectionReason} />
           <H4 className="font-semibold text-muted-foreground">
-            Supply Request Details
+            Borrow Request Details
           </H4>
         </div>
         <div>

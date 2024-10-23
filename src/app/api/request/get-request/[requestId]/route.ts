@@ -45,6 +45,7 @@ export async function GET(req: Request, params: Context) {
                 supplyItem: true,
               },
             },
+            request: true,
           },
         },
         jobRequest: {
@@ -87,7 +88,7 @@ export async function GET(req: Request, params: Context) {
             venue: {
               include: {
                 venueSetupRequirement: true,
-              }
+              },
             },
           },
         },
