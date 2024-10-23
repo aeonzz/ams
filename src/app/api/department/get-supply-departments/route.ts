@@ -1,25 +1,19 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db/index";
-import { checkAuth } from "@/lib/auth/utils";
+import { errorMonitor } from "stream";
 
 export async function GET(req: Request) {
-  await checkAuth();
   try {
-    const result = await db.supplyItemCategory.findMany({
+    const departments = await db.department.findMany({
       where: {
         isArchived: false,
-      },
-      include: {
-        supplyItem: true,
-      },
-      orderBy: {
-        createdAt: "desc",
+        managesSupplyRequest: true,
       },
     });
 
-    return NextResponse.json({ data: result }, { status: 200 });
+    return NextResponse.json({ data: departments }, { status: 200 });
   } catch (error) {
-    console.log(error);
+    console.log(errorMonitor);
     return NextResponse.json(
       { error: "Something went wrong! try again later" },
       { status: 500 }

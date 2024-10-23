@@ -28,11 +28,11 @@ export const returnableResourceRequestSchemaBase = z.object({
     }),
   purpose: z
     .string()
-    .min(1, { message: "This field is required" })
+    .min(1, { message: "Purpose is required" })
     .max(700, { message: "Cannot be more than 700 characters long" }),
   location: z
     .string()
-    .min(1, { message: "This field is required" })
+    .min(1, { message: "Location is required" })
     .max(100, { message: "Cannot be more than 100 characters long" }),
   notes: z
     .string()

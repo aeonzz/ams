@@ -58,7 +58,7 @@ import { createSupplyitem } from "@/lib/actions/supply";
 import { addDays, format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { useSupplyItemCategory } from "@/lib/hooks/use-supply-item-category";
-import { useDepartments } from "@/lib/hooks/use-departments";
+import { useSupplyDepartments } from "@/lib/hooks/use-supply-departments";
 
 export const UnitTypeSchema = [
   "Pieces",
@@ -100,7 +100,7 @@ export default function CreateSupplyItemForm({
   const pathname = usePathname();
   const queryClient = useQueryClient();
 
-  const { data, isLoading } = useDepartments();
+  const { data, isLoading } = useSupplyDepartments();
 
   const { data: itemCategory, isLoading: isLoadingItemCategory } =
     useSupplyItemCategory();
@@ -211,9 +211,9 @@ export default function CreateSupplyItemForm({
                     </PopoverTrigger>
                     <PopoverContent className="p-0">
                       <Command className="max-h-72">
-                        <CommandInput placeholder="Search type..." />
+                        <CommandInput placeholder="Search department..." />
                         <CommandList>
-                          <CommandEmpty>No type found.</CommandEmpty>
+                          <CommandEmpty>No department found.</CommandEmpty>
                           <CommandGroup>
                             {data?.map((department, index) => (
                               <CommandItem

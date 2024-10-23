@@ -68,7 +68,7 @@ import { addDays, format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
 import { Textarea } from "@/components/ui/text-area";
-import { useDepartments } from "@/lib/hooks/use-departments";
+import { useSupplyDepartments } from "@/lib/hooks/use-supply-departments";
 import { updateSupplyItem } from "@/lib/actions/supply";
 import { UnitTypeSchema } from "./create-supply-item-form";
 
@@ -101,7 +101,7 @@ export function UpdateSupplyItemSheet({
     },
   });
 
-  const { data, isLoading } = useDepartments();
+  const { data, isLoading } = useSupplyDepartments();
   const { data: itemCategory, isLoading: isLoadingItemCategory } =
     useSupplyItemCategory();
 
@@ -243,9 +243,9 @@ export function UpdateSupplyItemSheet({
                         </PopoverTrigger>
                         <PopoverContent className="p-0">
                           <Command className="max-h-72">
-                            <CommandInput placeholder="Search type..." />
+                            <CommandInput placeholder="Search department..." />
                             <CommandList>
-                              <CommandEmpty>No type found.</CommandEmpty>
+                              <CommandEmpty>No department found.</CommandEmpty>
                               <CommandGroup>
                                 {data?.map((department, index) => (
                                   <CommandItem

@@ -2,7 +2,12 @@
 
 import React from "react";
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -35,8 +40,7 @@ export default function SupplyResourceDialog() {
     defaultValues: {
       items: undefined,
       dateAndTimeNeeded: undefined,
-      purpose: [],
-      otherPurpose: "other",
+      purpose: "",
     },
   });
 

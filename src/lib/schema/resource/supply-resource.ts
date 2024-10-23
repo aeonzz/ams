@@ -7,7 +7,7 @@ export const supplyResourceRequestSchema = z.object({
     .array(
       z.object({
         supplyItemId: z.string().refine((val) => val !== "", {
-          message: "Supply item ID is required",
+          message: "Supply item  is required",
         }),
         quantity: z.number().min(1, "Quantity must be at least 1"),
       })
@@ -23,10 +23,10 @@ export const supplyResourceRequestSchema = z.object({
     .refine((date) => date.getHours() !== 0 || date.getMinutes() !== 0, {
       message: "Time cannot be exactly midnight (00:00)",
     }),
-  purpose: z.array(z.string()).refine((value) => value.some((item) => item), {
-    message: "You have to select at least one item.",
-  }),
-  otherPurpose: z.string().optional(),
+  purpose: z
+    .string()
+    .min(1, { message: "Purpose is required" })
+    .max(700, { message: "Cannot be more than 700 characters long" }),
 });
 
 export type SupplyResourceRequestSchema = z.infer<

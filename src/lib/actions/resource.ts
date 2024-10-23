@@ -115,7 +115,7 @@ export const createSupplyResourceRequest = authedProcedure
         prompt: `Create a clear and concise title for a request based on these details:
                  Notes: 
                  ${rest.type} request
-                 ${rest.purpose.join(", ")}
+                 ${rest.purpose}
 
                  
                  Guidelines:
@@ -155,12 +155,7 @@ export const createSupplyResourceRequest = authedProcedure
             create: {
               id: resourceRequestId,
               dateAndTimeNeeded: rest.dateAndTimeNeeded,
-              purpose: rest.purpose.includes("other")
-                ? [
-                    ...rest.purpose.filter((p) => p !== "other"),
-                    rest.otherPurpose,
-                  ].join(", ")
-                : rest.purpose.join(", "),
+              purpose: rest.purpose,
               items: {
                 create: rest.items.map((item) => ({
                   id: generateId(15),
