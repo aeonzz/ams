@@ -73,6 +73,7 @@ import { updateSupplyRequest } from "@/lib/actions/resource";
 import { AlertCard } from "@/components/ui/alert-card";
 import DateTimePicker from "@/components/ui/date-time-picker";
 import { useSupplyResourceData } from "@/lib/hooks/use-supply-resource-data";
+import SupplyRequestItemCard from "@/app/(app)/dashboard/_components/supply-request-item-card";
 
 interface SupplyResourceDetailsProps {
   data: SupplyRequestWithRelations;
@@ -105,19 +106,8 @@ export default function SupplyResourceDetails({
   const { mutateAsync, isPending } =
     useServerActionMutation(updateSupplyRequest);
 
-  const {
-    supplyData,
-    isSupplyDataLoading,
-    isErrorSupplyData,
-    refetchSupplyData,
-    categories,
-    isCategoriesLoading,
-    isErrorCategories,
-  } = useSupplyResourceData();
-
   const { dirtyFields } = useFormState({ control: form.control });
   const isFieldsDirty = Object.keys(dirtyFields).length > 0;
-  // const { variant, color, stroke } = getSupplyStatusColor(data.status);
 
   async function onSubmit(values: UpdateTransportRequestSchema) {
     try {
@@ -202,9 +192,20 @@ export default function SupplyResourceDetails({
             Supply Request Details
           </H4>
         </div>
-        {/* <div>
-          <H5 className="mb-2 font-semibold text-muted-foreground">Vehicle:</H5>
-        </div> */}
+        <div>
+          <H5 className="mb-2 font-semibold text-muted-foreground">Items:</H5>
+          <div className="space-y-2">
+            {data.items.map((item) => (
+              <SupplyRequestItemCard
+                key={item.id}
+                item={item}
+                canEdit={canEdit}
+                editField={editField}
+                setEditField={setEditField}
+              />
+            ))}
+          </div>
+        </div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             {editField === "dateAndTimeNeeded" ? (

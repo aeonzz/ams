@@ -12,6 +12,10 @@ import {
   updateSupplyResourceRequestSchemaWithPath,
 } from "../schema/resource/supply-resource";
 import { createNotification } from "./notification";
+import {
+  deleteSupplyRequestItemSchema,
+  extendedUpdateSupplyRequestItemSchema,
+} from "../schema/resource/request-supply";
 
 export const createReturnableResourceRequest = authedProcedure
   .createServerAction()
@@ -178,7 +182,7 @@ export const updateSupplyRequest = authedProcedure
   .createServerAction()
   .input(updateSupplyResourceRequestSchemaWithPath)
   .handler(async ({ input }) => {
-    const { path, id, items = [], ...rest } = input; 
+    const { path, id, items, ...rest } = input;
 
     try {
       const updatedSupplyRequest = await db.supplyRequest.update({
@@ -186,35 +190,51 @@ export const updateSupplyRequest = authedProcedure
           requestId: id,
         },
         data: {
-          ...rest, 
+          ...rest,
         },
       });
 
-      if (items.length > 0) {
-        const itemUpdates = items.map((item) =>
-          db.supplyRequestItem.upsert({
-            where: {
-              supplyRequestId_supplyItemId: {
-                supplyRequestId: updatedSupplyRequest.id,
-                supplyItemId: item.supplyItemId,
-              },
-            },
-            update: {
-              quantity: item.quantity, 
-            },
-            create: {
-              id: generateId(15),
-              supplyRequestId: updatedSupplyRequest.id,
-              supplyItemId: item.supplyItemId,
-              quantity: item.quantity, 
-            },
-          })
-        );
+      return revalidatePath(path);
+    } catch (error) {
+      return getErrorMessage(error);
+    }
+  });
 
-        await Promise.all(itemUpdates);
-      }
+export const updateRequestSupplyItem = authedProcedure
+  .createServerAction()
+  .input(extendedUpdateSupplyRequestItemSchema)
+  .handler(async ({ input }) => {
+    const { path, id, ...rest } = input;
 
-      // Revalidate the path to refresh the updated data
+    try {
+      const result = await db.supplyRequestItem.update({
+        where: {
+          id: id,
+        },
+        data: {
+          ...rest,
+        },
+      });
+
+      return revalidatePath(path);
+    } catch (error) {
+      return getErrorMessage(error);
+    }
+  });
+
+export const deleteRequestSupplyItem = authedProcedure
+  .createServerAction()
+  .input(deleteSupplyRequestItemSchema)
+  .handler(async ({ input }) => {
+    const { path, id } = input;
+
+    try {
+      const result = await db.supplyRequestItem.delete({
+        where: {
+          id: id,
+        },
+      });
+
       return revalidatePath(path);
     } catch (error) {
       return getErrorMessage(error);
