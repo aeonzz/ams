@@ -74,6 +74,8 @@ import { AlertCard } from "@/components/ui/alert-card";
 import DateTimePicker from "@/components/ui/date-time-picker";
 import { useSupplyResourceData } from "@/lib/hooks/use-supply-resource-data";
 import SupplyRequestItemCard from "@/app/(app)/dashboard/_components/supply-request-item-card";
+import AddSupplyItem from "./add-supply-item";
+import AddSupplyItemWrapper from "./add-supply-item-wrapper";
 
 interface SupplyResourceDetailsProps {
   data: SupplyRequestWithRelations;
@@ -81,6 +83,7 @@ interface SupplyResourceDetailsProps {
   rejectionReason: string | null;
   requestStatus: RequestStatusTypeType;
   isCurrentUser: boolean;
+  departmentId: string;
 }
 
 export default function SupplyResourceDetails({
@@ -89,6 +92,7 @@ export default function SupplyResourceDetails({
   rejectionReason,
   requestStatus,
   isCurrentUser,
+  departmentId,
 }: SupplyResourceDetailsProps) {
   const [editField, setEditField] = React.useState<string | null>(null);
   const pathname = usePathname();
@@ -193,17 +197,49 @@ export default function SupplyResourceDetails({
           </H4>
         </div>
         <div>
-          <H5 className="mb-2 font-semibold text-muted-foreground">Items:</H5>
+          <div className="mb-2 flex items-center justify-between">
+            <H5 className="font-semibold leading-none text-muted-foreground">
+              Items:
+            </H5>
+            {canEdit && (
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (editField === "addSupplyItem") {
+                    setEditField(null);
+                  } else {
+                    setEditField("addSupplyItem");
+                  }
+                }}
+              >
+                {editField === "addSupplyItem" ? "Close" : "Add"}
+              </Button>
+            )}
+          </div>
           <div className="space-y-2">
-            {data.items.map((item) => (
-              <SupplyRequestItemCard
-                key={item.id}
-                item={item}
-                canEdit={canEdit}
-                editField={editField}
+            {editField === "addSupplyItem" ? (
+              <AddSupplyItemWrapper
+                departmentId={departmentId}
+                items={data.items}
                 setEditField={setEditField}
+                supplyRequestId={data.id}
               />
-            ))}
+            ) : (
+              <>
+                {data.items.map((item) => (
+                  <SupplyRequestItemCard
+                    key={item.id}
+                    item={item}
+                    canEdit={canEdit}
+                    editField={editField}
+                    setEditField={setEditField}
+                    itemsCount={data.items.length}
+                  />
+                ))}
+              </>
+            )}
           </div>
         </div>
         <Form {...form}>

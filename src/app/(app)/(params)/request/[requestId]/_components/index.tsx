@@ -154,6 +154,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                 rejectionReason={data.rejectionReason}
                 requestStatus={data.status}
                 isCurrentUser={currentUser.id === data.userId}
+                departmentId={data.departmentId}
               />
             )}
             {data.type === "TRANSPORT" && data.transportRequest && (

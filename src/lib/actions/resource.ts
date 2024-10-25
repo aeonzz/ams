@@ -8,6 +8,7 @@ import { generateId } from "lucia";
 import { revalidatePath } from "next/cache";
 import { extendedReturnableResourceRequestSchema } from "../schema/resource/returnable-resource";
 import {
+  addSupplyItemWithPath,
   extendedSupplyResourceRequestSchema,
   updateSupplyResourceRequestSchemaWithPath,
 } from "../schema/resource/supply-resource";
@@ -234,6 +235,32 @@ export const deleteRequestSupplyItem = authedProcedure
           id: id,
         },
       });
+
+      return revalidatePath(path);
+    } catch (error) {
+      return getErrorMessage(error);
+    }
+  });
+
+export const createSupplyItemRequest = authedProcedure
+  .createServerAction()
+  .input(addSupplyItemWithPath)
+  .handler(async ({ input }) => {
+    const { path, id, items } = input;
+
+    try {
+      await Promise.all(
+        items.map(async (item) => {
+          await db.supplyRequestItem.create({
+            data: {
+              id: generateId(15),
+              supplyRequestId: id,
+              supplyItemId: item.supplyItemId,
+              quantity: item.quantity,
+            },
+          });
+        })
+      );
 
       return revalidatePath(path);
     } catch (error) {

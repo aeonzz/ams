@@ -27,12 +27,24 @@ import { socket } from "@/app/socket";
 import { usePathname } from "next/navigation";
 import { PhotoProvider, PhotoView } from "react-photo-view";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface SupplyRequestItemCardProps {
   item: SupplyRequestItemWithRelations;
   canEdit: boolean;
   editField: string | null;
   setEditField: (editField: string | null) => void;
+  itemsCount: number;
 }
 
 export default function SupplyRequestItemCard({
@@ -40,6 +52,7 @@ export default function SupplyRequestItemCard({
   canEdit,
   editField,
   setEditField,
+  itemsCount,
 }: SupplyRequestItemCardProps) {
   const pathname = usePathname();
   const status = getSupplyStatusColor(item.supplyItem.status);
@@ -74,6 +87,9 @@ export default function SupplyRequestItemCard({
   }
 
   async function handleDelete() {
+    if (itemsCount === 1) {
+      return toast.error("You must have at least one item.");
+    }
     toast.promise(
       deleteItem({
         id: item.id,
@@ -124,7 +140,10 @@ export default function SupplyRequestItemCard({
                 );
               }}
             >
-              <PhotoView key={item.supplyItem.id} src={item.supplyItem.imageUrl}>
+              <PhotoView
+                key={item.supplyItem.id}
+                src={item.supplyItem.imageUrl}
+              >
                 <div className="relative mr-2 aspect-square h-16 cursor-pointer transition-colors hover:brightness-75">
                   <Image
                     src={item.supplyItem.imageUrl}
@@ -209,19 +228,35 @@ export default function SupplyRequestItemCard({
                   />
                 </div>
                 <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost2"
-                      size="icon"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handleDelete();
-                      }}
-                      className="border"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost2"
+                          size="icon"
+                          className="border"
+                          disabled={isUpdating || isDeleting}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This action cannot be undone. This will permanently
+                          delete the item from your supply request.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => handleDelete()}>
+                          Delete
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                   <TooltipContent>Remove item</TooltipContent>
                 </Tooltip>
               </div>

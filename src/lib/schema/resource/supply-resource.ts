@@ -120,3 +120,25 @@ export const extendedUpdateSupplyItemSchema = updateSupplyItemSchema.extend({
 export type ExtendedUpdateSupplyItemSchema = z.infer<
   typeof extendedUpdateSupplyItemSchema
 >;
+
+export const addSupplyItem = z.object({
+  id: z.string(),
+  items: z
+    .array(
+      z.object({
+        supplyItemId: z.string().refine((val) => val !== "", {
+          message: "Supply item  is required",
+        }),
+        quantity: z.number().min(1, "Quantity must be at least 1"),
+      })
+    )
+    .min(1, "At least one item is required"),
+});
+
+export type AddsupplyItem = z.infer<typeof addSupplyItem>;
+
+export const addSupplyItemWithPath = addSupplyItem.extend({
+  path: z.string(),
+});
+
+export type AddSupplyItemWithPath = z.infer<typeof addSupplyItemWithPath>;
