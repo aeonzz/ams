@@ -5,7 +5,6 @@ import DepartmentBorrowableItemsScreen from "./_components";
 export interface DepartmentBorrowableItems {
   params: {
     departmentId: string;
-    venueId: string;
   };
 }
 

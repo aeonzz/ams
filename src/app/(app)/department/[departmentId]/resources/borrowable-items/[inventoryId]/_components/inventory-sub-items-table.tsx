@@ -10,10 +10,9 @@ import { useDataTable } from "@/lib/hooks/use-data-table";
 import { type DataTableFilterField } from "@/lib/types";
 import type { InventorySubItemType } from "@/lib/types/item";
 import { getInventorySubItems } from "@/lib/actions/inventoryItem";
-import { InventorySubItemsTableFloatingBar } from "@/app/(admin)/admin/inventory/[inventoryId]/_components/inventory-sub-items-table-floating-bar";
-import { InventorySubItemsTableToolbarActions } from "@/app/(admin)/admin/inventory/[inventoryId]/_components/inventory-sub-items-table-toolbar-actions";
-import { getInventorySubItemsColumns } from "@/app/(admin)/admin/inventory/[inventoryId]/_components/inventory-sub-items-columns";
-
+import { getInventorySubItemsColumns } from "@/app/(admin)/admin/inventory/lendable-items/[inventoryId]/_components/inventory-sub-items-columns";
+import { InventorySubItemsTableFloatingBar } from "@/app/(admin)/admin/inventory/lendable-items/[inventoryId]/_components/inventory-sub-items-table-floating-bar";
+import { InventorySubItemsTableToolbarActions } from "@/app/(admin)/admin/inventory/lendable-items/[inventoryId]/_components/inventory-sub-items-table-toolbar-actions";
 interface InventorySubItemsTableProps {
   inventorySubItemsPromise: ReturnType<typeof getInventorySubItems>;
 }

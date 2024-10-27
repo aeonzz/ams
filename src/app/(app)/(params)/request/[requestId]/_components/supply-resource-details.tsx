@@ -177,6 +177,12 @@ export default function SupplyResourceDetails({
 
   const canEdit = requestStatus === "PENDING" && isCurrentUser;
 
+  React.useEffect(() => {
+    if (!canEdit) {
+      setEditField(null);
+    }
+  }, [canEdit]);
+
   return (
     <>
       <div className="space-y-4 pb-10">
@@ -188,7 +194,7 @@ export default function SupplyResourceDetails({
                 title="Ready for Pickup"
                 description="The items is now ready to be picked up."
               />
-              <Separator className="my-3" />
+              <Separator className="my-6" />
             </div>
           )}
           <RejectionReasonCard rejectionReason={rejectionReason} />

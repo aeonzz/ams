@@ -48,6 +48,7 @@ import CompleteVenueRequest from "./complete-venue-request";
 import CompleteTransportRequest from "./complete-transport-request";
 import ReturnableRequestActions from "./returnable-request-actions";
 import SupplyResourceDetails from "./supply-resource-details";
+import SupplyRequestActions from "./supply-request-actions";
 
 interface RequestDetailsProps {
   params: string;
@@ -335,6 +336,15 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
               allowedApproverRoles={["DEPARTMENT_HEAD"]}
             />
           )}
+          {data.type === "SUPPLY" && data.supplyRequest && (
+            <RequestReviewerActions
+              request={data}
+              allowedRoles={["REQUEST_MANAGER"]}
+              allowedDepartment={data.departmentId}
+              allowedApproverRoles={["DEPARTMENT_HEAD"]}
+              supplyRequest
+            />
+          )}
           {data.type === "TRANSPORT" && data.transportRequest && (
             <RequestReviewerActions
               request={data}
@@ -369,6 +379,9 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                 requestId={data.id}
               />
             )}
+          {data.status === "APPROVED" &&
+            data.type === "SUPPLY" &&
+            data.supplyRequest && <SupplyRequestActions requestId={data.id} />}
           {/* {data.type === "VENUE" && data.venueRequest && (
             <JobRequestReviewerActions
               request={data}

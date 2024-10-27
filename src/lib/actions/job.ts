@@ -149,8 +149,7 @@ export const updateRequestStatus = authedProcedure
   .input(updateRequestStatusSchemaWithPath)
   .handler(async ({ ctx, input }) => {
     const { user } = ctx;
-    const { path, requestId, reviewerId, ...rest } = input;
-    console.log("asdasdasdsad", rest.rejectionReason)
+    const { path, requestId, reviewerId, supplyRequest, ...rest } = input;
 
     try {
       const result = await db.$transaction(async (prisma) => {
@@ -179,6 +178,27 @@ export const updateRequestStatus = authedProcedure
             },
           },
         });
+
+        if (rest.status === "APPROVED" && supplyRequest === true) {
+          const supplyRequestItems = await prisma.supplyRequestItem.findMany({
+            where: {
+              supplyRequest: {
+                requestId: requestId,
+              },
+            },
+          });
+
+          for (const item of supplyRequestItems) {
+            await prisma.supplyItem.update({
+              where: { id: item.supplyItemId },
+              data: {
+                quantity: {
+                  decrement: item.quantity,
+                },
+              },
+            });
+          }
+        }
 
         const departmentHeads = updatedRequest.department.userRole
           ?.filter((role) => role.role.name === "DEPARTMENT_HEAD")

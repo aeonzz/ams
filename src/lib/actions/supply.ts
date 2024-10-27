@@ -11,6 +11,7 @@ import {
   deleteSupplyItemsSchema,
   extendedUpdateSupplyItemSchema,
   updateSupplyItemItemStatusesSchema,
+  updateSupplyResourceRequestSchemaWithPath,
 } from "../schema/resource/supply-resource";
 import { revalidatePath } from "next/cache";
 
@@ -91,6 +92,79 @@ export async function getSupply(input: GetSupplyItemSchema) {
         return {
           ...item,
           departmentName: item.department.name,
+          categoryName: item.category.name,
+        };
+      })
+    );
+
+    return {
+      data: modifiedData,
+      pageCount,
+      departments: department,
+    };
+  } catch (err) {
+    console.error(err);
+    return { data: [], pageCount: 0 };
+  }
+}
+
+export async function getDepartmentSupply(
+  input: GetSupplyItemSchema & { departmentId: string }
+) {
+  await checkAuth();
+  const { page, per_page, sort, name, status, departmentId, from, to } = input;
+
+  try {
+    const skip = (page - 1) * per_page;
+
+    const [column, order] = (sort?.split(".") ?? ["createdAt", "desc"]) as [
+      keyof SupplyItem | undefined,
+      "asc" | "desc" | undefined,
+    ];
+
+    const where: any = {
+      isArchived: false,
+      departmentId: departmentId,
+    };
+
+    if (name) {
+      where.name = { contains: name, mode: "insensitive" };
+    }
+
+    if (status) {
+      where.status = { in: status.split(".") };
+    }
+
+    if (from && to) {
+      where.createdAt = {
+        gte: new Date(from),
+        lte: new Date(to),
+      };
+    }
+
+    const [data, total, department] = await db.$transaction([
+      db.supplyItem.findMany({
+        where,
+        take: per_page,
+        skip,
+        orderBy: {
+          [column || "createdAt"]: order || "desc",
+        },
+        include: {
+          department: true,
+          category: true,
+        },
+      }),
+      db.supplyItem.count({ where }),
+      db.department.findMany(),
+    ]);
+
+    const pageCount = Math.ceil(total / per_page);
+
+    const modifiedData = await Promise.all(
+      data.map(async (item) => {
+        return {
+          ...item,
           categoryName: item.category.name,
         };
       })
@@ -198,4 +272,31 @@ export const deleteSupplyItems = authedProcedure
     }
   });
 
-  
+export const supplyRequestActions = authedProcedure
+  .createServerAction()
+  .input(updateSupplyResourceRequestSchemaWithPath)
+  .handler(async ({ input }) => {
+    const { id, path } = input;
+    try {
+      const result = await db.$transaction(async (prisma) => {
+        const updatedRequest = await prisma.supplyRequest.update({
+          where: {
+            requestId: id,
+          },
+          data: {
+            request: {
+              update: {
+                status: "COMPLETED",
+                completedAt: new Date(),
+              },
+            },
+          },
+        });
+        return updatedRequest;
+      });
+
+      return revalidatePath(path);
+    } catch (error) {
+      getErrorMessage(error);
+    }
+  });

@@ -8,7 +8,7 @@ import CreateVenueDialog from "@/app/(admin)/admin/venues/_components/create-ven
 import { RoleGuard } from "@/components/role-guard";
 import { db } from "@/lib/db/index";
 import NotFound from "@/app/not-found";
-import CreateInventorySubItemDialog from "@/app/(admin)/admin/inventory/[inventoryId]/_components/create-inventory-sub-item-dialog";
+import CreateInventorySubItemDialog from "@/app/(admin)/admin/inventory/lendable-items/[inventoryId]/_components/create-inventory-sub-item-dialog";
 
 export interface Props {
   params: {

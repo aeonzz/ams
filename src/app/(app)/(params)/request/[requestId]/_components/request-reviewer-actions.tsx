@@ -54,6 +54,7 @@ interface RequestReviewerActionsProps {
   allowedRoles: string[];
   allowedDepartment?: string;
   allowedApproverRoles: string[];
+  supplyRequest?: boolean | undefined;
 }
 
 export default function RequestReviewerActions({
@@ -61,6 +62,7 @@ export default function RequestReviewerActions({
   allowedRoles,
   allowedDepartment,
   allowedApproverRoles,
+  supplyRequest,
 }: RequestReviewerActionsProps) {
   const currentUser = useSession();
   const pathname = usePathname();
@@ -266,6 +268,7 @@ export default function RequestReviewerActions({
                       <RequestApproverActions
                         request={request}
                         isPending={isUpdateStatusPending}
+                        supplyRequest={supplyRequest}
                       />
                     </PermissionGuard>
                   )}

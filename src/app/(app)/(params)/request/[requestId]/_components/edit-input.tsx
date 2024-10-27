@@ -8,7 +8,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { P } from "@/components/typography/text";
-import { DefaultValues, KeepStateOptions } from "react-hook-form";
+import type { DefaultValues, KeepStateOptions } from "react-hook-form";
 
 interface EditInputProps<T extends Record<string, any>> {
   isPending: boolean;

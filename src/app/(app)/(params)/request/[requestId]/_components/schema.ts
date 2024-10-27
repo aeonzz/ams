@@ -27,6 +27,7 @@ export const updateRequestStatusSchema = z.object({
   reviewerId: z.string().optional(),
   status: RequestStatusTypeSchema,
   rejectionReason: z.string().optional(),
+  supplyRequest: z.boolean().optional(),
 });
 
 export type UpdateRequestStatusSchema = z.infer<
@@ -82,7 +83,7 @@ export type UpdateReworkJobRequestSchema = z.infer<
 export const cancelOwnRequestSchema = z.object({
   requestId: z.string(),
   path: z.string(),
-  status: RequestStatusTypeSchema
+  status: RequestStatusTypeSchema,
 });
 
 export type CancelOwnRequestSchema = z.infer<typeof cancelOwnRequestSchema>;
