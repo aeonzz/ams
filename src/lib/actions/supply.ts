@@ -24,6 +24,7 @@ export async function getSupply(input: GetSupplyItemSchema) {
     name,
     status,
     departmentName: deptName,
+    categoryName,
     from,
     to,
   } = input;
@@ -61,6 +62,16 @@ export async function getSupply(input: GetSupplyItemSchema) {
       };
     }
 
+    if (categoryName) {
+      const categories = categoryName
+        .split(".")
+        .map((d) => d.trim().replace(/\+/g, " "));
+
+      where.category = {
+        name: { in: categories, mode: "insensitive" },
+      };
+    }
+
     if (from && to) {
       where.createdAt = {
         gte: new Date(from),
@@ -68,7 +79,7 @@ export async function getSupply(input: GetSupplyItemSchema) {
       };
     }
 
-    const [data, total, department] = await db.$transaction([
+    const [data, total, department, category] = await db.$transaction([
       db.supplyItem.findMany({
         where,
         take: per_page,
@@ -83,6 +94,11 @@ export async function getSupply(input: GetSupplyItemSchema) {
       }),
       db.supplyItem.count({ where }),
       db.department.findMany(),
+      db.supplyItemCategory.findMany({
+        where: {
+          isArchived: false,
+        },
+      }),
     ]);
 
     const pageCount = Math.ceil(total / per_page);
@@ -101,6 +117,7 @@ export async function getSupply(input: GetSupplyItemSchema) {
       data: modifiedData,
       pageCount,
       departments: department,
+      categories: category,
     };
   } catch (err) {
     console.error(err);
@@ -112,7 +129,17 @@ export async function getDepartmentSupply(
   input: GetSupplyItemSchema & { departmentId: string }
 ) {
   await checkAuth();
-  const { page, per_page, sort, name, status, departmentId, from, to } = input;
+  const {
+    page,
+    per_page,
+    sort,
+    name,
+    status,
+    departmentId,
+    categoryName,
+    from,
+    to,
+  } = input;
 
   try {
     const skip = (page - 1) * per_page;
@@ -135,6 +162,16 @@ export async function getDepartmentSupply(
       where.status = { in: status.split(".") };
     }
 
+    if (categoryName) {
+      const categories = categoryName
+        .split(".")
+        .map((d) => d.trim().replace(/\+/g, " "));
+
+      where.category = {
+        name: { in: categories, mode: "insensitive" },
+      };
+    }
+
     if (from && to) {
       where.createdAt = {
         gte: new Date(from),
@@ -142,7 +179,7 @@ export async function getDepartmentSupply(
       };
     }
 
-    const [data, total, department] = await db.$transaction([
+    const [data, total, department, category] = await db.$transaction([
       db.supplyItem.findMany({
         where,
         take: per_page,
@@ -156,7 +193,16 @@ export async function getDepartmentSupply(
         },
       }),
       db.supplyItem.count({ where }),
-      db.department.findMany(),
+      db.department.findMany({
+        where: {
+          isArchived: false,
+        },
+      }),
+      db.supplyItemCategory.findMany({
+        where: {
+          isArchived: false,
+        },
+      }),
     ]);
 
     const pageCount = Math.ceil(total / per_page);
@@ -165,6 +211,7 @@ export async function getDepartmentSupply(
       data.map(async (item) => {
         return {
           ...item,
+          departmentName: item.department.name,
           categoryName: item.category.name,
         };
       })
@@ -174,6 +221,7 @@ export async function getDepartmentSupply(
       data: modifiedData,
       pageCount,
       departments: department,
+      categories: category,
     };
   } catch (err) {
     console.error(err);

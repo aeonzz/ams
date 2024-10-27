@@ -33,10 +33,11 @@ const management: {
       "Manage department users. Control roles and permissions tailored to departmental needs.",
   },
   {
-    title: "Pending Requests",
-    href: "requests/pending?page=1&per_page=10&sort=createdAt.desc",
+    title: "Supply Management",
+    href: "resources/supply-items?page=1&per_page=10&sort=createdAt.desc",
     description:
-      "View and manage all pending requests within the department. Ensure timely follow-up and resolution of outstanding requests.",
+      "Oversee the department’s supply inventory. Track stock levels, manage supply requests, and ensure timely replenishment of critical items.",
+    condition: true,
   },
   {
     title: "Managing Job Requests",

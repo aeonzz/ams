@@ -198,7 +198,7 @@ export function UpdateSupplyItemSheet({
                   </FormItem>
                 )}
               />
-              {!queryKey && (
+              {!removeField && (
                 <FormField
                   control={form.control}
                   name="departmentId"

@@ -30,7 +30,7 @@ import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import Link from "next/link";
 import { type InventoryItemType } from "@/lib/types/item";
 import { updateInventory } from "@/lib/actions/inventory";
-import { UpdateInventorySheet } from "./inventory-inventory-sheet";
+import { UpdateInventorySheet } from "./update-inventory-sheet";
 import { DeleteInventoryDialog } from "./delete-inventories-dialog";
 import {
   ChevronDownIcon,

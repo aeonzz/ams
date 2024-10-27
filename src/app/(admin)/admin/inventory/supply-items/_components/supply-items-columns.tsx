@@ -49,7 +49,15 @@ import SupplyItemStatusSchema, {
   SupplyItemStatusType,
 } from "prisma/generated/zod/inputTypeSchemas/SupplyItemStatusSchema";
 
-export function getSupllyItemColumns(): ColumnDef<SupplyItemType>[] {
+type SupplyItemColumnProps = {
+  queryKey?: string[];
+  removeField?: boolean;
+};
+
+export function getSupllyItemColumns(
+  props: SupplyItemColumnProps
+): ColumnDef<SupplyItemType>[] {
+  const { queryKey, removeField = false } = props;
   return [
     {
       id: "select",
@@ -326,6 +334,8 @@ export function getSupllyItemColumns(): ColumnDef<SupplyItemType>[] {
             <UpdateSupplyItemSheet
               open={showUpdateTaskSheet}
               onOpenChange={setShowUpdateTaskSheet}
+              queryKey={queryKey}
+              removeField={removeField}
               item={row.original}
             />
             <DeleteSuppyItemDialog

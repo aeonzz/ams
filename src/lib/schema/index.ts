@@ -100,6 +100,7 @@ export const SupplyItemSearchParamsSchema = z.object({
   name: z.string().optional(),
   status: z.string().optional(),
   departmentName: z.string().optional(),
+  categoryName: z.string().optional(),
   from: z.string().optional(),
   to: z.string().optional(),
 });

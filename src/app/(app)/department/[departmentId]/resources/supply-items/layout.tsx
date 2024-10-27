@@ -9,6 +9,7 @@ import { RoleGuard } from "@/components/role-guard";
 import { db } from "@/lib/db/index";
 import NotFound from "@/app/not-found";
 import CreateInventoryDialog from "@/app/(admin)/admin/inventory/lendable-items/_components/create-inventory-dialog";
+import CreateSupplyItemDialog from "@/app/(admin)/admin/inventory/supply-items/_components/create-supply-item-dialog";
 
 interface Props {
   params: {
@@ -41,8 +42,8 @@ export default async function CommandLayout({ children, params }: Props) {
         <CommandSearchDialog>
           <ThemeDialog />
           <SettingsDialog />
-          <CreateInventoryDialog
-            queryKey={["department-returnable-items", params.departmentId]}
+          <CreateSupplyItemDialog
+            queryKey={["department-supply-items", params.departmentId]}
             departmentId={params.departmentId}
           />
         </CommandSearchDialog>

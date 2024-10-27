@@ -22,13 +22,18 @@ interface DepartmentSupplyItemsTableProps {
 export function DepartmentSupplyItemsTable({
   supplyPromise,
 }: DepartmentSupplyItemsTableProps) {
-  const { data, pageCount, departments } = React.use(supplyPromise);
+  const { data, pageCount, departments, categories } = React.use(supplyPromise);
 
-  const columns = React.useMemo(() => getSupllyItemColumns(), []);
+  const columns = React.useMemo(
+    () =>
+      getSupllyItemColumns({
+        queryKey: ["update-department-supply-items"],
+        removeField: true,
+      }),
+    []
+  );
 
-  const filterFields: DataTableFilterField<
-    Omit<SupplyItemType, "departmentName">
-  >[] = [
+  const filterFields: DataTableFilterField<SupplyItemType>[] = [
     {
       label: "Name",
       value: "name",
@@ -45,6 +50,21 @@ export function DepartmentSupplyItemsTable({
         withCount: true,
       })),
     },
+    ...(categories
+      ? [
+          {
+            label: "Category",
+            value: "categoryName" as keyof SupplyItemType,
+            options: categories.map((category) => ({
+              label:
+                category.name.charAt(0).toUpperCase() +
+                category.name.slice(1).toLowerCase().replace(/_/g, " "),
+              value: category.name,
+              withCount: true,
+            })),
+          },
+        ]
+      : []),
   ];
 
   const { table } = useDataTable({

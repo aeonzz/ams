@@ -69,7 +69,6 @@ export default function ManageVenueActions({
         onOpenChange={handleOpenChange}
         queryKey={["venue-details", venueId]}
         removeField
-        //@ts-ignore
         venue={data}
       />
     ),

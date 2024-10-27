@@ -20,9 +20,9 @@ interface SupplyItemsTableProps {
 }
 
 export function SupplyItemsTable({ supplyPromise }: SupplyItemsTableProps) {
-  const { data, pageCount, departments } = React.use(supplyPromise);
+  const { data, pageCount, departments, categories } = React.use(supplyPromise);
 
-  const columns = React.useMemo(() => getSupllyItemColumns(), []);
+  const columns = React.useMemo(() => getSupllyItemColumns({}), []);
 
   const filterFields: DataTableFilterField<SupplyItemType>[] = [
     {
@@ -52,6 +52,21 @@ export function SupplyItemsTable({ supplyPromise }: SupplyItemsTableProps) {
         withCount: true,
       })),
     },
+    ...(categories
+      ? [
+          {
+            label: "Category",
+            value: "categoryName" as keyof SupplyItemType,
+            options: categories.map((category) => ({
+              label:
+                category.name.charAt(0).toUpperCase() +
+                category.name.slice(1).toLowerCase().replace(/_/g, " "),
+              value: category.name,
+              withCount: true,
+            })),
+          },
+        ]
+      : []),
   ];
 
   const { table } = useDataTable({
