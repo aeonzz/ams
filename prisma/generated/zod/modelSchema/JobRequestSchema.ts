@@ -2,12 +2,10 @@ import { z } from 'zod';
 import { JobTypeSchema } from '../inputTypeSchemas/JobTypeSchema'
 import { PriorityTypeSchema } from '../inputTypeSchemas/PriorityTypeSchema'
 import { JobStatusSchema } from '../inputTypeSchemas/JobStatusSchema'
-import type { FileWithRelations } from './FileSchema'
 import type { ReworkWithRelations } from './ReworkSchema'
 import type { RequestWithRelations } from './RequestSchema'
 import type { UserWithRelations } from './UserSchema'
 import type { JobRequestEvaluationWithRelations } from './JobRequestEvaluationSchema'
-import { FileWithRelationsSchema } from './FileSchema'
 import { ReworkWithRelationsSchema } from './ReworkSchema'
 import { RequestWithRelationsSchema } from './RequestSchema'
 import { UserWithRelationsSchema } from './UserSchema'
@@ -30,6 +28,7 @@ export const JobRequestSchema = z.object({
   endDate: z.coerce.date().nullable(),
   costEstimate: z.number().nullable(),
   actualCost: z.number().nullable(),
+  images: z.string().array(),
   rejectionCount: z.number().int(),
   requestId: z.string(),
   assignedTo: z.string().nullable(),
@@ -44,7 +43,6 @@ export type JobRequest = z.infer<typeof JobRequestSchema>
 /////////////////////////////////////////
 
 export type JobRequestRelations = {
-  files: FileWithRelations[];
   reworkAttempts: ReworkWithRelations[];
   request: RequestWithRelations;
   assignedUser?: UserWithRelations | null;
@@ -54,7 +52,6 @@ export type JobRequestRelations = {
 export type JobRequestWithRelations = z.infer<typeof JobRequestSchema> & JobRequestRelations
 
 export const JobRequestWithRelationsSchema: z.ZodType<JobRequestWithRelations> = JobRequestSchema.merge(z.object({
-  files: z.lazy(() => FileWithRelationsSchema).array(),
   reworkAttempts: z.lazy(() => ReworkWithRelationsSchema).array(),
   request: z.lazy(() => RequestWithRelationsSchema),
   assignedUser: z.lazy(() => UserWithRelationsSchema).nullable(),

@@ -7,14 +7,14 @@ import { withRoles } from "@/middleware/withRole";
 export async function POST(request: NextRequest) {
   try {
     // const uploadPath = '/app/uploads';
-    const uploadPath = process.env.UPLOAD_PATH;
+    // const uploadPath = process.env.UPLOAD_PATH;
 
-    if (!uploadPath) {
-      return NextResponse.json(
-        { success: false, message: "Server error" },
-        { status: 500 }
-      );
-    }
+    // if (!uploadPath) {
+    //   return NextResponse.json(
+    //     { success: false, message: "Server error" },
+    //     { status: 500 }
+    //   );
+    // }
 
     const { files } = await request.json();
 
@@ -27,11 +27,11 @@ export async function POST(request: NextRequest) {
 
     const results = await Promise.all(
       files.map(async (file) => {
-        if (!file.content.startsWith("data:image/")) {
+        if (!file.content.startsWith("data:application/pdf")) {
           return {
             name: file.name,
             success: false,
-            message: "Not an image file",
+            message: "Not a PDF file",
           };
         }
 
@@ -40,14 +40,14 @@ export async function POST(request: NextRequest) {
         const buffer = Buffer.from(base64Data, "base64");
 
         // Generate a unique filename
-        const filename = `${generateId(10)}-${file.name}`;
+        const filename = `${generateId(3)}-${file.name}`;
         const fullPath = path.join(
           process.cwd(),
           "public",
-          "uploads",
+          "resources",
           filename
         );
-        const relativePath = path.posix.join("/uploads", filename);
+        const relativePath = path.posix.join("/resources", filename);
 
         // Write the file
         await writeFile(fullPath, buffer);
@@ -60,12 +60,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true, results });
   } catch (error) {
     console.error("Error processing files:", error);
-    return NextResponse.json(-
-      { success: false, message: "Server error" },
-      { status: 500 }
-    );
+    return NextResponse.json(-{ success: false, message: "Server error" }, {
+      status: 500,
+    });
   }
 }
 
 // export const POST = withRoles(handler, ['ADMIN'])
-

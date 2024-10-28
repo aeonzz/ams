@@ -1,17 +1,9 @@
 "use client";
 
 import React from "react";
-import {
-  useInfiniteQuery,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import type {
-  DepartmentWithRelations,
-  Notification,
-  NotificationWithRelations,
-} from "prisma/generated/zod";
+import type { Notification } from "prisma/generated/zod";
 import {
   Card,
   CardContent,
@@ -20,8 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { H1, H4, P } from "@/components/typography/text";
-import SearchInput from "@/app/(app)/_components/search-input";
+import { H1, P } from "@/components/typography/text";
 import FetchDataError from "@/components/card/fetch-data-error";
 import { cn, textTransform } from "@/lib/utils";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -29,20 +20,11 @@ import Link from "next/link";
 import OpenRequestsTable from "./open-requests-table";
 import TotalOpenRequests from "./total-open-requests";
 import Inbox from "@/app/(app)/dashboard/_components/inbox";
-import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
-import {
-  deleteNotification,
-  updateNotificationStatus,
-} from "@/lib/actions/notification";
-import LoadingSpinner from "@/components/loaders/loading-spinner";
-import { InboxIcon, Trash } from "lucide-react";
-import { CommandShortcut } from "@/components/ui/command";
-import { toast } from "sonner";
+import { InboxIcon } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { socket } from "@/app/socket";
 import DepartmentOverviewSkeleton from "./department-overview-skeleton";
-import OverviewNavigationMenu from "../../_components/navigation-menu";
 import { useDepartmentData } from "@/lib/hooks/use-department-data";
 
 const ITEMS_PER_PAGE = 10;
@@ -51,16 +33,13 @@ interface DepartmentOverviewScreenProps {
   departmentId: string;
 }
 
-export default function DepartmentOverviewScreen({
+export default function Component({
   departmentId,
 }: DepartmentOverviewScreenProps) {
   const queryClient = useQueryClient();
   const [selectedNotificationId, setSelectedNotificationId] = React.useState<
     string | null
   >(null);
-
-  const { mutateAsync: updateStatusMutate, isPending: isUpdatePending } =
-    useServerActionMutation(updateNotificationStatus);
 
   const { data, isLoading, isError, refetch } = useDepartmentData(departmentId);
 
@@ -94,7 +73,7 @@ export default function DepartmentOverviewScreen({
 
   const handleNotification = React.useCallback(() => {
     refetchNotifications();
-  }, [queryClient, departmentId]);
+  }, [refetchNotifications]);
 
   React.useEffect(() => {
     socket.on("notifications", handleNotification);
@@ -119,19 +98,6 @@ export default function DepartmentOverviewScreen({
       (notification) => notification.id === selectedNotificationId
     );
   }, [allNotifications, selectedNotificationId]);
-
-  React.useEffect(() => {
-    if (selectedNotification && !selectedNotification.isRead) {
-      updateStatusMutate({
-        notificationId: selectedNotification.id,
-        isRead: true,
-      }).then(() => {
-        refetchNotifications();
-        socket.emit("notifications");
-        console.log("Notification updated and socket event emitted");
-      });
-    }
-  }, [selectedNotification, updateStatusMutate, queryClient, departmentId]);
 
   if (isLoading) {
     return <DepartmentOverviewSkeleton />;

@@ -136,7 +136,7 @@ export default function OverviewNavigationMenu({
       <NavigationMenuList>
         <NavigationMenuItem>
           <Link
-            href={`/department/${departmentId}/overview`}
+            href={`/admin/departments/${departmentId}/overview`}
             legacyBehavior
             passHref
             prefetch
@@ -144,7 +144,7 @@ export default function OverviewNavigationMenu({
             <NavigationMenuLink
               className={cn(
                 navigationMenuTriggerStyle(),
-                pathname === `/department/${departmentId}/overview` &&
+                pathname === `/admin/departments/${departmentId}/overview` &&
                   "bg-secondary-accent"
               )}
             >
@@ -175,7 +175,7 @@ export default function OverviewNavigationMenu({
                     </div>
                   ) : (
                     <Link
-                      href={`/department/${departmentId}/${manage.href}`}
+                      href={`/admin/departments/${departmentId}/${manage.href}`}
                       legacyBehavior
                       passHref
                       prefetch
@@ -206,7 +206,7 @@ export default function OverviewNavigationMenu({
           <NavigationMenuContent>
             <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
               <Link
-                href={`/department/${departmentId}/insights`}
+                href={`/admin/departments/${departmentId}/insights`}
                 prefetch
                 className="row-span-4"
               >
@@ -225,7 +225,7 @@ export default function OverviewNavigationMenu({
               {resources.map((resource) => (
                 <Link
                   key={resource.title}
-                  href={`/department/${departmentId}/${resource.href}`}
+                  href={`/admin/departments/${departmentId}/${resource.href}`}
                   legacyBehavior
                   passHref
                   prefetch
@@ -249,7 +249,7 @@ export default function OverviewNavigationMenu({
         </NavigationMenuItem>
         <NavigationMenuItem>
           <Link
-            href={`/department/${departmentId}/about`}
+            href={`/admin/departments/${departmentId}/about`}
             legacyBehavior
             passHref
             prefetch
@@ -257,7 +257,7 @@ export default function OverviewNavigationMenu({
             <NavigationMenuLink
               className={cn(
                 navigationMenuTriggerStyle(),
-                pathname === `/department/${departmentId}/about` &&
+                pathname === `/admin/departments/${departmentId}/about` &&
                   "bg-secondary-accent"
               )}
             >

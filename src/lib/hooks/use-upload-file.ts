@@ -3,13 +3,13 @@ import { fileToBase64 } from "../fileToBase64";
 import { updateUser } from "../actions/users";
 import { useState } from "react";
 
-export function useUploadFile() {
+export function useUploadFile(url: string = "/api/file/image") {
   const [uploadedFiles, setUploadedFiles] = useState<string[]>([]);
   const [progresses, setProgresses] = useState<Record<string, number>>({});
   const [isUploading, setIsUploading] = useState(false);
   async function handleImageUpload(files: File[]) {
     try {
-      setIsUploading(true)
+      setIsUploading(true);
       const serializedFiles = await Promise.all(
         files.map(async (file) => ({
           name: file.name,
@@ -27,7 +27,7 @@ export function useUploadFile() {
       let uploadedSize = 0;
 
       const response = await axios.post(
-        "/api/file",
+        url,
         { files: serializedFiles },
         {
           headers: {

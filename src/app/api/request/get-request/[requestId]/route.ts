@@ -50,11 +50,15 @@ export async function GET(req: Request, params: Context) {
         },
         jobRequest: {
           include: {
-            files: true,
             assignedUser: true,
             request: {
               select: {
                 user: true,
+                department: {
+                  select: {
+                    files: true,
+                  },
+                },
               },
             },
             jobRequestEvaluation: true,

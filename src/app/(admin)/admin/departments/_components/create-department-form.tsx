@@ -276,7 +276,7 @@ export default function CreateDepartmentForm({
               )}
             />
             {form.watch("managesBorrowRequest") && (
-              <Card className="bg-secondary p-3 space-y-3">
+              <Card className="space-y-3 bg-secondary p-3">
                 <FormField
                   control={form.control}
                   name="maxBorrowDuration"

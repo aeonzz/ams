@@ -21,7 +21,7 @@ export const useDepartmentData = (departmentId: string) => {
   }, []);
 
   return useQuery<DepartmentWithRelations>({
-    queryKey: ["department", departmentId],
+    queryKey: [departmentId],
     queryFn: async () => {
       const res = await axios.get(
         `/api/department/get-department-by-id/${departmentId}`

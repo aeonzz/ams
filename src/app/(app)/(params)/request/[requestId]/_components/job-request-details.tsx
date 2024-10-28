@@ -136,6 +136,10 @@ export default function JobRequestDetails({
   const { dirtyFields } = useFormState({ control: form.control });
   const isFieldsDirty = Object.keys(dirtyFields).length > 0;
 
+  const existingFormFile = data.request.department.files.find(
+    (file) => file.filePurpose === "JOB_FORM"
+  )?.url;
+
   async function onSubmit(values: UpdateJobRequestSchemaServer) {
     try {
       const data: UpdateJobRequestSchemaServerWithPath = {
@@ -221,6 +225,7 @@ export default function JobRequestDetails({
   );
 
   const handleDownloadJobRequestForm = async () => {
+    if (!existingFormFile) return;
     const generateAndDownloadPDF = async () => {
       try {
         const pdfBlob = await fillJobRequestFormPDF({
@@ -233,6 +238,7 @@ export default function JobRequestDetails({
           personAttended: personAttended,
           status: requestStatus,
           requestedBy: requestedBy,
+          formUrl: existingFormFile,
         });
         const url = URL.createObjectURL(pdfBlob);
         const link = document.createElement("a");
@@ -302,28 +308,30 @@ export default function JobRequestDetails({
               Job Request Details
             </H4>
             <div className="space-x-2">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost2"
-                    size="icon"
-                    className="size-7"
-                    onClick={handleDownloadJobRequestForm}
+              {!existingFormFile && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost2"
+                      size="icon"
+                      className="size-7"
+                      onClick={handleDownloadJobRequestForm}
+                    >
+                      <Download className="size-4 text-muted-foreground" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent
+                    className="flex items-center gap-3"
+                    side="bottom"
                   >
-                    <Download className="size-4 text-muted-foreground" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent
-                  className="flex items-center gap-3"
-                  side="bottom"
-                >
-                  <CommandTooltip text="Download job request form">
-                    <CommandShortcut>Ctrl</CommandShortcut>
-                    <CommandShortcut>Shift</CommandShortcut>
-                    <CommandShortcut>D</CommandShortcut>
-                  </CommandTooltip>
-                </TooltipContent>
-              </Tooltip>
+                    <CommandTooltip text="Download job request form">
+                      <CommandShortcut>Ctrl</CommandShortcut>
+                      <CommandShortcut>Shift</CommandShortcut>
+                      <CommandShortcut>D</CommandShortcut>
+                    </CommandTooltip>
+                  </TooltipContent>
+                </Tooltip>
+              )}
               {isEvaluated && (
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -775,15 +783,15 @@ export default function JobRequestDetails({
           }}
         >
           <div>
-            {data.files.map((file) => (
-              <PhotoView key={file.id} src={file.url}>
+            {data.images.map((image, index) => (
+              <PhotoView key={index} src={image}>
                 <div
-                  key={file.id}
+                  key={index}
                   className="relative mb-3 w-full cursor-pointer"
                 >
                   <Image
-                    src={file.url}
-                    alt={`Image of ${file.url}`}
+                    src={image}
+                    alt={`Image of ${image}`}
                     placeholder="empty"
                     quality={100}
                     width={0}

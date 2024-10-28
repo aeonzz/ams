@@ -1,16 +1,17 @@
 import { z } from 'zod';
-import type { JobRequestWithRelations } from './JobRequestSchema'
-import { JobRequestWithRelationsSchema } from './JobRequestSchema'
+import { FilePurposeSchema } from '../inputTypeSchemas/FilePurposeSchema'
+import type { DepartmentWithRelations } from './DepartmentSchema'
+import { DepartmentWithRelationsSchema } from './DepartmentSchema'
 
 /////////////////////////////////////////
 // FILE SCHEMA
 /////////////////////////////////////////
 
 export const FileSchema = z.object({
+  filePurpose: FilePurposeSchema,
   id: z.string(),
   url: z.string(),
-  blurDataUrl: z.string().nullable(),
-  jobRequestId: z.string().nullable(),
+  departmentId: z.string().nullable(),
 })
 
 export type File = z.infer<typeof FileSchema>
@@ -20,13 +21,13 @@ export type File = z.infer<typeof FileSchema>
 /////////////////////////////////////////
 
 export type FileRelations = {
-  JobRequest?: JobRequestWithRelations | null;
+  department?: DepartmentWithRelations | null;
 };
 
 export type FileWithRelations = z.infer<typeof FileSchema> & FileRelations
 
 export const FileWithRelationsSchema: z.ZodType<FileWithRelations> = FileSchema.merge(z.object({
-  JobRequest: z.lazy(() => JobRequestWithRelationsSchema).nullable(),
+  department: z.lazy(() => DepartmentWithRelationsSchema).nullable(),
 }))
 
 export default FileSchema;

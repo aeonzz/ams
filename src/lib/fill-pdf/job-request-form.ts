@@ -63,9 +63,11 @@ function wrapText(
   return lines;
 }
 
-export async function fillJobRequestFormPDF(data: Data): Promise<Blob> {
-  const pdfPath = "/resources/FM-USTP-MEWS-01-JOB-REQUEST-FORM.pdf";
-  const pdfBytes = await fetch(pdfPath).then((res) => res.arrayBuffer());
+export async function fillJobRequestFormPDF(
+  data: Data & { formUrl: string }
+): Promise<Blob> {
+  // const pdfPath = "/resources/FM-USTP-MEWS-01-JOB-REQUEST-FORM.pdf";
+  const pdfBytes = await fetch(data.formUrl).then((res) => res.arrayBuffer());
 
   const pdfDoc = await PDFDocument.load(pdfBytes);
   pdfDoc.registerFontkit(fontkit);

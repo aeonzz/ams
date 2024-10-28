@@ -69,6 +69,7 @@ model Department {
   vehicle                   Vehicle[]
   departmentBorrowingPolicy DepartmentBorrowingPolicy?
   supplyItem                SupplyItem[]
+  files                     File[]
 }
 
 model UserDepartment {
@@ -118,9 +119,9 @@ model Session {
 model File {
   id           String      @id
   url          String
-  blurDataUrl  String?
-  JobRequest   JobRequest? @relation(fields: [jobRequestId], references: [id])
-  jobRequestId String?
+  filePurpose  FilePurpose @default(NONE)
+  department   Department? @relation(fields: [departmentId], references: [id])
+  departmentId String?
 }
 
 model Setting {
@@ -196,7 +197,7 @@ model JobRequest {
   costEstimate         Float?
   actualCost           Float?
   jobType              JobType
-  files                File[]
+  images               String[]
   reworkAttempts       Rework[]
   rejectionCount       Int                   @default(0)
   priority             PriorityType          @default(NO_PRIORITY)
@@ -505,6 +506,16 @@ enum NotificationType {
   SUCCESS
   WARNING
   APPROVAL
+}
+
+enum FilePurpose {
+  NONE
+  IMAGE
+  JOB_FORM
+  VENUE_FORM
+  TRANSPORT_FORM
+  SUPPLY_FORM
+  FACILITY_FORM
 }
 
 enum ResourceType {

@@ -31,6 +31,7 @@ export type DialogType =
   | "adminCreateUserRoleDialog"
   | "jobRequestEvaluationDialog"
   | "supplyCategoriesDialog"
+  | "uploadFileDialog"
   | null;
 
 export interface DialogState {

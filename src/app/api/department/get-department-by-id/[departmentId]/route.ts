@@ -15,6 +15,7 @@ export async function GET(req: Request, context: Context) {
         id: departmentId,
       },
       include: {
+        files: true,
         request: {
           include: {
             jobRequest: true,

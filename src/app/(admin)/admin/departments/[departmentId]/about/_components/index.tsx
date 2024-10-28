@@ -1,19 +1,23 @@
 "use client";
 
-import React from "react";
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
+import React, { useState } from "react";
 import {
-  CalendarIcon,
-  ClipboardIcon,
-  MapPinIcon,
   Pencil,
-  TruckIcon,
-  UserIcon,
+  CheckCircle,
+  XCircle,
+  EllipsisVertical,
+  File,
 } from "lucide-react";
 import type { DepartmentWithRelations } from "prisma/generated/zod";
-
-import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Card,
   CardContent,
@@ -21,17 +25,23 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import { H1, H4, P } from "@/components/typography/text";
-import SearchInput from "@/app/(app)/_components/search-input";
+import { H1, P } from "@/components/typography/text";
 import FetchDataError from "@/components/card/fetch-data-error";
-import { cn } from "@/lib/utils";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { UpdateDepartmentSheet } from "@/app/(admin)/admin/departments/_components/update-department-sheet";
 import { useHotkeys } from "react-hotkeys-hook";
-import Link from "next/link";
-import OverviewNavigationMenu from "../../_components/navigation-menu";
 import { useDepartmentData } from "@/lib/hooks/use-department-data";
+import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
+import UploadFileDialog from "./upload-file-dialog";
+import { FilePurposeType } from "prisma/generated/zod/inputTypeSchemas/FilePurposeSchema";
+
+export interface Capability {
+  name: string;
+  active: boolean;
+  description: string;
+  filePurpose: FilePurposeType;
+}
 
 interface AboutDepartmentScreenProps {
   departmentId: string;
@@ -40,7 +50,7 @@ interface AboutDepartmentScreenProps {
 export default function AboutDepartmentScreen({
   departmentId,
 }: AboutDepartmentScreenProps) {
-  const [showUpdateDepartment, setShowUpdateDepartment] = React.useState(false);
+  const [showUpdateDepartment, setShowUpdateDepartment] = useState(false);
   const { data, isLoading, isError, refetch } = useDepartmentData(departmentId);
 
   useHotkeys(
@@ -64,9 +74,45 @@ export default function AboutDepartmentScreen({
     );
   }
 
+  const capabilities: Capability[] = [
+    {
+      name: "Job Management",
+      active: data.acceptsJobs,
+      description:
+        "Handles job requests and assignments within the department.",
+      filePurpose: "JOB_FORM",
+    },
+    {
+      name: "Transport Management",
+      active: data.managesTransport,
+      description:
+        "Coordinates transportation and logistics for the department.",
+      filePurpose: "TRANSPORT_FORM",
+    },
+    {
+      name: "Facility Management",
+      active: data.managesFacility,
+      description:
+        "Oversees and maintains department facilities and infrastructure.",
+      filePurpose: "FACILITY_FORM",
+    },
+    {
+      name: "Supply Management",
+      active: data.managesSupplyRequest,
+      description: "Manages supply requests and inventory for the department.",
+      filePurpose: "NONE",
+    },
+    {
+      name: "Borrow Management",
+      active: data.managesBorrowRequest,
+      description: "Handles borrowing requests for equipment or resources.",
+      filePurpose: "NONE",
+    },
+  ];
+
   return (
     <div className="container w-full p-0">
-      <div className="space-y-3">
+      <div className="space-y-6">
         <div className="space-y-1">
           <div className="flex items-center justify-between">
             <H1 className="font-semibold tracking-tight">{data.name}</H1>
@@ -84,17 +130,56 @@ export default function AboutDepartmentScreen({
               <Pencil className="size-4" />
             </Button>
           </div>
-          <div className="flex space-x-1">
-            <Badge variant={data.acceptsJobs ? "default" : "red"}>Jobs</Badge>
-            <Badge variant={data.acceptsJobs ? "default" : "red"}>
-              Transport
-            </Badge>
-          </div>
           <P className="break-all text-muted-foreground">{data.description}</P>
         </div>
-        <div className="rounded-md border p-2">
-          <p className="text-xs font-semibold text-muted-foreground">Duties:</p>
-          <P>{data.responsibilities}</P>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {capabilities.map((capability) => (
+            <Card
+              key={capability.name}
+              className={cn(
+                "bg-secondary",
+                capability.active ? "border-primary" : ""
+              )}
+            >
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center text-lg">
+                  {capability.active ? (
+                    <CheckCircle className="mr-2 h-5 w-5 text-primary" />
+                  ) : (
+                    <XCircle className="mr-2 h-5 w-5 text-muted-foreground" />
+                  )}
+                  {capability.name}
+                  {capability.active && capability.filePurpose !== "NONE" && (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          size="icon"
+                          variant="ghost2"
+                          className="ml-auto size-8"
+                        >
+                          <EllipsisVertical className="size-5" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="w-40">
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuGroup>
+                          <UploadFileDialog
+                            data={data}
+                            capability={capability}
+                            departmentId={departmentId}
+                          />
+                        </DropdownMenuGroup>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription>{capability.description}</CardDescription>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       </div>
     </div>
@@ -122,17 +207,19 @@ function DepartmentSkeleton() {
             </div>
           </CardContent>
         </div>
-        <Card>
-          <CardHeader>
-            <Skeleton className="h-8 w-64" />
-          </CardHeader>
-          <CardContent>
-            <div className="flex justify-between">
-              <Skeleton className="h-6 w-40" />
-              <Skeleton className="h-6 w-40" />
-            </div>
-          </CardContent>
-        </Card>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {[...Array(5)].map((_, i) => (
+            <Card key={i}>
+              <CardHeader>
+                <Skeleton className="h-6 w-40" />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="mt-2 h-4 w-3/4" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
     </div>
   );
