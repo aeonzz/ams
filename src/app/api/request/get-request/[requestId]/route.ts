@@ -85,6 +85,16 @@ export async function GET(req: Request, params: Context) {
         transportRequest: {
           include: {
             vehicle: true,
+            request: {
+              select: {
+                department: {
+                  select: {
+                    files: true,
+                  },
+                },
+                user: true,
+              },
+            },
           },
         },
         venueRequest: {
@@ -92,6 +102,22 @@ export async function GET(req: Request, params: Context) {
             venue: {
               include: {
                 venueSetupRequirement: true,
+              },
+            },
+            request: {
+              select: {
+                department: {
+                  select: {
+                    files: true,
+                    userRole: {
+                      select: {
+                        role: true,
+                        user: true,
+                      },
+                    },
+                  },
+                },
+                user: true,
               },
             },
           },

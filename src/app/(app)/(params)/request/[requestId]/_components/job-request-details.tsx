@@ -243,7 +243,7 @@ export default function JobRequestDetails({
         const url = URL.createObjectURL(pdfBlob);
         const link = document.createElement("a");
         link.href = url;
-        link.download = `FM_USTP_MEWS_01_JOB_REQUEST_FORM_${requestId}.pdf`;
+        link.download = `${existingFormFile}_${requestId}.pdf`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -308,7 +308,7 @@ export default function JobRequestDetails({
               Job Request Details
             </H4>
             <div className="space-x-2">
-              {!existingFormFile && (
+              {existingFormFile && (
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button

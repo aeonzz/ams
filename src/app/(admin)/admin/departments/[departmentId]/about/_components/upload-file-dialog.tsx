@@ -54,16 +54,19 @@ interface UploadFileDialogProps {
   data: DepartmentWithRelations;
   departmentId: string;
   capability: Capability;
+  open: boolean;
+  setOpen: (open: boolean) => void;
 }
 
 export default function UploadFileDialog({
   data,
   departmentId,
   capability,
+  setOpen,
+  open,
 }: UploadFileDialogProps) {
   const queryClient = useQueryClient();
   const pathname = usePathname();
-  const [open, setOpen] = React.useState(false);
   const [alertOpen, setAlertOpen] = React.useState(false);
   const [activeTab, setActiveTab] = React.useState<"view" | "upload">("view");
 
@@ -105,13 +108,13 @@ export default function UploadFileDialog({
       };
 
       toast.promise(mutateAsync(data), {
-        loading: "Submitting...",
+        loading: "Saving...",
         success: () => {
           handleOpenChange(false);
           queryClient.invalidateQueries({
             queryKey: [departmentId],
           });
-          return "Your request has been submitted and is awaiting approval.";
+          return "Form is successfully saved";
         },
         error: (err) => {
           console.log(err);
@@ -125,7 +128,9 @@ export default function UploadFileDialog({
   }
 
   React.useEffect(() => {
-    form.reset();
+    if (open) {
+      form.reset();
+    }
   }, [open]);
 
   const existingFile = data.files.find(
@@ -133,131 +138,119 @@ export default function UploadFileDialog({
   );
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <DropdownMenuItem
-          onSelect={(e) => {
-            e.preventDefault();
-          }}
-        >
-          <File className="mr-1 size-5" />
-          <span>Request Form</span>
-        </DropdownMenuItem>
-      </DialogTrigger>
-      <DialogContent
-        onInteractOutside={(e) => {
-          if (isPending) {
-            e.preventDefault();
-          }
-          if (isFieldsDirty && !isPending) {
-            e.preventDefault();
-            setAlertOpen(true);
-          }
-        }}
-        className="max-w-2xl"
-        isLoading={isPending}
+    <DialogContent
+      onInteractOutside={(e) => {
+        if (isPending) {
+          e.preventDefault();
+        }
+        if (isFieldsDirty && !isPending) {
+          e.preventDefault();
+          setAlertOpen(true);
+        }
+      }}
+      className="max-w-2xl"
+      isLoading={isPending}
+    >
+      <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
+        {isFieldsDirty && !isPending && (
+          <AlertDialogTrigger disabled={isPending} asChild>
+            <button
+              disabled={isPending}
+              className="absolute right-4 top-4 z-50 cursor-pointer rounded-sm opacity-70 ring-offset-background transition-opacity data-[state=open]:bg-accent data-[state=open]:text-muted-foreground hover:opacity-100 focus:outline-none focus:ring-0 focus:ring-ring focus:ring-offset-0 active:scale-95 disabled:pointer-events-none"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </AlertDialogTrigger>
+        )}
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              You have unsaved changes. Are you sure you want to leave?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                setOpen(false);
+              }}
+            >
+              Continue
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      <DialogHeader>
+        <DialogTitle>{capability.name} Form</DialogTitle>
+      </DialogHeader>
+      <Tabs
+        value={activeTab}
+        onValueChange={(value) => setActiveTab(value as "view" | "upload")}
       >
-        <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
-          {isFieldsDirty && !isPending && (
-            <AlertDialogTrigger disabled={isPending} asChild>
-              <button
-                disabled={isPending}
-                className="absolute right-4 top-4 z-50 cursor-pointer rounded-sm opacity-70 ring-offset-background transition-opacity data-[state=open]:bg-accent data-[state=open]:text-muted-foreground hover:opacity-100 focus:outline-none focus:ring-0 focus:ring-ring focus:ring-offset-0 active:scale-95 disabled:pointer-events-none"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </AlertDialogTrigger>
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="view">View Form</TabsTrigger>
+          <TabsTrigger value="upload">Upload New Form</TabsTrigger>
+        </TabsList>
+        <TabsContent value="view">
+          {existingFile ? (
+            <div className="px-4 py-1">
+              <h3 className="mb-2 text-lg font-semibold">
+                Current {capability.name} Form
+              </h3>
+              <iframe
+                src={existingFile.url}
+                className="h-[400px] w-full border"
+              />
+            </div>
+          ) : (
+            <div className="flex min-h-[55vh] items-center justify-center">
+              <p className="text-center text-muted-foreground">
+                No form uploaded yet.
+              </p>
+            </div>
           )}
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-              <AlertDialogDescription>
-                You have unsaved changes. Are you sure you want to leave?
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={() => {
-                  setOpen(false);
-                }}
-              >
-                Continue
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-        <DialogHeader>
-          <DialogTitle>{capability.name} Form</DialogTitle>
-        </DialogHeader>
-        <Tabs
-          value={activeTab}
-          onValueChange={(value) => setActiveTab(value as "view" | "upload")}
-        >
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="view">View Form</TabsTrigger>
-            <TabsTrigger value="upload">Upload New Form</TabsTrigger>
-          </TabsList>
-          <TabsContent value="view">
-            {existingFile ? (
-              <div className="px-4 py-1">
-                <h3 className="mb-2 text-lg font-semibold">
-                  Current {capability.name} Form
-                </h3>
-                <iframe
-                  src={existingFile.url}
-                  className="h-[400px] w-full border"
+        </TabsContent>
+        <TabsContent value="upload">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+              <div className="scroll-bar flex max-h-[55vh] gap-6 overflow-y-auto px-4 py-1">
+                <FormField
+                  control={form.control}
+                  name="file"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>Upload Request Form</FormLabel>
+                      <FormControl>
+                        <FileUploader
+                          value={field.value}
+                          accept={{ "application/pdf": [] }}
+                          onValueChange={field.onChange}
+                          maxFiles={1}
+                          maxSize={4 * 1024 * 1024}
+                          progresses={progresses}
+                          disabled={isPending || isUploading}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
               </div>
-            ) : (
-              <div className="flex min-h-[55vh] items-center justify-center">
-                <p className="text-center text-muted-foreground">
-                  No form uploaded yet.
-                </p>
-              </div>
-            )}
-          </TabsContent>
-          <TabsContent value="upload">
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)}>
-                <div className="scroll-bar flex max-h-[55vh] gap-6 overflow-y-auto px-4 py-1">
-                  <FormField
-                    control={form.control}
-                    name="file"
-                    render={({ field }) => (
-                      <FormItem className="w-full">
-                        <FormLabel>Upload Request Form</FormLabel>
-                        <FormControl>
-                          <FileUploader
-                            value={field.value}
-                            accept={{ "application/pdf": [] }}
-                            onValueChange={field.onChange}
-                            maxFiles={1}
-                            maxSize={4 * 1024 * 1024}
-                            progresses={progresses}
-                            disabled={isPending || isUploading}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <Separator className="my-4" />
-                <DialogFooter>
-                  <div></div>
-                  <SubmitButton
-                    disabled={isUploading || isPending}
-                    className="w-28"
-                  >
-                    Submit
-                  </SubmitButton>
-                </DialogFooter>
-              </form>
-            </Form>
-          </TabsContent>
-        </Tabs>
-      </DialogContent>
-    </Dialog>
+              <Separator className="my-4" />
+              <DialogFooter>
+                <div></div>
+                <SubmitButton
+                  disabled={isUploading || isPending}
+                  className="w-28"
+                >
+                  Save
+                </SubmitButton>
+              </DialogFooter>
+            </form>
+          </Form>
+        </TabsContent>
+      </Tabs>
+    </DialogContent>
   );
 }

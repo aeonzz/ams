@@ -254,6 +254,8 @@ model VenueRequest {
   request           Request   @relation(fields: [requestId], references: [id], onDelete: Cascade)
   venueId           String
   venue             Venue     @relation(fields: [venueId], references: [id])
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 }
 
 model Venue {

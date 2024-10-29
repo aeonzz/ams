@@ -19,6 +19,8 @@ export const VenueRequestSchema = z.object({
   inProgress: z.boolean(),
   requestId: z.string(),
   venueId: z.string(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
 })
 
 export type VenueRequest = z.infer<typeof VenueRequestSchema>

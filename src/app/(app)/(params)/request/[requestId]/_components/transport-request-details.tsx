@@ -13,6 +13,7 @@ import {
   Book,
   Calendar,
   Dot,
+  Download,
   Ellipsis,
   MapPin,
   PencilLine,
@@ -24,6 +25,7 @@ import { Card, CardDescription, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
+  formatFullName,
   getChangeTypeInfo,
   getVehicleStatusColor,
   textTransform,
@@ -66,6 +68,9 @@ import TransportEditTimeInput from "./transport-edit-time-input";
 import type { RequestStatusTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestStatusTypeSchema";
 import { socket } from "@/app/socket";
 import RejectionReasonCard from "./rejection-reason-card";
+import CommandTooltip from "@/components/ui/command-tooltip";
+import { fillTransportRequestFormPDF } from "@/lib/fill-pdf/transport-request-form";
+import { AlertCard } from "@/components/ui/alert-card";
 
 interface TransportRequestDetailsProps {
   data: TransportRequestWithRelations;
@@ -139,6 +144,59 @@ export default function TransportRequestDetails({
     }
   }
 
+  const existingFormFile = data.request.department.files.find(
+    (file) => file.filePurpose === "TRANSPORT_FORM"
+  )?.url;
+
+  const handleDownloadTransportRequestForm = async () => {
+    if (!existingFormFile) return;
+
+    const requestedBy = formatFullName(
+      data.request.user.firstName,
+      data.request.user.middleName,
+      data.request.user.lastName
+    );
+
+    const generateAndDownloadPDF = async () => {
+      try {
+        const pdfBlob = await fillTransportRequestFormPDF({
+          createdAt: data.createdAt,
+          id: data.id,
+          requestedBy: requestedBy,
+          office: data.department,
+          destination: data.destination,
+          numberOfPassengers: data.passengersName.length,
+          passengersName: data.passengersName,
+          vehicle: data.vehicle.name,
+          dateOfTravel: data.dateAndTimeNeeded,
+          description: data.description,
+          status: requestStatus,
+          formUrl: existingFormFile,
+        });
+        const url = URL.createObjectURL(pdfBlob);
+        const cleanedFileName = existingFormFile.replace("/resources/", "");
+        console.log("Original filename:", existingFormFile);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `${cleanedFileName}_${requestId}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        return "PDF downloaded successfully";
+      } catch (error) {
+        console.error("Error generating PDF:", error);
+        throw new Error("Failed to generate PDF");
+      }
+    };
+
+    toast.promise(generateAndDownloadPDF(), {
+      loading: "Generating PDF...",
+      success: (message) => message,
+      error: (err) => `Error: ${err.message}`,
+    });
+  };
+
   useHotkeys(
     "shift+enter",
     (event) => {
@@ -169,11 +227,47 @@ export default function TransportRequestDetails({
   return (
     <>
       <div className="space-y-4 pb-10">
-        <div className="flex h-7 items-center justify-between">
-          <H4 className="font-semibold text-muted-foreground">
-            Transport Request Details
-          </H4>
+        <div className="space-y-1">
           {data.inProgress && (
+            <div>
+              <AlertCard
+                variant="info"
+                title="Transport Request in Progress"
+                description="This transport request is currently underway."
+              />
+              <Separator className="my-6" />
+            </div>
+          )}
+          <RejectionReasonCard rejectionReason={rejectionReason} />
+          <div className="flex h-7 items-center justify-between">
+            <H4 className="font-semibold text-muted-foreground">
+              Transport Request Details
+            </H4>
+            {existingFormFile && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost2"
+                    size="icon"
+                    className="size-7"
+                    onClick={handleDownloadTransportRequestForm}
+                  >
+                    <Download className="size-4 text-muted-foreground" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent
+                  className="flex items-center gap-3"
+                  side="bottom"
+                >
+                  <CommandTooltip text="Download transport request form">
+                    <CommandShortcut>Ctrl</CommandShortcut>
+                    <CommandShortcut>Shift</CommandShortcut>
+                    <CommandShortcut>D</CommandShortcut>
+                  </CommandTooltip>
+                </TooltipContent>
+              </Tooltip>
+            )}
+            {/* {data.inProgress && (
             <Tooltip>
               <TooltipTrigger asChild>
                 <div className="flex animate-pulse cursor-pointer items-center space-x-2 rounded-md p-2 hover:bg-tertiary">
@@ -187,7 +281,8 @@ export default function TransportRequestDetails({
                 Transport is in progress
               </TooltipContent>
             </Tooltip>
-          )}
+          )} */}
+          </div>
         </div>
         <div>
           <H5 className="mb-2 font-semibold text-muted-foreground">Vehicle:</H5>
@@ -483,7 +578,6 @@ export default function TransportRequestDetails({
             )}
           </form>
         </Form>
-        <RejectionReasonCard rejectionReason={rejectionReason} />
       </div>
       <Separator className="my-6" />
     </>

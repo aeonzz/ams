@@ -9,6 +9,7 @@ import {
   CalendarIcon,
   Clock,
   Dot,
+  Download,
   Info,
   MapPin,
   Settings,
@@ -25,7 +26,11 @@ import {
 import Image from "next/image";
 import { Card, CardDescription, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { getVenueStatusColor, textTransform } from "@/lib/utils";
+import {
+  formatFullName,
+  getVenueStatusColor,
+  textTransform,
+} from "@/lib/utils";
 import {
   Form,
   FormControl,
@@ -54,6 +59,10 @@ import MultiSelect from "@/components/multi-select";
 import { Textarea } from "@/components/ui/text-area";
 import { useHotkeys } from "react-hotkeys-hook";
 import RejectionReasonCard from "./rejection-reason-card";
+import { AlertCard } from "@/components/ui/alert-card";
+import CommandTooltip from "@/components/ui/command-tooltip";
+import { CommandShortcut } from "@/components/ui/command";
+import { fillVenueRequestFormPDF } from "@/lib/fill-pdf/venue-request-form";
 
 interface VenueRequestDetailsProps {
   data: VenueRequestWithRelations;
@@ -137,6 +146,68 @@ export default function VenueRequestDetails({
     }
   }
 
+  const departmentHead = data.request.department.userRole.find(
+    (role) => role.role.name === "DEPARTMENT_HEAD"
+  )?.user;
+  console.log(data.request.department.userRole, departmentHead)
+
+  const existingFormFile = data.request.department.files.find(
+    (file) => file.filePurpose === "VENUE_FORM"
+  )?.url;
+
+  const handleDownloadVenueRequestForm = async () => {
+    if (!existingFormFile) return;
+
+    const requestedBy = formatFullName(
+      data.request.user.firstName,
+      data.request.user.middleName,
+      data.request.user.lastName
+    );
+
+    const generateAndDownloadPDF = async () => {
+      try {
+        const pdfBlob = await fillVenueRequestFormPDF({
+          requestedBy: requestedBy,
+          requestedByAlt: requestedBy,
+          createdAt: data.createdAt,
+          venue: data.venue.name,
+          dateReserved: data.startTime,
+          purpose: data.purpose,
+          equipmentNeeded: data.setupRequirements.join(", "),
+          status: requestStatus,
+          departmentHead: departmentHead
+            ? formatFullName(
+                departmentHead.firstName,
+                departmentHead.middleName,
+                departmentHead.lastName
+              )
+            : "N/A",
+          formUrl: existingFormFile,
+        });
+        const url = URL.createObjectURL(pdfBlob);
+        const cleanedFileName = existingFormFile.replace("/resources/", "");
+        console.log("Original filename:", existingFormFile);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `${cleanedFileName}_${requestId}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        return "PDF downloaded successfully";
+      } catch (error) {
+        console.error("Error generating PDF:", error);
+        throw new Error("Failed to generate PDF");
+      }
+    };
+
+    toast.promise(generateAndDownloadPDF(), {
+      loading: "Generating PDF...",
+      success: (message) => message,
+      error: (err) => `Error: ${err.message}`,
+    });
+  };
+
   useHotkeys(
     "shift+enter",
     (event) => {
@@ -167,11 +238,48 @@ export default function VenueRequestDetails({
   return (
     <>
       <div className="space-y-4 pb-10">
-        <div className="flex h-7 items-center justify-between">
-          <H4 className="font-semibold text-muted-foreground">
-            Venue Request Details
-          </H4>
+        <div className="space-y-1">
           {data.inProgress && (
+            <div>
+              <AlertCard
+                variant="info"
+                title="Ongoing Venue Reservation"
+                description="This venue reservation is currently active. Please ensure that all necessary preparations and arrangements are in place."
+              />
+
+              <Separator className="my-6" />
+            </div>
+          )}
+          <RejectionReasonCard rejectionReason={rejectionReason} />
+          <div className="flex h-7 items-center justify-between">
+            <H4 className="font-semibold text-muted-foreground">
+              Venue Request Details
+            </H4>
+            {existingFormFile && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost2"
+                    size="icon"
+                    className="size-7"
+                    onClick={handleDownloadVenueRequestForm}
+                  >
+                    <Download className="size-4 text-muted-foreground" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent
+                  className="flex items-center gap-3"
+                  side="bottom"
+                >
+                  <CommandTooltip text="Download venue request form">
+                    <CommandShortcut>Ctrl</CommandShortcut>
+                    <CommandShortcut>Shift</CommandShortcut>
+                    <CommandShortcut>D</CommandShortcut>
+                  </CommandTooltip>
+                </TooltipContent>
+              </Tooltip>
+            )}
+            {/* {data.inProgress && (
             <Tooltip>
               <TooltipTrigger asChild>
                 <div className="flex animate-pulse cursor-pointer items-center space-x-2 rounded-md p-2 hover:bg-tertiary">
@@ -182,10 +290,11 @@ export default function VenueRequestDetails({
                 </div>
               </TooltipTrigger>
               <TooltipContent className="flex items-center gap-3" side="bottom">
-                Request is in progress
+                Transport is in progress
               </TooltipContent>
             </Tooltip>
-          )}
+          )} */}
+          </div>
         </div>
         <div>
           <H5 className="mb-2 font-semibold text-muted-foreground">Venue:</H5>
@@ -473,7 +582,6 @@ export default function VenueRequestDetails({
             )}
           </form>
         </Form>
-        <RejectionReasonCard rejectionReason={rejectionReason} />
         <Separator className="my-6" />
       </div>
     </>

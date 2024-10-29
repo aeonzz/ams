@@ -35,6 +35,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import UploadFileDialog from "./upload-file-dialog";
 import { FilePurposeType } from "prisma/generated/zod/inputTypeSchemas/FilePurposeSchema";
+import { Dialog } from "@/components/ui/dialog";
 
 export interface Capability {
   name: string;
@@ -50,7 +51,8 @@ interface AboutDepartmentScreenProps {
 export default function AboutDepartmentScreen({
   departmentId,
 }: AboutDepartmentScreenProps) {
-  const [showUpdateDepartment, setShowUpdateDepartment] = useState(false);
+  const [showUpdateDepartment, setShowUpdateDepartment] = React.useState(false);
+  const [openDialog, setOpenDialog] = React.useState<string | null>(null);
   const { data, isLoading, isError, refetch } = useDepartmentData(departmentId);
 
   useHotkeys(
@@ -94,7 +96,7 @@ export default function AboutDepartmentScreen({
       active: data.managesFacility,
       description:
         "Oversees and maintains department facilities and infrastructure.",
-      filePurpose: "FACILITY_FORM",
+      filePurpose: "VENUE_FORM",
     },
     {
       name: "Supply Management",
@@ -150,28 +152,45 @@ export default function AboutDepartmentScreen({
                   )}
                   {capability.name}
                   {capability.active && capability.filePurpose !== "NONE" && (
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          size="icon"
-                          variant="ghost2"
-                          className="ml-auto size-8"
-                        >
-                          <EllipsisVertical className="size-5" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent className="w-40">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuGroup>
-                          <UploadFileDialog
-                            data={data}
-                            capability={capability}
-                            departmentId={departmentId}
-                          />
-                        </DropdownMenuGroup>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    <Dialog
+                      open={openDialog === capability.name}
+                      onOpenChange={(isOpen) =>
+                        setOpenDialog(isOpen ? capability.name : null)
+                      }
+                    >
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            size="icon"
+                            variant="ghost2"
+                            className="ml-auto size-8"
+                          >
+                            <EllipsisVertical className="size-5" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="w-40">
+                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuGroup>
+                            <DropdownMenuItem
+                              onSelect={() => setOpenDialog(capability.name)}
+                            >
+                              <File className="mr-1 size-5" />
+                              <span>Request Form</span>
+                            </DropdownMenuItem>
+                          </DropdownMenuGroup>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                      <UploadFileDialog
+                        data={data}
+                        capability={capability}
+                        departmentId={departmentId}
+                        open={openDialog === capability.name}
+                        setOpen={(isOpen) =>
+                          setOpenDialog(isOpen ? capability.name : null)
+                        }
+                      />
+                    </Dialog>
                   )}
                 </CardTitle>
               </CardHeader>
