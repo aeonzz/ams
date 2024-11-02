@@ -1,6 +1,6 @@
 import ContentLayout from "@/components/layouts/content-layout";
 import DepartmentVehicleScreen from "./components";
-import DepartmentLayout from "../_components/department-layout";
+import DepartmentLayout from "../../_components/department-layout";
 
 export interface DepartmentVehiclePage {
   params: {

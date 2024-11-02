@@ -32,7 +32,7 @@ export default function DepartmentJobRequestsScreen({
       );
       return res.data.data;
     },
-    queryKey: [departmentId],
+    queryKey: ["department-job-requests",departmentId],
   });
 
   if (isLoading) {
@@ -51,6 +51,8 @@ export default function DepartmentJobRequestsScreen({
     );
   }
 
+  console.log(data);
+
   const formattedData = data.map((request) => ({
     id: request.requestId,
     title: request.request.title,
@@ -65,7 +67,7 @@ export default function DepartmentJobRequestsScreen({
   );
 
   return (
-    <div className="h-fit w-full border rounded-md">
+    <div className="h-fit w-full rounded-md border">
       <div className="flex w-full flex-col">
         <ScheduleCalendar data={formattedData} />
         {activeJobs.length > 0 && (

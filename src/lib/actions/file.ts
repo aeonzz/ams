@@ -4,7 +4,10 @@ import { checkAuth } from "../auth/utils";
 import { db } from "@/lib/db/index";
 import { authedProcedure, convertToBase64, getErrorMessage } from "./utils";
 import { revalidatePath } from "next/cache";
-import { uploadFileSchemaServerWithPath } from "../schema/file";
+import {
+  uploadFileSchemaServerWithPath,
+  uploadVenueRulesFileWithPath,
+} from "../schema/file";
 import { generateId } from "lucia";
 
 export const updateDepartmentFile = authedProcedure
@@ -27,6 +30,29 @@ export const updateDepartmentFile = authedProcedure
           url: url[0],
           filePurpose: filePurpose,
           departmentId: departmentId,
+        },
+      });
+
+      return revalidatePath(path);
+    } catch (error) {
+      console.log(error);
+      return getErrorMessage(error);
+    }
+  });
+
+export const updateVenueRulesFile = authedProcedure
+  .createServerAction()
+  .input(uploadVenueRulesFileWithPath)
+  .handler(async ({ input }) => {
+    const { path, url, venueId } = input;
+
+    try {
+      await db.venue.update({
+        where: {
+          id: venueId,
+        },
+        data: {
+          rulesAndRegulations: url[0],
         },
       });
 

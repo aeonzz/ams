@@ -61,6 +61,7 @@ export async function getVenues(input: GetVenuesSchema) {
         },
         include: {
           department: true,
+          venueSetupRequirement: true,
         },
       }),
       db.venue.count({ where }),
@@ -290,4 +291,3 @@ export const deleteVenues = authedProcedure
       getErrorMessage(error);
     }
   });
-

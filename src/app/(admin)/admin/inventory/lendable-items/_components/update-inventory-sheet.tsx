@@ -33,18 +33,39 @@ import {
   updateInventoryItemSchema,
   type UpdateInventoryItemSchema,
 } from "@/lib/db/schema/inventory";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 import { Textarea } from "@/components/ui/text-area";
 import { type InventoryItemType } from "@/lib/types/item";
 import { updateInventory } from "@/lib/actions/inventory";
 import { ExtendedUpdateInventoryItemServerSchema } from "@/lib/schema/resource/returnable-resource";
+import { useLendableDepartments } from "@/lib/hooks/use-lendable-departments";
+import { cn } from "@/lib/utils";
+import LoadingSpinner from "@/components/loaders/loading-spinner";
+import { Check, ChevronsUpDown } from "lucide-react";
 
 interface UpdateInventoryProps
   extends React.ComponentPropsWithRef<typeof Sheet> {
   inventory: InventoryItemType;
+  queryKey?: string[];
+  removeField?: boolean;
 }
 
 export function UpdateInventorySheet({
   inventory,
+  queryKey,
+  removeField = false,
   ...props
 }: UpdateInventoryProps) {
   const pathname = usePathname();
@@ -58,6 +79,8 @@ export function UpdateInventorySheet({
   });
 
   const { dirtyFields } = useFormState({ control: form.control });
+
+  const { data, isLoading } = useLendableDepartments();
 
   const { isPending, mutateAsync } = useServerActionMutation(updateInventory);
   const { uploadFiles, progresses, isUploading } = useUploadFile();
@@ -144,6 +167,80 @@ export function UpdateInventorySheet({
                   </FormItem>
                 )}
               />
+              {!removeField && (
+                <FormField
+                  control={form.control}
+                  name="departmentId"
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel>Department</FormLabel>
+                      <Popover modal>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              disabled={isUploading || isPending || isLoading}
+                              role="combobox"
+                              className={cn(
+                                "w-full flex-1 justify-between",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value ? (
+                                <p className="truncate">
+                                  {
+                                    data?.find(
+                                      (department) =>
+                                        department.id === field.value
+                                    )?.name
+                                  }
+                                </p>
+                              ) : (
+                                "Select managing department"
+                              )}
+                              {isLoading ? (
+                                <LoadingSpinner />
+                              ) : (
+                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                              )}
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="p-0">
+                          <Command className="max-h-72">
+                            <CommandInput placeholder="Search department..." />
+                            <CommandList>
+                              <CommandEmpty>No department found.</CommandEmpty>
+                              <CommandGroup>
+                                {data?.map((department, index) => (
+                                  <CommandItem
+                                    value={department.id}
+                                    key={index}
+                                    onSelect={() => {
+                                      field.onChange(department.id);
+                                    }}
+                                  >
+                                    {department.name}
+                                    <Check
+                                      className={cn(
+                                        "ml-auto h-4 w-4",
+                                        department.id === field.value
+                                          ? "opacity-100"
+                                          : "opacity-0"
+                                      )}
+                                    />
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
               <FormField
                 control={form.control}
                 name="description"
@@ -155,7 +252,7 @@ export function UpdateInventorySheet({
                         rows={1}
                         maxRows={5}
                         placeholder="Description"
-                        className="min-h-[100px] flex-grow resize-none"
+                        className="min-h-[100px] flex-grow resize-none bg-transparent text-sm"
                         disabled={isPending}
                         {...field}
                       />

@@ -7,7 +7,7 @@ export function useGetVenue(venueId: string) {
     VenueWithRelations,
     Error
   >({
-    queryKey: ["venue-details", venueId],
+    queryKey: [venueId],
     queryFn: async () => {
       const response = await axios.get<{ data: VenueWithRelations }>(
         `/api/venue/get-venue/${venueId}`

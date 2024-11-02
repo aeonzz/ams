@@ -118,7 +118,13 @@ export default function OverviewNavigationMenu({
     );
   }
 
-  const { managesTransport, managesFacility, acceptsJobs } = data;
+  const {
+    managesTransport,
+    managesFacility,
+    acceptsJobs,
+    managesBorrowRequest,
+    managesSupplyRequest,
+  } = data;
 
   const managementWithConditions = management.map((item) => {
     if (item.title === "Transport Services") {
@@ -129,6 +135,12 @@ export default function OverviewNavigationMenu({
     }
     if (item.title === "Managing Job Requests") {
       return { ...item, condition: acceptsJobs };
+    }
+    if (item.title === "Manage Borrowable Items") {
+      return { ...item, condition: managesBorrowRequest };
+    }
+    if (item.title === "Supply Management") {
+      return { ...item, condition: managesSupplyRequest };
     }
     return item;
   });

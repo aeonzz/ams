@@ -190,15 +190,15 @@ export default function ManageVenueScreen({ params }: ManageVenueScreenProps) {
               <Separator className="my-2" />
               <div className="flex items-center justify-between">
                 <P className="font-semibold text-muted-foreground">Features</P>
-                {/* {data.features && (
+                {data.venueSetupRequirement ? (
                   <div className="flex max-w-64 flex-wrap items-center gap-1">
-                    {(data.features as VenueFeaturesType[]).map((value) => (
+                    {data.venueSetupRequirement.map((value) => (
                       <Badge key={value.id} variant="teal">
                         {value.name}
                       </Badge>
                     ))}
                   </div>
-                )} */}
+                ) : '-'}
               </div>
             </div>
           </div>

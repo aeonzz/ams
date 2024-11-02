@@ -365,25 +365,6 @@ export default function CreateVenueForm({
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="rulesAndRegulations"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Textarea
-                    rows={1}
-                    maxRows={10}
-                    placeholder="Rules and Regulations..."
-                    className="min-h-[150px] flex-grow resize-none placeholder:text-sm"
-                    disabled={isUploading || isPending}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
         </div>
         <Separator className="my-4" />
         <DialogFooter>

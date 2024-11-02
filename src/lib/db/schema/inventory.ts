@@ -22,12 +22,7 @@ export const createInventoryItemSchema = z.object({
 export type CreateInventoryItemSchema = z.infer<
   typeof createInventoryItemSchema
 >;
-
-export const updateInventoryItemSchema = z.object({
-  name: z.string().optional(),
-  description: z.string().optional(),
-  imageUrl: z.array(z.instanceof(File)).optional(),
-});
+export const updateInventoryItemSchema = createInventoryItemSchema.partial();
 
 export type UpdateInventoryItemSchema = z.infer<
   typeof updateInventoryItemSchema

@@ -55,6 +55,7 @@ import { type Department } from "prisma/generated/zod";
 import axios from "axios";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useLendableDepartments } from "@/lib/hooks/use-lendable-departments";
 
 interface CreateInventoryFormProps {
   setAlertOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -83,13 +84,7 @@ export default function CreateInventoryForm({
   const pathname = usePathname();
   const queryClient = useQueryClient();
 
-  const { data, isLoading } = useQuery<Department[]>({
-    queryFn: async () => {
-      const res = await axios.get("/api/department/get-departments");
-      return res.data.data;
-    },
-    queryKey: ["create-inventory-department-selection"],
-  });
+  const { data, isLoading } = useLendableDepartments();
 
   const { uploadFiles, progresses, isUploading } = useUploadFile();
 
@@ -187,7 +182,7 @@ export default function CreateInventoryForm({
                       <FormControl>
                         <Button
                           variant="outline"
-                          disabled={isUploading || isPending}
+                          disabled={isUploading || isPending || isLoading}
                           role="combobox"
                           className="w-full flex-1 justify-between"
                         >

@@ -28,6 +28,7 @@ import {
   VenueStatusSchema,
   type Venue,
   VenueTypeSchema,
+  VenueWithRelations,
 } from "prisma/generated/zod";
 import {
   Command,
@@ -76,7 +77,7 @@ import ChangeTypeSchema, {
 
 interface UpdateDeparVenueProps
   extends React.ComponentPropsWithRef<typeof Sheet> {
-  venue: Venue;
+  venue: VenueWithRelations;
   queryKey?: string[];
   removeField?: boolean;
 }
@@ -104,9 +105,7 @@ export function UpdateVenueSheet({
       departmentId: venue.departmentId,
       imageUrl: undefined,
       venueType: venue.venueType,
-      features: Array.isArray(venue.features)
-        ? (venue.features as VenueFeaturesType[]).map((feature) => feature.name)
-        : undefined,
+      setupRequirements: venue.venueSetupRequirement
     },
   });
 

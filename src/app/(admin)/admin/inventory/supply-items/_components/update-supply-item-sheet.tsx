@@ -213,7 +213,8 @@ export function UpdateSupplyItemSheet({
                               disabled={
                                 isUploading ||
                                 isPending ||
-                                isLoadingItemCategory
+                                isLoadingItemCategory ||
+                                isLoading
                               }
                               role="combobox"
                               className={cn(

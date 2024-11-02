@@ -33,64 +33,64 @@ export function getAdminMenuList(pathname: string): Group[] {
         },
         {
           href: "/notification",
-          label: "Notifications",
+          label: "Requests",
           active: pathname.includes("/notification"),
           icon: Bell,
           submenus: [],
         },
       ],
     },
-    {
-      groupLabel: "Resource Management",
-      menus: [
-        {
-          href: "/requests",
-          label: "Request Management",
-          active: pathname.includes("/requests"),
-          icon: ClipboardList,
-          submenus: [
-            {
-              href: "/requests/pending",
-              label: "Pending Requests",
-              active: pathname === "/requests/pending",
-            },
-            {
-              href: "/requests/approved",
-              label: "Approved Requests",
-              active: pathname === "/requests/approved",
-            },
-            {
-              href: "/requests/rejected",
-              label: "Rejected Requests",
-              active: pathname === "/requests/rejected",
-            },
-          ],
-        },
-        {
-          href: "/reservations",
-          label: "Reservation Management",
-          active: pathname.includes("/reservations"),
-          icon: Calendar,
-          submenus: [
-            {
-              href: "/reservations/pending",
-              label: "Pending Reservations",
-              active: pathname === "/reservations/pending",
-            },
-            {
-              href: "/reservations/approved",
-              label: "Approved Reservations",
-              active: pathname === "/reservations/approved",
-            },
-            {
-              href: "/reservations/rejected",
-              label: "Rejected Reservations",
-              active: pathname === "/reservations/rejected",
-            },
-          ],
-        },
-      ],
-    },
+    // {
+    //   groupLabel: "Resource Management",
+    //   menus: [
+    //     {
+    //       href: "/requests",
+    //       label: "Request Management",
+    //       active: pathname.includes("/requests"),
+    //       icon: ClipboardList,
+    //       submenus: [
+    //         {
+    //           href: "/requests/pending",
+    //           label: "Pending Requests",
+    //           active: pathname === "/requests/pending",
+    //         },
+    //         {
+    //           href: "/requests/approved",
+    //           label: "Approved Requests",
+    //           active: pathname === "/requests/approved",
+    //         },
+    //         {
+    //           href: "/requests/rejected",
+    //           label: "Rejected Requests",
+    //           active: pathname === "/requests/rejected",
+    //         },
+    //       ],
+    //     },
+    //     {
+    //       href: "/reservations",
+    //       label: "Reservation Management",
+    //       active: pathname.includes("/reservations"),
+    //       icon: Calendar,
+    //       submenus: [
+    //         {
+    //           href: "/reservations/pending",
+    //           label: "Pending Reservations",
+    //           active: pathname === "/reservations/pending",
+    //         },
+    //         {
+    //           href: "/reservations/approved",
+    //           label: "Approved Reservations",
+    //           active: pathname === "/reservations/approved",
+    //         },
+    //         {
+    //           href: "/reservations/rejected",
+    //           label: "Rejected Reservations",
+    //           active: pathname === "/reservations/rejected",
+    //         },
+    //       ],
+    //     },
+    //   ],
+    // },
     {
       groupLabel: "User Management",
       menus: [
@@ -118,7 +118,7 @@ export function getAdminMenuList(pathname: string): Group[] {
       ],
     },
     {
-      groupLabel: "Asset Management",
+      groupLabel: "Resource Management",
       menus: [
         {
           href: "/admin/venues",
@@ -154,103 +154,33 @@ export function getAdminMenuList(pathname: string): Group[] {
         },
       ],
     },
-    {
-      groupLabel: "Reports",
-      menus: [
-        {
-          href: "/reports",
-          label: "Reports & Analytics",
-          active: pathname.includes("/reports"),
-          icon: BarChart,
-          submenus: [
-            {
-              href: "/reports/usage",
-              label: "Resource Usage",
-              active: pathname === "/reports/usage",
-            },
-            {
-              href: "/reports/trends",
-              label: "Request Trends",
-              active: pathname === "/reports/trends",
-            },
-            {
-              href: "/reports/inventory",
-              label: "Inventory Reports",
-              active: pathname === "/reports/inventory",
-            },
-          ],
-        },
-      ],
-    },
-    {
-      groupLabel: "System Administration",
-      menus: [
-        {
-          href: "/settings",
-          label: "System Settings",
-          active: pathname.includes("/settings"),
-          icon: Settings,
-          submenus: [
-            {
-              href: "/settings/general",
-              label: "General Settings",
-              active: pathname === "/settings/general",
-            },
-            {
-              href: "/settings/security",
-              label: "Security Settings",
-              active: pathname === "/settings/security",
-            },
-            {
-              href: "/settings/notifications",
-              label: "Notification Settings",
-              active: pathname === "/settings/notifications",
-            },
-          ],
-        },
-        {
-          href: "/maintenance",
-          label: "System Maintenance",
-          active: pathname.includes("/maintenance"),
-          icon: Wrench,
-          submenus: [],
-        },
-      ],
-    },
-    {
-      groupLabel: "Help & Support",
-      menus: [
-        {
-          href: "/help",
-          label: "Help Center",
-          active: pathname.includes("/help"),
-          icon: HelpCircle,
-          submenus: [
-            {
-              href: "/help/faq",
-              label: "FAQ",
-              active: pathname === "/help/faq",
-            },
-            {
-              href: "/help/contact",
-              label: "Contact Support",
-              active: pathname === "/help/contact",
-            },
-            {
-              href: "/help/user-manual",
-              label: "User Manual",
-              active: pathname === "/help/user-manual",
-            },
-          ],
-        },
-        {
-          href: "/policies",
-          label: "Policies & Procedures",
-          active: pathname.includes("/policies"),
-          icon: FileText,
-          submenus: [],
-        },
-      ],
-    },
+    // {
+    //   groupLabel: "Reports",
+    //   menus: [
+    //     {
+    //       href: "/reports",
+    //       label: "Reports & Analytics",
+    //       active: pathname.includes("/reports"),
+    //       icon: BarChart,
+    //       submenus: [
+    //         {
+    //           href: "/reports/usage",
+    //           label: "Resource Usage",
+    //           active: pathname === "/reports/usage",
+    //         },
+    //         {
+    //           href: "/reports/trends",
+    //           label: "Request Trends",
+    //           active: pathname === "/reports/trends",
+    //         },
+    //         {
+    //           href: "/reports/inventory",
+    //           label: "Inventory Reports",
+    //           active: pathname === "/reports/inventory",
+    //         },
+    //       ],
+    //     },
+    //   ],
+    // },
   ];
 }

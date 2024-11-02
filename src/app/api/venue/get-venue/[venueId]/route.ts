@@ -28,6 +28,7 @@ export async function GET(request: NextRequest, params: Context) {
       },
       include: {
         department: true,
+        venueSetupRequirement: true,
         requests: {
           include: {
             request: true,
