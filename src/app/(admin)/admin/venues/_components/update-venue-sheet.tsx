@@ -74,6 +74,8 @@ import { VenueFeaturesType } from "@/lib/types/venue";
 import ChangeTypeSchema, {
   ChangeTypeType,
 } from "prisma/generated/zod/inputTypeSchemas/ChangeTypeSchema";
+import { TagInput } from "@/components/ui/tag-input";
+import NumberInput from "@/components/number-input";
 
 interface UpdateDeparVenueProps
   extends React.ComponentPropsWithRef<typeof Sheet> {
@@ -90,9 +92,6 @@ export function UpdateVenueSheet({
 }: UpdateDeparVenueProps) {
   const [open, setOpen] = React.useState(false);
   const [venueType, setVenueType] = React.useState(false);
-  const [featuresError, setFeaturesError] = React.useState<string | undefined>(
-    undefined
-  );
   const pathname = usePathname();
   const queryClient = useQueryClient();
   const form = useForm<UpdateVenueSchema>({
@@ -105,7 +104,8 @@ export function UpdateVenueSheet({
       departmentId: venue.departmentId,
       imageUrl: undefined,
       venueType: venue.venueType,
-      setupRequirements: venue.venueSetupRequirement
+      setupRequirements:
+        venue.venueSetupRequirement?.map((req) => req.name) ?? [],
     },
   });
 
@@ -131,16 +131,12 @@ export function UpdateVenueSheet({
       departmentId: venue.departmentId,
       imageUrl: undefined,
       venueType: venue.venueType,
-      features: Array.isArray(venue.features)
-        ? (venue.features as VenueFeaturesType[]).map((feature) => feature.name)
-        : undefined,
+      setupRequirements:
+        venue.venueSetupRequirement?.map((req) => req.name) ?? [],
     });
   }, [venue, form, props.open]);
 
   async function onSubmit(values: UpdateVenueSchema) {
-    if (featuresError) {
-      return;
-    }
     try {
       let uploadedFilesResult: { filePath: string }[] = [];
 
@@ -148,35 +144,16 @@ export function UpdateVenueSheet({
         uploadedFilesResult = await uploadFiles(values.imageUrl);
       }
 
-      let changeType: ChangeTypeType = ChangeTypeSchema.enum.OTHER;
-
-      if (dirtyFields.status) {
-        changeType = ChangeTypeSchema.enum.STATUS_CHANGE;
-      } else if (
-        dirtyFields.name ||
-        dirtyFields.capacity ||
-        dirtyFields.venueType
-      ) {
-        changeType = ChangeTypeSchema.enum.FIELD_UPDATE;
-      } else if (dirtyFields.location) {
-        changeType = ChangeTypeSchema.enum.LOCATION_UPDATE;
-      } else if (dirtyFields.departmentId) {
-        changeType = ChangeTypeSchema.enum.ASSIGNMENT_CHANGE;
-      } else if (dirtyFields.imageUrl) {
-        changeType = ChangeTypeSchema.enum.VENUE_CHANGE;
-      }
-
       const data: ExtendedUpdateVenueServerSchema = {
         id: venue.id,
         path: pathname,
         name: values.name,
-        departmentId: values.departmentId,
+        departmenId: values.departmentId,
         venueType: values.venueType,
-        features: values.features,
+        setupRequirements: values.setupRequirements,
         location: values.location,
         capacity: values.capacity,
         status: values.status,
-        changeType: changeType,
         imageUrl: uploadedFilesResult.map(
           (result: { filePath: string }) => result.filePath
         ),
@@ -269,12 +246,15 @@ export function UpdateVenueSheet({
                     <FormItem>
                       <FormLabel>Capacity</FormLabel>
                       <FormControl>
-                        <Input
-                          autoComplete="off"
-                          type="number"
-                          placeholder="24"
+                        <NumberInput
+                          value={field.value}
+                          min={0}
+                          max={100}
                           disabled={isPending || isUploading}
-                          {...field}
+                          onChange={(value) => {
+                            field.onChange(value);
+                          }}
+                          className="w-full justify-between"
                         />
                       </FormControl>
                       <FormMessage />
@@ -466,14 +446,22 @@ export function UpdateVenueSheet({
                 />
                 <FormField
                   control={form.control}
-                  name="features"
+                  name="setupRequirements"
                   render={({ field }) => (
-                    <VenueFeatures
-                      field={field}
-                      disabled={isPending || isUploading}
-                      error={featuresError}
-                      setError={setFeaturesError}
-                    />
+                    <FormItem className="flex flex-grow flex-col">
+                      <FormLabel className="text-left">
+                        Setup Requirements
+                      </FormLabel>
+                      <FormControl>
+                        <TagInput
+                          placeholder="Enter one or more items"
+                          disabled={isPending || isUploading}
+                          value={field.value || []}
+                          onChange={field.onChange}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
                   )}
                 />
                 <FormField

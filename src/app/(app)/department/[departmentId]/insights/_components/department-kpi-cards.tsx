@@ -7,6 +7,7 @@ import { Clock, Users, FileText, CheckCircle } from "lucide-react";
 import type { DepartmentWithRelations } from "prisma/generated/zod";
 import { DateRange } from "react-day-picker";
 import type { RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTypeSchema";
+import NumberFlow from "@number-flow/react";
 
 interface DepartmentKPICardsProps {
   data: DepartmentWithRelations;
@@ -98,7 +99,14 @@ export default function DepartmentKPICards({
           <FileText className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{totalRequests}</div>
+          <NumberFlow
+            willChange
+            continuous
+            value={totalRequests}
+            format={{ useGrouping: false }}
+            className="text-2xl font-bold"
+            aria-hidden
+          />
           <p className="text-xs text-muted-foreground">
             All submitted requests {periodText} {typeText}
           </p>
@@ -110,7 +118,14 @@ export default function DepartmentKPICards({
           <CheckCircle className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{completedTasks}</div>
+          <NumberFlow
+            willChange
+            continuous
+            value={completedTasks}
+            format={{ useGrouping: false }}
+            className="text-2xl font-bold"
+            aria-hidden
+          />
           <p className="text-xs text-muted-foreground">
             Successfully completed requests {periodText} {typeText}
           </p>
@@ -125,7 +140,14 @@ export default function DepartmentKPICards({
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            {roundedAverageCompletionTime} hours
+            <NumberFlow
+              willChange
+              continuous
+              value={roundedAverageCompletionTime}
+              format={{ useGrouping: false }}
+              aria-hidden
+            />{" "}
+            hours
           </div>
           <p className="text-xs text-muted-foreground">
             Average time to complete requests {periodText} {typeText}
@@ -138,7 +160,14 @@ export default function DepartmentKPICards({
           <Users className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{activeUsers}</div>
+          <NumberFlow
+            willChange
+            continuous
+            value={activeUsers}
+            format={{ useGrouping: false }}
+            className="text-2xl font-bold"
+            aria-hidden
+          />
           <p className="text-xs text-muted-foreground">
             Users engaged with the department {periodText}
           </p>

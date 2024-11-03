@@ -37,6 +37,9 @@ import ItemStatusSchema, {
 import { format, formatDate } from "date-fns";
 import { UpdateInventorySubItemSheet } from "./update-sub-inventory-item-sheet";
 import { DeleteInventorySubItemsDialog } from "./delete-inventory-sub-items-dialog";
+import { PhotoProvider, PhotoView } from "react-photo-view";
+import LoadingSpinner from "@/components/loaders/loading-spinner";
+import { CircleMinus, CirclePlus, RotateCw } from "lucide-react";
 
 export function getInventorySubItemsColumns(): ColumnDef<InventorySubItemType>[] {
   return [
@@ -77,26 +80,44 @@ export function getInventorySubItemsColumns(): ColumnDef<InventorySubItemType>[]
       cell: ({ row }) => {
         return (
           <div className="flex items-center justify-start">
-            <Dialog>
-              <DialogTrigger asChild>
-                <div className="relative aspect-square h-10 cursor-pointer transition-colors hover:brightness-75">
-                  <Image
-                    src={row.original.imageUrl}
-                    alt={`Image of ${row.original.name}`}
-                    fill
-                    className="rounded-md border object-cover"
-                  />
-                </div>
-              </DialogTrigger>
-              <DialogContent className="aspect-square min-h-[80vh] max-w-2xl">
-                <Image
-                  src={row.original.imageUrl}
-                  alt={`Image of ${row.original.name}`}
-                  fill
-                  className="rounded-md border object-cover"
-                />
-              </DialogContent>
-            </Dialog>
+            <PhotoProvider
+              speed={() => 300}
+              maskOpacity={0.8}
+              loadingElement={<LoadingSpinner />}
+              toolbarRender={({ onScale, scale, rotate, onRotate }) => {
+                return (
+                  <>
+                    <div className="flex gap-3">
+                      <CirclePlus
+                        className="size-5 cursor-pointer opacity-75 transition-opacity ease-linear hover:opacity-100"
+                        onClick={() => onScale(scale + 1)}
+                      />
+                      <CircleMinus
+                        className="size-5 cursor-pointer opacity-75 transition-opacity ease-linear hover:opacity-100"
+                        onClick={() => onScale(scale - 1)}
+                      />
+                      <RotateCw
+                        className="size-5 cursor-pointer opacity-75 transition-opacity ease-linear hover:opacity-100"
+                        onClick={() => onRotate(rotate + 90)}
+                      />
+                    </div>
+                  </>
+                );
+              }}
+            >
+              <div>
+                <PhotoView src={row.original.imageUrl}>
+                  <div className="relative aspect-square h-10 cursor-pointer transition-colors hover:brightness-75">
+                    <Image
+                      src={row.original.imageUrl}
+                      alt={`Image of ${row.original.name}`}
+                      fill
+                      className="rounded-md border object-cover"
+                    />
+                  </div>
+                </PhotoView>
+              </div>
+            </PhotoProvider>
           </div>
         );
       },

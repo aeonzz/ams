@@ -1,7 +1,6 @@
-"use client";
-
 import React from "react";
-
+import Image from "next/image";
+import { Check, ChevronsUpDown, Dot } from "lucide-react";
 import {
   Command,
   CommandEmpty,
@@ -16,24 +15,18 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import {
-  Form,
-  FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
+  FormControl,
   FormMessage,
 } from "@/components/ui/form";
-import { Check, ChevronsUpDown, Dot } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Path, UseFormReturn } from "react-hook-form";
 import { cn, getVenueStatusColor, textTransform } from "@/lib/utils";
-import { type VenueRequestSchema } from "@/lib/schema/request";
-import LoadingSpinner from "@/components/loaders/loading-spinner";
-import { H3, H5, P } from "@/components/typography/text";
-import { Badge } from "@/components/ui/badge";
-import Image from "next/image";
 import type { VenueWithRelations } from "prisma/generated/zod";
+import type { VenueRequestSchema } from "@/lib/schema/request";
 
 interface VenueProps {
   form: UseFormReturn<VenueRequestSchema>;
@@ -55,7 +48,7 @@ export default function VenueField({
       control={form.control}
       name={name}
       render={({ field }) => (
-        <FormItem className="flex flex-col flex-1">
+        <FormItem className="flex flex-1 flex-col">
           <FormLabel>Venue</FormLabel>
           <Popover open={open} onOpenChange={setOpen} modal>
             <PopoverTrigger asChild>
@@ -88,14 +81,26 @@ export default function VenueField({
                   <CommandGroup>
                     {data?.map((venue) => {
                       const status = getVenueStatusColor(venue.status);
+                      const isDisabled =
+                        venue.status === "CLOSED" ||
+                        venue.status === "RESERVED" ||
+                        venue.status === "UNDER_MAINTENANCE";
+
                       return (
                         <CommandItem
                           value={venue.id}
                           key={venue.id}
+                          disabled={isDisabled}
                           onSelect={() => {
-                            form.setValue("venueId", venue.id);
-                            setOpen(false);
+                            if (!isDisabled) {
+                              form.setValue("venueId", venue.id);
+                              setOpen(false);
+                            }
                           }}
+                          className={cn(
+                            "flex w-full items-center space-x-3",
+                            isDisabled && "cursor-not-allowed opacity-50"
+                          )}
                         >
                           <div className="flex w-full space-x-3">
                             <div className="relative aspect-square h-16 cursor-pointer transition-colors hover:brightness-75">
@@ -108,7 +113,7 @@ export default function VenueField({
                             </div>
                             <div className="flex flex-grow flex-col justify-between">
                               <div className="space-y-1 truncate">
-                                <P className="truncate">{venue.name}</P>
+                                <p className="truncate">{venue.name}</p>
                                 <Badge
                                   variant={status.variant}
                                   className="pr-3.5"
@@ -123,15 +128,17 @@ export default function VenueField({
                               </div>
                             </div>
                           </div>
-                          <Check
-                            className={cn(
-                              "h-4 w-4",
-                              venue.id === field.value
-                                ? "opacity-100"
-                                : "opacity-0",
-                              "self-start"
-                            )}
-                          />
+                          {!isDisabled && (
+                            <Check
+                              className={cn(
+                                "h-4 w-4",
+                                venue.id === field.value
+                                  ? "opacity-100"
+                                  : "opacity-0",
+                                "self-start"
+                              )}
+                            />
+                          )}
                         </CommandItem>
                       );
                     })}

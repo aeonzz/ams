@@ -340,6 +340,25 @@ export const supplyRequestActions = authedProcedure
             },
           },
         });
+
+        const supplyRequestItems = await prisma.supplyRequestItem.findMany({
+          where: {
+            supplyRequest: {
+              requestId: id,
+            },
+          },
+        });
+
+        for (const item of supplyRequestItems) {
+          await prisma.supplyItem.update({
+            where: { id: item.supplyItemId },
+            data: {
+              quantity: {
+                decrement: item.quantity,
+              },
+            },
+          });
+        }
         return updatedRequest;
       });
 

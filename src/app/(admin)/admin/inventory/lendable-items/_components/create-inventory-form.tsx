@@ -56,6 +56,7 @@ import axios from "axios";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLendableDepartments } from "@/lib/hooks/use-lendable-departments";
+import NumberInput from "@/components/number-input";
 
 interface CreateInventoryFormProps {
   setAlertOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -154,16 +155,15 @@ export default function CreateInventoryForm({
               <FormItem>
                 <FormLabel>Inventory Count</FormLabel>
                 <FormControl>
-                  <Input
-                    autoComplete="off"
-                    type="number"
-                    placeholder="1"
+                  <NumberInput
+                    value={field.value}
+                    min={0}
+                    max={100}
                     disabled={isPending || isUploading}
-                    {...field}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                      const value = e.target.value.slice(0, 3);
+                    onChange={(value) => {
                       field.onChange(value);
                     }}
+                    className="w-full justify-between"
                   />
                 </FormControl>
                 <FormMessage />

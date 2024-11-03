@@ -56,7 +56,6 @@ export function ManageVenueStatusDialog({
         id: venueId,
         status: status,
         path: pathname,
-        changeType: "STATUS_CHANGE",
       }),
       {
         loading: "Updating status...",

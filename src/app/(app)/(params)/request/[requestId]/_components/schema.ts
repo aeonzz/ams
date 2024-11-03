@@ -27,7 +27,6 @@ export const updateRequestStatusSchema = z.object({
   reviewerId: z.string().optional(),
   status: RequestStatusTypeSchema,
   rejectionReason: z.string().optional(),
-  supplyRequest: z.boolean().optional(),
 });
 
 export type UpdateRequestStatusSchema = z.infer<

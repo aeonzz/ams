@@ -118,18 +118,10 @@ export const updateVehicle = authedProcedure
   .createServerAction()
   .input(extendedUpdateVehicleServerSchema)
   .handler(async ({ ctx, input }) => {
-    const { path, id, imageUrl, changeType, ...rest } = input;
+    const { path, id, imageUrl, ...rest } = input;
     const { user } = ctx;
     try {
       const result = await db.$transaction(async (prisma) => {
-        const currentVehicle = await prisma.vehicle.findUnique({
-          where: { id },
-        });
-
-        if (!currentVehicle) {
-          throw "Vehicle not found";
-        }
-
         const updateVehicle = await db.vehicle.update({
           where: {
             id: id,
@@ -139,21 +131,7 @@ export const updateVehicle = authedProcedure
             ...rest,
           },
         });
-
-        const oldValueJson = JSON.parse(JSON.stringify(currentVehicle));
-        const newValueJson = JSON.parse(JSON.stringify(updateVehicle));
-
-        await prisma.genericAuditLog.create({
-          data: {
-            id: generateId(15),
-            entityId: updateVehicle.id,
-            changeType: changeType,
-            entityType: "VENUE",
-            oldValue: oldValueJson,
-            newValue: newValueJson,
-            changedById: user.id,
-          },
-        });
+        return updateVehicle;
       });
 
       return revalidatePath(path);

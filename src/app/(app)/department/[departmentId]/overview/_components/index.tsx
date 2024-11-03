@@ -94,6 +94,7 @@ export default function DepartmentOverviewScreen({
 
   const handleNotification = React.useCallback(() => {
     refetchNotifications();
+    refetch();
   }, [queryClient, departmentId]);
 
   React.useEffect(() => {
@@ -146,7 +147,10 @@ export default function DepartmentOverviewScreen({
   }
 
   const openRequests = data.request.filter(
-    (request) => request.status !== "COMPLETED" && request.status !== "PENDING"
+    (request) =>
+      request.status !== "COMPLETED" &&
+      request.status !== "CANCELLED" &&
+      request.status !== "REJECTED"
   );
 
   const pendingJobs = data.request.filter(

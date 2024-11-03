@@ -4,7 +4,13 @@ import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { type VehicleWithRelations } from "prisma/generated/zod";
-import { Dot, ChevronLeft } from "lucide-react";
+import {
+  Dot,
+  ChevronLeft,
+  CirclePlus,
+  CircleMinus,
+  RotateCw,
+} from "lucide-react";
 import { H1, H4, H5, P } from "@/components/typography/text";
 import SearchInput from "@/app/(app)/_components/search-input";
 import FetchDataError from "@/components/card/fetch-data-error";
@@ -23,6 +29,8 @@ import { useSession } from "@/lib/hooks/use-session";
 import { PermissionGuard } from "@/components/permission-guard";
 import ManageVehicleSkeleton from "./manage-vehicle-skeleton";
 import VehicleRequestsTable from "./vehicle-requests-table";
+import LoadingSpinner from "@/components/loaders/loading-spinner";
+import { PhotoProvider, PhotoView } from "react-photo-view";
 
 interface ManageVehicleScreenProps {
   params: {
@@ -84,27 +92,45 @@ export default function ManageVehicleScreen({
       </div>
       <div className="scroll-bar container flex h-full overflow-y-auto p-0">
         <div className="flex flex-col gap-3 p-6 pr-0">
-          <Dialog>
-            <DialogTrigger asChild>
-              <div className="relative aspect-video h-64 w-[380px] cursor-pointer transition-all hover:brightness-75">
-                <Image
-                  src={data.imageUrl}
-                  alt={`Image of ${data.name}`}
-                  fill
-                  priority
-                  className="rounded-md border object-cover"
-                />
-              </div>
-            </DialogTrigger>
-            <DialogContent className="aspect-square w-[80vw]">
-              <Image
-                src={data.imageUrl}
-                alt={`Image of ${data.name}`}
-                fill
-                className="rounded-md border object-cover"
-              />
-            </DialogContent>
-          </Dialog>
+          <PhotoProvider
+            speed={() => 300}
+            maskOpacity={0.8}
+            loadingElement={<LoadingSpinner />}
+            toolbarRender={({ onScale, scale, rotate, onRotate }) => {
+              return (
+                <>
+                  <div className="flex gap-3">
+                    <CirclePlus
+                      className="size-5 cursor-pointer opacity-75 transition-opacity ease-linear hover:opacity-100"
+                      onClick={() => onScale(scale + 1)}
+                    />
+                    <CircleMinus
+                      className="size-5 cursor-pointer opacity-75 transition-opacity ease-linear hover:opacity-100"
+                      onClick={() => onScale(scale - 1)}
+                    />
+                    <RotateCw
+                      className="size-5 cursor-pointer opacity-75 transition-opacity ease-linear hover:opacity-100"
+                      onClick={() => onRotate(rotate + 90)}
+                    />
+                  </div>
+                </>
+              );
+            }}
+          >
+            <div>
+              <PhotoView key={data.imageUrl} src={data.imageUrl}>
+                <div className="relative aspect-video h-60 w-[380px] cursor-pointer transition-all hover:brightness-75">
+                  <Image
+                    src={data.imageUrl}
+                    alt={`Image of ${data.name}`}
+                    fill
+                    priority
+                    className="rounded-md border object-cover"
+                  />
+                </div>
+              </PhotoView>
+            </div>
+          </PhotoProvider>
           <div className="flex h-full flex-col gap-3">
             <div className="space-y-3">
               <div className="space-y-1">
@@ -133,19 +159,11 @@ export default function ManageVehicleScreen({
                 >
                   <Button
                     className="flex-1"
+                    variant="outline"
                     onClick={() => setShowUpdateVehicleSheet(true)}
                   >
                     Edit
                   </Button>
-                  <Link
-                    href={`/department/${departmentId}/transport/${vehicleId}/logs`}
-                    className={cn(
-                      buttonVariants({ variant: "secondary" }),
-                      "flex-1"
-                    )}
-                  >
-                    <P>Logs</P>
-                  </Link>
                 </PermissionGuard>
               </div>
             </div>
@@ -161,7 +179,9 @@ export default function ManageVehicleScreen({
               </div>
               <Separator className="my-2" />
               <div className="flex items-center justify-between">
-                <P className="font-semibold text-muted-foreground">Lincense Plate</P>
+                <P className="font-semibold text-muted-foreground">
+                  Lincense Plate
+                </P>
                 <P>{data.licensePlate}</P>
               </div>
               <Separator className="my-2" />

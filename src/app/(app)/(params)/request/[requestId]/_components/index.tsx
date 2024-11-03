@@ -342,7 +342,6 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
               allowedRoles={["REQUEST_MANAGER"]}
               allowedDepartment={data.departmentId}
               allowedApproverRoles={["DEPARTMENT_HEAD"]}
-              supplyRequest
             />
           )}
           {data.type === "TRANSPORT" && data.transportRequest && (

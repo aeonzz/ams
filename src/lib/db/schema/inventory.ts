@@ -14,9 +14,9 @@ export const createInventoryItemSchema = z.object({
   }),
   departmentId: z.string().min(1, "Department is required"),
   inventoryCount: z
-    .string()
-    .transform((val) => parseInt(val, 10))
-    .pipe(z.number().min(1, "Inventory count must be atleast 1")),
+    .number()
+    .min(1, "inventory is required")
+    .max(100, "Cannot exceed 100 "),
 });
 
 export type CreateInventoryItemSchema = z.infer<

@@ -116,8 +116,7 @@ export default function DepartmentInsightsScreen({
                         (service) =>
                           (service !== "JOB" || data.acceptsJobs) &&
                           (service !== "TRANSPORT" || data.managesTransport) &&
-                          (service !== "RESOURCE" ||
-                            data.managesBorrowRequest) &&
+                          (service !== "BORROW" || data.managesBorrowRequest) &&
                           (service !== "VENUE" || data.managesFacility)
                       )
                       .map((service) => (
@@ -206,7 +205,7 @@ export default function DepartmentInsightsScreen({
           requestType={requestType}
           dateRange={date}
         />
-        {requestType === "RESOURCE" && (
+        {requestType === "BORROW" && (
           <>
             <OverdueItemsChart
               data={data}

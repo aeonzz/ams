@@ -70,6 +70,7 @@ import { UpdateVehicleSheetSkeleton } from "./update-vehicle-sheet-skeleton";
 import ChangeTypeSchema, {
   ChangeTypeType,
 } from "prisma/generated/zod/inputTypeSchemas/ChangeTypeSchema";
+import NumberInput from "@/components/number-input";
 
 interface UpdateVehicleProps extends React.ComponentPropsWithRef<typeof Sheet> {
   vehicle: Vehicle;
@@ -132,28 +133,11 @@ export function UpdateVehicleSheet({
         uploadedFilesResult = await uploadFiles(values.imageUrl);
       }
 
-      let changeType: ChangeTypeType = ChangeTypeSchema.enum.OTHER;
-
-      if (dirtyFields.status) {
-        changeType = ChangeTypeSchema.enum.STATUS_CHANGE;
-      } else if (
-        dirtyFields.name ||
-        dirtyFields.type ||
-        dirtyFields.capacity ||
-        dirtyFields.licensePlate ||
-        dirtyFields.imageUrl
-      ) {
-        changeType = ChangeTypeSchema.enum.FIELD_UPDATE;
-      } else if (dirtyFields.departmentId) {
-        changeType = ChangeTypeSchema.enum.ASSIGNMENT_CHANGE;
-      }
-
       const data: ExtendedUpdateVehicleServerSchema = {
         id: vehicle.id,
         path: pathname,
         name: values.name,
         type: values.type,
-        changeType: changeType,
         departmentId: values.departmentId,
         capacity: values.capacity,
         licensePlate: values.licensePlate,
@@ -248,7 +232,7 @@ export function UpdateVehicleSheet({
                   name="licensePlate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>License plate</FormLabel>
+                      <FormLabel>License Plate No.</FormLabel>
                       <FormControl>
                         <Input
                           autoComplete="off"
@@ -268,12 +252,15 @@ export function UpdateVehicleSheet({
                     <FormItem>
                       <FormLabel>Capacity</FormLabel>
                       <FormControl>
-                        <Input
-                          autoComplete="off"
-                          type="number"
-                          placeholder="24 seats"
+                        <NumberInput
+                          value={field.value}
+                          min={0}
+                          max={100}
                           disabled={isPending || isUploading}
-                          {...field}
+                          onChange={(value) => {
+                            field.onChange(value);
+                          }}
+                          className="w-full justify-between"
                         />
                       </FormControl>
                       <FormMessage />
@@ -292,7 +279,7 @@ export function UpdateVehicleSheet({
                       >
                         <FormControl>
                           <SelectTrigger
-                            className="bg-secondary capitalize"
+                            className="bg-transparent capitalize"
                             disabled={isPending || isUploading}
                           >
                             <SelectValue placeholder="Select a role" />

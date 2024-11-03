@@ -7,16 +7,16 @@ export const createSupplyItemSchema = z.object({
     required_error: "Image is required",
   }),
   quantity: z
-    .string()
-    .transform((val) => parseInt(val, 10))
-    .pipe(z.number().min(1, "Quantity must be atleast 1")),
+    .number()
+    .min(1, "Quantity is required")
+    .max(200, "Cannot exceed 200 "),
   unit: z.string({
     required_error: "Unit is required",
   }),
   lowStockThreshold: z
-    .string()
-    .transform((val) => parseInt(val, 10))
-    .pipe(z.number().min(1, "Low stock threshold must be atleast 1")),
+    .number()
+    .min(1, "lowStockThreshold is required")
+    .max(200, "Cannot exceed 200 "),
   expirationDate: z.date().optional(),
   categoryId: z.string({
     required_error: "Category is required",
@@ -28,12 +28,6 @@ export const createSupplyItemSchema = z.object({
 
 export type CreateSupplyItemSchema = z.infer<typeof createSupplyItemSchema>;
 
-export const updateSupplyItemSchema = createSupplyItemSchema.partial().extend({
-  quantity: z.number().min(1, "Quantity must be at least 1").optional(),
-  lowStockThreshold: z
-    .number()
-    .min(1, "Low stock threshold must be at least 1")
-    .optional(),
-});
+export const updateSupplyItemSchema = createSupplyItemSchema.partial();
 
 export type UpdateSupplyItemSchema = z.infer<typeof updateSupplyItemSchema>;

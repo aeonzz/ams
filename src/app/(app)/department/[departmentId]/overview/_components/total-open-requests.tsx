@@ -10,6 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ChartContainer } from "@/components/ui/chart";
+import NumberFlow from "@number-flow/react";
 
 interface TotalOpenRequestsProps {
   totalRequestsCount: number;
@@ -35,7 +36,13 @@ export default function TotalOpenRequests({
       </CardHeader>
       <CardContent className="flex flex-row items-baseline gap-4 p-4 pt-0">
         <div className="flex items-baseline gap-1 text-3xl font-bold tabular-nums leading-none">
-          {totalRequestsCount}
+          <NumberFlow
+            willChange
+            continuous
+            value={totalRequestsCount}
+            format={{ useGrouping: false }}
+            aria-hidden
+          />
           <span className="text-sm font-normal text-muted-foreground">
             requests
           </span>

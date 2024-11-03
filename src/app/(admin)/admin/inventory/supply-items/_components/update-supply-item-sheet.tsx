@@ -71,6 +71,7 @@ import { Textarea } from "@/components/ui/text-area";
 import { useSupplyDepartments } from "@/lib/hooks/use-supply-departments";
 import { updateSupplyItem } from "@/lib/actions/supply";
 import { UnitTypeSchema } from "./create-supply-item-form";
+import NumberInput from "@/components/number-input";
 
 interface UpdateSupplyItemSheetProps
   extends React.ComponentPropsWithRef<typeof Sheet> {
@@ -285,21 +286,15 @@ export function UpdateSupplyItemSheet({
                     <FormItem className="flex-1">
                       <FormLabel>Quantity</FormLabel>
                       <FormControl>
-                        <Input
-                          autoComplete="off"
-                          type="number"
-                          placeholder="1"
+                        <NumberInput
+                          value={field.value}
+                          min={0}
+                          max={200}
                           disabled={isPending || isUploading}
-                          {...field}
-                          onChange={(
-                            e: React.ChangeEvent<HTMLInputElement>
-                          ) => {
-                            const value = e.target.value.slice(0, 3);
-                            const numericValue = Number(value);
-                            field.onChange(
-                              isNaN(numericValue) ? 0 : numericValue
-                            );
+                          onChange={(value) => {
+                            field.onChange(value);
                           }}
+                          className="w-full justify-between"
                         />
                       </FormControl>
                       <FormMessage />
@@ -313,21 +308,15 @@ export function UpdateSupplyItemSheet({
                     <FormItem className="flex-1">
                       <FormLabel>Low Stock Threshhold</FormLabel>
                       <FormControl>
-                        <Input
-                          autoComplete="off"
-                          type="number"
-                          placeholder="1"
+                        <NumberInput
+                          value={field.value}
+                          min={0}
+                          max={200}
                           disabled={isPending || isUploading}
-                          {...field}
-                          onChange={(
-                            e: React.ChangeEvent<HTMLInputElement>
-                          ) => {
-                            const value = e.target.value.slice(0, 3);
-                            const numericValue = Number(value);
-                            field.onChange(
-                              isNaN(numericValue) ? 0 : numericValue
-                            );
+                          onChange={(value) => {
+                            field.onChange(value);
                           }}
+                          className="w-full justify-between"
                         />
                       </FormControl>
                       <FormMessage />

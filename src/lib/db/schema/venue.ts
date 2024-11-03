@@ -8,10 +8,7 @@ export const createVenueSchema = z.object({
     required_error: "Department is required",
   }),
   venueType: VenueTypeSchema,
-  capacity: z
-    .string()
-    .transform((val) => parseInt(val, 10))
-    .pipe(z.number().min(1, "Capacity is required")),
+  capacity: z.number().min(1, "Capacity is required"),
   imageUrl: z.array(z.instanceof(File), {
     required_error: "Image is required",
   }),

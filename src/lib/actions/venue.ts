@@ -9,6 +9,7 @@ import {
   createVenueSchemaWithPath,
   deleteVenuesSchema,
   extendedUpdateVenueServerSchema,
+  updateSetupRequirementSchema,
   updateVenueStatusesSchema,
 } from "../schema/venue";
 import { revalidatePath } from "next/cache";
@@ -128,50 +129,82 @@ export const updateVenue = authedProcedure
   .input(extendedUpdateVenueServerSchema)
   .handler(async ({ ctx, input }) => {
     const { user } = ctx;
-    const { path, id, imageUrl, departmentId, features, changeType, ...rest } =
+    const { path, id, imageUrl, departmenId, setupRequirements, ...rest } =
       input;
 
     try {
       const result = await db.$transaction(async (prisma) => {
-        const featuresWithIds = features?.map((feature) => ({
-          id: generateId(15),
-          name: feature,
-        }));
-
-        const currentVenue = await prisma.venue.findUnique({
+        const updatedVenue = await prisma.venue.update({
           where: { id },
-        });
-
-        if (!currentVenue) {
-          throw "Venue not found";
-        }
-
-        const updateVenue = await prisma.venue.update({
-          where: {
-            id: id,
-          },
           data: {
             imageUrl: imageUrl && imageUrl[0],
-            departmentId: departmentId,
-            features: featuresWithIds,
+            departmentId: departmenId,
             ...rest,
           },
         });
 
-        const oldValueJson = JSON.parse(JSON.stringify(currentVenue));
-        const newValueJson = JSON.parse(JSON.stringify(updateVenue));
+        if (setupRequirements !== undefined) {
+          const existingRequirements =
+            await prisma.venueSetupRequirement.findMany({
+              where: { venueId: updatedVenue.id },
+            });
 
-        await prisma.genericAuditLog.create({
-          data: {
-            id: generateId(15),
-            entityId: updateVenue.id,
-            changeType: changeType,
-            entityType: "VENUE",
-            oldValue: oldValueJson,
-            newValue: newValueJson,
-            changedById: user.id,
-          },
-        });
+          const existingRequirementNames = new Set(
+            existingRequirements.map((req) => req.name)
+          );
+
+          // Identify requirements to add, update, and delete
+          const requirementsToAdd = setupRequirements.filter(
+            (req) => !existingRequirementNames.has(req)
+          );
+          const requirementsToKeep = setupRequirements.filter((req) =>
+            existingRequirementNames.has(req)
+          );
+          const requirementsToDelete = existingRequirements.filter(
+            (req) => !setupRequirements.includes(req.name)
+          );
+
+          // Add new requirements
+          if (requirementsToAdd.length > 0) {
+            const newRequirementsData = requirementsToAdd.map(
+              (requirement) => ({
+                id: generateId(15),
+                venueId: updatedVenue.id,
+                name: requirement,
+              })
+            );
+
+            await prisma.venueSetupRequirement.createMany({
+              data: newRequirementsData,
+            });
+          }
+
+          // Update existing requirements if necessary
+          for (const requirement of requirementsToKeep) {
+            await prisma.venueSetupRequirement.updateMany({
+              where: {
+                venueId: updatedVenue.id,
+                name: requirement,
+              },
+              data: {
+                name: requirement,
+              },
+            });
+          }
+
+          // Delete requirements that are no longer needed
+          if (requirementsToDelete.length > 0) {
+            await prisma.venueSetupRequirement.deleteMany({
+              where: {
+                id: {
+                  in: requirementsToDelete.map((req) => req.id),
+                },
+              },
+            });
+          }
+        }
+
+        return updatedVenue;
       });
 
       return revalidatePath(path);
@@ -288,6 +321,32 @@ export const deleteVenues = authedProcedure
       return revalidatePath(path);
     } catch (error) {
       console.log(error);
+      getErrorMessage(error);
+    }
+  });
+
+export const updateSetupStatus = authedProcedure
+  .createServerAction()
+  .input(updateSetupRequirementSchema)
+  .handler(async ({ ctx, input }) => {
+    const { path, id, status } = input;
+
+    try {
+      const result = await db.$transaction(async (prisma) => {
+        const updatedVenue = await prisma.venueSetupRequirement.update({
+          where: {
+            id: id,
+          },
+          data: {
+            available: status,
+          },
+        });
+
+        return updatedVenue;
+      });
+
+      return revalidatePath(path);
+    } catch (error) {
       getErrorMessage(error);
     }
   });

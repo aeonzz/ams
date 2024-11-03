@@ -10,24 +10,14 @@ export const createVehicleSchema = z.object({
   imageUrl: z.array(z.instanceof(File), {
     required_error: "Image is required",
   }),
-  capacity: z
-    .string()
-    .transform((val) => parseInt(val, 10))
-    .pipe(z.number().min(1, "Capacity is required")),
-  licensePlate: z.string().min(1, "Name is required"),
+  capacity: z.number().min(1, "Capacity is required"),
+  licensePlate: z.string().min(1, "License number is required"),
+  status: VehicleStatusSchema.optional(),
 });
 
 export type CreateVehicleSchema = z.infer<typeof createVehicleSchema>;
 
-export const updateVehicleSchema = z.object({
-  name: z.string().optional(),
-  type: z.string().optional(),
-  departmentId: z.string().optional(),
-  capacity: z.preprocess((val) => Number(val), z.number().optional()),
-  status: VehicleStatusSchema,
-  licensePlate: z.string().optional(),
-  imageUrl: z.array(z.instanceof(File)).optional(),
-});
+export const updateVehicleSchema = createVehicleSchema.partial();
 
 export type UpdateVehicleSchema = z.infer<typeof updateVehicleSchema>;
 

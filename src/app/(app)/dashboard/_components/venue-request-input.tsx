@@ -95,7 +95,7 @@ export default function VenueRequestInput({
       const res = await axios.get(`/api/reserved-dates/venue/${venueId}`);
       return res.data.data;
     },
-    queryKey: [venueId],
+    queryKey: ["venue-reserved-dates", venueId],
     enabled: !!venueId,
     refetchOnWindowFocus: false,
   });

@@ -48,6 +48,7 @@ import { toast } from "sonner";
 import SupplyItemStatusSchema, {
   SupplyItemStatusType,
 } from "prisma/generated/zod/inputTypeSchemas/SupplyItemStatusSchema";
+import NumberFlow from "@number-flow/react";
 
 type SupplyItemColumnProps = {
   queryKey?: string[];
@@ -167,20 +168,6 @@ export function getSupllyItemColumns(
       },
     },
     {
-      accessorKey: "unit",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Unit" />
-      ),
-      cell: ({ row }) => {
-        return (
-          <div className="flex space-x-2">
-            <P className="truncate font-medium">{row.original.unit}</P>
-          </div>
-        );
-      },
-      size: 0,
-    },
-    {
       accessorKey: "departmentName",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Deparment" />
@@ -243,7 +230,27 @@ export function getSupllyItemColumns(
       cell: ({ row }) => {
         return (
           <div className="flex space-x-2">
-            <P className="truncate font-medium">{row.original.quantity}</P>
+            <NumberFlow
+              willChange
+              continuous
+              value={row.original.quantity}
+              format={{ useGrouping: false }}
+              aria-hidden
+            />
+          </div>
+        );
+      },
+      size: 0,
+    },
+    {
+      accessorKey: "unit",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Unit" />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="flex space-x-2">
+            <P className="truncate font-medium">{row.original.unit}</P>
           </div>
         );
       },
@@ -257,9 +264,13 @@ export function getSupllyItemColumns(
       cell: ({ row }) => {
         return (
           <div className="flex space-x-2">
-            <P className="truncate font-medium">
-              {row.original.lowStockThreshold}
-            </P>
+            <NumberFlow
+              willChange
+              continuous
+              value={row.original.lowStockThreshold}
+              format={{ useGrouping: false }}
+              aria-hidden
+            />
           </div>
         );
       },

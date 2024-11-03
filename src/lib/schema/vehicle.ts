@@ -34,7 +34,6 @@ export const updateVehicleSchemaServer = z.object({
 
 export const extendedUpdateVehicleServerSchema =
   updateVehicleSchemaServer.extend({
-    changeType: ChangeTypeSchema,
     path: z.string(),
     id: z.string().optional(),
   });

@@ -143,7 +143,7 @@ export default function UploadRulesPdfDialog({
           setAlertOpen(true);
         }
       }}
-      className="flex max-h-[90vh] max-w-2xl flex-col"
+      className="flex max-h-[90vh] max-w-4xl flex-col"
       isLoading={isPending}
     >
       <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
@@ -185,8 +185,8 @@ export default function UploadRulesPdfDialog({
         className="h-full px-3"
       >
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="view">View Form</TabsTrigger>
-          <TabsTrigger value="upload">Upload New Form</TabsTrigger>
+          <TabsTrigger value="view">View File</TabsTrigger>
+          <TabsTrigger value="upload">Upload New File</TabsTrigger>
         </TabsList>
         <TabsContent value="view">
           {file ? (

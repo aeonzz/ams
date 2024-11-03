@@ -14,13 +14,11 @@ import { socket } from "@/app/socket";
 interface RequestApproverActionsProps {
   request: RequestWithRelations;
   isPending: boolean;
-  supplyRequest?: boolean | undefined;
 }
 
 export default function RequestApproverActions({
   request,
   isPending,
-  supplyRequest,
 }: RequestApproverActionsProps) {
   const currentUser = useSession();
   const pathname = usePathname();
@@ -33,7 +31,6 @@ export default function RequestApproverActions({
         path: pathname,
         requestId: request.id,
         status: action,
-        supplyRequest: supplyRequest,
       };
 
       const actionText =

@@ -12,7 +12,7 @@ export const createVenueSchemaServer = z.object({
   capacity: z.number(),
   venueType: VenueTypeSchema,
   setupRequirements: z.array(z.string()).optional(),
-  rulesAndRegulations: z.string().optional(),
+  status: VenueStatusSchema.optional(),
   imageUrl: z.array(
     z.string({
       required_error: "Image is required",
@@ -28,19 +28,9 @@ export type CreateVenueSchemaWithPath = z.infer<
   typeof createVenueSchemaWithPath
 >;
 
-export const updateVenueSchemaServer = z.object({
-  name: z.string().optional(),
-  location: z.string().optional(),
-  departmentId: z.string().optional(),
-  venueType: VenueTypeSchema.optional(),
-  features: z.array(z.string()).optional(),
-  capacity: z.number().optional(),
-  imageUrl: z.array(z.string()).optional(),
-  status: VenueStatusSchema.optional(),
-});
+export const updateVenueSchemaServer = createVenueSchemaServer.partial();
 
 export const extendedUpdateVenueServerSchema = updateVenueSchemaServer.extend({
-  changeType: ChangeTypeSchema,
   path: z.string(),
   id: z.string().optional(),
 });
@@ -65,3 +55,13 @@ export const deleteVenuesSchema = z.object({
 });
 
 export type DeleteVenuesSchema = z.infer<typeof deleteVenuesSchema>;
+
+export const updateSetupRequirementSchema = z.object({
+  id: z.string(),
+  status: z.boolean(),
+  path: z.string(),
+});
+
+export type UpdateSetupRequirementSchema = z.infer<
+  typeof updateSetupRequirementSchema
+>;

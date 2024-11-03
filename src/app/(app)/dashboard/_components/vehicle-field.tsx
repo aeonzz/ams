@@ -57,7 +57,7 @@ export default function VehicleField({
       control={form.control}
       name={name}
       render={({ field }) => (
-        <FormItem className="flex flex-col flex-1">
+        <FormItem className="flex flex-1 flex-col">
           <FormLabel>Vehicle</FormLabel>
           <Popover open={open} onOpenChange={setOpen} modal>
             <PopoverTrigger asChild>
@@ -90,13 +90,19 @@ export default function VehicleField({
                   <CommandGroup>
                     {data?.map((vehicle) => {
                       const status = getVehicleStatusColor(vehicle.status);
+                      const isDisabled =
+                        vehicle.status === "RESERVED" ||
+                        vehicle.status === "UNDER_MAINTENANCE";
                       return (
                         <CommandItem
                           value={vehicle.id}
                           key={vehicle.id}
+                          disabled={isDisabled}
                           onSelect={() => {
-                            form.setValue("vehicleId", vehicle.id);
-                            setOpen(false);
+                            if (!isDisabled) {
+                              form.setValue("vehicleId", vehicle.id);
+                              setOpen(false);
+                            }
                           }}
                         >
                           <div className="flex w-full space-x-3">

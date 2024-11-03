@@ -59,6 +59,7 @@ import { addDays, format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { useSupplyItemCategory } from "@/lib/hooks/use-supply-item-category";
 import { useSupplyDepartments } from "@/lib/hooks/use-supply-departments";
+import NumberInput from "@/components/number-input";
 
 export const UnitTypeSchema = [
   "Pieces",
@@ -252,16 +253,15 @@ export default function CreateSupplyItemForm({
                 <FormItem className="flex-1">
                   <FormLabel>Quantity</FormLabel>
                   <FormControl>
-                    <Input
-                      autoComplete="off"
-                      type="number"
-                      placeholder="1"
+                    <NumberInput
+                      value={field.value}
+                      min={0}
+                      max={200}
                       disabled={isPending || isUploading}
-                      {...field}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                        const value = e.target.value.slice(0, 3);
+                      onChange={(value) => {
                         field.onChange(value);
                       }}
+                      className="w-full justify-between"
                     />
                   </FormControl>
                   <FormMessage />
@@ -275,16 +275,15 @@ export default function CreateSupplyItemForm({
                 <FormItem className="flex-1">
                   <FormLabel>Low Stock Threshhold</FormLabel>
                   <FormControl>
-                    <Input
-                      autoComplete="off"
-                      type="number"
-                      placeholder="1"
+                    <NumberInput
+                      value={field.value}
+                      min={0}
+                      max={200}
                       disabled={isPending || isUploading}
-                      {...field}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                        const value = e.target.value.slice(0, 3);
+                      onChange={(value) => {
                         field.onChange(value);
                       }}
+                      className="w-full justify-between"
                     />
                   </FormControl>
                   <FormMessage />

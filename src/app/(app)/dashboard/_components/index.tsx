@@ -13,14 +13,6 @@ import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import UserRequestOverview from "./user-request-overview";
 import SearchInput from "../../_components/search-input";
 import { cn, formatFullName } from "@/lib/utils";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
 export default function DashboardScreen() {
   const currentUser = useSession();

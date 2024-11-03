@@ -50,6 +50,7 @@ import { P } from "@/components/typography/text";
 import { Textarea } from "@/components/ui/text-area";
 import VenueFeatures from "./venue-features";
 import { TagInput } from "@/components/ui/tag-input";
+import NumberInput from "@/components/number-input";
 
 interface CreateVenueFormProps {
   setAlertOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -315,12 +316,15 @@ export default function CreateVenueForm({
               <FormItem>
                 <FormLabel>Capacity</FormLabel>
                 <FormControl>
-                  <Input
-                    autoComplete="off"
-                    type="number"
-                    placeholder="24"
+                  <NumberInput
+                    value={field.value}
+                    min={0}
+                    max={100}
                     disabled={isPending || isUploading}
-                    {...field}
+                    onChange={(value) => {
+                      field.onChange(value);
+                    }}
+                    className="w-full justify-between"
                   />
                 </FormControl>
                 <FormMessage />

@@ -14,7 +14,7 @@ export default function CommandLayout({ children, params }: Props) {
     <>
       <ManageVenueStatusDialog
         venueId={params.venueId}
-        queryKey={["venue-details", params.venueId]}
+        queryKey={[params.venueId]}
       />
       <RequestOption />
       {children}

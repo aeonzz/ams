@@ -15,6 +15,8 @@ import FetchDataError from "@/components/card/fetch-data-error";
 import DashboardSkeleton from "./dashboard-skeleton";
 import EventsCalendar from "./events-calendar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTypeSchema";
+import NumberFlow from "@number-flow/react";
 
 export default function UserRequestOverview() {
   const { data, isLoading, refetch, isError } = useQuery<
@@ -46,7 +48,13 @@ export default function UserRequestOverview() {
     );
   }
 
-  const requestTypes = ["JOB", "RESOURCE", "VENUE", "TRANSPORT"];
+  const requestTypes: RequestTypeType[] = [
+    "JOB",
+    "SUPPLY",
+    "BORROW",
+    "VENUE",
+    "TRANSPORT",
+  ];
 
   return (
     <div className="space-y-3">
@@ -63,7 +71,7 @@ export default function UserRequestOverview() {
             See all
           </Link>
         </div>
-        <div className="grid grid-cols-4 gap-3 p-3">
+        <div className="grid grid-cols-5 gap-3 p-3">
           {requestTypes.map((type) => (
             <Card key={type}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -73,7 +81,13 @@ export default function UserRequestOverview() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {getRequestTypeCount(type)}
+                  <NumberFlow
+                    willChange
+                    continuous
+                    value={getRequestTypeCount(type)}
+                    format={{ useGrouping: false }}
+                    aria-hidden
+                  />
                 </div>
                 <p className="text-xs text-muted-foreground">
                   Total {type.toLowerCase()} requests
@@ -86,8 +100,12 @@ export default function UserRequestOverview() {
       <Tabs defaultValue="calendar" className="w-full">
         <div className="px-3">
           <TabsList className="">
-            <TabsTrigger value="calendar" className="text-xs">Event</TabsTrigger>
-            <TabsTrigger value="pending" className="text-xs">Pending Requests</TabsTrigger>
+            <TabsTrigger value="calendar" className="text-xs">
+              Event
+            </TabsTrigger>
+            <TabsTrigger value="pending" className="text-xs">
+              Pending Requests
+            </TabsTrigger>
           </TabsList>
         </div>
         <TabsContent value="calendar">

@@ -18,7 +18,8 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import { VenueWithRelations } from "prisma/generated/zod";
 import { CommandShortcut } from "@/components/ui/command";
-import { useRouter } from "next/navigation";
+import { Dialog } from "@/components/ui/dialog";
+import UploadRulesPdfDialog from "@/app/(app)/department/[departmentId]/resources/facilities/[venueId]/_components/upload-rules-pdf-dialog";
 
 interface ManageVenueActionsProps {
   venueId: string;
@@ -32,7 +33,6 @@ export default function ManageVenueActions({
   data,
 }: ManageVenueActionsProps) {
   const dialogManager = useDialogManager();
-  const router = useRouter();
 
   const isUpdateSheetOpen =
     dialogManager.activeDialog === "adminUpdateVenueSheet";
@@ -49,9 +49,12 @@ export default function ManageVenueActions({
   );
 
   useHotkeys(
-    "l",
-    () => {
-      router.push(`/department/${departmentId}/facilities/${venueId}/logs`);
+    "r",
+    (event) => {
+      if (!dialogManager.isAnyDialogOpen()) {
+        event.preventDefault();
+        dialogManager.setActiveDialog("uploadFileDialog");
+      }
     },
     { enableOnFormTags: false }
   );
@@ -67,9 +70,8 @@ export default function ManageVenueActions({
       <UpdateVenueSheet
         open={isUpdateSheetOpen}
         onOpenChange={handleOpenChange}
-        queryKey={["venue-details", venueId]}
+        queryKey={[venueId]}
         removeField
-        //@ts-ignore
         venue={data}
       />
     ),
@@ -102,15 +104,15 @@ export default function ManageVenueActions({
             <CommandShortcut>S</CommandShortcut>
           </DropdownMenuShortcut>
         </DropdownMenuItem>
-        <Link href={`/department/${departmentId}/facilities/${venueId}/logs`}>
-          <DropdownMenuItem>
-            <FileClock className="mr-2 size-4" />
-            Logs
-            <DropdownMenuShortcut>
-              <CommandShortcut>L</CommandShortcut>
-            </DropdownMenuShortcut>
-          </DropdownMenuItem>
-        </Link>
+        <DropdownMenuItem
+          onSelect={() => dialogManager.setActiveDialog("uploadFileDialog")}
+        >
+          <Circle className="mr-2 size-4" />
+          Venue Policies
+          <DropdownMenuShortcut>
+            <CommandShortcut>R</CommandShortcut>
+          </DropdownMenuShortcut>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     ),
     [departmentId, venueId, dialogManager]
@@ -119,14 +121,26 @@ export default function ManageVenueActions({
   return (
     <>
       {MemoizedUpdateVenueSheet}
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost2" size="icon">
-            <EllipsisVertical className="size-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        {MemoizedDropdownContent}
-      </DropdownMenu>
+
+      <Dialog
+        open={dialogManager.activeDialog === "uploadFileDialog"}
+        onOpenChange={handleOpenChange}
+      >
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost2" size="icon">
+              <EllipsisVertical className="size-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          {MemoizedDropdownContent}
+        </DropdownMenu>
+        <UploadRulesPdfDialog
+          file={data.rulesAndRegulations}
+          venueId={venueId}
+          open={dialogManager.activeDialog === "uploadFileDialog"}
+          setOpen={handleOpenChange}
+        />
+      </Dialog>
     </>
   );
 }
