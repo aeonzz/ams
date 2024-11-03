@@ -14,6 +14,7 @@ import {
   updateSupplyResourceRequestSchemaWithPath,
 } from "../schema/resource/supply-resource";
 import { revalidatePath } from "next/cache";
+import { createNotification } from "./notification";
 
 export async function getSupply(input: GetSupplyItemSchema) {
   await checkAuth();
@@ -323,7 +324,8 @@ export const deleteSupplyItems = authedProcedure
 export const supplyRequestActions = authedProcedure
   .createServerAction()
   .input(updateSupplyResourceRequestSchemaWithPath)
-  .handler(async ({ input }) => {
+  .handler(async ({ input, ctx }) => {
+    const { user } = ctx;
     const { id, path } = input;
     try {
       const result = await db.$transaction(async (prisma) => {
@@ -347,17 +349,54 @@ export const supplyRequestActions = authedProcedure
               requestId: id,
             },
           },
+          include: {
+            supplyItem: true,
+          },
         });
 
         for (const item of supplyRequestItems) {
-          await prisma.supplyItem.update({
+          const updatedItemAfterQuantityChange = await prisma.supplyItem.update(
+            {
+              where: { id: item.supplyItemId },
+              data: {
+                quantity: {
+                  decrement: item.quantity,
+                },
+              },
+            }
+          );
+
+          const newStatus =
+            updatedItemAfterQuantityChange.quantity <= 0
+              ? "OUT_OF_STOCK"
+              : updatedItemAfterQuantityChange.quantity <=
+                  updatedItemAfterQuantityChange.lowStockThreshold
+                ? "LOW_STOCK"
+                : "IN_STOCK";
+
+          const finalUpdatedItem = await prisma.supplyItem.update({
             where: { id: item.supplyItemId },
             data: {
-              quantity: {
-                decrement: item.quantity,
+              status: {
+                set: newStatus,
               },
             },
           });
+
+          if (
+            finalUpdatedItem.status === "LOW_STOCK" ||
+            finalUpdatedItem.status === "OUT_OF_STOCK"
+          ) {
+            await createNotification({
+              resourceId: `/department/${finalUpdatedItem.departmentId}/resources/supply-items?page=1&per_page=10&sort=createdAt.desc`,
+              title: `Low Stock Alert: ${finalUpdatedItem.name}`,
+              resourceType: "SUPPLY",
+              notificationType: "WARNING",
+              message: `The supply item "${finalUpdatedItem.name}" is low on stock. Only ${finalUpdatedItem.quantity} ${finalUpdatedItem.unit}(s) remain. Please consider restocking to avoid shortages.`,
+              recepientIds: [finalUpdatedItem.departmentId],
+              userId: user.id,
+            });
+          }
         }
         return updatedRequest;
       });

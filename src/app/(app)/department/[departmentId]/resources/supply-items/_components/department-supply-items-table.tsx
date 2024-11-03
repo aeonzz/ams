@@ -14,6 +14,7 @@ import { SupplyItemStatusSchema } from "prisma/generated/zod";
 import { SupplyitemsTableFloatingBar } from "@/app/(admin)/admin/inventory/supply-items/_components/supply-items-table-floating-bar";
 import { SupplyItemsTableToolbarActions } from "@/app/(admin)/admin/inventory/supply-items/_components/supply-items-table-toolbar-actions";
 import { getSupllyItemColumns } from "@/app/(admin)/admin/inventory/supply-items/_components/supply-items-columns";
+import { AlertCard } from "@/components/ui/alert-card";
 
 interface DepartmentSupplyItemsTableProps {
   supplyPromise: ReturnType<typeof getDepartmentSupply>;
@@ -79,11 +80,22 @@ export function DepartmentSupplyItemsTable({
     getRowId: (originalRow, index) => `${originalRow.id}-${index}`,
   });
 
+  const hasLowOrNoStock = data.some(
+    (item) => item.status === "LOW_STOCK" || item.status === "OUT_OF_STOCK"
+  );
+
   return (
     <DataTable
       table={table}
       floatingBar={<SupplyitemsTableFloatingBar table={table} />}
     >
+      {hasLowOrNoStock && (
+        <AlertCard
+          variant="warning"
+          title="Low Stock Alert"
+          description="Some items are running low or out of stock. Please check the inventory."
+        />
+      )}
       <DataTableToolbar table={table} filterFields={filterFields}>
         <SupplyItemsTableToolbarActions table={table} />
       </DataTableToolbar>

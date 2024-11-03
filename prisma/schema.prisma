@@ -526,6 +526,7 @@ enum ResourceType {
   FILE
   TASK
   REWORK
+  SUPPLY
 }
 
 enum VenueType {

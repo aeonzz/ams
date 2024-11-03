@@ -47,6 +47,7 @@ import axios from "axios";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import CreateVehicleFormSkeleton from "./create-vehicle-form-skeleton";
+import NumberInput from "@/components/number-input";
 
 interface CreateVenueFehiclerops {
   setAlertOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -193,12 +194,15 @@ export default function CreateVehicleForm({
               <FormItem>
                 <FormLabel>Capacity</FormLabel>
                 <FormControl>
-                  <Input
-                    autoComplete="off"
-                    type="number"
-                    placeholder="24 seats"
+                  <NumberInput
+                    value={field.value}
+                    min={0}
+                    max={100}
                     disabled={isPending || isUploading}
-                    {...field}
+                    onChange={(value) => {
+                      field.onChange(value);
+                    }}
+                    className="w-full justify-between"
                   />
                 </FormControl>
                 <FormMessage />

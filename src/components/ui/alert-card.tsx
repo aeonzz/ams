@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { X, AlertCircle, CheckCircle, Info, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -11,7 +11,7 @@ const alertCardVariants = cva(
       variant: {
         default: "bg-secondary text-foreground",
         destructive:
-        "border-red-500/20 bg-red-100 text-red-500 dark:bg-red-900/20 [&>svg]:text-red-500",
+          "border-red-500/20 bg-red-100 text-red-500 dark:bg-red-900/20 [&>svg]:text-red-500",
         success:
           "border-green-500/20 bg-green-100 text-green-500 dark:bg-green-900/20 [&>svg]:text-green-500",
         warning:
@@ -47,18 +47,30 @@ const AlertCard = React.forwardRef<HTMLDivElement, AlertCardProps>(
     { className, variant, title, description, icon, onDismiss, ...props },
     ref
   ) => {
+    const [isVisible, setIsVisible] = useState(true);
     const Icon = icon ? icons[icon] : icons[variant || "default"];
+
+    const handleDismiss = () => {
+      setIsVisible(false);
+      if (onDismiss) {
+        onDismiss();
+      }
+    };
+
+    if (!isVisible) {
+      return null;
+    }
 
     return (
       <div
         ref={ref}
         role="alert"
-        className={cn(alertCardVariants({ variant }), className)}
+        className={cn("relative", alertCardVariants({ variant }), className)}
         {...props}
       >
         <Icon className="h-4 w-4" />
         <div className="flex w-full items-center justify-between">
-          <div>
+          <div className="flex-grow pr-4">
             {title && (
               <P className="mb-1 font-medium leading-none tracking-tight">
                 {title}
@@ -68,16 +80,14 @@ const AlertCard = React.forwardRef<HTMLDivElement, AlertCardProps>(
               <P className="[&_p]:leading-relaxed">{description}</P>
             )}
           </div>
-          {onDismiss && (
-            <button
-              onClick={onDismiss}
-              className="ml-4 rounded-full p-1 transition-colors hover:bg-secondary"
-              aria-label="Dismiss alert"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          )}
         </div>
+        <button
+          onClick={handleDismiss}
+          className="absolute right-3 top-3 rounded-full w-fit"
+          aria-label="Dismiss alert"
+        >
+          <X className="h-4 w-4" />
+        </button>
       </div>
     );
   }

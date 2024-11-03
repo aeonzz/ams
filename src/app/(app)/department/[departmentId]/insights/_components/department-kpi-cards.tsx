@@ -81,12 +81,17 @@ export default function DepartmentKPICards({
     return sum + completionTime;
   }, 0);
 
-  const averageCompletionTime =
+  const averageCompletionTimeInMinutes =
     filteredCompletedTasks.length > 0
-      ? totalCompletionTime / filteredCompletedTasks.length / (1000 * 60 * 60)
+      ? totalCompletionTime / filteredCompletedTasks.length / (1000 * 60)
       : 0;
 
-  const roundedAverageCompletionTime = Number(averageCompletionTime.toFixed(2));
+  const averageCompletionHours = Math.floor(
+    averageCompletionTimeInMinutes / 60
+  );
+  const averageCompletionMinutes = Math.round(
+    averageCompletionTimeInMinutes % 60
+  );
 
   const periodText = dateRange ? "in selected period" : "overall";
   const typeText = requestType ? `for ${requestType} requests` : "";
@@ -143,11 +148,25 @@ export default function DepartmentKPICards({
             <NumberFlow
               willChange
               continuous
-              value={roundedAverageCompletionTime}
+              value={averageCompletionHours}
               format={{ useGrouping: false }}
+              isolate
               aria-hidden
             />{" "}
-            hours
+            <span className="text-lg font-semibold text-muted-foreground">
+              hr
+            </span>{" "}
+            <NumberFlow
+              willChange
+              continuous
+              value={averageCompletionMinutes}
+              format={{ useGrouping: false }}
+              isolate
+              aria-hidden
+            />{" "}
+            <span className="text-lg font-semibold text-muted-foreground">
+              min
+            </span>
           </div>
           <p className="text-xs text-muted-foreground">
             Average time to complete requests {periodText} {typeText}
