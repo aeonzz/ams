@@ -60,7 +60,7 @@ export default function CreateDepartmentDialog() {
       <DialogTrigger asChild>
         <Button variant="secondary" size="sm">
           <PlusIcon className="mr-2 size-4" aria-hidden="true" />
-          New department
+          Add
         </Button>
       </DialogTrigger>
       <DialogContent

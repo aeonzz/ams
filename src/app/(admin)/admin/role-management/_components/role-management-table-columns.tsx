@@ -26,7 +26,7 @@ import { UpdateRoleSheet } from "./update-role-sheet";
 import { DeleteRolesDialog } from "./delete-roles-dialog";
 import AssignUserRoleRowPopover from "./assign-user-role-row-popover";
 import type { RoleTableType } from "./types";
-import { formatDate } from "date-fns";
+import { format, formatDate } from "date-fns";
 import DataTableExpand from "@/components/data-table/data-table-expand";
 
 export function getRoleColumns(): ColumnDef<RoleTableType>[] {
@@ -92,7 +92,13 @@ export function getRoleColumns(): ColumnDef<RoleTableType>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Date Created" />
       ),
-      cell: ({ cell }) => formatDate(cell.getValue() as Date, "PPP p"),
+      cell: ({ cell }) => {
+        return (
+          <P className="text-muted-foreground">
+            {format(cell.getValue() as Date, "PP")}
+          </P>
+        );
+      },
       size: 0,
     },
     {
@@ -100,7 +106,13 @@ export function getRoleColumns(): ColumnDef<RoleTableType>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Last Modified" />
       ),
-      cell: ({ cell }) => formatDate(cell.getValue() as Date, "PPP p"),
+      cell: ({ cell }) => {
+        return (
+          <P className="text-muted-foreground">
+            {format(cell.getValue() as Date, "PP")}
+          </P>
+        );
+      },
       size: 0,
     },
     {

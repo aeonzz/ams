@@ -71,6 +71,7 @@ import ChangeTypeSchema, {
   ChangeTypeType,
 } from "prisma/generated/zod/inputTypeSchemas/ChangeTypeSchema";
 import NumberInput from "@/components/number-input";
+import { useTransportDepartments } from "@/lib/hooks/use-transport-depratments";
 
 interface UpdateVehicleProps extends React.ComponentPropsWithRef<typeof Sheet> {
   vehicle: Vehicle;
@@ -100,14 +101,7 @@ export function UpdateVehicleSheet({
     },
   });
 
-  const { data, isLoading } = useQuery<Department[]>({
-    queryFn: async () => {
-      const res = await axios.get("/api/department/get-departments");
-      return res.data.data;
-    },
-    queryKey: ["update-vehicle-department-selection-vehicle-table"],
-  });
-
+  const { data, isLoading } = useTransportDepartments();
   const { dirtyFields } = useFormState({ control: form.control });
 
   const { isPending, mutateAsync } = useServerActionMutation(updateVehicle);

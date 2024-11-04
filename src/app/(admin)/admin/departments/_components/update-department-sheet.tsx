@@ -57,10 +57,11 @@ import { cn, textTransform } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { useQueryClient } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
+import type { DepartmentsTableType } from "./types";
 
 interface UpdateDepartmentSheetProps
   extends React.ComponentPropsWithRef<typeof Sheet> {
-  department: DepartmentWithRelations;
+  department: DepartmentsTableType;
   queryKey?: string[];
   removeField?: boolean;
 }

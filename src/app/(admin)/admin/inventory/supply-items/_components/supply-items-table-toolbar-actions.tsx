@@ -39,7 +39,7 @@ export function SupplyItemsTableToolbarActions({
         }
       >
         <PlusIcon className="mr-2 size-4" aria-hidden="true" />
-        Add Item
+        Add
       </Button>
       <React.Suspense fallback={<Skeleton className="h-7 w-52" />}>
         <DateRangePicker

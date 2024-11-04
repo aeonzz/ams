@@ -243,7 +243,7 @@ export function getDepartmentsColumns(): ColumnDef<DepartmentsTableType>[] {
       ),
       cell: ({ cell }) => (
         <P className="text-muted-foreground">
-          {formatDate(cell.getValue() as Date, "PP p")}
+          {formatDate(cell.getValue() as Date, "PP")}
         </P>
       ),
     },
@@ -254,7 +254,7 @@ export function getDepartmentsColumns(): ColumnDef<DepartmentsTableType>[] {
       ),
       cell: ({ cell }) => (
         <P className="text-muted-foreground">
-          {formatDate(cell.getValue() as Date, "PP p")}
+          {formatDate(cell.getValue() as Date, "PP")}
         </P>
       ),
     },

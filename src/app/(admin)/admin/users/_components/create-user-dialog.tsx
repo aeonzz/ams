@@ -52,7 +52,7 @@ export default function CreateUserDialog() {
       <DialogTrigger asChild>
         <Button variant="secondary" size="sm">
           <PlusIcon className="mr-2 size-4" aria-hidden="true" />
-          New user
+          Add
         </Button>
       </DialogTrigger>
       <DialogContent

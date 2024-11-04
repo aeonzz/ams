@@ -1,19 +1,21 @@
+import React from "react";
+
 import ThemeDialog from "@/components/dialogs/theme-dialog";
 import SettingsDialog from "@/components/dialogs/settings-dialog";
-import CreateVehicleDialog from "./_components/create-vehicle-dialog";
 import AdminCommandSearchDialog from "@/components/dialogs/admin-command-search-dialog";
 
-export default async function AppLayout({
+export default function CommandLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <AdminCommandSearchDialog>
-      <ThemeDialog />
-      <SettingsDialog />
-      <CreateVehicleDialog />
+    <>
+      <AdminCommandSearchDialog>
+        <ThemeDialog />
+        <SettingsDialog />
+      </AdminCommandSearchDialog>
       {children}
-    </AdminCommandSearchDialog>
+    </>
   );
 }

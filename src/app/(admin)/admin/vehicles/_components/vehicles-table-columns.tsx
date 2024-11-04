@@ -38,9 +38,12 @@ import VehicleStatusSchema, {
 import { updateVehicle } from "@/lib/actions/vehicle";
 import { UpdateVehicleSheet } from "./update-vehicle-sheet";
 import { DeleteVehiclesDialog } from "./delete-vehicles-dialog";
-import { formatDate } from "date-fns";
+import { format, formatDate } from "date-fns";
 import type { VehicleTableType } from "./types";
-import { Dot } from "lucide-react";
+import { CircleMinus, CirclePlus, Dot, RotateCw } from "lucide-react";
+import NumberFlow from "@number-flow/react";
+import { PhotoProvider, PhotoView } from "react-photo-view";
+import LoadingSpinner from "@/components/loaders/loading-spinner";
 
 export function getVehiclesColumns(): ColumnDef<VehicleTableType>[] {
   return [
@@ -81,26 +84,44 @@ export function getVehiclesColumns(): ColumnDef<VehicleTableType>[] {
       cell: ({ row }) => {
         return (
           <div className="flex items-center justify-start">
-            <Dialog>
-              <DialogTrigger asChild>
-                <div className="relative aspect-square h-10 cursor-pointer transition-colors hover:brightness-75">
-                  <Image
-                    src={row.original.imageUrl}
-                    alt={`Image of ${row.original.name}`}
-                    fill
-                    className="rounded-md border object-cover"
-                  />
-                </div>
-              </DialogTrigger>
-              <DialogContent className="aspect-square min-h-[80vh] max-w-2xl">
-                <Image
-                  src={row.original.imageUrl}
-                  alt={`Image of ${row.original.name}`}
-                  fill
-                  className="rounded-md border object-cover"
-                />
-              </DialogContent>
-            </Dialog>
+            <PhotoProvider
+              speed={() => 300}
+              maskOpacity={0.8}
+              loadingElement={<LoadingSpinner />}
+              toolbarRender={({ onScale, scale, rotate, onRotate }) => {
+                return (
+                  <>
+                    <div className="flex gap-3">
+                      <CirclePlus
+                        className="size-5 cursor-pointer opacity-75 transition-opacity ease-linear hover:opacity-100"
+                        onClick={() => onScale(scale + 1)}
+                      />
+                      <CircleMinus
+                        className="size-5 cursor-pointer opacity-75 transition-opacity ease-linear hover:opacity-100"
+                        onClick={() => onScale(scale - 1)}
+                      />
+                      <RotateCw
+                        className="size-5 cursor-pointer opacity-75 transition-opacity ease-linear hover:opacity-100"
+                        onClick={() => onRotate(rotate + 90)}
+                      />
+                    </div>
+                  </>
+                );
+              }}
+            >
+              <div>
+                <PhotoView src={row.original.imageUrl}>
+                  <div className="relative aspect-square h-10 cursor-pointer transition-colors hover:brightness-75">
+                    <Image
+                      src={row.original.imageUrl}
+                      alt={`Image of ${row.original.name}`}
+                      fill
+                      className="rounded-md border object-cover"
+                    />
+                  </div>
+                </PhotoView>
+              </div>
+            </PhotoProvider>
           </div>
         );
       },
@@ -140,8 +161,14 @@ export function getVehiclesColumns(): ColumnDef<VehicleTableType>[] {
       ),
       cell: ({ row }) => {
         return (
-          <div className="flex items-center">
-            <P>{row.original.capacity}</P>
+          <div className="flex space-x-2">
+            <NumberFlow
+              willChange
+              continuous
+              value={row.original.capacity}
+              format={{ useGrouping: false }}
+              aria-hidden
+            />
           </div>
         );
       },
@@ -201,14 +228,26 @@ export function getVehiclesColumns(): ColumnDef<VehicleTableType>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Date Created" />
       ),
-      cell: ({ cell }) => formatDate(cell.getValue() as Date, "PPP p"),
+      cell: ({ cell }) => {
+        return (
+          <P className="text-muted-foreground">
+            {format(cell.getValue() as Date, "PP")}
+          </P>
+        );
+      },
     },
     {
       accessorKey: "updatedAt",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Date Modified" />
       ),
-      cell: ({ cell }) => formatDate(cell.getValue() as Date, "PPP p"),
+      cell: ({ cell }) => {
+        return (
+          <P className="text-muted-foreground">
+            {format(cell.getValue() as Date, "PP")}
+          </P>
+        );
+      },
     },
     {
       id: "actions",
@@ -261,7 +300,6 @@ export function getVehiclesColumns(): ColumnDef<VehicleTableType>[] {
                             id: row.original.id,
                             status: value as VehicleStatusType,
                             path: pathname,
-                            changeType: "STATUS_CHANGE",
                           }),
                           {
                             loading: "Updating status...",

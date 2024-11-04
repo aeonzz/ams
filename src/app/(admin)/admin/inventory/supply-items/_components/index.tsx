@@ -9,6 +9,7 @@ import { SupplyItemsTable } from "./supply-items-table";
 import { getSupply } from "@/lib/actions/supply";
 import SupplyMenu from "./supply-menu";
 import SearchInput from "@/app/(app)/_components/search-input";
+import AdminSearchInput from "../../../_components/admin-search-input";
 
 interface SupplyItemsScreenProps {
   params: GetSupplyItemSchema;
@@ -24,7 +25,7 @@ export default function SupplyItemsScreen({ params }: SupplyItemsScreenProps) {
           <P className="font-medium">Inventory</P>
           <div className="flex gap-2">
             <SupplyMenu />
-            <SearchInput />
+            <AdminSearchInput />
           </div>
         </div>
         <div className="grid min-h-[calc(100vh_-_100px)] place-items-center items-center py-3">

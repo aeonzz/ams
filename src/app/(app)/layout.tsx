@@ -1,6 +1,5 @@
 import { currentUser } from "@/lib/actions/users";
 import { checkAuth } from "@/lib/auth/utils";
-import CommandLayout from "@/components/layouts/command-layout";
 import DashboardLayout from "@/app/(app)/_components/dashboard-layout";
 import SessionProvider from "@/components/providers/session-provider";
 import Error from "@/components/error";

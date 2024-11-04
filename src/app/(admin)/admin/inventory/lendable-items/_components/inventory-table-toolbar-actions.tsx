@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { DownloadIcon } from "@radix-ui/react-icons";
 import { type Table } from "@tanstack/react-table";
 
@@ -9,6 +10,8 @@ import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import { PlusIcon } from "lucide-react";
 import { type InventoryItemType } from "@/lib/types/item";
 import { DeleteInventoryDialog } from "./delete-inventories-dialog";
+import { DateRangePicker } from "@/components/date-range-picker";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface InventoryTableToolbarActionsProps {
   table: Table<InventoryItemType>;
@@ -31,11 +34,21 @@ export function InventoryTableToolbarActions({
       <Button
         variant="secondary"
         size="sm"
-        onClick={() => dialogManager.setActiveDialog("adminCreateInventoryItemDialog")}
+        onClick={() =>
+          dialogManager.setActiveDialog("adminCreateInventoryItemDialog")
+        }
       >
         <PlusIcon className="mr-2 size-4" aria-hidden="true" />
-        Create Inventory
+        Add
       </Button>
+      <React.Suspense fallback={<Skeleton className="h-7 w-52" />}>
+        <DateRangePicker
+          triggerVariant="secondary"
+          triggerSize="sm"
+          triggerClassName="ml-auto w-fit"
+          placeholder="Created"
+        />
+      </React.Suspense>
       <Button
         variant="secondary"
         size="sm"

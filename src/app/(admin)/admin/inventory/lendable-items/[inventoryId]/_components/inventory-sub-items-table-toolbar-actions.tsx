@@ -11,6 +11,7 @@ import { PlusIcon } from "lucide-react";
 import type { InventorySubItemType } from "@/lib/types/item";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DateRangePicker } from "@/components/date-range-picker";
+import { DeleteInventorySubItemsDialog } from "./delete-inventory-sub-items-dialog";
 
 interface InventorySubItemsTableToolbarActionsProps {
   table: Table<InventorySubItemType>;
@@ -22,14 +23,14 @@ export function InventorySubItemsTableToolbarActions({
   const dialogManager = useDialogManager();
   return (
     <div className="flex items-center gap-2">
-      {/* {table.getFilteredSelectedRowModel().rows.length > 0 ? (
-        <DeleteEquipmentsDialog
-          equipments={table
+      {table.getFilteredSelectedRowModel().rows.length > 0 ? (
+        <DeleteInventorySubItemsDialog
+          items={table
             .getFilteredSelectedRowModel()
             .rows.map((row) => row.original)}
           onSuccess={() => table.toggleAllRowsSelected(false)}
         />
-      ) : null} */}
+      ) : null}
       <Button
         variant="secondary"
         size="sm"
@@ -38,7 +39,7 @@ export function InventorySubItemsTableToolbarActions({
         }
       >
         <PlusIcon className="mr-2 size-4" aria-hidden="true" />
-        New equipment
+        Add
       </Button>
       <React.Suspense fallback={<Skeleton className="h-7 w-52" />}>
         <DateRangePicker

@@ -1,11 +1,9 @@
 import { currentUser } from "@/lib/actions/users";
 import { checkAuth } from "@/lib/auth/utils";
-import CommandLayout from "@/components/layouts/command-layout";
 import SessionProvider from "@/components/providers/session-provider";
 import { redirect } from "next/navigation";
 import Error from "@/components/error";
 import AdminDashboardLayout from "./_components/admin-dashboard-layout";
-import AdminCommandLayout from "@/components/layouts/admin-command-layout";
 import { RoleGuard } from "@/components/role-guard";
 
 export default async function AppLayout({

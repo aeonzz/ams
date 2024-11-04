@@ -51,6 +51,7 @@ import { Textarea } from "@/components/ui/text-area";
 import VenueFeatures from "./venue-features";
 import { TagInput } from "@/components/ui/tag-input";
 import NumberInput from "@/components/number-input";
+import { useFacilityDepartments } from "@/lib/hooks/use-facility-departments";
 
 interface CreateVenueFormProps {
   setAlertOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -81,14 +82,7 @@ export default function CreateVenueForm({
   const [open, setOpen] = React.useState(false);
   const [venueType, setVenueType] = React.useState(false);
 
-  const { data, isLoading } = useQuery<Department[]>({
-    queryFn: async () => {
-      const res = await axios.get("/api/department/get-departments");
-      return res.data.data;
-    },
-    queryKey: ["create-venue-department-selection-venue-table"],
-  });
-
+  const { data, isLoading } = useFacilityDepartments();
   const { uploadFiles, progresses, isUploading } = useUploadFile();
 
   async function onSubmit(values: CreateVenueSchema) {

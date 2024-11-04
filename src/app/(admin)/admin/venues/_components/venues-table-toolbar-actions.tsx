@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { DownloadIcon } from "@radix-ui/react-icons";
 import { type Table } from "@tanstack/react-table";
 
@@ -12,6 +13,8 @@ import { PlusIcon } from "lucide-react";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import { DeleteVenuesDialog } from "./delete-venues-dialog";
 import type { VenueTableType } from "./types";
+import { DateRangePicker } from "@/components/date-range-picker";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface VenuesTableToolbarActionsProps {
   table: Table<VenueTableType>;
@@ -37,8 +40,16 @@ export function VenuesTableToolbarActions({
         onClick={() => dialogManager.setActiveDialog("adminCreateVenueDialog")}
       >
         <PlusIcon className="mr-2 size-4" aria-hidden="true" />
-        New venue
+        Add
       </Button>
+      <React.Suspense fallback={<Skeleton className="h-7 w-52" />}>
+        <DateRangePicker
+          triggerVariant="secondary"
+          triggerSize="sm"
+          triggerClassName="ml-auto w-fit"
+          placeholder="Created"
+        />
+      </React.Suspense>
       <Button
         variant="secondary"
         size="sm"

@@ -40,7 +40,7 @@ export default function AdminCommandSearchDialog({
     (event) => {
       event.preventDefault();
       if (!dialogManager.isAnyDialogOpen()) {
-        dialogManager.setActiveDialog("commandDialog");
+        dialogManager.setActiveDialog("adminCommandDialog");
       }
     },
     { enableOnFormTags: false }
@@ -55,7 +55,7 @@ export default function AdminCommandSearchDialog({
   return (
     <>
       <CommandDialog
-        open={dialogManager.activeDialog === "commandDialog"}
+        open={dialogManager.activeDialog === "adminCommandDialog"}
         onOpenChange={handleOpenChange}
       >
         <CommandInput placeholder="Type a command or search..." />

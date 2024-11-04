@@ -33,10 +33,12 @@ import { usePathname } from "next/navigation";
 import { type VenueStatusType } from "prisma/generated/zod/inputTypeSchemas/VenueStatusSchema";
 import { UpdateVenueSheet } from "./update-venue-sheet";
 import { DeleteVenuesDialog } from "./delete-venues-dialog";
-import { formatDate } from "date-fns";
+import { format, formatDate } from "date-fns";
 import type { VenueTableType } from "./types";
-import { VenueFeaturesType } from "@/lib/types/venue";
-import { Dot } from "lucide-react";
+import { CircleMinus, CirclePlus, Dot, RotateCw } from "lucide-react";
+import NumberFlow from "@number-flow/react";
+import { PhotoProvider, PhotoView } from "react-photo-view";
+import LoadingSpinner from "@/components/loaders/loading-spinner";
 
 export function getVenuesColumns(): ColumnDef<VenueTableType>[] {
   return [
@@ -77,26 +79,44 @@ export function getVenuesColumns(): ColumnDef<VenueTableType>[] {
       cell: ({ row }) => {
         return (
           <div className="flex items-center justify-start">
-            <Dialog>
-              <DialogTrigger asChild>
-                <div className="relative aspect-square h-10 cursor-pointer transition-colors hover:brightness-75">
-                  <Image
-                    src={row.original.imageUrl}
-                    alt={`Image of ${row.original.name}`}
-                    fill
-                    className="rounded-md border object-cover"
-                  />
-                </div>
-              </DialogTrigger>
-              <DialogContent className="aspect-square w-[80vw]">
-                <Image
-                  src={row.original.imageUrl}
-                  alt={`Image of ${row.original.name}`}
-                  fill
-                  className="rounded-md border object-cover"
-                />
-              </DialogContent>
-            </Dialog>
+            <PhotoProvider
+              speed={() => 300}
+              maskOpacity={0.8}
+              loadingElement={<LoadingSpinner />}
+              toolbarRender={({ onScale, scale, rotate, onRotate }) => {
+                return (
+                  <>
+                    <div className="flex gap-3">
+                      <CirclePlus
+                        className="size-5 cursor-pointer opacity-75 transition-opacity ease-linear hover:opacity-100"
+                        onClick={() => onScale(scale + 1)}
+                      />
+                      <CircleMinus
+                        className="size-5 cursor-pointer opacity-75 transition-opacity ease-linear hover:opacity-100"
+                        onClick={() => onScale(scale - 1)}
+                      />
+                      <RotateCw
+                        className="size-5 cursor-pointer opacity-75 transition-opacity ease-linear hover:opacity-100"
+                        onClick={() => onRotate(rotate + 90)}
+                      />
+                    </div>
+                  </>
+                );
+              }}
+            >
+              <div>
+                <PhotoView src={row.original.imageUrl}>
+                  <div className="relative aspect-square h-10 cursor-pointer transition-colors hover:brightness-75">
+                    <Image
+                      src={row.original.imageUrl}
+                      alt={`Image of ${row.original.name}`}
+                      fill
+                      className="rounded-md border object-cover"
+                    />
+                  </div>
+                </PhotoView>
+              </div>
+            </PhotoProvider>
           </div>
         );
       },
@@ -132,23 +152,46 @@ export function getVenuesColumns(): ColumnDef<VenueTableType>[] {
       },
     },
     {
-      accessorKey: "features",
+      accessorKey: "status",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Features" />
+        <DataTableColumnHeader column={column} title="Status" />
       ),
       cell: ({ row }) => {
-        const features = row.original.features as VenueFeaturesType[];
+        const status = getVenueStatusColor(row.original.status);
+        return (
+          <div className="flex items-center">
+            <Badge variant={status.variant} className="pr-3.5">
+              <Dot
+                className="mr-1 size-3"
+                strokeWidth={status.stroke}
+                color={status.color}
+              />
+              {textTransform(row.original.status)}
+            </Badge>
+          </div>
+        );
+      },
+      filterFn: (row, id, value) => {
+        return Array.isArray(value) && value.includes(row.getValue(id));
+      },
+    },
+    {
+      accessorKey: "venueSetupRequirement",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Setup" />
+      ),
+      cell: ({ row }) => {
+        const features = row.original.venueSetupRequirement;
         if (!features || features.length === 0) {
           return <P className="text-muted-foreground">No features</P>;
         }
 
         return (
-          <div className="flex flex-wrap">
+          <div className="flex w-60 flex-wrap gap-1">
             {features.map((feature, index) => (
-              <P key={index}>
+              <Badge variant="outline" key={index}>
                 {feature.name}
-                {features.length - 1 !== index && ", "}
-              </P>
+              </Badge>
             ))}
           </div>
         );
@@ -174,34 +217,16 @@ export function getVenuesColumns(): ColumnDef<VenueTableType>[] {
       ),
       cell: ({ row }) => {
         return (
-          <div className="flex items-center">
-            <P>{row.original.capacity}</P>
+          <div className="flex space-x-2">
+            <NumberFlow
+              willChange
+              continuous
+              value={row.original.capacity}
+              format={{ useGrouping: false }}
+              aria-hidden
+            />
           </div>
         );
-      },
-    },
-    {
-      accessorKey: "status",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Status" />
-      ),
-      cell: ({ row }) => {
-        const status = getVenueStatusColor(row.original.status);
-        return (
-          <div className="flex items-center">
-            <Badge variant={status.variant} className="pr-3.5">
-              <Dot
-                className="mr-1 size-3"
-                strokeWidth={status.stroke}
-                color={status.color}
-              />
-              {textTransform(row.original.status)}
-            </Badge>
-          </div>
-        );
-      },
-      filterFn: (row, id, value) => {
-        return Array.isArray(value) && value.includes(row.getValue(id));
       },
     },
     {
@@ -222,14 +247,26 @@ export function getVenuesColumns(): ColumnDef<VenueTableType>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Date Created" />
       ),
-      cell: ({ cell }) => formatDate(cell.getValue() as Date, "PPP p"),
+      cell: ({ cell }) => {
+        return (
+          <P className="text-muted-foreground">
+            {format(cell.getValue() as Date, "PP")}
+          </P>
+        );
+      },
     },
     {
       accessorKey: "updatedAt",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Date Modified" />
       ),
-      cell: ({ cell }) => formatDate(cell.getValue() as Date, "PPP p"),
+      cell: ({ cell }) => {
+        return (
+          <P className="text-muted-foreground">
+            {format(cell.getValue() as Date, "PP")}
+          </P>
+        );
+      },
     },
     {
       id: "actions",
@@ -283,7 +320,6 @@ export function getVenuesColumns(): ColumnDef<VenueTableType>[] {
                             id: row.original.id,
                             status: value as VenueStatusType,
                             path: pathname,
-                            changeType: "STATUS_CHANGE",
                           }),
                           {
                             loading: "Updating status...",

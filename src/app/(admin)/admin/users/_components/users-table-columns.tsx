@@ -20,9 +20,16 @@ import { P } from "@/components/typography/text";
 import { UpdateUserSheet } from "./update-user-sheet";
 import { DeleteUsersDialog } from "./delete-users-dialog";
 import { type UserType } from "@/lib/types/user";
-import { ChevronDownIcon, ChevronRightIcon, X } from "lucide-react";
+import {
+  ChevronDownIcon,
+  ChevronRightIcon,
+  CircleMinus,
+  CirclePlus,
+  RotateCw,
+  X,
+} from "lucide-react";
 import CreateUserRole from "./create-user-role";
-import { formatDate } from "date-fns";
+import { format, formatDate } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import placeholder from "public/placeholder.svg";
@@ -43,6 +50,8 @@ import { RemoveUserDepartmentSchema } from "./schema";
 import { usePathname } from "next/navigation";
 import { useHotkeys } from "react-hotkeys-hook";
 import DataTableExpand from "@/components/data-table/data-table-expand";
+import { PhotoProvider, PhotoView } from "react-photo-view";
+import LoadingSpinner from "@/components/loaders/loading-spinner";
 
 export function getUsersColumns(): ColumnDef<UserType>[] {
   const columns: ColumnDef<UserType>[] = [
@@ -83,26 +92,44 @@ export function getUsersColumns(): ColumnDef<UserType>[] {
       cell: ({ row }) => {
         return (
           <div className="flex items-center justify-start">
-            <Dialog>
-              <DialogTrigger asChild>
-                <div className="relative size-10 cursor-pointer rounded-full transition-colors hover:brightness-75">
-                  <Image
-                    src={row.original.profileUrl ?? placeholder}
-                    alt={`Image of ${row.original.firstName}`}
-                    fill
-                    className="rounded-full border object-cover"
-                  />
-                </div>
-              </DialogTrigger>
-              <DialogContent className="aspect-square w-[80vw]">
-                <Image
-                  src={row.original.profileUrl ?? placeholder}
-                  alt={`Image of ${row.original.firstName}`}
-                  fill
-                  className="rounded-md border object-cover"
-                />
-              </DialogContent>
-            </Dialog>
+            <PhotoProvider
+              speed={() => 300}
+              maskOpacity={0.8}
+              loadingElement={<LoadingSpinner />}
+              toolbarRender={({ onScale, scale, rotate, onRotate }) => {
+                return (
+                  <>
+                    <div className="flex gap-3">
+                      <CirclePlus
+                        className="size-5 cursor-pointer opacity-75 transition-opacity ease-linear hover:opacity-100"
+                        onClick={() => onScale(scale + 1)}
+                      />
+                      <CircleMinus
+                        className="size-5 cursor-pointer opacity-75 transition-opacity ease-linear hover:opacity-100"
+                        onClick={() => onScale(scale - 1)}
+                      />
+                      <RotateCw
+                        className="size-5 cursor-pointer opacity-75 transition-opacity ease-linear hover:opacity-100"
+                        onClick={() => onRotate(rotate + 90)}
+                      />
+                    </div>
+                  </>
+                );
+              }}
+            >
+              <div>
+                <PhotoView src={row.original.profileUrl ?? placeholder}>
+                  <div className="relative aspect-square h-10 cursor-pointer transition-colors hover:brightness-75">
+                    <Image
+                      src={row.original.profileUrl ?? placeholder}
+                      alt={`Image of ${row.original.firstName}`}
+                      fill
+                      className="rounded-md border object-cover"
+                    />
+                  </div>
+                </PhotoView>
+              </div>
+            </PhotoProvider>
           </div>
         );
       },
@@ -287,14 +314,26 @@ export function getUsersColumns(): ColumnDef<UserType>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Date Created" />
       ),
-      cell: ({ cell }) => formatDate(cell.getValue() as Date, "PPP p"),
+      cell: ({ cell }) => {
+        return (
+          <P className="text-muted-foreground">
+            {format(cell.getValue() as Date, "PP")}
+          </P>
+        );
+      },
     },
     {
       accessorKey: "updatedAt",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Last Modified" />
       ),
-      cell: ({ cell }) => formatDate(cell.getValue() as Date, "PPP p"),
+      cell: ({ cell }) => {
+        return (
+          <P className="text-muted-foreground">
+            {format(cell.getValue() as Date, "PP")}
+          </P>
+        );
+      },
     },
     {
       id: "actions",

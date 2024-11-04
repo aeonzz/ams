@@ -48,6 +48,7 @@ import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import CreateVehicleFormSkeleton from "./create-vehicle-form-skeleton";
 import NumberInput from "@/components/number-input";
+import { useTransportDepartments } from "@/lib/hooks/use-transport-depratments";
 
 interface CreateVenueFehiclerops {
   setAlertOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -77,13 +78,7 @@ export default function CreateVehicleForm({
   const pathname = usePathname();
   const queryClient = useQueryClient();
 
-  const { data, isLoading } = useQuery<Department[]>({
-    queryFn: async () => {
-      const res = await axios.get("/api/department/get-departments");
-      return res.data.data;
-    },
-    queryKey: ["create-vehicle-department-selection-vehicle-table"],
-  });
+  const { data, isLoading } = useTransportDepartments()
 
   const { uploadFiles, progresses, isUploading } = useUploadFile();
 

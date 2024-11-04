@@ -76,10 +76,12 @@ import ChangeTypeSchema, {
 } from "prisma/generated/zod/inputTypeSchemas/ChangeTypeSchema";
 import { TagInput } from "@/components/ui/tag-input";
 import NumberInput from "@/components/number-input";
+import { useFacilityDepartments } from "@/lib/hooks/use-facility-departments";
+import { VenueTableType } from "./types";
 
 interface UpdateDeparVenueProps
   extends React.ComponentPropsWithRef<typeof Sheet> {
-  venue: VenueWithRelations;
+  venue: VenueTableType;
   queryKey?: string[];
   removeField?: boolean;
 }
@@ -109,13 +111,7 @@ export function UpdateVenueSheet({
     },
   });
 
-  const { data, isLoading } = useQuery<Department[]>({
-    queryFn: async () => {
-      const res = await axios.get("/api/department/get-departments");
-      return res.data.data;
-    },
-    queryKey: ["update-venue-department-selection-venue-table"],
-  });
+  const { data, isLoading } = useFacilityDepartments();
 
   const { dirtyFields } = useFormState({ control: form.control });
 

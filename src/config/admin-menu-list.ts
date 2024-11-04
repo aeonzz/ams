@@ -25,16 +25,16 @@ export function getAdminMenuList(pathname: string): Group[] {
       groupLabel: "Overview",
       menus: [
         {
-          href: "/admin",
+          href: "/admin/dashboard",
           label: "Dashboard",
           active: pathname === "/admin",
           icon: LayoutGrid,
           submenus: [],
         },
         {
-          href: "/notification",
+          href: "/admin/requests",
           label: "Requests",
-          active: pathname.includes("/notification"),
+          active: pathname.includes("/requests"),
           icon: Bell,
           submenus: [],
         },

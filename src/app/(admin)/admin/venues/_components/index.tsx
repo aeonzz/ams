@@ -8,6 +8,7 @@ import { type GetVenuesSchema } from "@/lib/schema";
 import { getVenues } from "@/lib/actions/venue";
 import { VenuesTable } from "./venues-table";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
+import AdminSearchInput from "../../_components/admin-search-input";
 
 interface VenuesScreenProps {
   params: GetVenuesSchema;
@@ -26,14 +27,7 @@ export default function VenuesScreen({ params }: VenuesScreenProps) {
            * It is used to filter the tasks based on the selected date range it was created at.
            * The business logic for filtering the tasks based on the selected date range is handled inside the component.
            */}
-          <React.Suspense fallback={<Skeleton className="h-7 w-52" />}>
-            <DateRangePicker
-              triggerVariant="secondary"
-              triggerSize="sm"
-              triggerClassName="ml-auto w-56 sm:w-60"
-              align="end"
-            />
-          </React.Suspense>
+          <AdminSearchInput />
         </div>
         <div className="grid min-h-[calc(100vh_-_100px)] place-items-center items-center py-3">
           <React.Suspense fallback={<LoadingSpinner />}>
