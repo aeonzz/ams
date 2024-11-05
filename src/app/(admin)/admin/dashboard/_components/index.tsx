@@ -45,6 +45,12 @@ import {
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import RequestsTable from "./requests-table";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+
+interface jsPDFWithAutoTable extends jsPDF {
+  autoTable: (options: any) => jsPDF;
+}
 
 export default function AdminDashboardScreen() {
   const [requestType, setRequestType] = React.useState<RequestTypeType | "">(
@@ -93,6 +99,60 @@ export default function AdminDashboardScreen() {
       users: filteredUsers,
     };
   }, [data, date, requestType]);
+
+  const generatePDF = () => {
+    const doc = new jsPDF("landscape", "pt", "a4") as jsPDFWithAutoTable;
+    doc.text("System Overview Report", 40, 15);
+
+    // Add requests table
+    doc.autoTable({
+      head: [
+        [
+          "ID",
+          "Title",
+          "Type",
+          "Department",
+          "Status",
+          "Requester",
+          "Created",
+          "Completed",
+        ],
+      ],
+      body: filteredData.requests.map((request) => [
+        request.id,
+        request.title,
+        request.type,
+        request.department.name,
+        request.status,
+        formatFullName(
+          request.user.firstName,
+          request.user.middleName,
+          request.user.lastName
+        ),
+        new Date(request.createdAt).toLocaleDateString(),
+        request.completedAt
+          ? new Date(request.completedAt).toLocaleDateString()
+          : "-",
+      ]),
+      startY: 20,
+    });
+
+    // Add users table
+    // doc.addPage();
+    // doc.text("Users", 14, 15);
+    // doc.autoTable({
+    //   head: [["ID", "Name", "Created At"]],
+    //   body: filteredData.users.map((user) => [
+    //     user.id,
+    //     `${user.firstName} ${user.lastName}`,
+    //     new Date(user.createdAt).toLocaleDateString(),
+    //   ]),
+    //   startY: 20,
+    // });
+
+    // Save the PDF
+    doc.save("system-overview-report.pdf");
+  };
 
   return (
     <div className="flex h-full w-full flex-col">
@@ -208,6 +268,9 @@ export default function AdminDashboardScreen() {
             </PopoverContent>
             <AdminSearchInput />
           </Popover>
+          <Button variant="outline" size="sm" onClick={generatePDF}>
+            Generate PDF Report
+          </Button>
         </div>
       </div>
       {isLoading ? (
