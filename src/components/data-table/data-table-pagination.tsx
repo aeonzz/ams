@@ -17,17 +17,18 @@ import {
 
 interface DataTablePaginationProps<TData> {
   table: Table<TData>;
-  pageSizeOptions?: number[];
+  pageSizeOptions?: (number | "All")[];
   showSelectedRows?: boolean;
   showRowsPerPage?: boolean;
 }
 
 export function DataTablePagination<TData>({
   table,
-  pageSizeOptions = [10, 20, 30, 40, 50],
+  pageSizeOptions = [10, 20, 30, 40, 50, "All"],
   showSelectedRows = true,
   showRowsPerPage = true,
 }: DataTablePaginationProps<TData>) {
+  const totalRows = table.getFilteredRowModel().rows.length;
   return (
     <div className="flex w-full flex-col-reverse items-center justify-between gap-4 overflow-auto p-1 sm:flex-row sm:gap-8">
       {showSelectedRows ? (
@@ -47,18 +48,26 @@ export function DataTablePagination<TData>({
             <Select
               value={`${table.getState().pagination.pageSize}`}
               onValueChange={(value) => {
-                table.setPageSize(Number(value));
+                if (value === "All") {
+                  table.setPageSize(table.getFilteredRowModel().rows.length); // Show all rows
+                } else {
+                  table.setPageSize(Number(value));
+                }
               }}
             >
               <SelectTrigger className="h-8 w-[4.5rem]">
                 <SelectValue
-                  placeholder={table.getState().pagination.pageSize}
+                  placeholder={
+                    table.getState().pagination.pageSize === totalRows
+                      ? "All"
+                      : `${table.getState().pagination.pageSize}`
+                  }
                 />
               </SelectTrigger>
               <SelectContent side="top">
                 {pageSizeOptions.map((pageSize) => (
                   <SelectItem key={pageSize} value={`${pageSize}`}>
-                    {pageSize}
+                    {pageSize === "All" ? "All" : pageSize}
                   </SelectItem>
                 ))}
               </SelectContent>

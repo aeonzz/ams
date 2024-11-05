@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db/index";
-import { errorMonitor } from "stream";
 import { checkAuth } from "@/lib/auth/utils";
 import { currentUser } from "@/lib/actions/users";
 
@@ -27,9 +26,9 @@ export async function GET(req: Request) {
 
     return NextResponse.json({ data: result }, { status: 200 });
   } catch (error) {
-    console.log(errorMonitor);
+    console.log(error);
     return NextResponse.json(
-      { error: "Form submission failed" },
+      { error: "Something went wrong! try again later" },
       { status: 500 }
     );
   }

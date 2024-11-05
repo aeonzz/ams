@@ -4,45 +4,37 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { Clock, Users, FileText, CheckCircle } from "lucide-react";
-import type { DepartmentWithRelations } from "prisma/generated/zod";
 import { DateRange } from "react-day-picker";
 import type { RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTypeSchema";
 import NumberFlow from "@number-flow/react";
+import { SystemOverViewData } from "./types";
 
-interface DepartmentKPICardsProps {
-  data: DepartmentWithRelations;
+interface SystemKPICardsProps {
+  data: SystemOverViewData;
   className?: string;
   dateRange: DateRange | undefined;
   requestType: RequestTypeType | "";
 }
 
-export default function DepartmentKPICards({
+export default function SystemKPICards({
   data,
   className,
   dateRange,
   requestType,
-}: DepartmentKPICardsProps) {
-  const { request, userDepartments } = data;
+}: SystemKPICardsProps) {
+  const { requests, users } = data;
 
-  const filteredData = React.useMemo(() => {
-    let filtered = request;
-
-    if (dateRange?.from && dateRange?.to) {
-      filtered = filtered.filter((r) => {
-        const createdAt = new Date(r.createdAt);
-        return createdAt >= dateRange.from! && createdAt <= dateRange.to!;
-      });
-    }
-
-    if (requestType) {
-      filtered = filtered.filter((r) => r.type === requestType);
-    }
-
-    return filtered;
-  }, [request, dateRange, requestType]);
+  // Initialize state for each KPI with 0
+  const [animatedTotalRequests, setAnimatedTotalRequests] = React.useState(0);
+  const [animatedCompletedTasks, setAnimatedCompletedTasks] = React.useState(0);
+  const [animatedActiveUsers, setAnimatedActiveUsers] = React.useState(0);
+  const [animatedCompletionHours, setAnimatedCompletionHours] =
+    React.useState(0);
+  const [animatedCompletionMinutes, setAnimatedCompletionMinutes] =
+    React.useState(0);
 
   const filteredCompletedTasks = React.useMemo(() => {
-    return filteredData.filter((r) => {
+    return requests.filter((r) => {
       const completedAt = r.completedAt ? new Date(r.completedAt) : null;
       return (
         completedAt &&
@@ -51,34 +43,18 @@ export default function DepartmentKPICards({
         (!dateRange?.to || completedAt <= dateRange.to)
       );
     });
-  }, [filteredData, dateRange]);
-
-  const filteredUserDepartments = React.useMemo(() => {
-    if (!dateRange?.from || !dateRange?.to) return userDepartments;
-
-    return userDepartments.filter((ud) => {
-      const createdAt = new Date(ud.createdAt);
-      return createdAt >= dateRange.from! && createdAt <= dateRange.to!;
-    });
-  }, [userDepartments, dateRange]);
+  }, [requests, dateRange]);
 
   // Calculate KPIs
-  const totalRequests = filteredData.length;
+  const totalRequests = requests.length;
   const completedTasks = filteredCompletedTasks.length;
-  const activeUsers = filteredUserDepartments.filter(
-    (ud) => !ud.user.isArchived
-  ).length;
+  const activeUsers = users.filter((ud) => !ud.isArchived).length;
 
   const totalCompletionTime = filteredCompletedTasks.reduce((sum, r) => {
     const completedAt = r.completedAt ? new Date(r.completedAt) : null;
     const createdAt = r.createdAt ? new Date(r.createdAt) : null;
-
-    if (!completedAt || !createdAt) {
-      return sum;
-    }
-
-    const completionTime = completedAt.getTime() - createdAt.getTime();
-    return sum + completionTime;
+    if (!completedAt || !createdAt) return sum;
+    return sum + (completedAt.getTime() - createdAt.getTime());
   }, 0);
 
   const averageCompletionTimeInMinutes =
@@ -96,8 +72,28 @@ export default function DepartmentKPICards({
   const periodText = dateRange ? "in selected period" : "overall";
   const typeText = requestType ? `for ${requestType} requests` : "";
 
+  // Update states to trigger animations
+  React.useEffect(() => {
+    setAnimatedTotalRequests(totalRequests);
+    setAnimatedCompletedTasks(completedTasks);
+    setAnimatedActiveUsers(activeUsers);
+    setAnimatedCompletionHours(averageCompletionHours);
+    setAnimatedCompletionMinutes(averageCompletionMinutes);
+  }, [
+    totalRequests,
+    completedTasks,
+    activeUsers,
+    averageCompletionHours,
+    averageCompletionMinutes,
+  ]);
+
   return (
-    <div className={cn("grid gap-3 md:grid-cols-2 lg:grid-cols-4", className)}>
+    <div
+      className={cn(
+        "grid w-full gap-3 md:grid-cols-2 lg:grid-cols-4",
+        className
+      )}
+    >
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Total Requests</CardTitle>
@@ -107,7 +103,7 @@ export default function DepartmentKPICards({
           <NumberFlow
             willChange
             continuous
-            value={totalRequests}
+            value={animatedTotalRequests}
             format={{ useGrouping: false }}
             className="text-2xl font-bold"
             aria-hidden
@@ -119,14 +115,16 @@ export default function DepartmentKPICards({
       </Card>
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Completed Requests</CardTitle>
+          <CardTitle className="text-sm font-medium">
+            Completed Requests
+          </CardTitle>
           <CheckCircle className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
           <NumberFlow
             willChange
             continuous
-            value={completedTasks}
+            value={animatedCompletedTasks}
             format={{ useGrouping: false }}
             className="text-2xl font-bold"
             aria-hidden
@@ -148,7 +146,7 @@ export default function DepartmentKPICards({
             <NumberFlow
               willChange
               continuous
-              value={averageCompletionHours}
+              value={animatedCompletionHours}
               format={{ useGrouping: false }}
               isolate
               aria-hidden
@@ -159,7 +157,7 @@ export default function DepartmentKPICards({
             <NumberFlow
               willChange
               continuous
-              value={averageCompletionMinutes}
+              value={animatedCompletionMinutes}
               format={{ useGrouping: false }}
               isolate
               aria-hidden
@@ -182,13 +180,13 @@ export default function DepartmentKPICards({
           <NumberFlow
             willChange
             continuous
-            value={activeUsers}
+            value={animatedActiveUsers}
             format={{ useGrouping: false }}
             className="text-2xl font-bold"
             aria-hidden
           />
           <p className="text-xs text-muted-foreground">
-            Users engaged with the department {periodText}
+            Users engaged with the system {periodText}
           </p>
         </CardContent>
       </Card>

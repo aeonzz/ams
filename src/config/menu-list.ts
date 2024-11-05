@@ -7,6 +7,7 @@ import {
   FolderKanban,
   Hammer,
   HelpCircle,
+  Inbox,
   LayoutGrid,
   Mails,
   Settings,
@@ -63,7 +64,7 @@ export function getMenuList({
       href: `/department/${userDepartment.departmentId}`,
       label: userDepartment.department.name,
       active: pathname.includes(`/department/${userDepartment.departmentId}`),
-      icon: Building,
+      icon: Briefcase,
       submenus: baseSubmenus,
     };
   });
@@ -114,15 +115,15 @@ export function getMenuList({
           href: "/requests",
           label: "My Requests",
           active: pathname.includes("/requests"),
-          icon: Mails,
+          icon: Inbox,
           submenus: [
             {
-              href: "/requests/my-requests?page=1&per_page=10&sort=createdAt.desc",
+              href: "/request/my-requests?page=1&per_page=10&sort=createdAt.desc",
               label: "Requests",
               active: pathname === "/requests/my-requests",
             },
             {
-              href: "/requests/cancelled",
+              href: "/request/cancelled",
               label: "Cancelled Requests",
               active: pathname === "/requests/cancelled",
             },

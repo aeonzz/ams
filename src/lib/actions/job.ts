@@ -9,6 +9,7 @@ import { revalidatePath } from "next/cache";
 import { generateText } from "ai";
 import { cohere } from "@ai-sdk/cohere";
 import { extendedJobRequestSchemaServer } from "../db/schema/job";
+import { createNotification } from "./notification";
 import {
   assignPersonnelSchemaWithPath,
   cancelOwnRequestSchema,
@@ -16,8 +17,7 @@ import {
   updateJobRequestSchemaWithPath,
   updateRequestStatusSchemaWithPath,
   updateReworkJobRequestSchema,
-} from "@/app/(app)/(params)/request/[requestId]/_components/schema";
-import { createNotification } from "./notification";
+} from "@/app/(admin)/admin/requests/[requestId]/_components/schema";
 
 export const createJobRequest = authedProcedure
   .createServerAction()

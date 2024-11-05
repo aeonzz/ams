@@ -15,6 +15,7 @@ import {
   GraduationCap,
   ClipboardList,
   FileText,
+  Inbox,
 } from "lucide-react";
 
 import { Group } from "@/lib/types/menu";
@@ -35,7 +36,7 @@ export function getAdminMenuList(pathname: string): Group[] {
           href: "/admin/requests",
           label: "Requests",
           active: pathname.includes("/requests"),
-          icon: Bell,
+          icon: Inbox,
           submenus: [],
         },
       ],
@@ -105,7 +106,7 @@ export function getAdminMenuList(pathname: string): Group[] {
           href: "/admin/departments",
           label: "Departments",
           active: pathname.includes("/admin/departments"),
-          icon: GraduationCap,
+          icon: Briefcase,
           submenus: [],
         },
         {

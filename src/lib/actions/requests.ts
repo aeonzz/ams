@@ -23,116 +23,108 @@ import { checkAuth } from "../auth/utils";
 import { currentUser } from "./users";
 import { UserCheck2Icon } from "lucide-react";
 import { createNotification } from "./notification";
-import { updateRequestStatusSchemaWithPath } from "@/app/(app)/(params)/request/[requestId]/_components/schema";
 import { updateReturnableResourceRequestSchemaWithPath } from "../schema/resource/returnable-resource";
+import { updateRequestStatusSchemaWithPath } from "@/app/(app)/request/[requestId]/_components/schema";
 
 const cohere = createCohere({
   apiKey: process.env.COHERE_API_KEY,
 });
 
-// export const createRequest = authedProcedure
-//   .createServerAction()
-//   .input(extendedJobRequestSchema)
-//   .handler(async ({ ctx, input }) => {
-//     const { user } = ctx;
+export async function getRequests(input: GetRequestsSchema) {
+  await checkAuth();
+  const user = await currentUser();
+  const {
+    page,
+    per_page,
+    sort,
+    title,
+    status,
+    type,
+    priority,
+    from,
+    to,
+    departmentId,
+    departmentName,
+  } = input;
 
-//     const { jobType, path, ...rest } = input;
+  try {
+    const skip = (page - 1) * per_page;
 
-//     console.log(input)
-//     if (!jobType) {
-//       throw "Jobtype is undefined";
-//     }
+    const [column, order] = (sort?.split(".") ?? ["createdAt", "desc"]) as [
+      keyof Request | undefined,
+      "asc" | "desc" | undefined,
+    ];
 
-//     try {
-//       const departments = await db.department.findMany();
+    const where: any = {};
 
-//       const { text } = await generateText({
-//         model: cohere("command-r-plus"),
-//         system: `You are an expert at creating concise, informative titles for work requests.
-//                  Your task is to generate clear, action-oriented titles that quickly convey
-//                  the nature of the request. Always consider the job type, category, and specific
-//                  name of the task when crafting the title. Aim for brevity and clarity. And make it unique for every request. Dont add quotes`,
-//         prompt: `Create a clear and concise title for a request based on these details:
-//                  Notes:
-//                  ${input.type} request
-//                  ${input.notes}
+    if (title) {
+      where.title = { contains: title, mode: "insensitive" };
+    }
 
-//                  Guidelines:
-//                  1. Keep it under 50 characters
-//                  2. Include the job type, category, and name in the title
-//                  3. Capture the main purpose of the request
-//                  4. Use action-oriented language
-//                  5. Be specific to the request's context
-//                  6. Make it easy to understand at a glance
-//                  7. Use title case
+    if (status) {
+      where.status = status;
+    }
 
-//                  Example:
-//                  If given:
-//                  Notes: Fix leaking faucet in the main office bathroom
-//                  Job Type: Maintenance
-//                  Category: Building
-//                  Name: Plumbing
+    if (type) {
+      where.type = { in: type.split(".") };
+    }
 
-//                  A good title might be:
-//                  "Urgent Plumbing Maintenance: Office Bathroom Faucet Repair"
+    if (priority) {
+      where.priority = priority;
+    }
 
-//                  Now, create a title for the request using the provided details above.`,
-//       });
+    if (departmentName) {
+      const departments = departmentName
+        .split(".")
+        .map((d) => d.trim().replace(/\+/g, " "));
 
-//       const departmentNames = departments.map((d) => d.name).join(", ");
-//       const { text: assignedDepartment } = await generateText({
-//         model: cohere("command-r-plus"),
-//         system: `You are an AI assistant that assigns departments to job requests based on their description.`,
-//         prompt: `Given the following job request description, choose the most appropriate department from this list: ${departmentNames}.
-//                  Job description: ${input.notes}
-//                  Job Type: ${jobType}
+      where.department = {
+        name: {
+          in: departments,
+          mode: "insensitive",
+        },
+      };
+    }
 
-//                  Respond with only the name of the chosen department.`,
-//       });
+    if (from && to) {
+      where.createdAt = {
+        gte: new Date(from),
+        lte: new Date(to),
+      };
+    }
 
-//       const matchedDepartment = departments.find(
-//         (d) => d.name.toLowerCase() === assignedDepartment.toLowerCase().trim()
-//       );
+    const [data, total, department] = await db.$transaction([
+      db.request.findMany({
+        where,
+        take: per_page,
+        skip,
+        orderBy: {
+          [column || "createdAt"]: order || "desc",
+        },
+        include: {
+          user: true,
+          department: true,
+        },
+      }),
+      db.request.count({ where }),
+      db.department.findMany(),
+    ]);
+    const pageCount = Math.ceil(total / per_page);
 
-//       if (!matchedDepartment) {
-//         throw "couldn't assign a valid department";
-//       }
-
-//       const requestId = `REQ-${generateId(15)}`;
-//       const jobRequestId = `JRQ-${generateId(15)}`;
-
-//       const request = await db.request.create({
-//         data: {
-//           id: requestId,
-//           userId: user.id,
-//           priority: rest.priority,
-//           type: rest.type,
-//           title: text,
-//           department: rest.department,
-//           jobRequest: {
-//             create: {
-//               id: jobRequestId,
-//               notes: rest.notes,
-//               dueDate: rest.dueDate,
-//               jobType: jobType,
-//               assignTo: matchedDepartment.name,
-//               files: {
-//                 create: rest.images?.map((fileName) => ({
-//                   id: `JRQ-${generateId(15)}`,
-//                   url: fileName,
-//                 })),
-//               },
-//             },
-//           },
-//         },
-//       });
-
-//       return revalidatePath(path);
-//     } catch (error) {
-//       getErrorMessage(error);
-//     }
-//   });
-
+    const formattedData = await Promise.all(
+      data.map(async (data) => {
+        return {
+          ...data,
+          departmentName: data.department.name,
+        };
+      })
+    );
+    return { data: formattedData, pageCount, departments: department };
+  } catch (err) {
+    console.error(err);
+    return { data: [], pageCount: 0 };
+  }
+}
 export const createVenueRequest = authedProcedure
   .createServerAction()
   .input(extendedVenueRequestSchema)
@@ -349,9 +341,7 @@ export const getUserReqcount = authedProcedure
     }
   });
 
-export async function getManageRequests(
-  input: GetRequestsSchema & { departmentId: string }
-) {
+export async function getManageRequests(input: GetRequestsSchema) {
   await checkAuth();
   const user = await currentUser();
   const {

@@ -25,7 +25,7 @@ export default function DepartmentLayout({
           <SearchInput />
         </div>
       </div>
-      <div className="scroll-bar flex flex-1 justify-center overflow-y-auto p-3">
+      <div className="scroll-bar container flex flex-1 justify-center overflow-y-auto p-3">
         {children}
       </div>
     </div>
