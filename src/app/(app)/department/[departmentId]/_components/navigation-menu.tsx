@@ -69,33 +69,6 @@ const management: {
   },
 ];
 
-const insights: { title: string; href: string; description: string }[] = [
-  {
-    title: "Borrow Service",
-    href: "overview/borrow",
-    description:
-      "Get a comprehensive overview of all borrow requests made by your department. Analyze trends and borrowing patterns.",
-  },
-  {
-    title: "Borrow Requests Insights",
-    href: "/department/borrow-requests/insights",
-    description:
-      "Dive deeper into the data of borrow requests. Explore metrics, user engagement, and item demand.",
-  },
-  {
-    title: "Pending Borrow Requests",
-    href: "/department/borrow-requests/pending",
-    description:
-      "View all pending borrow requests. Ensure timely processing and resolution of outstanding requests.",
-  },
-  {
-    title: "Borrowing Policy Review",
-    href: "/department/borrow-requests/policy",
-    description:
-      "Review the current borrowing policies and guidelines for your department. Ensure compliance and effective resource management.",
-  },
-];
-
 interface OverviewNavigationMenuProps {
   departmentId: string;
 }
@@ -214,52 +187,22 @@ export default function OverviewNavigationMenu({
           </NavigationMenuContent>
         </NavigationMenuItem>
         <NavigationMenuItem>
-          <NavigationMenuTrigger>
-            <P>Insights</P>
-          </NavigationMenuTrigger>
-          <NavigationMenuContent>
-            <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-              <Link
-                href={`/department/${departmentId}/insights`}
-                prefetch
-                className="row-span-4"
-              >
-                <NavigationMenuLink className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-primary/50 to-primary p-6 no-underline outline-none focus:shadow-md">
-                  <BarChartIcon className="h-6 w-6" />
-                  <div className="mb-2 mt-4 text-lg font-medium">
-                    Department Insights
-                  </div>
-                  <p className="text-sm leading-tight text-muted-foreground">
-                    Gain valuable insights into department performance, request
-                    volume, and resource usage. Monitor key metrics and
-                    visualize data for better decision-making and optimization.
-                  </p>
-                </NavigationMenuLink>
-              </Link>
-              {insights.map((insight) => (
-                <Link
-                  key={insight.title}
-                  href={`/department/${departmentId}/${insight.href}`}
-                  legacyBehavior
-                  passHref
-                  prefetch
-                >
-                  <NavigationMenuLink
-                    className={cn(
-                      "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-secondary-accent hover:text-secondary-accent-foreground focus:bg-secondary-accent focus:text-secondary-accent-foreground"
-                    )}
-                  >
-                    <div className="text-sm font-medium leading-none">
-                      {insight.title}
-                    </div>
-                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                      {insight.description}
-                    </p>
-                  </NavigationMenuLink>
-                </Link>
-              ))}
-            </ul>
-          </NavigationMenuContent>
+          <Link
+            href={`/department/${departmentId}/insights`}
+            legacyBehavior
+            passHref
+            prefetch
+          >
+            <NavigationMenuLink
+              className={cn(
+                navigationMenuTriggerStyle(),
+                pathname === `/department/${departmentId}/insights` &&
+                  "bg-secondary-accent"
+              )}
+            >
+              Insights
+            </NavigationMenuLink>
+          </Link>
         </NavigationMenuItem>
         <NavigationMenuItem>
           <Link

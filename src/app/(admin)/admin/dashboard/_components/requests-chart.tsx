@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import React from "react";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import {
   Card,
@@ -36,13 +36,11 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-type TimeRange = "day" | "week" | "month";
+export type TimeRange = "day" | "week" | "month";
 
-const processChartData = (
+export const processChartData = (
   requests: SystemOverViewData["requests"],
-  range: TimeRange,
-  requestType: RequestTypeType | "",
-  dateRange: DateRange | undefined
+  range: TimeRange
 ) => {
   const data: { [key: string]: { created: number } } = {};
 
@@ -79,20 +77,24 @@ interface RequestChartProps {
   data: SystemOverViewData;
   className?: string;
   dateRange: DateRange | undefined;
+  exporting?: boolean;
   requestType: RequestTypeType | "";
+  setTimeRange: (timeRange: TimeRange) => void;
+  timeRange: TimeRange;
 }
 
 export default function RequestChart({
   data,
   className,
   dateRange,
+  exporting = false,
   requestType,
+  setTimeRange,
+  timeRange,
 }: RequestChartProps) {
-  const [timeRange, setTimeRange] = useState<TimeRange>("day");
-
-  const chartData = useMemo(
-    () => processChartData(data.requests, timeRange, requestType, dateRange),
-    [data.requests, timeRange, requestType, dateRange]
+  const chartData = React.useMemo(
+    () => processChartData(data.requests, timeRange),
+    [data.requests, timeRange]
   );
 
   const formatXAxis = (value: string) => {
@@ -138,7 +140,9 @@ export default function RequestChart({
           value={timeRange}
           onValueChange={(value: TimeRange) => setTimeRange(value)}
         >
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger
+            className={cn(exporting && "bg-transparent", "w-[180px]")}
+          >
             <SelectValue placeholder="Select time range" />
           </SelectTrigger>
           <SelectContent>

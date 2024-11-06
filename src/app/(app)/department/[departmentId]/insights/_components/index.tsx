@@ -4,7 +4,7 @@ import React from "react";
 import FetchDataError from "@/components/card/fetch-data-error";
 import { useDepartmentData } from "@/lib/hooks/use-department-data";
 import RequestStatusOverview from "./request-status-overview";
-import RequestChart from "./request-chart";
+import RequestChart, { TimeRange } from "./request-chart";
 import DepartmentKPICards from "./department-kpi-cards";
 import DepartmentRequestsTable from "./requests-table";
 import {
@@ -32,6 +32,11 @@ import { OverdueItemsChart } from "./overdue-items-chart";
 import { RequestTypeSchema } from "prisma/generated/zod";
 import { P } from "@/components/typography/text";
 import type { RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTypeSchema";
+import DashboardActions from "@/app/(admin)/admin/dashboard/_components/dashboard-actions";
+import { generateSystemReport } from "@/lib/fill-pdf/system-report";
+import { toast } from "sonner";
+import { useSession } from "@/lib/hooks/use-session";
+import { generateDepartmentReport } from "@/lib/fill-pdf/department-report";
 
 interface DepartmentInsightsScreenProps {
   departmentId: string;
@@ -40,6 +45,9 @@ interface DepartmentInsightsScreenProps {
 export default function DepartmentInsightsScreen({
   departmentId,
 }: DepartmentInsightsScreenProps) {
+  const currentUser = useSession();
+  const [isGenerating, setIsGenerating] = React.useState(false);
+  const [timeRange, setTimeRange] = React.useState<TimeRange>("day");
   const [requestType, setRequestType] = React.useState<RequestTypeType | "">(
     ""
   );
@@ -49,6 +57,35 @@ export default function DepartmentInsightsScreen({
     to: undefined,
   });
   const { data, isLoading, isError, refetch } = useDepartmentData(departmentId);
+
+  const filteredData = React.useMemo(() => {
+    if (!data) return { requests: [], users: [] };
+    let filteredRequests = data.request;
+
+    if (date?.from && date?.to) {
+      filteredRequests = filteredRequests.filter((r) => {
+        const createdAt = new Date(r.createdAt);
+        return createdAt >= date.from! && createdAt <= date.to!;
+      });
+    }
+
+    if (requestType) {
+      filteredRequests = filteredRequests.filter((r) => r.type === requestType);
+    }
+
+    let filteredUsers = data.userDepartments;
+    if (date?.from && date?.to) {
+      filteredUsers = filteredUsers.filter((u) => {
+        const createdAt = new Date(u.createdAt);
+        return createdAt >= date.from! && createdAt <= date.to!;
+      });
+    }
+
+    return {
+      requests: filteredRequests,
+      users: filteredUsers,
+    };
+  }, [data, date, requestType]);
 
   if (isLoading) {
     return (
@@ -66,144 +103,61 @@ export default function DepartmentInsightsScreen({
     );
   }
 
+  const generatePDF = async () => {
+    try {
+      setIsGenerating(true);
+      await generateDepartmentReport({
+        data: filteredData,
+        date,
+        requestType,
+        currentUser,
+        timeRange,
+        setTimeRange,
+        departmentName: data.name,
+      });
+    } catch (error) {
+      console.error("Error generating report:", error);
+      toast.error("An error occurred during generation. Please try again.");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   return (
     <div className="space-y-3">
       <div className="flex justify-between">
         <div></div>
         <div className="flex gap-2">
-          {(date?.from !== undefined || requestType !== "") && (
-            <Button
-              variant="ghost2"
-              size="sm"
-              onClick={() => {
-                setDate(undefined);
-                setRequestType("");
-              }}
-              className="flex items-center"
-            >
-              Clear
-              <X className="ml-1 size-4" />
-            </Button>
-          )}
-          <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="secondary"
-                role="combobox"
-                size="sm"
-                aria-expanded={open}
-                className={cn(
-                  "w-[200px] justify-between",
-                  !requestType && "text-muted-foreground"
-                )}
-              >
-                {requestType ? (
-                  <P>{textTransform(requestType)}</P>
-                ) : (
-                  "Select service..."
-                )}
-                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[200px] p-0">
-              <Command>
-                <CommandInput placeholder="Search service..." />
-                <CommandList>
-                  <CommandEmpty>No service found.</CommandEmpty>
-                  <CommandGroup>
-                    {RequestTypeSchema.options
-                      .filter(
-                        (service) =>
-                          (service !== "JOB" || data.acceptsJobs) &&
-                          (service !== "TRANSPORT" || data.managesTransport) &&
-                          (service !== "BORROW" || data.managesBorrowRequest) &&
-                          (service !== "VENUE" || data.managesFacility)
-                      )
-                      .map((service) => (
-                        <CommandItem
-                          key={service}
-                          value={service}
-                          onSelect={(currentValue) => {
-                            setRequestType(
-                              currentValue === requestType
-                                ? ""
-                                : (currentValue as RequestTypeType)
-                            );
-                            setOpen(false);
-                          }}
-                        >
-                          <Check
-                            className={cn(
-                              "mr-2 h-4 w-4",
-                              requestType === service
-                                ? "opacity-100"
-                                : "opacity-0"
-                            )}
-                          />
-                          {textTransform(service)}
-                        </CommandItem>
-                      ))}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                id="date"
-                variant="secondary"
-                size="sm"
-                className={cn(
-                  "w-[300px] justify-start text-left font-normal",
-                  !date && "text-muted-foreground"
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {date?.from ? (
-                  date.to ? (
-                    <>
-                      {format(date.from, "LLL dd, y")} -{" "}
-                      {format(date.to, "LLL dd, y")}
-                    </>
-                  ) : (
-                    format(date.from, "LLL dd, y")
-                  )
-                ) : (
-                  <span>Pick a date</span>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                initialFocus
-                mode="range"
-                defaultMonth={date?.from}
-                selected={date}
-                onSelect={setDate}
-                numberOfMonths={2}
-              />
-            </PopoverContent>
-          </Popover>
+          <DashboardActions
+            requestType={requestType}
+            setRequestType={setRequestType}
+            isLoading={isLoading}
+            date={date}
+            setDate={setDate}
+            generatePDF={generatePDF}
+            isGenerating={isGenerating}
+          />
         </div>
       </div>
       <div className="grid h-fit grid-flow-row grid-cols-3 gap-3 pb-3">
         <DepartmentKPICards
-          data={data}
+          data={filteredData}
           className="col-span-3"
           dateRange={date}
           requestType={requestType}
         />
-        <RequestStatusOverview
-          data={data}
+        {/* <RequestStatusOverview
+          data={filteredData}
           requestType={requestType}
           className="h-[400px]"
-        />
+        /> */}
         <RequestChart
-          data={data}
-          className="col-span-2 h-[400px]"
+          data={filteredData}
+          className="col-span-3 h-[400px]"
           requestType={requestType}
           dateRange={date}
+          timeRange={timeRange}
+          setTimeRange={setTimeRange}
         />
         {requestType === "BORROW" && (
           <>

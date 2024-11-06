@@ -1,9 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { TrendingUp, TrendingDown } from "lucide-react";
+import React from "react";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
-
 import {
   Card,
   CardContent,
@@ -19,10 +17,6 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { cn, textTransform } from "@/lib/utils";
-import type {
-  DepartmentWithRelations,
-  RequestWithRelations,
-} from "prisma/generated/zod";
 import { P } from "@/components/typography/text";
 import {
   Select,
@@ -33,37 +27,26 @@ import {
 } from "@/components/ui/select";
 import { DateRange } from "react-day-picker";
 import { RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTypeSchema";
+import { DepartmentOverViewData } from "./types";
 
 const chartConfig = {
   created: {
     label: "Created Requests",
     color: "hsl(var(--chart-1))",
   },
-  completed: {
-    label: "Completed Requests",
-    color: "hsl(var(--chart-4))",
-  },
 } satisfies ChartConfig;
 
-type TimeRange = "day" | "week" | "month";
+export type TimeRange = "day" | "week" | "month";
 
-const processChartData = (
-  requests: RequestWithRelations[],
-  range: TimeRange,
-  requestType: RequestTypeType | ""
+export const processChartData = (
+  requests: DepartmentOverViewData["requests"],
+  range: TimeRange
 ) => {
-  const data: { [key: string]: { created: number; completed: number } } = {};
+  const data: { [key: string]: { created: number } } = {};
 
-  const filteredRequests = requestType
-    ? requests.filter((request) => request.type === requestType)
-    : requests;
-
-  filteredRequests.forEach((request) => {
+  requests.forEach((request) => {
     let key: string;
     const createdDate = new Date(request.createdAt);
-    const completedDate = request.completedAt
-      ? new Date(request.completedAt)
-      : null;
 
     switch (range) {
       case "day":
@@ -80,30 +63,9 @@ const processChartData = (
     }
 
     if (!data[key]) {
-      data[key] = { created: 0, completed: 0 };
+      data[key] = { created: 0 };
     }
     data[key].created++;
-
-    if (completedDate) {
-      let completedKey: string;
-      switch (range) {
-        case "day":
-          completedKey = completedDate.toISOString().slice(0, 10);
-          break;
-        case "week":
-          const weekStart = new Date(completedDate);
-          weekStart.setDate(completedDate.getDate() - completedDate.getDay());
-          completedKey = weekStart.toISOString().slice(0, 10);
-          break;
-        case "month":
-          completedKey = completedDate.toISOString().slice(0, 7);
-          break;
-      }
-      if (!data[completedKey]) {
-        data[completedKey] = { created: 0, completed: 0 };
-      }
-      data[completedKey].completed++;
-    }
   });
 
   return Object.entries(data)
@@ -112,37 +74,28 @@ const processChartData = (
 };
 
 interface RequestChartProps {
-  data: DepartmentWithRelations;
+  data: DepartmentOverViewData;
   className?: string;
   dateRange: DateRange | undefined;
+  exporting?: boolean;
   requestType: RequestTypeType | "";
+  setTimeRange: (timeRange: TimeRange) => void;
+  timeRange: TimeRange;
 }
 
 export default function RequestChart({
   data,
   className,
   dateRange,
+  exporting = false,
   requestType,
+  setTimeRange,
+  timeRange,
 }: RequestChartProps) {
-  const [timeRange, setTimeRange] = useState<TimeRange>("day");
-
-  const chartData = useMemo(
-    () => processChartData(data.request, timeRange, requestType),
-    [data.request, timeRange, requestType]
+  const chartData = React.useMemo(
+    () => processChartData(data.requests, timeRange),
+    [data.requests, timeRange]
   );
-
-  const latestPeriod = chartData[chartData.length - 1];
-  const previousPeriod = chartData[chartData.length - 2];
-  const createdTrend = previousPeriod
-    ? ((latestPeriod.created - previousPeriod.created) /
-        previousPeriod.created) *
-      100
-    : 0;
-  const completedTrend = previousPeriod
-    ? ((latestPeriod.completed - previousPeriod.completed) /
-        previousPeriod.completed) *
-      100
-    : 0;
 
   const formatXAxis = (value: string) => {
     const date = new Date(value);
@@ -162,6 +115,11 @@ export default function RequestChart({
     }
   };
 
+  const dateRangeText =
+    dateRange?.from && dateRange?.to
+      ? `${dateRange.from.toLocaleDateString()} - ${dateRange.to.toLocaleDateString()}`
+      : "All time";
+
   return (
     <Card className={cn("bg-transparent", className)}>
       <CardHeader className="w-full flex-row items-start justify-between">
@@ -173,15 +131,18 @@ export default function RequestChart({
               : timeRange === "week"
                 ? "Weekly"
                 : "Monthly"}{" "}
-            requests created and completed
-            {requestType && ` for ${textTransform(requestType)} requests`}
+            requests created
+            {requestType && ` for ${textTransform(requestType)} requests`} /
+            Date Range: {dateRangeText}
           </CardDescription>
         </div>
         <Select
           value={timeRange}
           onValueChange={(value: TimeRange) => setTimeRange(value)}
         >
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger
+            className={cn(exporting && "bg-transparent", "w-[180px]")}
+          >
             <SelectValue placeholder="Select time range" />
           </SelectTrigger>
           <SelectContent>
@@ -226,27 +187,7 @@ export default function RequestChart({
                   stopOpacity={0.1}
                 />
               </linearGradient>
-              <linearGradient id="fillCompleted" x1="0" y1="0" x2="0" y2="1">
-                <stop
-                  offset="5%"
-                  stopColor="var(--color-completed)"
-                  stopOpacity={0.8}
-                />
-                <stop
-                  offset="95%"
-                  stopColor="var(--color-completed)"
-                  stopOpacity={0.1}
-                />
-              </linearGradient>
             </defs>
-            <Area
-              type="monotone"
-              dataKey="completed"
-              stroke="var(--color-completed)"
-              fillOpacity={0.4}
-              fill="url(#fillCompleted)"
-              stackId="1"
-            />
             <Area
               type="monotone"
               dataKey="created"
@@ -259,19 +200,19 @@ export default function RequestChart({
         </ChartContainer>
       </CardContent>
       <CardFooter>
-        <div className="flex w-full flex-col text-sm gap-2">
-          <P className="font-medium leading-none">Requests</P>
+        <div className="flex w-full flex-col gap-2 text-sm">
+          <P className="font-medium leading-none">Requests Overview</P>
           <P className="leading-none text-muted-foreground">
-            This chart tracks the{" "}
+            This chart shows the{" "}
             {timeRange === "day"
               ? "daily"
               : timeRange === "week"
                 ? "weekly"
                 : "monthly"}{" "}
-            trends of requests created versus completed
+            request trends
             {requestType && ` for ${textTransform(requestType)} requests`},
-            providing insights into the department&apos;s workload and
-            efficiency in handling requests over time.
+            providing insights into workload patterns over time. Data reflects
+            the period: {dateRangeText}.
           </P>
         </div>
       </CardFooter>

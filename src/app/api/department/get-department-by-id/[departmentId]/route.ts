@@ -19,6 +19,8 @@ export async function GET(req: Request, context: Context) {
         request: {
           include: {
             jobRequest: true,
+            user: true,
+            department: true,
           },
           orderBy: {
             createdAt: "desc",

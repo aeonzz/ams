@@ -20,6 +20,7 @@ import {
 import { DepartmentWithRelations } from "prisma/generated/zod";
 import { cn, textTransform } from "@/lib/utils";
 import { RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTypeSchema";
+import { DepartmentOverViewData } from "./types";
 
 const chartConfig = {
   requests: {
@@ -52,7 +53,7 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 interface RequestStatusOverviewProps {
-  data: DepartmentWithRelations;
+  data: DepartmentOverViewData;
   className?: string;
   requestType: RequestTypeType | "";
 }
@@ -62,7 +63,7 @@ export default function RequestStatusOverview({
   className,
   requestType,
 }: RequestStatusOverviewProps) {
-  const { request, name } = data;
+  const { requests } = data;
 
   const filteredRequests = React.useMemo(() => {
     return requestType
@@ -108,7 +109,7 @@ export default function RequestStatusOverview({
       <CardHeader className="items-center pb-0">
         <CardTitle>Request Status Overview</CardTitle>
         <CardDescription>
-          {name} - {requestType ? textTransform(requestType) : "Overall"}
+          {requestType ? textTransform(requestType) : "Overall"}
         </CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">

@@ -8,7 +8,7 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui/form";
-import { generateDescription } from "@/lib/actions/ai";
+import { generateResponseText } from "@/lib/actions/ai";
 import { UseFormReturn } from "react-hook-form";
 import { CreateJobRequestSchema } from "./schema";
 import { Textarea } from "@/components/ui/text-area";
@@ -30,7 +30,7 @@ export default function GenerateDescription({
     const prompt = `Generate a brief job description for a ${jobType} job in the ${department} department, located at ${location}, due by ${dueDate}.`;
 
     try {
-      const result = await generateDescription(prompt);
+      const result = await generateResponseText(prompt);
       if (result.success) {
         form.setValue("description", result.text);
       } else {

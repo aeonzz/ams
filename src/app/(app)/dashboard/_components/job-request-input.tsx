@@ -66,7 +66,6 @@ import JobRequestInputSkeleton from "./job-request-input-skeleton";
 import { ComboboxInput } from "@/components/ui/combobox-input";
 import { Input } from "@/components/ui/input";
 import { socket } from "@/app/socket";
-import GenerateDescription from "./generate-description";
 
 interface JobRequestInputProps {
   mutateAsync: UseMutateAsyncFunction<

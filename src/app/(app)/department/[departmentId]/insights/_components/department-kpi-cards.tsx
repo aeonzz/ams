@@ -4,16 +4,17 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { Clock, Users, FileText, CheckCircle } from "lucide-react";
-import type { DepartmentWithRelations } from "prisma/generated/zod";
 import { DateRange } from "react-day-picker";
 import type { RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTypeSchema";
 import NumberFlow from "@number-flow/react";
+import { DepartmentOverViewData } from "./types";
 
 interface DepartmentKPICardsProps {
-  data: DepartmentWithRelations;
+  data: DepartmentOverViewData;
   className?: string;
   dateRange: DateRange | undefined;
   requestType: RequestTypeType | "";
+  exporting?: boolean;
 }
 
 export default function DepartmentKPICards({
@@ -21,28 +22,20 @@ export default function DepartmentKPICards({
   className,
   dateRange,
   requestType,
+  exporting = false,
 }: DepartmentKPICardsProps) {
-  const { request, userDepartments } = data;
+  const { requests, users } = data;
 
-  const filteredData = React.useMemo(() => {
-    let filtered = request;
-
-    if (dateRange?.from && dateRange?.to) {
-      filtered = filtered.filter((r) => {
-        const createdAt = new Date(r.createdAt);
-        return createdAt >= dateRange.from! && createdAt <= dateRange.to!;
-      });
-    }
-
-    if (requestType) {
-      filtered = filtered.filter((r) => r.type === requestType);
-    }
-
-    return filtered;
-  }, [request, dateRange, requestType]);
+  const [animatedTotalRequests, setAnimatedTotalRequests] = React.useState(0);
+  const [animatedCompletedTasks, setAnimatedCompletedTasks] = React.useState(0);
+  const [animatedActiveUsers, setAnimatedActiveUsers] = React.useState(0);
+  const [animatedCompletionHours, setAnimatedCompletionHours] =
+    React.useState(0);
+  const [animatedCompletionMinutes, setAnimatedCompletionMinutes] =
+    React.useState(0);
 
   const filteredCompletedTasks = React.useMemo(() => {
-    return filteredData.filter((r) => {
+    return requests.filter((r) => {
       const completedAt = r.completedAt ? new Date(r.completedAt) : null;
       return (
         completedAt &&
@@ -51,23 +44,12 @@ export default function DepartmentKPICards({
         (!dateRange?.to || completedAt <= dateRange.to)
       );
     });
-  }, [filteredData, dateRange]);
-
-  const filteredUserDepartments = React.useMemo(() => {
-    if (!dateRange?.from || !dateRange?.to) return userDepartments;
-
-    return userDepartments.filter((ud) => {
-      const createdAt = new Date(ud.createdAt);
-      return createdAt >= dateRange.from! && createdAt <= dateRange.to!;
-    });
-  }, [userDepartments, dateRange]);
+  }, [requests, dateRange]);
 
   // Calculate KPIs
-  const totalRequests = filteredData.length;
+  const totalRequests = requests.length;
   const completedTasks = filteredCompletedTasks.length;
-  const activeUsers = filteredUserDepartments.filter(
-    (ud) => !ud.user.isArchived
-  ).length;
+  const activeUsers = users.filter((ud) => !ud.user.isArchived).length;
 
   const totalCompletionTime = filteredCompletedTasks.reduce((sum, r) => {
     const completedAt = r.completedAt ? new Date(r.completedAt) : null;
@@ -96,47 +78,76 @@ export default function DepartmentKPICards({
   const periodText = dateRange ? "in selected period" : "overall";
   const typeText = requestType ? `for ${requestType} requests` : "";
 
+  React.useEffect(() => {
+    setAnimatedTotalRequests(totalRequests);
+    setAnimatedCompletedTasks(completedTasks);
+    setAnimatedActiveUsers(activeUsers);
+    setAnimatedCompletionHours(averageCompletionHours);
+    setAnimatedCompletionMinutes(averageCompletionMinutes);
+  }, [
+    totalRequests,
+    completedTasks,
+    activeUsers,
+    averageCompletionHours,
+    averageCompletionMinutes,
+  ]);
+
   return (
-    <div className={cn("grid gap-3 md:grid-cols-2 lg:grid-cols-4", className)}>
-      <Card>
+    <div
+      className={cn(
+        "grid w-full gap-3 md:grid-cols-2 lg:grid-cols-4",
+        className
+      )}
+    >
+      <Card className={cn(exporting && "bg-transparent")}>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Total Requests</CardTitle>
           <FileText className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <NumberFlow
-            willChange
-            continuous
-            value={totalRequests}
-            format={{ useGrouping: false }}
-            className="text-2xl font-bold"
-            aria-hidden
-          />
+          {exporting ? (
+            <p className="text-2xl font-bold">{totalRequests}</p>
+          ) : (
+            <NumberFlow
+              willChange
+              continuous
+              value={animatedTotalRequests}
+              format={{ useGrouping: false }}
+              className="text-2xl font-bold"
+              aria-hidden
+            />
+          )}
           <p className="text-xs text-muted-foreground">
             All submitted requests {periodText} {typeText}
           </p>
         </CardContent>
       </Card>
-      <Card>
+      <Card className={cn(exporting && "bg-transparent")}>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Completed Requests</CardTitle>
+          <CardTitle className="text-sm font-medium">
+            Completed Requests
+          </CardTitle>
           <CheckCircle className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <NumberFlow
-            willChange
-            continuous
-            value={completedTasks}
-            format={{ useGrouping: false }}
-            className="text-2xl font-bold"
-            aria-hidden
-          />
+          {exporting ? (
+            <p className="text-2xl font-bold">{completedTasks}</p>
+          ) : (
+            <NumberFlow
+              willChange
+              continuous
+              value={animatedCompletedTasks}
+              format={{ useGrouping: false }}
+              className="text-2xl font-bold"
+              aria-hidden
+            />
+          )}
           <p className="text-xs text-muted-foreground">
             Successfully completed requests {periodText} {typeText}
           </p>
         </CardContent>
       </Card>
-      <Card>
+      <Card className={cn(exporting && "bg-transparent")}>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">
             Average Completion Time
@@ -144,51 +155,67 @@ export default function DepartmentKPICards({
           <Clock className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">
-            <NumberFlow
-              willChange
-              continuous
-              value={averageCompletionHours}
-              format={{ useGrouping: false }}
-              isolate
-              aria-hidden
-            />{" "}
-            <span className="text-lg font-semibold text-muted-foreground">
-              hr
-            </span>{" "}
-            <NumberFlow
-              willChange
-              continuous
-              value={averageCompletionMinutes}
-              format={{ useGrouping: false }}
-              isolate
-              aria-hidden
-            />{" "}
-            <span className="text-lg font-semibold text-muted-foreground">
-              min
-            </span>
+          <div className="flex gap-1 text-2xl font-bold">
+            <div className="flex items-center gap-1">
+              {exporting ? (
+                <p className="text-2xl font-bold">{averageCompletionHours}</p>
+              ) : (
+                <NumberFlow
+                  willChange
+                  continuous
+                  value={animatedCompletionHours}
+                  format={{ useGrouping: false }}
+                  isolate
+                  aria-hidden
+                />
+              )}
+              <span className="text-lg font-semibold text-muted-foreground">
+                hr
+              </span>
+            </div>
+            <div className="flex items-center gap-1">
+              {exporting ? (
+                <p className="text-2xl font-bold">{averageCompletionMinutes}</p>
+              ) : (
+                <NumberFlow
+                  willChange
+                  continuous
+                  value={animatedCompletionMinutes}
+                  format={{ useGrouping: false }}
+                  isolate
+                  aria-hidden
+                />
+              )}
+              <span className="text-lg font-semibold text-muted-foreground">
+                min
+              </span>
+            </div>
           </div>
           <p className="text-xs text-muted-foreground">
             Average time to complete requests {periodText} {typeText}
           </p>
         </CardContent>
       </Card>
-      <Card>
+      <Card className={cn(exporting && "bg-transparent")}>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Active Users</CardTitle>
           <Users className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <NumberFlow
-            willChange
-            continuous
-            value={activeUsers}
-            format={{ useGrouping: false }}
-            className="text-2xl font-bold"
-            aria-hidden
-          />
+          {exporting ? (
+            <p className="text-2xl font-bold">{activeUsers}</p>
+          ) : (
+            <NumberFlow
+              willChange
+              continuous
+              value={animatedActiveUsers}
+              format={{ useGrouping: false }}
+              className="text-2xl font-bold"
+              aria-hidden
+            />
+          )}
           <p className="text-xs text-muted-foreground">
-            Users engaged with the department {periodText}
+            Users engaged with the system {periodText}
           </p>
         </CardContent>
       </Card>

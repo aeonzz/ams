@@ -14,6 +14,7 @@ interface SystemKPICardsProps {
   className?: string;
   dateRange: DateRange | undefined;
   requestType: RequestTypeType | "";
+  exporting?: boolean;
 }
 
 export default function SystemKPICards({
@@ -21,6 +22,7 @@ export default function SystemKPICards({
   className,
   dateRange,
   requestType,
+  exporting = false,
 }: SystemKPICardsProps) {
   const { requests, users } = data;
 
@@ -94,26 +96,30 @@ export default function SystemKPICards({
         className
       )}
     >
-      <Card>
+      <Card className={cn(exporting && "bg-transparent")}>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Total Requests</CardTitle>
           <FileText className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <NumberFlow
-            willChange
-            continuous
-            value={animatedTotalRequests}
-            format={{ useGrouping: false }}
-            className="text-2xl font-bold"
-            aria-hidden
-          />
+          {exporting ? (
+            <p className="text-2xl font-bold">{totalRequests}</p>
+          ) : (
+            <NumberFlow
+              willChange
+              continuous
+              value={animatedTotalRequests}
+              format={{ useGrouping: false }}
+              className="text-2xl font-bold"
+              aria-hidden
+            />
+          )}
           <p className="text-xs text-muted-foreground">
             All submitted requests {periodText} {typeText}
           </p>
         </CardContent>
       </Card>
-      <Card>
+      <Card className={cn(exporting && "bg-transparent")}>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">
             Completed Requests
@@ -121,20 +127,24 @@ export default function SystemKPICards({
           <CheckCircle className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <NumberFlow
-            willChange
-            continuous
-            value={animatedCompletedTasks}
-            format={{ useGrouping: false }}
-            className="text-2xl font-bold"
-            aria-hidden
-          />
+          {exporting ? (
+            <p className="text-2xl font-bold">{completedTasks}</p>
+          ) : (
+            <NumberFlow
+              willChange
+              continuous
+              value={animatedCompletedTasks}
+              format={{ useGrouping: false }}
+              className="text-2xl font-bold"
+              aria-hidden
+            />
+          )}
           <p className="text-xs text-muted-foreground">
             Successfully completed requests {periodText} {typeText}
           </p>
         </CardContent>
       </Card>
-      <Card>
+      <Card className={cn(exporting && "bg-transparent")}>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">
             Average Completion Time
@@ -142,49 +152,65 @@ export default function SystemKPICards({
           <Clock className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">
-            <NumberFlow
-              willChange
-              continuous
-              value={animatedCompletionHours}
-              format={{ useGrouping: false }}
-              isolate
-              aria-hidden
-            />{" "}
-            <span className="text-lg font-semibold text-muted-foreground">
-              hr
-            </span>{" "}
-            <NumberFlow
-              willChange
-              continuous
-              value={animatedCompletionMinutes}
-              format={{ useGrouping: false }}
-              isolate
-              aria-hidden
-            />{" "}
-            <span className="text-lg font-semibold text-muted-foreground">
-              min
-            </span>
+          <div className="flex gap-1 text-2xl font-bold">
+            <div className="flex items-end gap-1">
+              {exporting ? (
+                <p className="text-2xl font-bold">{averageCompletionHours}</p>
+              ) : (
+                <NumberFlow
+                  willChange
+                  continuous
+                  value={animatedCompletionHours}
+                  format={{ useGrouping: false }}
+                  isolate
+                  aria-hidden
+                />
+              )}
+              <span className="text-lg font-semibold text-muted-foreground">
+                hr
+              </span>
+            </div>
+            <div className="flex items-end gap-1">
+              {exporting ? (
+                <p className="text-2xl font-bold">{averageCompletionMinutes}</p>
+              ) : (
+                <NumberFlow
+                  willChange
+                  continuous
+                  value={animatedCompletionMinutes}
+                  format={{ useGrouping: false }}
+                  isolate
+                  aria-hidden
+                />
+              )}
+              <span className="text-lg font-semibold text-muted-foreground">
+                min
+              </span>
+            </div>
           </div>
           <p className="text-xs text-muted-foreground">
             Average time to complete requests {periodText} {typeText}
           </p>
         </CardContent>
       </Card>
-      <Card>
+      <Card className={cn(exporting && "bg-transparent")}>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Active Users</CardTitle>
           <Users className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <NumberFlow
-            willChange
-            continuous
-            value={animatedActiveUsers}
-            format={{ useGrouping: false }}
-            className="text-2xl font-bold"
-            aria-hidden
-          />
+          {exporting ? (
+            <p className="text-2xl font-bold">{activeUsers}</p>
+          ) : (
+            <NumberFlow
+              willChange
+              continuous
+              value={animatedActiveUsers}
+              format={{ useGrouping: false }}
+              className="text-2xl font-bold"
+              aria-hidden
+            />
+          )}
           <p className="text-xs text-muted-foreground">
             Users engaged with the system {periodText}
           </p>

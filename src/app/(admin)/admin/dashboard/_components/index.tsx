@@ -12,28 +12,13 @@ import { DateRange } from "react-day-picker";
 import { useQuery } from "@tanstack/react-query";
 import type { SystemOverViewData } from "./types";
 import axios from "axios";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-import DepartmentInsightsSkeleton from "../../departments/[departmentId]/insights/_components/department-insights-skeleton";
 import FetchDataError from "@/components/card/fetch-data-error";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { CalendarIcon, Check, ChevronsUpDown, Dot, X } from "lucide-react";
 import { cn, formatFullName, getStatusColor, textTransform } from "@/lib/utils";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import SystemKPICards from "./system-kpi-cards";
-import RequestChart from "./requests-chart";
+import RequestChart, { TimeRange } from "./requests-chart";
 import OverviewSkeleton from "./overview-skeleton";
 import {
   Card,
@@ -47,21 +32,21 @@ import Link from "next/link";
 import RequestsTable from "./requests-table";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
-
-interface jsPDFWithAutoTable extends jsPDF {
-  autoTable: (options: any) => jsPDF;
-}
+import DashboardActions from "./dashboard-actions";
+import { Dot } from "lucide-react";
+import { toast } from "sonner";
+import { generateSystemReport } from "@/lib/fill-pdf/system-report";
+import LoadingSpinner from "@/components/loaders/loading-spinner";
 
 export default function AdminDashboardScreen() {
+  const currentUser = useSession();
+  const [isGenerating, setIsGenerating] = React.useState(false);
+  const [timeRange, setTimeRange] = React.useState<TimeRange>("day");
   const [requestType, setRequestType] = React.useState<RequestTypeType | "">(
     ""
   );
-  const [open, setOpen] = React.useState(false);
-  const [date, setDate] = React.useState<DateRange | undefined>({
-    from: undefined,
-    to: undefined,
-  });
-
+  const [date, setDate] = React.useState<DateRange | undefined>(undefined);
+  console.log(date);
   const { data, isLoading, isError, refetch } = useQuery<SystemOverViewData>({
     queryKey: ["system-overview"],
     queryFn: async () => {
@@ -100,58 +85,23 @@ export default function AdminDashboardScreen() {
     };
   }, [data, date, requestType]);
 
-  const generatePDF = () => {
-    const doc = new jsPDF("landscape", "pt", "a4") as jsPDFWithAutoTable;
-    doc.text("System Overview Report", 40, 15);
-
-    // Add requests table
-    doc.autoTable({
-      head: [
-        [
-          "ID",
-          "Title",
-          "Type",
-          "Department",
-          "Status",
-          "Requester",
-          "Created",
-          "Completed",
-        ],
-      ],
-      body: filteredData.requests.map((request) => [
-        request.id,
-        request.title,
-        request.type,
-        request.department.name,
-        request.status,
-        formatFullName(
-          request.user.firstName,
-          request.user.middleName,
-          request.user.lastName
-        ),
-        new Date(request.createdAt).toLocaleDateString(),
-        request.completedAt
-          ? new Date(request.completedAt).toLocaleDateString()
-          : "-",
-      ]),
-      startY: 20,
-    });
-
-    // Add users table
-    // doc.addPage();
-    // doc.text("Users", 14, 15);
-    // doc.autoTable({
-    //   head: [["ID", "Name", "Created At"]],
-    //   body: filteredData.users.map((user) => [
-    //     user.id,
-    //     `${user.firstName} ${user.lastName}`,
-    //     new Date(user.createdAt).toLocaleDateString(),
-    //   ]),
-    //   startY: 20,
-    // });
-
-    // Save the PDF
-    doc.save("system-overview-report.pdf");
+  const generatePDF = async () => {
+    try {
+      setIsGenerating(true);
+      await generateSystemReport({
+        data: filteredData,
+        date,
+        requestType,
+        currentUser,
+        timeRange,
+        setTimeRange,
+      });
+    } catch (error) {
+      console.error("Error generating report:", error);
+      toast.error("An error occurred during generation. Please try again.");
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   return (
@@ -159,118 +109,16 @@ export default function AdminDashboardScreen() {
       <div className="flex h-[50px] items-center justify-between border-b px-3">
         <P className="font-medium">Overview</P>
         <div className="flex gap-2">
-          {(date?.from !== undefined || requestType !== "") && (
-            <Button
-              variant="ghost2"
-              size="sm"
-              onClick={() => {
-                setDate(undefined);
-                setRequestType("");
-              }}
-              className="flex items-center"
-            >
-              Clear
-              <X className="ml-1 size-4" />
-            </Button>
-          )}
-          <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="secondary"
-                role="combobox"
-                size="sm"
-                aria-expanded={open}
-                disabled={isLoading}
-                className={cn(
-                  "w-fit justify-between",
-                  !requestType && "text-muted-foreground"
-                )}
-              >
-                {requestType ? (
-                  <P>{textTransform(requestType)}</P>
-                ) : (
-                  "Select service..."
-                )}
-                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[200px] p-0">
-              <Command>
-                <CommandInput placeholder="Search service..." />
-                <CommandList>
-                  <CommandEmpty>No service found.</CommandEmpty>
-                  <CommandGroup>
-                    {RequestTypeSchema.options.map((service) => (
-                      <CommandItem
-                        key={service}
-                        value={service}
-                        onSelect={(currentValue) => {
-                          setRequestType(
-                            currentValue === requestType
-                              ? ""
-                              : (currentValue as RequestTypeType)
-                          );
-                          setOpen(false);
-                        }}
-                      >
-                        <Check
-                          className={cn(
-                            "mr-2 h-4 w-4",
-                            requestType === service
-                              ? "opacity-100"
-                              : "opacity-0"
-                          )}
-                        />
-                        {textTransform(service)}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                id="date"
-                variant="secondary"
-                disabled={isLoading}
-                size="sm"
-                className={cn(
-                  "w-fit justify-start text-left font-normal",
-                  !date && "text-muted-foreground"
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {date?.from ? (
-                  date.to ? (
-                    <>
-                      {format(date.from, "LLL dd, y")} -{" "}
-                      {format(date.to, "LLL dd, y")}
-                    </>
-                  ) : (
-                    format(date.from, "LLL dd, y")
-                  )
-                ) : (
-                  <span>Pick a date</span>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                initialFocus
-                mode="range"
-                defaultMonth={date?.from}
-                selected={date}
-                onSelect={setDate}
-                numberOfMonths={2}
-              />
-            </PopoverContent>
-            <AdminSearchInput />
-          </Popover>
-          <Button variant="outline" size="sm" onClick={generatePDF}>
-            Generate PDF Report
-          </Button>
+          <DashboardActions
+            requestType={requestType}
+            setRequestType={setRequestType}
+            isLoading={isLoading}
+            date={date}
+            setDate={setDate}
+            generatePDF={generatePDF}
+            isGenerating={isGenerating}
+          />
+          <AdminSearchInput />
         </div>
       </div>
       {isLoading ? (
@@ -295,6 +143,8 @@ export default function AdminDashboardScreen() {
               className="col-span-3 h-[400px]"
               requestType={requestType}
               dateRange={date}
+              timeRange={timeRange}
+              setTimeRange={setTimeRange}
             />
             <Card className="col-span-3 bg-secondary">
               <CardHeader>
@@ -366,11 +216,14 @@ export default function AdminDashboardScreen() {
                 >
                   <P>View All Requests </P>
                 </Link>
-                <Button variant="outline" size="sm">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={generatePDF}
+                  disabled={isGenerating}
+                >
+                  {isGenerating && <LoadingSpinner className="mr-2" />}
                   Generate Report
-                </Button>
-                <Button variant="outline" size="sm">
-                  System Settings
                 </Button>
               </CardContent>
             </Card>
