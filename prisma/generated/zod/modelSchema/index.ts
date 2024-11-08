@@ -16,7 +16,6 @@ export * from './VenueRequestSchema';
 export * from './VenueSchema';
 export * from './VenueSetupRequirementSchema';
 export * from './ReturnableRequestSchema';
-export * from './DepartmentBorrowingPolicySchema';
 export * from './InventorySubItemSchema';
 export * from './InventoryItemSchema';
 export * from './SupplyRequestSchema';

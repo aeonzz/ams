@@ -81,15 +81,7 @@ export function getDepartmentsColumns(): ColumnDef<DepartmentsTableType>[] {
       cell: ({ row }) => {
         return (
           <div className="flex items-center">
-            <Link
-              href={`/admin/departments/${row.original.id}/overview`}
-              className={cn(
-                buttonVariants({ variant: "link" }),
-                "p-0 text-foreground"
-              )}
-            >
-              <P className="truncate font-medium">{row.original.name}</P>
-            </Link>
+            <P className="truncate font-medium">{row.original.name}</P>
           </div>
         );
       },

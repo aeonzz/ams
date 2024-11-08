@@ -81,7 +81,6 @@ export default function ReturnableResourceDialog() {
             setAlertOpen(true);
           }
         }}
-        className={cn(itemid ? "max-w-4xl" : "")}
         isLoading={isPending}
       >
         <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>

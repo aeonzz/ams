@@ -7,21 +7,6 @@ import RequestStatusOverview from "./request-status-overview";
 import RequestChart, { TimeRange } from "./request-chart";
 import DepartmentKPICards from "./department-kpi-cards";
 import DepartmentRequestsTable from "./requests-table";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
-import { CalendarIcon, Check, ChevronsUpDown, X } from "lucide-react";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
 import { cn, textTransform } from "@/lib/utils";
 import { DateRange } from "react-day-picker";
 import { addDays, format } from "date-fns";
@@ -37,6 +22,7 @@ import { generateSystemReport } from "@/lib/fill-pdf/system-report";
 import { toast } from "sonner";
 import { useSession } from "@/lib/hooks/use-session";
 import { generateDepartmentReport } from "@/lib/fill-pdf/department-report";
+import { useDashboardActions } from "@/lib/hooks/use-dashboard-actions";
 
 interface DepartmentInsightsScreenProps {
   departmentId: string;
@@ -46,17 +32,9 @@ export default function DepartmentInsightsScreen({
   departmentId,
 }: DepartmentInsightsScreenProps) {
   const currentUser = useSession();
-  const [isGenerating, setIsGenerating] = React.useState(false);
-  const [timeRange, setTimeRange] = React.useState<TimeRange>("day");
-  const [requestType, setRequestType] = React.useState<RequestTypeType | "">(
-    ""
-  );
-  const [open, setOpen] = React.useState(false);
-  const [date, setDate] = React.useState<DateRange | undefined>({
-    from: undefined,
-    to: undefined,
-  });
   const { data, isLoading, isError, refetch } = useDepartmentData(departmentId);
+  const { setIsGenerating, timeRange, setTimeRange, requestType, date, reset } =
+    useDashboardActions();
 
   const filteredData = React.useMemo(() => {
     if (!data) return { requests: [], users: [] };
@@ -129,13 +107,9 @@ export default function DepartmentInsightsScreen({
         <div></div>
         <div className="flex gap-2">
           <DashboardActions
-            requestType={requestType}
-            setRequestType={setRequestType}
+            data={data}
             isLoading={isLoading}
-            date={date}
-            setDate={setDate}
             generatePDF={generatePDF}
-            isGenerating={isGenerating}
           />
         </div>
       </div>
@@ -146,33 +120,33 @@ export default function DepartmentInsightsScreen({
           dateRange={date}
           requestType={requestType}
         />
-        {/* <RequestStatusOverview
+        <RequestStatusOverview
           data={filteredData}
           requestType={requestType}
           className="h-[400px]"
-        /> */}
+        />
         <RequestChart
           data={filteredData}
-          className="col-span-3 h-[400px]"
+          className="col-span-2 h-[400px]"
           requestType={requestType}
           dateRange={date}
           timeRange={timeRange}
           setTimeRange={setTimeRange}
         />
-        {requestType === "BORROW" && (
+        {requestType === "" || requestType === "BORROW" ? (
           <>
-            <OverdueItemsChart
+            {/* <OverdueItemsChart
               data={data}
-              className="col-span-2 h-[400px]"
+              className="col-span-3 h-[400px]"
               dateRange={
                 date?.from && date?.to
                   ? { from: date.from, to: date.to }
                   : undefined
               }
-            />
+            /> */}
             <ItemRequestsChart
               data={data}
-              className="h-[400px]"
+              className="col-span-3 h-[400px]"
               dateRange={
                 date?.from && date?.to
                   ? { from: date.from, to: date.to }
@@ -180,7 +154,7 @@ export default function DepartmentInsightsScreen({
               }
             />
           </>
-        )}
+        ) : null}
         <DepartmentRequestsTable
           data={data.request}
           requestType={requestType}

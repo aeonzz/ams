@@ -258,7 +258,7 @@ export default function ReturnableResourceRequestInput({
                 )}
               />
             </div>
-            {itemId && selectedDepartmentId && (
+            {/* {itemId && selectedDepartmentId && (
               <div className="flex-1">
                 <DepartmentBorrowingPolicyCard
                   data={
@@ -268,7 +268,7 @@ export default function ReturnableResourceRequestInput({
                   }
                 />
               </div>
-            )}
+            )} */}
           </div>
           <Separator className="my-4" />
           <DialogFooter>

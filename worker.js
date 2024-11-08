@@ -152,11 +152,7 @@ async function updateInProgressStatus() {
         include: {
           request: {
             include: {
-              department: {
-                include: {
-                  departmentBorrowingPolicy: true,
-                },
-              },
+              department: true,
             },
           },
         },
@@ -164,17 +160,8 @@ async function updateInProgressStatus() {
 
       const overdueRequestIds = returnableRequests
         .filter((request) => {
-          const {
-            returnDateAndTime,
-            request: {
-              department: { departmentBorrowingPolicy },
-            },
-          } = request;
-          const gracePeriodEnd = addHours(
-            returnDateAndTime,
-            departmentBorrowingPolicy.gracePeriod
-          );
-          return now > gracePeriodEnd;
+          const { returnDateAndTime } = request;
+          return now > returnDateAndTime;
         })
         .map((request) => request.id);
 

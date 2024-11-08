@@ -48,28 +48,27 @@ model User {
 }
 
 model Department {
-  id                        String                     @id
-  description               String?
-  name                      String
-  acceptsJobs               Boolean                    @default(false)
-  managesTransport          Boolean                    @default(false)
-  managesBorrowRequest      Boolean                    @default(false)
-  managesSupplyRequest      Boolean                    @default(false)
-  managesFacility           Boolean                    @default(false)
-  createdAt                 DateTime                   @default(now())
-  updatedAt                 DateTime                   @updatedAt
-  responsibilities          String?
-  departmentType            DepartmentType
-  isArchived                Boolean                    @default(false)
-  userRole                  UserRole[]
-  inventoryItem             InventoryItem[]
-  userDepartments           UserDepartment[]
-  request                   Request[]
-  venue                     Venue[]
-  vehicle                   Vehicle[]
-  departmentBorrowingPolicy DepartmentBorrowingPolicy?
-  supplyItem                SupplyItem[]
-  files                     File[]
+  id                   String           @id
+  description          String?
+  name                 String
+  acceptsJobs          Boolean          @default(false)
+  managesTransport     Boolean          @default(false)
+  managesBorrowRequest Boolean          @default(false)
+  managesSupplyRequest Boolean          @default(false)
+  managesFacility      Boolean          @default(false)
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+  responsibilities     String?
+  departmentType       DepartmentType
+  isArchived           Boolean          @default(false)
+  userRole             UserRole[]
+  inventoryItem        InventoryItem[]
+  userDepartments      UserDepartment[]
+  request              Request[]
+  venue                Venue[]
+  vehicle              Vehicle[]
+  supplyItem           SupplyItem[]
+  files                File[]
 }
 
 model UserDepartment {
@@ -304,18 +303,6 @@ model ReturnableRequest {
   request           Request          @relation(fields: [requestId], references: [id], onDelete: Cascade)
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
-}
-
-model DepartmentBorrowingPolicy {
-  id                       String     @id
-  departmentId             String     @unique
-  department               Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
-  maxBorrowDuration        Int
-  penaltyBorrowBanDuration Int?
-  gracePeriod              Int
-  other                    String?
-  createdAt                DateTime   @default(now())
-  updatedAt                DateTime   @updatedAt
 }
 
 model InventorySubItem {

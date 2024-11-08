@@ -56,7 +56,6 @@ export async function getDepartments(input: GetDepartmentsSchema) {
               role: true,
             },
           },
-          departmentBorrowingPolicy: true,
         },
       }),
       db.department.count({ where }),
@@ -85,38 +84,25 @@ export const createDepartment = authedProcedure
   .createServerAction()
   .input(createDepartmentSchema)
   .handler(async ({ input }) => {
-    const {
-      path,
-      maxBorrowDuration,
-      gracePeriod,
-      penaltyBorrowBanDuration,
-      other,
-      managesBorrowRequest,
-      ...rest
-    } = input;
+    const { path, ...rest } = input;
 
     try {
       const departmentId = generateId(15);
 
-      const departmentBorrowingPolicyData = managesBorrowRequest
-        ? {
-            create: {
-              id: generateId(15),
-              maxBorrowDuration: maxBorrowDuration!,
-              penaltyBorrowBanDuration: penaltyBorrowBanDuration,
-              gracePeriod: gracePeriod!,
-              other,
-            },
-          }
-        : undefined;
+      // a = managesBorrowRequest
+      //   ? {
+      //       create: {
+      //         id: generateId(15),
+      //         penaltyBorrowBanDuration: penaltyBorrowBanDuration,
+      //         gracePeriod: gracePeriod!,
+      //         other,
+      //       },
+      //     }
+      //   : undefined;
 
       await db.department.create({
         data: {
           id: departmentId,
-          ...(departmentBorrowingPolicyData && {
-            departmentBorrowingPolicy: departmentBorrowingPolicyData,
-          }),
-          managesBorrowRequest: managesBorrowRequest,
           ...rest,
         },
       });
@@ -132,45 +118,32 @@ export const updateDepartment = authedProcedure
   .createServerAction()
   .input(updateDepartmentSchema)
   .handler(async ({ input }) => {
-    const {
-      departmentId,
-      path,
-      maxBorrowDuration,
-      gracePeriod,
-      penaltyBorrowBanDuration,
-      other,
-      managesBorrowRequest,
-      ...rest
-    } = input;
+    const { departmentId, path, ...rest } = input;
 
     try {
-      const departmentBorrowingPolicyData = managesBorrowRequest
-        ? {
-            upsert: {
-              create: {
-                id: generateId(15),
-                maxBorrowDuration: maxBorrowDuration!,
-                penaltyBorrowBanDuration: penaltyBorrowBanDuration,
-                gracePeriod: gracePeriod!,
-                other,
-              },
-              update: {
-                maxBorrowDuration: maxBorrowDuration!,
-                penaltyBorrowBanDuration: penaltyBorrowBanDuration,
-                gracePeriod: gracePeriod!,
-                other,
-              },
-            },
-          }
-        : undefined;
+      // const departmentBorrowingPolicyData = managesBorrowRequest
+      //   ? {
+      //       upsert: {
+      //         create: {
+      //           id: generateId(15),
+      //           maxBorrowDuration: maxBorrowDuration!,
+      //           penaltyBorrowBanDuration: penaltyBorrowBanDuration,
+      //           gracePeriod: gracePeriod!,
+      //           other,
+      //         },
+      //         update: {
+      //           maxBorrowDuration: maxBorrowDuration!,
+      //           penaltyBorrowBanDuration: penaltyBorrowBanDuration,
+      //           gracePeriod: gracePeriod!,
+      //           other,
+      //         },
+      //       },
+      //     }
+      //   : undefined;
 
       await db.department.update({
         where: { id: departmentId },
         data: {
-          ...(departmentBorrowingPolicyData && {
-            departmentBorrowingPolicy: departmentBorrowingPolicyData,
-          }),
-          managesBorrowRequest: managesBorrowRequest,
           ...rest,
         },
       });

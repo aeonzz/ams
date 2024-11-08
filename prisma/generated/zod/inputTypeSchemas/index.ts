@@ -17,7 +17,6 @@ export { VenueRequestScalarFieldEnumSchema } from './VenueRequestScalarFieldEnum
 export { VenueScalarFieldEnumSchema } from './VenueScalarFieldEnumSchema';
 export { VenueSetupRequirementScalarFieldEnumSchema } from './VenueSetupRequirementScalarFieldEnumSchema';
 export { ReturnableRequestScalarFieldEnumSchema } from './ReturnableRequestScalarFieldEnumSchema';
-export { DepartmentBorrowingPolicyScalarFieldEnumSchema } from './DepartmentBorrowingPolicyScalarFieldEnumSchema';
 export { InventorySubItemScalarFieldEnumSchema } from './InventorySubItemScalarFieldEnumSchema';
 export { InventoryItemScalarFieldEnumSchema } from './InventoryItemScalarFieldEnumSchema';
 export { SupplyRequestScalarFieldEnumSchema } from './SupplyRequestScalarFieldEnumSchema';

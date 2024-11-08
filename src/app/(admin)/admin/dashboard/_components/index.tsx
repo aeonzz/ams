@@ -37,16 +37,19 @@ import { Dot } from "lucide-react";
 import { toast } from "sonner";
 import { generateSystemReport } from "@/lib/fill-pdf/system-report";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
+import { useDashboardActions } from "@/lib/hooks/use-dashboard-actions";
 
 export default function AdminDashboardScreen() {
   const currentUser = useSession();
-  const [isGenerating, setIsGenerating] = React.useState(false);
-  const [timeRange, setTimeRange] = React.useState<TimeRange>("day");
-  const [requestType, setRequestType] = React.useState<RequestTypeType | "">(
-    ""
-  );
-  const [date, setDate] = React.useState<DateRange | undefined>(undefined);
-  console.log(date);
+  const {
+    setIsGenerating,
+    isGenerating,
+    timeRange,
+    setTimeRange,
+    requestType,
+    date,
+    reset,
+  } = useDashboardActions();
   const { data, isLoading, isError, refetch } = useQuery<SystemOverViewData>({
     queryKey: ["system-overview"],
     queryFn: async () => {
@@ -109,15 +112,7 @@ export default function AdminDashboardScreen() {
       <div className="flex h-[50px] items-center justify-between border-b px-3">
         <P className="font-medium">Overview</P>
         <div className="flex gap-2">
-          <DashboardActions
-            requestType={requestType}
-            setRequestType={setRequestType}
-            isLoading={isLoading}
-            date={date}
-            setDate={setDate}
-            generatePDF={generatePDF}
-            isGenerating={isGenerating}
-          />
+          <DashboardActions isLoading={isLoading} generatePDF={generatePDF} />
           <AdminSearchInput />
         </div>
       </div>

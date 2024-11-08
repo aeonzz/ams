@@ -101,12 +101,16 @@ export default function DepartmentKPICards({
     >
       <Card className={cn(exporting && "bg-transparent")}>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Requests</CardTitle>
+          <CardTitle
+            className={cn("text-sm font-medium", exporting && "text-black")}
+          >
+            Total Requests
+          </CardTitle>
           <FileText className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
           {exporting ? (
-            <p className="text-2xl font-bold">{totalRequests}</p>
+            <p className="text-2xl font-bold text-black">{totalRequests}</p>
           ) : (
             <NumberFlow
               willChange
@@ -117,21 +121,28 @@ export default function DepartmentKPICards({
               aria-hidden
             />
           )}
-          <p className="text-xs text-muted-foreground">
+          <p
+            className={cn(
+              "text-xs text-muted-foreground",
+              exporting && "text-black"
+            )}
+          >
             All submitted requests {periodText} {typeText}
           </p>
         </CardContent>
       </Card>
       <Card className={cn(exporting && "bg-transparent")}>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">
+          <CardTitle
+            className={cn("text-sm font-medium", exporting && "text-black")}
+          >
             Completed Requests
           </CardTitle>
           <CheckCircle className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
           {exporting ? (
-            <p className="text-2xl font-bold">{completedTasks}</p>
+            <p className="text-2xl font-bold text-black">{completedTasks}</p>
           ) : (
             <NumberFlow
               willChange
@@ -142,14 +153,21 @@ export default function DepartmentKPICards({
               aria-hidden
             />
           )}
-          <p className="text-xs text-muted-foreground">
+          <p
+            className={cn(
+              "text-xs text-muted-foreground",
+              exporting && "text-black"
+            )}
+          >
             Successfully completed requests {periodText} {typeText}
           </p>
         </CardContent>
       </Card>
       <Card className={cn(exporting && "bg-transparent")}>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">
+          <CardTitle
+            className={cn("text-sm font-medium", exporting && "text-black")}
+          >
             Average Completion Time
           </CardTitle>
           <Clock className="h-4 w-4 text-muted-foreground" />
@@ -158,7 +176,9 @@ export default function DepartmentKPICards({
           <div className="flex gap-1 text-2xl font-bold">
             <div className="flex items-center gap-1">
               {exporting ? (
-                <p className="text-2xl font-bold">{averageCompletionHours}</p>
+                <p className="text-2xl font-bold text-black">
+                  {averageCompletionHours}
+                </p>
               ) : (
                 <NumberFlow
                   willChange
@@ -175,7 +195,9 @@ export default function DepartmentKPICards({
             </div>
             <div className="flex items-center gap-1">
               {exporting ? (
-                <p className="text-2xl font-bold">{averageCompletionMinutes}</p>
+                <p className="text-2xl font-bold text-black">
+                  {averageCompletionMinutes}
+                </p>
               ) : (
                 <NumberFlow
                   willChange
@@ -191,19 +213,28 @@ export default function DepartmentKPICards({
               </span>
             </div>
           </div>
-          <p className="text-xs text-muted-foreground">
+          <p
+            className={cn(
+              "text-xs text-muted-foreground",
+              exporting && "text-black"
+            )}
+          >
             Average time to complete requests {periodText} {typeText}
           </p>
         </CardContent>
       </Card>
       <Card className={cn(exporting && "bg-transparent")}>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Active Users</CardTitle>
+          <CardTitle
+            className={cn("text-sm font-medium", exporting && "text-black")}
+          >
+            Active Users
+          </CardTitle>
           <Users className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
           {exporting ? (
-            <p className="text-2xl font-bold">{activeUsers}</p>
+            <p className="text-2xl font-bold text-black">{activeUsers}</p>
           ) : (
             <NumberFlow
               willChange
@@ -214,7 +245,12 @@ export default function DepartmentKPICards({
               aria-hidden
             />
           )}
-          <p className="text-xs text-muted-foreground">
+          <p
+            className={cn(
+              "text-xs text-muted-foreground",
+              exporting && "text-black"
+            )}
+          >
             Users engaged with the system {periodText}
           </p>
         </CardContent>

@@ -63,7 +63,7 @@ export default function RequestStatusOverview({
   className,
   requestType,
 }: RequestStatusOverviewProps) {
-  const { requests } = data;
+  const { requests: request } = data;
 
   const filteredRequests = React.useMemo(() => {
     return requestType
@@ -171,7 +171,7 @@ export default function RequestStatusOverview({
           %
         </div>
         <div className="text-center leading-none text-muted-foreground">
-          Showing request status breakdown for {name}
+          Showing request status breakdown for the department
           {requestType && ` - ${textTransform(requestType)} requests`}
         </div>
       </CardFooter>

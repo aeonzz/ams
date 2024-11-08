@@ -13,11 +13,7 @@ export async function GET(req: Request) {
       },
       include: {
         inventorySubItems: true,
-        department: {
-          include: {
-            departmentBorrowingPolicy: true,
-          },
-        },
+        department: true,
       },
     });
 

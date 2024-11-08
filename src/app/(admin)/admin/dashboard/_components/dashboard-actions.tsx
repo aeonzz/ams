@@ -28,37 +28,36 @@ import {
 } from "lucide-react";
 import { cn, textTransform } from "@/lib/utils";
 import { P } from "@/components/typography/text";
-import { RequestTypeSchema } from "prisma/generated/zod";
+import {
+  DepartmentWithRelations,
+  RequestTypeSchema,
+} from "prisma/generated/zod";
 import type { RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTypeSchema";
 import { format } from "date-fns";
 import { DateRange } from "react-day-picker";
 import { Calendar } from "@/components/ui/calendar";
 import { Separator } from "@/components/ui/separator";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
+import { useDashboardActions } from "@/lib/hooks/use-dashboard-actions";
 
 interface DashboardActionsProps {
-  requestType: RequestTypeType | "";
   isLoading: boolean;
-  setRequestType: (requestType: RequestTypeType | "") => void;
-  date: DateRange | undefined;
-  setDate: (date: DateRange | undefined) => void;
+  data?: DepartmentWithRelations;
   generatePDF: () => void;
-  isGenerating: boolean;
 }
 
 export default function DashboardActions({
-  requestType,
-  setRequestType,
+  data,
   isLoading,
-  date,
-  setDate,
   generatePDF,
-  isGenerating,
 }: DashboardActionsProps) {
   const [open, setOpen] = React.useState(false);
+  const { isGenerating, requestType, setRequestType, date, setDate, reset } =
+    useDashboardActions();
+
   const isFiltered = date?.from !== undefined || requestType !== "";
   return (
-    <Popover>
+    <Popover modal>
       <PopoverTrigger asChild>
         <Button
           variant="secondary"
@@ -87,7 +86,7 @@ export default function DashboardActions({
                   role="combobox"
                   size="sm"
                   aria-expanded={open}
-                  disabled={isLoading}
+                  disabled={isLoading || isGenerating}
                   className={cn("flex-1 justify-between")}
                 >
                   {requestType ? (
@@ -104,30 +103,51 @@ export default function DashboardActions({
                   <CommandList>
                     <CommandEmpty>No service found.</CommandEmpty>
                     <CommandGroup>
-                      {RequestTypeSchema.options.map((service) => (
-                        <CommandItem
-                          key={service}
-                          value={service}
-                          onSelect={(currentValue) => {
-                            setRequestType(
-                              currentValue === requestType
-                                ? ""
-                                : (currentValue as RequestTypeType)
-                            );
-                            setOpen(false);
-                          }}
-                        >
-                          <Check
-                            className={cn(
-                              "mr-2 h-4 w-4",
-                              requestType === service
-                                ? "opacity-100"
-                                : "opacity-0"
-                            )}
-                          />
-                          {textTransform(service)}
-                        </CommandItem>
-                      ))}
+                      {RequestTypeSchema.options
+                        .filter((service) => {
+                          if (!data) return true;
+                          if (service === "JOB" && !data.acceptsJobs)
+                            return false;
+                          if (
+                            service === "BORROW" &&
+                            !data.managesBorrowRequest
+                          )
+                            return false;
+                          if (
+                            service === "SUPPLY" &&
+                            !data.managesSupplyRequest
+                          )
+                            return false;
+                          if (service === "VENUE" && !data.managesFacility)
+                            return false;
+                          if (service === "TRANSPORT" && !data.managesTransport)
+                            return false;
+                          return true;
+                        })
+                        .map((service) => (
+                          <CommandItem
+                            key={service}
+                            value={service}
+                            onSelect={(currentValue) => {
+                              setRequestType(
+                                currentValue === requestType
+                                  ? ""
+                                  : (currentValue as RequestTypeType)
+                              );
+                              setOpen(false);
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                requestType === service
+                                  ? "opacity-100"
+                                  : "opacity-0"
+                              )}
+                            />
+                            {textTransform(service)}
+                          </CommandItem>
+                        ))}
                     </CommandGroup>
                   </CommandList>
                 </Command>
@@ -144,7 +164,7 @@ export default function DashboardActions({
                 <Button
                   id="date"
                   variant="secondary"
-                  disabled={isLoading}
+                  disabled={isLoading || isGenerating}
                   size="sm"
                   className={cn("flex-1 justify-between")}
                 >

@@ -183,7 +183,7 @@ export default function ReturnableResourceDetails({
                 title="Ready for Pickup"
                 description="The item is now ready to be picked up."
               />
-              <Separator className="my-3" />
+              <Separator className="my-6" />
             </div>
           )}
           {data.inProgress && data.isOverdue && (
@@ -192,6 +192,16 @@ export default function ReturnableResourceDetails({
                 variant="warning"
                 title="Request Overdue"
                 description="This request is overdue. The item has not been returned yet. Please return it as soon as possible."
+              />
+              <Separator className="my-6" />
+            </div>
+          )}
+          {data.isOverdue && (
+            <div>
+              <AlertCard
+                variant="warning"
+                title="Request Overdue"
+                description="This request is overdue."
               />
               <Separator className="my-6" />
             </div>

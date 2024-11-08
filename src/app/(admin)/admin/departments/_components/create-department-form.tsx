@@ -275,7 +275,7 @@ export default function CreateDepartmentForm({
                 </FormItem>
               )}
             />
-            {form.watch("managesBorrowRequest") && (
+            {/* {form.watch("managesBorrowRequest") && (
               <Card className="space-y-3 bg-secondary p-3">
                 <FormField
                   control={form.control}
@@ -413,7 +413,7 @@ export default function CreateDepartmentForm({
                   )}
                 />
               </Card>
-            )}
+            )} */}
             <FormField
               control={form.control}
               name="managesSupplyRequest"

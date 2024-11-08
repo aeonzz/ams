@@ -13,39 +13,34 @@ const baseDepartmentSchema = z.object({
   managesSupplyRequest: z.boolean().default(false).optional(),
   managesFacility: z.boolean().default(false).optional(),
   responsibilities: z.string().optional(),
-  maxBorrowDuration: z.number().int().optional(),
-  penaltyBorrowBanDuration: z.number().int().optional(),
-  gracePeriod: z.number().int().optional(),
-  other: z.string().optional(),
   departmentType: DepartmentTypeSchema,
   path: z.string(),
 });
 
-export const createDepartmentSchema = baseDepartmentSchema
-  .refine(
-    (data) =>
-      !data.acceptsJobs ||
-      (data.responsibilities && data.responsibilities.length > 0),
-    {
-      path: ["responsibilities"],
-      message: "Responsibilities are required if acceptsJobs is true",
-    }
-  )
-  .refine(
-    (data) =>
-      !data.managesBorrowRequest || data.maxBorrowDuration !== undefined,
-    {
-      path: ["maxBorrowDuration"],
-      message: "Max Borrow Duration is required",
-    }
-  )
-  .refine(
-    (data) => !data.managesBorrowRequest || data.gracePeriod !== undefined,
-    {
-      path: ["gracePeriod"],
-      message: "Grace Period is required",
-    }
-  );
+export const createDepartmentSchema = baseDepartmentSchema.refine(
+  (data) =>
+    !data.acceptsJobs ||
+    (data.responsibilities && data.responsibilities.length > 0),
+  {
+    path: ["responsibilities"],
+    message: "Responsibilities are required if accepting jobs",
+  }
+);
+// .refine(
+//   (data) =>
+//     !data.managesBorrowRequest || data.maxBorrowDuration !== undefined,
+//   {
+//     path: ["maxBorrowDuration"],
+//     message: "Max Borrow Duration is required",
+//   }
+// )
+// .refine(
+//   (data) => !data.managesBorrowRequest || data.gracePeriod !== undefined,
+//   {
+//     path: ["gracePeriod"],
+//     message: "Grace Period is required",
+//   }
+// );
 
 export type CreateDepartmentSchema = z.infer<typeof createDepartmentSchema>;
 
@@ -64,22 +59,22 @@ export const updateDepartmentSchema = baseUpdateDepartmentSchema
       message: "Responsibilities are required if acceptsJobs is true",
     }
   )
-  .refine(
-    (data) =>
-      !data.managesBorrowRequest || data.maxBorrowDuration !== undefined,
-    {
-      path: ["maxBorrowDuration"],
-      message:
-        "Max Borrow Duration is required if managesBorrowRequest is true",
-    }
-  )
-  .refine(
-    (data) => !data.managesBorrowRequest || data.gracePeriod !== undefined,
-    {
-      path: ["gracePeriod"],
-      message: "Grace Period is required if managesBorrowRequest is true",
-    }
-  );
+  // .refine(
+  //   (data) =>
+  //     !data.managesBorrowRequest || data.maxBorrowDuration !== undefined,
+  //   {
+  //     path: ["maxBorrowDuration"],
+  //     message:
+  //       "Max Borrow Duration is required if managesBorrowRequest is true",
+  //   }
+  // )
+  // .refine(
+  //   (data) => !data.managesBorrowRequest || data.gracePeriod !== undefined,
+  //   {
+  //     path: ["gracePeriod"],
+  //     message: "Grace Period is required if managesBorrowRequest is true",
+  //   }
+  // );
 
 export type UpdateDepartmentSchema = z.infer<typeof updateDepartmentSchema>;
 
