@@ -89,12 +89,6 @@ export function UpdateDepartmentSheet({
       managesSupplyRequest: department.managesSupplyRequest,
       path: pathname,
       departmentId: department.id,
-      gracePeriod: department.departmentBorrowingPolicy?.gracePeriod,
-      maxBorrowDuration:
-        department.departmentBorrowingPolicy?.maxBorrowDuration,
-      penaltyBorrowBanDuration:
-        department.departmentBorrowingPolicy?.penaltyBorrowBanDuration || 0,
-      other: department.departmentBorrowingPolicy?.other || "",
     },
   });
 
@@ -115,12 +109,6 @@ export function UpdateDepartmentSheet({
       managesSupplyRequest: department.managesSupplyRequest,
       path: pathname,
       departmentId: department.id,
-      gracePeriod: department.departmentBorrowingPolicy?.gracePeriod,
-      maxBorrowDuration:
-        department.departmentBorrowingPolicy?.maxBorrowDuration,
-      penaltyBorrowBanDuration:
-        department.departmentBorrowingPolicy?.penaltyBorrowBanDuration || 0,
-      other: department.departmentBorrowingPolicy?.other || "",
     });
   }, [department, form, props.open]);
 
@@ -144,8 +132,6 @@ export function UpdateDepartmentSheet({
       },
     });
   }
-
-  console.log(form.formState.errors);
 
   return (
     <Sheet {...props}>
@@ -288,267 +274,123 @@ export function UpdateDepartmentSheet({
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="acceptsJobs"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-sm">Accept Jobs</FormLabel>
-                      <FormDescription className="text-xs">
-                        Indicates whether this department can handle job
-                        requests.
-                      </FormDescription>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="managesTransport"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-sm">
-                        Transport Services
-                      </FormLabel>
-                      <FormDescription className="text-xs">
-                        Indicates whether this department offers or manages
-                        transport services.
-                      </FormDescription>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="managesBorrowRequest"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-sm">
-                        Borrow Request Management
-                      </FormLabel>
-                      <FormDescription className="text-xs">
-                        Indicates whether this department manages or handles
-                        borrow requests.
-                      </FormDescription>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              {form.watch("managesBorrowRequest") && (
-                <Card className="space-y-3 bg-transparent p-3">
+              {!removeField && (
+                <>
                   <FormField
                     control={form.control}
-                    name="maxBorrowDuration"
+                    name="acceptsJobs"
                     render={({ field }) => (
-                      <FormItem className="flex-1">
-                        <FormLabel>Max Borrow Duration (Hours)</FormLabel>
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-sm">Accept Jobs</FormLabel>
+                          <FormDescription className="text-xs">
+                            Indicates whether this department can handle job
+                            requests.
+                          </FormDescription>
+                        </div>
                         <FormControl>
-                          <Input
-                            type="number"
-                            placeholder="Borrow Duration"
-                            autoComplete="off"
-                            {...field}
-                            min={0}
-                            onChange={(e) => {
-                              const value = e.target.value;
-                              if (
-                                value === "" ||
-                                (parseInt(value, 10) >= 0 &&
-                                  parseInt(value, 10) <= 99)
-                              ) {
-                                field.onChange(parseInt(e.target.value, 10));
-                              }
-                            }}
-                            onWheel={(e) => e.currentTarget.blur()}
-                            onKeyDown={(e) => {
-                              if (
-                                e.key === "ArrowUp" ||
-                                e.key === "ArrowDown"
-                              ) {
-                                e.preventDefault();
-                              }
-                            }}
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
                           />
                         </FormControl>
-                        <FormMessage />
                       </FormItem>
                     )}
                   />
                   <FormField
                     control={form.control}
-                    name="gracePeriod"
+                    name="managesTransport"
                     render={({ field }) => (
-                      <FormItem className="flex-1">
-                        <FormLabel>Grace Period (Hours)</FormLabel>
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-sm">
+                            Transport Services
+                          </FormLabel>
+                          <FormDescription className="text-xs">
+                            Indicates whether this department offers or manages
+                            transport services.
+                          </FormDescription>
+                        </div>
                         <FormControl>
-                          <Input
-                            type="number"
-                            placeholder="Period"
-                            autoComplete="off"
-                            {...field}
-                            min={0}
-                            onChange={(e) => {
-                              const value = e.target.value;
-                              if (
-                                value === "" ||
-                                (parseInt(value, 10) >= 0 &&
-                                  parseInt(value, 10) <= 99)
-                              ) {
-                                field.onChange(parseInt(e.target.value, 10));
-                              }
-                            }}
-                            onWheel={(e) => e.currentTarget.blur()}
-                            onKeyDown={(e) => {
-                              if (
-                                e.key === "ArrowUp" ||
-                                e.key === "ArrowDown"
-                              ) {
-                                e.preventDefault();
-                              }
-                            }}
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
                           />
                         </FormControl>
-                        <FormMessage />
                       </FormItem>
                     )}
                   />
                   <FormField
                     control={form.control}
-                    name="penaltyBorrowBanDuration"
+                    name="managesBorrowRequest"
                     render={({ field }) => (
-                      <FormItem className="flex-1">
-                        <FormLabel>
-                          Penalty Borrow Ban Duration (Hours){" "}
-                          <span className="text-xs text-muted-foreground">
-                            (Optional)
-                          </span>
-                        </FormLabel>
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-sm">
+                            Borrow Request Management
+                          </FormLabel>
+                          <FormDescription className="text-xs">
+                            Indicates whether this department manages or handles
+                            borrow requests.
+                          </FormDescription>
+                        </div>
                         <FormControl>
-                          <Input
-                            type="number"
-                            placeholder="Ban Duration"
-                            autoComplete="off"
-                            {...field}
-                            min={0}
-                            onChange={(e) => {
-                              const value = e.target.value;
-                              if (
-                                value === "" ||
-                                (parseInt(value, 10) >= 0 &&
-                                  parseInt(value, 10) <= 99)
-                              ) {
-                                field.onChange(parseInt(e.target.value, 10));
-                              }
-                            }}
-                            onWheel={(e) => e.currentTarget.blur()}
-                            onKeyDown={(e) => {
-                              if (
-                                e.key === "ArrowUp" ||
-                                e.key === "ArrowDown"
-                              ) {
-                                e.preventDefault();
-                              }
-                            }}
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
                           />
                         </FormControl>
-                        <FormMessage />
                       </FormItem>
                     )}
                   />
                   <FormField
                     control={form.control}
-                    name="other"
+                    name="managesSupplyRequest"
                     render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Other Info.{" "}
-                          <span className="text-xs text-muted-foreground">
-                            (Optional)
-                          </span>
-                        </FormLabel>
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-sm">
+                            Supply Request Management
+                          </FormLabel>
+                          <FormDescription className="text-xs">
+                            Indicates whether this department manages or handles
+                            supply requests.
+                          </FormDescription>
+                        </div>
                         <FormControl>
-                          <Textarea
-                            rows={1}
-                            maxRows={10}
-                            placeholder="Info..."
-                            className="min-h-[100px] flex-grow resize-none bg-transparent text-sm"
-                            disabled={isPending}
-                            {...field}
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
                           />
                         </FormControl>
-                        <FormMessage />
                       </FormItem>
                     )}
                   />
-                </Card>
+                  <FormField
+                    control={form.control}
+                    name="managesFacility"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-sm">
+                            Facility Management
+                          </FormLabel>
+                          <FormDescription className="text-xs">
+                            Indicates whether this department manages or handles
+                            facilities.
+                          </FormDescription>
+                        </div>
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </>
               )}
-              <FormField
-                control={form.control}
-                name="managesSupplyRequest"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-sm">
-                        Supply Request Management
-                      </FormLabel>
-                      <FormDescription className="text-xs">
-                        Indicates whether this department manages or handles
-                        supply requests.
-                      </FormDescription>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="managesFacility"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-sm">
-                        Facility Management
-                      </FormLabel>
-                      <FormDescription className="text-xs">
-                        Indicates whether this department manages or handles
-                        facilities.
-                      </FormDescription>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
             </div>
             <div>
               <Separator className="my-2" />

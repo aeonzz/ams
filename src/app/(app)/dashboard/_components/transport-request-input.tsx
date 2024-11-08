@@ -48,6 +48,7 @@ import TransportRequestInputSkeleton from "./transport-request-input-skeleton";
 import ScheduledEventCardSkeleton from "./scheduled-event-card-skeleton";
 import { TagInput } from "@/components/ui/tag-input";
 import { Info } from "lucide-react";
+import { socket } from "@/app/socket";
 
 interface VenueRequestInputProps {
   mutateAsync: UseMutateAsyncFunction<
@@ -133,9 +134,8 @@ export default function TransportRequestInput({
     toast.promise(mutateAsync(data), {
       loading: "Submitting...",
       success: () => {
-        queryClient.invalidateQueries({
-          queryKey: ["user-dashboard-overview"],
-        });
+        socket.emit("notifications");
+        socket.emit("request_update");
         handleOpenChange(false);
         return "Your request has been submitted and is awaiting approval.";
       },

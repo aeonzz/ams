@@ -249,20 +249,6 @@ export default function DepartmentOverviewScreen({
             <div className="flex-1">
               <TotalOpenRequests totalRequestsCount={openRequests.length} />
             </div>
-            <Card className="flex-1 bg-secondary">
-              <CardHeader className="p-4 pb-0">
-                <CardTitle>Pending Jobs</CardTitle>
-                <CardDescription>{description}</CardDescription>
-              </CardHeader>
-              <CardContent className="flex flex-row items-baseline gap-4 p-4 pt-0">
-                <div className="flex items-baseline gap-1 text-3xl font-bold tabular-nums leading-none">
-                  {pendingJobsCount}
-                  <span className="text-sm font-normal text-muted-foreground">
-                    jobs
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
           </div>
           <div className="">
             <OpenRequestsTable data={openRequests} />

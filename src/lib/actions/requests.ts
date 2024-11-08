@@ -169,8 +169,8 @@ export const createVenueRequest = authedProcedure
                  Now, create a title for the request using the provided details above.`,
       });
 
-      const requestId = `REQ-${generateId(15)}`;
-      const venuRequestId = `VRQ-${generateId(15)}`;
+      const requestId = `REQ-${generateId(3)}`;
+      const venuRequestId = `VRQ-${generateId(3)}`;
 
       const createdRequest = await db.request.create({
         data: {
@@ -257,10 +257,10 @@ export const createTransportRequest = authedProcedure
                  Now, create a title for the request using the provided details above.`,
       });
 
-      const requestId = `REQ-${generateId(15)}`;
-      const transportRequestId = `TRQ-${generateId(15)}`;
+      const requestId = `REQ-${generateId(3)}`;
+      const transportRequestId = `TRQ-${generateId(3)}`;
 
-      await db.request.create({
+      const createdRequest = await db.request.create({
         data: {
           id: requestId,
           userId: user.id,
@@ -281,6 +281,16 @@ export const createTransportRequest = authedProcedure
             },
           },
         },
+      });
+
+      await createNotification({
+        resourceId: `/request/${createdRequest.id}`,
+        title: `New Job Request: ${createdRequest.title}`,
+        resourceType: "REQUEST",
+        notificationType: "INFO",
+        message: `A new transport request titled "${createdRequest.title}" has been submitted. Please review the details and take the necessary actions.`,
+        recepientIds: [createdRequest.departmentId],
+        userId: user.id,
       });
 
       return revalidatePath(path);

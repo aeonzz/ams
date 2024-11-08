@@ -89,7 +89,6 @@ export default function JobRequestInput({
   handleOpenChange,
   isFieldsDirty,
 }: JobRequestInputProps) {
-  const queryClient = useQueryClient();
   const pathname = usePathname();
 
   const { data, isLoading } = useQuery<Department[]>({
@@ -130,9 +129,6 @@ export default function JobRequestInput({
       toast.promise(mutateAsync(data), {
         loading: "Submitting...",
         success: () => {
-          queryClient.invalidateQueries({
-            queryKey: ["user-dashboard-overview"],
-          });
           socket.emit("notifications");
           socket.emit("request_update");
           handleOpenChange(false);

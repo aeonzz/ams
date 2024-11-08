@@ -229,7 +229,7 @@ export default function JobRequestDetails({
     const generateAndDownloadPDF = async () => {
       try {
         const pdfBlob = await fillJobRequestFormPDF({
-          id: data.id,
+          id: data.requestId,
           description: data.description,
           location: data.location,
           createdAt: data.createdAt,

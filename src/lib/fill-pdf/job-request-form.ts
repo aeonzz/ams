@@ -80,8 +80,8 @@ export async function fillJobRequestFormPDF(
   console.log(`PDF dimensions: ${width}x${height}`);
 
   const fieldPositions: FieldPositions = {
-    id: { x: 70, y: height - 260, size: 10, maxWidth: 200 },
-    description: { x: 143, y: height - 280, size: 6, maxWidth: 200 },
+    id: { x: 100, y: height - 260, size: 9, maxWidth: 200 },
+    description: { x: 143, y: height - 280, size: 8, maxWidth: 200 },
     location: { x: 350, y: height - 260, size: 10, maxWidth: 100 },
     createdAt: { x: 600, y: height - 187, size: 10, maxWidth: 150 },
     startDate: { x: 456, y: height - 260, size: 10, maxWidth: 50 },

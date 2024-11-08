@@ -153,9 +153,6 @@ export default function ReturnableResourceRequestInput({
     toast.promise(mutateAsync(data), {
       loading: "Submitting...",
       success: () => {
-        queryClient.invalidateQueries({
-          queryKey: ["user-dashboard-overview"],
-        });
         socket.emit("notifications");
         socket.emit("request_update");
         handleOpenChange(false);

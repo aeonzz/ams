@@ -65,7 +65,7 @@ export const createJobRequest = authedProcedure
 
       const createdRequest = await db.request.create({
         data: {
-          id: `REQ-${generateId(15)}`,
+          id: `REQ-${generateId(3)}`,
           userId: user.id,
           priority: rest.priority,
           type: rest.type,
@@ -73,7 +73,7 @@ export const createJobRequest = authedProcedure
           departmentId: rest.departmentId,
           jobRequest: {
             create: {
-              id: `JRQ-${generateId(15)}`,
+              id: `JRQ-${generateId(3)}`,
               description: rest.description,
               dueDate: rest.dueDate,
               location: rest.location,

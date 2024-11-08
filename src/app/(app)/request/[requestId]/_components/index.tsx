@@ -66,7 +66,6 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
 
   const statusColor = getStatusColor(data.status);
   const RequestTypeIcon = getRequestTypeIcon(data.type);
-  console.log(data);
   return (
     <div className="flex h-full w-full">
       <div className="flex-1 overflow-hidden">

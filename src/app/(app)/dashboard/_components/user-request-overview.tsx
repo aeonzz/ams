@@ -17,6 +17,7 @@ import EventsCalendar from "./events-calendar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTypeSchema";
 import NumberFlow from "@number-flow/react";
+import { socket } from "@/app/socket";
 
 export default function UserRequestOverview() {
   const { data, isLoading, refetch, isError } = useQuery<
@@ -36,6 +37,16 @@ export default function UserRequestOverview() {
   const getPendingRequests = () => {
     return data?.filter((request) => request.status === "PENDING") || [];
   };
+
+  React.useEffect(() => {
+    socket.on("request_update", () => {
+      refetch();
+    });
+
+    return () => {
+      socket.off("request_update");
+    };
+  }, []);
 
   if (isLoading) {
     return <DashboardSkeleton />;

@@ -9,7 +9,7 @@ export const useDepartmentData = (departmentId: string) => {
   React.useEffect(() => {
     const handleUpdate = () => {
       queryClient.invalidateQueries({
-        queryKey: ["department", departmentId],
+        queryKey: [departmentId],
       });
     };
 
