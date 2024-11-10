@@ -17,6 +17,7 @@ import { getAdminMenuList } from "@/config/admin-menu-list";
 import MenuButton from "@/components/menu-button";
 import CollapseMenuButton from "@/components/collapse-menu-button";
 import UserNav from "@/components/user-nav";
+import AdminUserNav from "./admin-user-nav";
 
 interface AdminMainMenuProps {
   isOpen: boolean | undefined;
@@ -27,7 +28,7 @@ export default function AdminMainMenu({ isOpen }: AdminMainMenuProps) {
   const menuList = getAdminMenuList(pathname);
   return (
     <>
-      <UserNav isOpen={isOpen} />
+      <AdminUserNav isOpen={isOpen} />
       <ScrollArea className="[&>div>div[style]]:!block">
         <nav className="h-full w-full">
           <ul className="flex flex-col items-start space-y-1">

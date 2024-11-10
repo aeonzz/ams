@@ -19,18 +19,18 @@ import { updateUser } from "@/lib/actions/users";
 import { toast } from "sonner";
 
 export default function UploadProfileDialog() {
-
+  const [open, setOpen] = React.useState(false);
   const { uploadFiles, progresses, isUploading } = useUploadFile();
 
   const handleUpload = useCallback(
     async (files: File[]) => {
       try {
         const results = await uploadFiles(files);
-        console.log(results);
         await updateUser({
           profileUrl: results[0].filePath,
           path: "/settings/account",
         });
+        setOpen(false);
       } catch (error) {
         toast.error("Uh oh! Something went wrong.", {
           description: "Could not update user, please try again later.",
@@ -41,7 +41,7 @@ export default function UploadProfileDialog() {
   );
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
           variant="expandIcon"
@@ -61,18 +61,20 @@ export default function UploadProfileDialog() {
         isLoading={isUploading}
       >
         <DialogHeader>
-          <DialogTitle>Upload Image</DialogTitle>
+          <DialogTitle>Upload Avatar</DialogTitle>
           <DialogDescription>
-            Drag and drop your image here or click to browse.
+            Drag and drop your avatar here or click to browse.
           </DialogDescription>
         </DialogHeader>
-        <FileUploader
-          maxFiles={2}
-          maxSize={4 * 1024 * 1024}
-          onUpload={handleUpload}
-          progresses={progresses}
-          disabled={isUploading}
-        />
+        <div className="p-3 pt-0">
+          <FileUploader
+            maxFiles={1}
+            maxSize={8 * 1024 * 1024}
+            onUpload={handleUpload}
+            progresses={progresses}
+            disabled={isUploading}
+          />
+        </div>
       </DialogContent>
     </Dialog>
   );

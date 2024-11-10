@@ -22,7 +22,7 @@ export default function RoleManagementScreen({
     <div className="flex h-full w-full">
       <div className="flex-1">
         <div className="flex h-[50px] items-center justify-between border-b px-3">
-          <P className="font-medium">Inventory</P>
+          <P className="font-medium">Role Management</P>
           <AdminSearchInput />
         </div>
         <div className="grid min-h-[calc(100vh_-_100px)] place-items-center items-center py-3">

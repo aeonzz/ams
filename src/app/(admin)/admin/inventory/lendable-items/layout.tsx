@@ -1,5 +1,5 @@
 import ThemeDialog from "@/components/dialogs/theme-dialog";
-import SettingsDialog from "@/components/dialogs/settings-dialog";
+import AdminSettingsDialog from "@/components/dialogs/settings-dialog";
 import CreateInventoryDialog from "./_components/create-inventory-dialog";
 import AdminCommandSearchDialog from "@/components/dialogs/admin-command-search-dialog";
 
@@ -11,7 +11,7 @@ export default async function AppLayout({
   return (
     <AdminCommandSearchDialog>
       <ThemeDialog />
-      <SettingsDialog />
+      <AdminSettingsDialog />
       <CreateInventoryDialog />
       {children}
     </AdminCommandSearchDialog>

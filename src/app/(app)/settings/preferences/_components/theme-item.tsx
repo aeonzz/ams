@@ -41,6 +41,7 @@ export default function ThemeItem() {
           <SelectContent>
             <SelectItem value="light">Light</SelectItem>
             <SelectItem value="dark">Dark</SelectItem>
+            <SelectItem value="blue">Blue</SelectItem>
             <SelectItem value="system">System</SelectItem>
           </SelectContent>
         </Select>

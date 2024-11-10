@@ -108,7 +108,7 @@ export function getMenuList({
         ]
       : []),
     {
-      groupLabel: "My Requests & Reservations",
+      groupLabel: "My Requests",
       menus: [
         {
           href: "/requests",
@@ -176,18 +176,18 @@ export function getMenuList({
     //     },
     //   ],
     // },
-    {
-      groupLabel: "Preferences",
-      menus: [
-        {
-          href: "/settings/profile",
-          label: "Settings",
-          active: pathname.includes("/settings"),
-          icon: Settings,
-          submenus: [],
-        },
-      ],
-    },
+    // {
+    //   groupLabel: "Preferences",
+    //   menus: [
+    //     {
+    //       href: "/settings/profile",
+    //       label: "Settings",
+    //       active: pathname.includes("/settings"),
+    //       icon: Settings,
+    //       submenus: [],
+    //     },
+    //   ],
+    // },
     // {
     //   groupLabel: "Help & Support",
     //   menus: [

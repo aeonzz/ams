@@ -33,14 +33,14 @@ export function RoleManagementTableToolbarActions({
           onSuccess={() => table.toggleAllRowsSelected(false)}
         />
       ) : null}
-      <Button
+      {/* <Button
         variant="secondary"
         size="sm"
         onClick={() => dialogManager.setActiveDialog("adminCreateRoleDialog")}
       >
         <PlusIcon className="mr-2 size-4" aria-hidden="true" />
         Add role
-      </Button>
+      </Button> */}
       <Button
         variant="secondary"
         size="sm"
@@ -51,14 +51,14 @@ export function RoleManagementTableToolbarActions({
         <PlusIcon className="mr-2 size-4" aria-hidden="true" />
         Create user role
       </Button>
-      <React.Suspense fallback={<Skeleton className="h-7 w-52" />}>
+      {/* <React.Suspense fallback={<Skeleton className="h-7 w-52" />}>
         <DateRangePicker
           triggerVariant="secondary"
           triggerSize="sm"
           triggerClassName="ml-auto w-fit"
           placeholder="Created"
         />
-      </React.Suspense>
+      </React.Suspense> */}
       <Button
         variant="secondary"
         size="sm"

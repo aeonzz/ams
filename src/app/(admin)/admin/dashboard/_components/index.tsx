@@ -130,12 +130,12 @@ export default function AdminDashboardScreen() {
         </div>
       </div>
       {isLoading ? (
-        <div className="h-screen w-full p-3">
+        <div className="scroll-bar h-full w-full overflow-auto p-3">
           <OverviewSkeleton />
         </div>
       ) : isError || !data ? (
-        <div className="flex h-screen w-full items-center justify-center">
-          <FetchDataError refetch={refetch} />
+        <div className="h-full] flex w-full items-center justify-center">
+          {/* <FetchDataError refetch={refetch} /> */}
         </div>
       ) : (
         <div className="scroll-bar container flex flex-1 justify-center overflow-y-auto p-3">
@@ -217,7 +217,7 @@ export default function AdminDashboardScreen() {
               </CardHeader>
               <CardContent className="flex gap-3">
                 <Link
-                  href={`/admin/requests`}
+                  href={`/admin/requests?page=1&per_page=10&sort=createdAt.desc`}
                   className={cn(
                     buttonVariants({ variant: "default", size: "sm" })
                   )}

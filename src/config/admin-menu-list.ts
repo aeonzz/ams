@@ -33,7 +33,7 @@ export function getAdminMenuList(pathname: string): Group[] {
           submenus: [],
         },
         {
-          href: "/admin/requests",
+          href: "/admin/requests?page=1&per_page=10&sort=createdAt.desc",
           label: "Requests",
           active: pathname.includes("/requests"),
           icon: Inbox,
@@ -103,7 +103,7 @@ export function getAdminMenuList(pathname: string): Group[] {
           submenus: [],
         },
         {
-          href: "/admin/departments",
+          href: "/admin/departments?page=1&per_page=10&sort=createdAt.desc",
           label: "Departments",
           active: pathname.includes("/admin/departments"),
           icon: Briefcase,
@@ -122,14 +122,14 @@ export function getAdminMenuList(pathname: string): Group[] {
       groupLabel: "Resource Management",
       menus: [
         {
-          href: "/admin/venues",
+          href: "/admin/venues?page=1&per_page=10&sort=createdAt.desc",
           label: "Facilities",
           active: pathname.includes("/admin/venues"),
           icon: Building,
           submenus: [],
         },
         {
-          href: "/admin/vehicles",
+          href: "/admin/vehicles?page=1&per_page=10&sort=createdAt.desc",
           label: "Vehicles",
           active: pathname.includes("/admin/vehicles"),
           icon: Truck,

@@ -3,7 +3,7 @@
 import * as React from "react";
 import { type ColumnDef } from "@tanstack/react-table";
 
-import { cn } from "@/lib/utils";
+import { cn, textTransform } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
 
 import { P } from "@/components/typography/text";
@@ -31,35 +31,35 @@ import DataTableExpand from "@/components/data-table/data-table-expand";
 
 export function getRoleColumns(): ColumnDef<RoleTableType>[] {
   return [
-    {
-      id: "select",
-      header: ({ table }) => (
-        <div className="px-3">
-          <Checkbox
-            checked={
-              table.getIsAllPageRowsSelected() ||
-              (table.getIsSomePageRowsSelected() && "indeterminate")
-            }
-            onCheckedChange={(value) =>
-              table.toggleAllPageRowsSelected(!!value)
-            }
-            aria-label="Select all"
-            className="translate-y-0.5"
-          />
-        </div>
-      ),
-      cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
-          className="translate-y-0.5"
-        />
-      ),
-      enableSorting: false,
-      enableHiding: false,
-      size: 20,
-    },
+    // {
+    //   id: "select",
+    //   header: ({ table }) => (
+    //     <div className="px-3">
+    //       <Checkbox
+    //         checked={
+    //           table.getIsAllPageRowsSelected() ||
+    //           (table.getIsSomePageRowsSelected() && "indeterminate")
+    //         }
+    //         onCheckedChange={(value) =>
+    //           table.toggleAllPageRowsSelected(!!value)
+    //         }
+    //         aria-label="Select all"
+    //         className="translate-y-0.5"
+    //       />
+    //     </div>
+    //   ),
+    //   cell: ({ row }) => (
+    //     <Checkbox
+    //       checked={row.getIsSelected()}
+    //       onCheckedChange={(value) => row.toggleSelected(!!value)}
+    //       aria-label="Select row"
+    //       className="translate-y-0.5"
+    //     />
+    //   ),
+    //   enableSorting: false,
+    //   enableHiding: false,
+    //   size: 20,
+    // },
     {
       accessorKey: "name",
       header: ({ column }) => (
@@ -73,48 +73,48 @@ export function getRoleColumns(): ColumnDef<RoleTableType>[] {
         );
       },
     },
-    {
-      accessorKey: "description",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Description" />
-      ),
-      cell: ({ row }) => {
-        return (
-          <div className="flex space-x-2">
-            <P className="truncate font-medium">{row.original.description}</P>
-          </div>
-        );
-      },
-      size: 0,
-    },
-    {
-      accessorKey: "createdAt",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Date Created" />
-      ),
-      cell: ({ cell }) => {
-        return (
-          <P className="text-muted-foreground">
-            {format(cell.getValue() as Date, "PP")}
-          </P>
-        );
-      },
-      size: 0,
-    },
-    {
-      accessorKey: "updatedAt",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Last Modified" />
-      ),
-      cell: ({ cell }) => {
-        return (
-          <P className="text-muted-foreground">
-            {format(cell.getValue() as Date, "PP")}
-          </P>
-        );
-      },
-      size: 0,
-    },
+    // {
+    //   accessorKey: "description",
+    //   header: ({ column }) => (
+    //     <DataTableColumnHeader column={column} title="Description" />
+    //   ),
+    //   cell: ({ row }) => {
+    //     return (
+    //       <div className="flex space-x-2">
+    //         <P className="truncate font-medium">{row.original.description}</P>
+    //       </div>
+    //     );
+    //   },
+    //   size: 0,
+    // },
+    // {
+    //   accessorKey: "createdAt",
+    //   header: ({ column }) => (
+    //     <DataTableColumnHeader column={column} title="Date Created" />
+    //   ),
+    //   cell: ({ cell }) => {
+    //     return (
+    //       <P className="text-muted-foreground">
+    //         {format(cell.getValue() as Date, "PP")}
+    //       </P>
+    //     );
+    //   },
+    //   size: 0,
+    // },
+    // {
+    //   accessorKey: "updatedAt",
+    //   header: ({ column }) => (
+    //     <DataTableColumnHeader column={column} title="Last Modified" />
+    //   ),
+    //   cell: ({ cell }) => {
+    //     return (
+    //       <P className="text-muted-foreground">
+    //         {format(cell.getValue() as Date, "PP")}
+    //       </P>
+    //     );
+    //   },
+    //   size: 0,
+    // },
     {
       id: "userRoles",
       header: () => <P>User Roles</P>,
@@ -174,23 +174,22 @@ export function getRoleColumns(): ColumnDef<RoleTableType>[] {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-40">
-                <DropdownMenuItem onSelect={() => setShowUpdateRoleSheet(true)}>
+                {/* <DropdownMenuItem onSelect={() => setShowUpdateRoleSheet(true)}>
                   Edit
-                </DropdownMenuItem>
+                </DropdownMenuItem> */}
                 <AssignUserRoleRowPopover roleId={row.original.id} />
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
+                {/* <DropdownMenuItem
                   onSelect={() => setShowDeleteRoleDialog(true)}
                   className="focus:bg-destructive focus:text-destructive-foreground"
                 >
                   Delete
-                </DropdownMenuItem>
+                </DropdownMenuItem> */}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
         );
       },
-      size: 40,
+      size: 10,
     },
   ];
 }

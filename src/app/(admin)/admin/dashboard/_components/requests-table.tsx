@@ -40,8 +40,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTypeSchema";
-import { StatusFilter } from "../../departments/[departmentId]/insights/_components/status-filter";
 import { DateRange } from "react-day-picker";
+import { StatusFilter } from "@/app/(app)/department/[departmentId]/insights/_components/status-filter";
 
 interface RequestsTableProps {
   data: RequestWithRelations[];

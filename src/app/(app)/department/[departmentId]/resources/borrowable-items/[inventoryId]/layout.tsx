@@ -38,7 +38,7 @@ export default async function CommandLayout({ children, params }: Props) {
 
   return (
     <>
-      <RoleGuard allowedRoles={["DEPARTMENT_HEAD", "ADMIN"]}>
+      <RoleGuard allowedRoles={["DEPARTMENT_HEAD"]}>
         <CommandSearchDialog>
           <ThemeDialog />
           <SettingsDialog />

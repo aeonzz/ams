@@ -14,9 +14,9 @@ import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import { Cog } from "lucide-react";
 
 const settingLinks = [
-  { name: "Account", href: "/admin/settings/account" },
-  { name: "Password", href: "/admin/settings/password" },
-  { name: "Preference", href: "/admin/settings/preferences" },
+  { name: "Account", href: "/settings/account" },
+  { name: "Password", href: "/settings/password" },
+  { name: "Preference", href: "/settings/preferences" },
 ];
 
 export default function AdminSettingsDialog() {

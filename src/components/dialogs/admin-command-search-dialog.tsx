@@ -1,6 +1,8 @@
 "use client";
 
+import React from "react";
 import {
+  ArrowRight,
   Mail,
   PaletteIcon,
   PanelRight,
@@ -24,6 +26,42 @@ import {
 } from "@/components/ui/command";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
+import { useRouter } from "next/navigation";
+
+const NavigationLinks = [
+  {
+    name: "Go to requests",
+    href: "/admin/requests?page=1&per_page=10&sort=createdAt.desc",
+  },
+  {
+    name: "Go to users",
+    href: "/admin/users?page=1&per_page=10&sort=createdAt.desc",
+  },
+  {
+    name: "Go to departments",
+    href: "/admin/departments?page=1&per_page=10&sort=createdAt.desc",
+  },
+  {
+    name: "Go to role management",
+    href: "/admin/role-management?page=1&per_page=10&sort=createdAt.desc",
+  },
+  {
+    name: "Go to facilities",
+    href: "/admin/role-venues?page=1&per_page=10&sort=createdAt.desc",
+  },
+  {
+    name: "Go to vehicles",
+    href: "/admin/vehicles?page=1&per_page=10&sort=createdAt.desc",
+  },
+  {
+    name: "Go to lendable items",
+    href: "/admin/inventory/lendable-items?page=1&per_page=10&sort=createdAt.desc",
+  },
+  {
+    name: "Go to supply items",
+    href: "/admin/inventory/supply-items?page=1&per_page=10&sort=createdAt.desc",
+  },
+];
 
 interface AdminCommandSearchDialogProps {
   children: React.ReactNode;
@@ -32,6 +70,7 @@ interface AdminCommandSearchDialogProps {
 export default function AdminCommandSearchDialog({
   children,
 }: AdminCommandSearchDialogProps) {
+  const router = useRouter();
   const dialogManager = useDialogManager();
   const sidebar = useSidebarToggle();
 
@@ -52,6 +91,17 @@ export default function AdminCommandSearchDialog({
     }
   };
 
+  const handleSelect = (href: string) => {
+    dialogManager.setActiveDialog(null);
+    router.push(href);
+  };
+
+  React.useEffect(() => {
+    NavigationLinks.forEach((link) => {
+      router.prefetch(link.href);
+    });
+  }, [router]);
+
   return (
     <>
       <CommandDialog
@@ -61,10 +111,22 @@ export default function AdminCommandSearchDialog({
         <CommandInput placeholder="Type a command or search..." />
         <CommandList>
           <CommandEmpty>No results found.</CommandEmpty>
+          <CommandGroup heading="Navigation">
+            {NavigationLinks.map((link) => (
+              <CommandItem
+                key={link.name}
+                onSelect={() => handleSelect(link.href)}
+              >
+                <ArrowRight className="mr-2 h-4 w-4" />
+                <span>{link.name}</span>
+              </CommandItem>
+            ))}
+          </CommandGroup>
+          <CommandSeparator />
           <CommandGroup heading="Settings">
             <CommandItem
               onSelect={() => {
-                dialogManager.setActiveDialog("settingsDialog");
+                dialogManager.setActiveDialog("adminSettingsDialog");
               }}
             >
               <Settings className="mr-2 h-4 w-4" />

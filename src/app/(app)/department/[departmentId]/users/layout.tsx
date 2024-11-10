@@ -13,7 +13,7 @@ export default function CommandLayout({
 }) {
   return (
     <>
-      <RoleGuard allowedRoles={["DEPARTMENT_HEAD", "ADMIN"]}>
+      <RoleGuard allowedRoles={["DEPARTMENT_HEAD"]}>
         <CommandSearchDialog>
           <ThemeDialog />
           <SettingsDialog />

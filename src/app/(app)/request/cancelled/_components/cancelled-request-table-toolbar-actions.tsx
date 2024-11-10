@@ -34,6 +34,7 @@ export function CancelledRequestTableToolbarActions({
           triggerSize="sm"
           triggerClassName="ml-auto w-fit"
           align="end"
+          placeholder="Created"
         />
       </React.Suspense>
       {/**

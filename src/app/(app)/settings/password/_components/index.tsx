@@ -27,7 +27,7 @@ export default function PasswordScreen() {
           <H2 className="font-semibold">Password</H2>
           <P className="text-muted-foreground">Change your account password</P>
           <Separator className="my-6" />
-          <Card>
+          <Card className="bg-secondary">
             <CardHeader>
               <CardTitle>Set Password</CardTitle>
             </CardHeader>

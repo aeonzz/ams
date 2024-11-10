@@ -16,14 +16,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Button } from "./ui/button";
-import { P } from "./typography/text";
+import { Button } from "@/components/ui/button";
+import { P } from "@/components/typography/text";
 
-interface UserNavProps {
+interface AdminUserNavProps {
   isOpen: boolean | undefined;
 }
 
-export default function UserNav({ isOpen }: UserNavProps) {
+export default function AdminUserNav({ isOpen }: AdminUserNavProps) {
   const currentUser = useSession();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -90,7 +90,7 @@ export default function UserNav({ isOpen }: UserNavProps) {
             </p>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <Link href="/settings/account" prefetch>
+          <Link href="/admin/settings/account" prefetch>
             <DropdownMenuItem>
               <Cog className="mr-2 size-5" />
               Settings

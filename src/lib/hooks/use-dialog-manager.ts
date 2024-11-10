@@ -12,6 +12,7 @@ export type DialogType =
   | "updateVenueStatusCommand"
   | "transportDialog"
   | "settingsDialog"
+  | "adminSettingsDialog"
   | "jobDetailsDialog"
   | "adminCreateVenueDialog"
   | "adminCreateVehicleDialog"

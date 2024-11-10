@@ -111,17 +111,15 @@ export default function ResetPasswordForm({
             name="password"
             render={({ field }) => (
               <FormItem>
-                <MotionLayout>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <PasswordInput
-                      id="password"
-                      placeholder="Enter your new password"
-                      disabled={isLoading}
-                      {...field}
-                    />
-                  </FormControl>
-                </MotionLayout>
+                <FormLabel>Password</FormLabel>
+                <FormControl>
+                  <PasswordInput
+                    id="password"
+                    placeholder="Enter your new password"
+                    disabled={isLoading}
+                    {...field}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
@@ -131,26 +129,20 @@ export default function ResetPasswordForm({
             name="confirmPassword"
             render={({ field }) => (
               <FormItem>
-                <MotionLayout>
-                  <FormLabel>Re-Enter your password</FormLabel>
-                  <FormControl>
-                    <PasswordInput
-                      id="password"
-                      placeholder="Re-Enter your new password"
-                      disabled={isLoading}
-                      {...field}
-                    />
-                  </FormControl>
-                </MotionLayout>
+                <FormLabel>Re-Enter your password</FormLabel>
+                <FormControl>
+                  <PasswordInput
+                    id="password"
+                    placeholder="Re-Enter your new password"
+                    disabled={isLoading}
+                    {...field}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          <SubmitButton
-            disabled={isLoading}
-            className="w-full"
-            variant="ringHover"
-          >
+          <SubmitButton disabled={isLoading} className="w-full">
             Confirm
           </SubmitButton>
         </form>

@@ -32,13 +32,8 @@ const NavigationLinks = [
   { name: "Go to notifications", href: "/notification" },
   {
     name: "Go to my requests",
-    href: "/requests/my-requests?page=1&per_page=10&sort=createdAt.desc",
+    href: "/request/my-requests?page=1&per_page=10&sort=createdAt.desc",
   },
-  {
-    name: "Go to pending requests",
-    href: "/requests/my-requests?page=1&per_page=10&sort=createdAt.desc&status=PENDING",
-  },
-  { name: "Go to my reservations", href: "/reservations/my-reservations" },
 ];
 
 interface CommandSearchDialogProps {
