@@ -81,7 +81,7 @@ export async function signUpAction(
   if (error !== null) return { error };
 
   const hashedPassword = await new Argon2id().hash(data.password);
-  const userId = generateId(15);
+  const userId = generateId(3);
 
   try {
     await db.user.create({
@@ -481,7 +481,7 @@ export const createUser = authedProcedure
         throw "Email already exists";
       }
 
-      const userId = generateId(15);
+      const userId = generateId(3);
       const hashedPassword = await new Argon2id().hash(password);
 
       await db.user.create({
@@ -492,10 +492,12 @@ export const createUser = authedProcedure
           ...rest,
           userDepartments: {
             createMany: {
-              data: departmentIds.map((departmentId) => ({
-                id: generateId(15),
-                departmentId,
-              })),
+              data: departmentIds
+                ? departmentIds.map((departmentId) => ({
+                    id: generateId(3),
+                    departmentId,
+                  }))
+                : [],
             },
           },
         },
@@ -541,7 +543,7 @@ export const assignRole = authedProcedure
 
     try {
       const userRoles = roleId.map((role) => ({
-        id: generateId(15),
+        id: generateId(3),
         userId,
         roleId: role,
         departmentId,

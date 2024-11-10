@@ -15,7 +15,6 @@ import {
 import { revalidatePath } from "next/cache";
 import { generateId } from "lucia";
 import { Venue } from "prisma/generated/zod";
-import { updateRequestStatusSchemaWithPath } from "@/app/(app)/(params)/request/[requestId]/_components/schema";
 
 export async function getVenues(input: GetVenuesSchema) {
   await checkAuth();
@@ -94,7 +93,7 @@ export const createVenue = authedProcedure
       const result = await db.$transaction(async (prisma) => {
         const createVenue = await prisma.venue.create({
           data: {
-            id: generateId(15),
+            id: generateId(3),
             imageUrl: imageUrl[0],
             departmentId: departmenId,
             ...rest,
@@ -104,7 +103,7 @@ export const createVenue = authedProcedure
         if (setupRequirements && setupRequirements.length > 0) {
           const setupRequirementsData = setupRequirements.map(
             (requirement) => ({
-              id: generateId(15),
+              id: generateId(3),
               venueId: createVenue.id,
               name: requirement,
             })
@@ -168,7 +167,7 @@ export const updateVenue = authedProcedure
           if (requirementsToAdd.length > 0) {
             const newRequirementsData = requirementsToAdd.map(
               (requirement) => ({
-                id: generateId(15),
+                id: generateId(3),
                 venueId: updatedVenue.id,
                 name: requirement,
               })
@@ -239,27 +238,6 @@ export const updateVenueStatuses = authedProcedure
             ...(rest.status !== undefined && { status: rest.status }),
           },
         });
-
-        const updatedVenues = await prisma.venue.findMany({
-          where: { id: { in: ids } },
-        });
-
-        for (let i = 0; i < ids.length; i++) {
-          const oldValueJson = JSON.stringify(currentVenues[i]);
-          const newValueJson = JSON.stringify(updatedVenues[i]);
-
-          await prisma.genericAuditLog.create({
-            data: {
-              id: generateId(15),
-              entityId: updatedVenues[i].id,
-              changeType: "STATUS_CHANGE",
-              entityType: "VENUE",
-              oldValue: oldValueJson,
-              newValue: newValueJson,
-              changedById: user.id,
-            },
-          });
-        }
       });
 
       return revalidatePath(path);
@@ -295,27 +273,6 @@ export const deleteVenues = authedProcedure
             isArchived: true,
           },
         });
-
-        const updatedVenues = await prisma.venue.findMany({
-          where: { id: { in: ids } },
-        });
-
-        for (let i = 0; i < ids.length; i++) {
-          const oldValueJson = JSON.stringify(currentVenues[i]);
-          const newValueJson = JSON.stringify(updatedVenues[i]);
-
-          await prisma.genericAuditLog.create({
-            data: {
-              id: generateId(15),
-              entityId: updatedVenues[i].id,
-              changeType: "ARCHIVED",
-              entityType: "VENUE",
-              oldValue: oldValueJson,
-              newValue: newValueJson,
-              changedById: user.id,
-            },
-          });
-        }
       });
 
       return revalidatePath(path);

@@ -26,7 +26,7 @@ export const updateDepartmentFile = authedProcedure
 
       await db.file.create({
         data: {
-          id: generateId(15),
+          id: generateId(3),
           url: url[0],
           filePurpose: filePurpose,
           departmentId: departmentId,

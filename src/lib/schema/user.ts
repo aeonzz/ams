@@ -6,11 +6,7 @@ export const createUserSchemaBase = z.object({
   middleName: z.string().optional(),
   lastName: z.string().min(1, "last name is required"),
   profileUrl: z.string().optional(),
-  departmentIds: z
-    .array(z.string(), {
-      required_error: "Department is required",
-    })
-    .min(1, "At least one department is required"),
+  departmentIds: z.array(z.string()).optional(),
   password: z
     .string()
     .min(4, { message: "Must be at least 4 characters long" })

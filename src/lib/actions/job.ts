@@ -434,7 +434,7 @@ export const reworkJobRequest = authedProcedure
 
         await prisma.rework.create({
           data: {
-            id: generateId(15),
+            id: generateId(3),
             jobRequestId: updateJobRequestStatus.id,
             rejectionReason: rejectionReason,
           },

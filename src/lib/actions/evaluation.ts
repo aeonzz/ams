@@ -15,7 +15,7 @@ export const createJobRequestEvaluation = authedProcedure
     try {
       await db.jobRequestEvaluation.create({
         data: {
-          id: generateId(15),
+          id: generateId(3),
           surveyResponses: surveyResponses,
           position: position === "Others" && otherPosition ? otherPosition : position,
           ...rest,

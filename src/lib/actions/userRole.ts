@@ -66,7 +66,7 @@ export const createUserRole = authedProcedure
         } else {
           await db.userRole.create({
             data: {
-              id: generateId(15),
+              id: generateId(3),
               userId: userId,
               roleId: roleId,
               departmentId: departmentId,
@@ -143,7 +143,7 @@ export const createMultipleUserRoleUser = authedProcedure
 
         await db.userRole.create({
           data: {
-            id: generateId(15),
+            id: generateId(3),
             userId: userId,
             roleId: roleId,
             departmentId: departmentId,

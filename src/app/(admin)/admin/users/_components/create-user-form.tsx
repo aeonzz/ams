@@ -191,7 +191,12 @@ export default function CreateUserForm({
               name="departmentIds"
               render={({ field }) => (
                 <FormItem className="flex-1">
-                  <FormLabel>Departments</FormLabel>
+                  <FormLabel>
+                    Departments{" "}
+                    <span className="text-xs text-muted-foreground">
+                      (optional)
+                    </span>
+                  </FormLabel>
                   <Popover open={open} onOpenChange={setOpen}>
                     <PopoverTrigger asChild>
                       <FormControl>
@@ -204,7 +209,7 @@ export default function CreateUserForm({
                             !field.value?.length && "text-muted-foreground"
                           )}
                         >
-                          {field.value?.length > 0
+                          {field.value && field.value?.length > 0
                             ? `${field.value.length} department${field.value.length > 1 ? "s" : ""} selected`
                             : "Select departments"}
                           {isLoading ? (
@@ -256,7 +261,7 @@ export default function CreateUserForm({
                       </Command>
                     </PopoverContent>
                   </Popover>
-                  {field.value?.length > 0 && (
+                  {field.value && field.value?.length > 0 && (
                     <div className="mt-2 flex flex-wrap gap-2">
                       {field.value.map((departmentId) => {
                         const department = data?.find(
@@ -271,7 +276,7 @@ export default function CreateUserForm({
                               className="ml-1 h-auto p-0 text-muted-foreground"
                               onClick={() => {
                                 field.onChange(
-                                  field.value.filter(
+                                  field.value?.filter(
                                     (id) => id !== department.id
                                   )
                                 );

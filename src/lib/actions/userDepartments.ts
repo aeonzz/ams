@@ -33,7 +33,7 @@ export const createUserDepartments = authedProcedure
 
         await db.userDepartment.create({
           data: {
-            id: generateId(15),
+            id: generateId(3),
             userId: userId,
             departmentId: departmentId,
           },

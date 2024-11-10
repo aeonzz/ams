@@ -21,7 +21,7 @@ export const createNotification = authedProcedure
         recepientIds.map(async (recepientId) => {
           return await db.notification.create({
             data: {
-              id: generateId(15),
+              id: generateId(3),
               userId: userId,
               recepientId: recepientId,
               ...rest,

@@ -239,7 +239,7 @@ export const createSupplyitem = authedProcedure
     try {
       const result = await db.supplyItem.create({
         data: {
-          id: generateId(15),
+          id: generateId(3),
           imageUrl: imageUrl[0],
           ...rest,
         },

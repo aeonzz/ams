@@ -122,7 +122,7 @@ export const createInventory = authedProcedure
     const { path, imageUrl, inventoryCount, ...rest } = input;
 
     try {
-      const itemId = generateId(15);
+      const itemId = generateId(3);
 
       const inventoryItem = await db.inventoryItem.create({
         data: {
@@ -136,7 +136,7 @@ export const createInventory = authedProcedure
       for (let i = 0; i < inventoryCount; i++) {
         const subItem = await db.inventorySubItem.create({
           data: {
-            id: generateId(15),
+            id: generateId(3),
             imageUrl: inventoryItem.imageUrl,
             inventoryId: inventoryItem.id,
             subName: `${rest.name}-${generateId(5)}`,

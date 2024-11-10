@@ -231,7 +231,7 @@ export function getUsersColumns(): ColumnDef<UserType>[] {
                   ))}
                 </>
               ) : (
-                <p>-</p>
+                <span className="text-muted-foreground">-</span>
               )}
             </div>
             <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>

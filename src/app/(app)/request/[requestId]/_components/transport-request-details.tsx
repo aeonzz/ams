@@ -4,7 +4,6 @@ import React from "react";
 
 import {
   type TransportRequestWithRelations,
-  type GenericAuditLog,
 } from "prisma/generated/zod";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";

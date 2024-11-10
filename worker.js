@@ -192,7 +192,7 @@ async function updateInProgressStatus() {
           if (updatedRequest.request.reviewedBy) {
             await prisma.notification.create({
               data: {
-                id: generateId(15),
+                id: generateId(3),
                 userId: updatedRequest.request.reviewedBy,
                 recepientId: updatedRequest.request.user.id,
                 resourceId: `/request/${updatedRequest.requestId}`,
@@ -205,7 +205,7 @@ async function updateInProgressStatus() {
 
             await prisma.notification.create({
               data: {
-                id: generateId(15),
+                id: generateId(3),
                 userId: updatedRequest.request.reviewedBy,
                 recepientId: updatedRequest.request.departmentId,
                 resourceId: `/request/${updatedRequest.requestId}`,

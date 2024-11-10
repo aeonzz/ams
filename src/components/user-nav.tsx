@@ -65,7 +65,14 @@ export default function UserNav({ isOpen }: UserNavProps) {
                   currentUser.lastName
                 )}
               </P>
-              <p className="truncate whitespace-nowrap text-start text-xs tracking-tight text-muted-foreground">
+              <p
+                className={cn(
+                  "truncate whitespace-nowrap text-start text-xs tracking-tight text-muted-foreground",
+                  isOpen === false
+                    ? "hidden -translate-x-96 opacity-0"
+                    : "translate-x-0 opacity-100"
+                )}
+              >
                 {currentUser.email}
               </p>
             </div>

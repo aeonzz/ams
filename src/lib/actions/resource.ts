@@ -61,8 +61,8 @@ export const createReturnableResourceRequest = authedProcedure
                  Now, create a title for the request using the provided details above.`,
       });
 
-      const requestId = `REQ-${generateId(15)}`;
-      const resourceRequestId = `RRQ-${generateId(15)}`;
+      const requestId = `REQ-${generateId(3)}`;
+      const resourceRequestId = `RRQ-${generateId(3)}`;
 
       const createdRequest = await db.request.create({
         data: {
@@ -163,7 +163,7 @@ export const createSupplyResourceRequest = authedProcedure
               purpose: rest.purpose,
               items: {
                 create: rest.items.map((item) => ({
-                  id: generateId(15),
+                  id: generateId(3),
                   quantity: item.quantity,
                   supplyItemId: item.supplyItemId,
                 })),
@@ -263,7 +263,7 @@ export const createSupplyItemRequest = authedProcedure
         items.map(async (item) => {
           await db.supplyRequestItem.create({
             data: {
-              id: generateId(15),
+              id: generateId(3),
               supplyRequestId: id,
               supplyItemId: item.supplyItemId,
               quantity: item.quantity,

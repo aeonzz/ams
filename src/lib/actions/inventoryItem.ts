@@ -93,7 +93,7 @@ export const createInventorySubItem = authedProcedure
   .handler(async ({ input, ctx }) => {
     const { path, imageUrl, ...rest } = input;
     try {
-      const itemId = generateId(15);
+      const itemId = generateId(3);
       const result = await db.inventorySubItem.create({
         data: {
           id: itemId,
@@ -220,48 +220,11 @@ export const returnableResourceActions = authedProcedure
             request: {
               include: {
                 user: true,
-                department: {
-                  include: {
-                    departmentBorrowingPolicy: true,
-                  },
-                },
+                department: true,
               },
             },
           },
         });
-
-        if (
-          updatedRequest.isOverdue &&
-          updatedRequest.request.department.departmentBorrowingPolicy &&
-          updatedRequest.request.department.departmentBorrowingPolicy
-            .penaltyBorrowBanDuration !== null
-        ) {
-          await prisma.userBan.create({
-            data: {
-              id: generateId(15),
-              userId: updatedRequest.request.userId,
-              departmentId: updatedRequest.request.department.id,
-              bannedAt: new Date(),
-              banDuration:
-                updatedRequest.request.department.departmentBorrowingPolicy
-                  .penaltyBorrowBanDuration,
-              reason: "Overdue item return",
-            },
-          });
-
-          await prisma.notification.create({
-            data: {
-              id: generateId(15),
-              userId: updatedRequest.request.user.id,
-              recepientId: updatedRequest.request.user.id,
-              resourceId: `/request/${updatedRequest.requestId}`,
-              title: `Overdue Request Ban`,
-              resourceType: "REQUEST",
-              notificationType: "ALERT",
-              message: `Your account has been temporarily banned from submitting borrow requests in the ${updatedRequest.request.department.name} department for ${updatedRequest.request.department.departmentBorrowingPolicy.penaltyBorrowBanDuration} hours due to an overdue item return.`,
-            },
-          });
-        }
 
         return updatedRequest;
       });

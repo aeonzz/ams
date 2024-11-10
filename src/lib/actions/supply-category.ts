@@ -16,7 +16,7 @@ export const createCategory = authedProcedure
     try {
       const result = await db.supplyItemCategory.create({
         data: {
-          id: generateId(15),
+          id: generateId(3),
           ...rest,
         },
       });

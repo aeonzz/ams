@@ -85,7 +85,7 @@ export const createRole = authedProcedure
         throw `Role "${role}" already exists.`;
       }
 
-      const roleId = generateId(15);
+      const roleId = generateId(3);
 
       await db.role.create({
         data: {
@@ -136,7 +136,7 @@ export const assignRoles = authedProcedure
             },
             update: {},
             create: {
-              id: generateId(15),
+              id: generateId(3),
               userId,
               roleId,
               departmentId,

@@ -2,10 +2,7 @@
 
 import React from "react";
 
-import {
-  type TransportRequestWithRelations,
-  type GenericAuditLog,
-} from "prisma/generated/zod";
+import { type TransportRequestWithRelations } from "prisma/generated/zod";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { H4, H5, P } from "@/components/typography/text";
