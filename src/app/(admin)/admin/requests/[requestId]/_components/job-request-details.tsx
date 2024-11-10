@@ -55,7 +55,6 @@ import {
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
-  GenericAuditLog,
   JobTypeSchema,
   type JobRequestWithRelations,
 } from "prisma/generated/zod";
@@ -263,7 +262,7 @@ export default function JobRequestDetails({
   };
 
   useHotkeys(
-    "ctrl+shift+e",
+    "mod+shift+e",
     (event) => {
       event.preventDefault();
       handleDownloadEvaluation();

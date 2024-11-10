@@ -42,7 +42,7 @@ export default function TransportDialog() {
       vehicleId: undefined,
       department: "",
       description: "",
-      destination: undefined,
+      destination: "",
       dateAndTimeNeeded: undefined,
     },
   });

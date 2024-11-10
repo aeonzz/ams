@@ -24,25 +24,25 @@ datasource db {
 }
 
 model User {
-  id                       String            @id
-  email                    String            @unique
+  id                       String           @id
+  email                    String           @unique
   profileUrl               String?
   hashedPassword           String
-  resetPasswordToken       String?           @unique
+  resetPasswordToken       String?          @unique
   resetPasswordTokenExpiry DateTime?
   firstName                String
   middleName               String?
   lastName                 String
-  isArchived               Boolean           @default(false)
-  createdAt                DateTime          @default(now())
-  updatedAt                DateTime          @updatedAt
+  isArchived               Boolean          @default(false)
+  createdAt                DateTime         @default(now())
+  updatedAt                DateTime         @updatedAt
+  isAdmin                  Boolean          @default(false)
   sessions                 Session[]
   setting                  Setting?
-  requestAsUser            Request[]         @relation(name: "UserRelation")
-  requestAsReviewer        Request[]         @relation(name: "ReviewerRelation")
+  requestAsUser            Request[]        @relation(name: "UserRelation")
+  requestAsReviewer        Request[]        @relation(name: "ReviewerRelation")
   userRole                 UserRole[]
   jobRequestsAsAssigned    JobRequest[]
-  genericAuditLog          GenericAuditLog[]
   userDepartments          UserDepartment[]
   notification             Notification[]
 }
@@ -171,18 +171,6 @@ model Request {
   returnableRequest ReturnableRequest?
   supplyRequest     SupplyRequest?
   transportRequest  TransportRequest?
-}
-
-model GenericAuditLog {
-  id          String     @id
-  entityId    String
-  entityType  EntityType
-  changeType  ChangeType
-  oldValue    Json?
-  newValue    Json?
-  changedById String
-  changedBy   User       @relation(fields: [changedById], references: [id])
-  timestamp   DateTime   @default(now())
 }
 
 model JobRequest {
@@ -403,20 +391,19 @@ model TransportRequest {
 }
 
 model Vehicle {
-  id                String              @id
-  name              String
-  type              String
-  imageUrl          String
-  capacity          Int
-  licensePlate      String
-  isArchived        Boolean             @default(false)
-  createdAt         DateTime            @default(now())
-  updatedAt         DateTime            @updatedAt
-  status            VehicleStatus       @default(AVAILABLE)
-  departmentId      String
-  department        Department          @relation(fields: [departmentId], references: [id])
-  transportRequest  TransportRequest[]
-  maintenanceRecord MaintenanceRecord[]
+  id               String             @id
+  name             String
+  type             String
+  imageUrl         String
+  capacity         Int
+  licensePlate     String
+  isArchived       Boolean            @default(false)
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  status           VehicleStatus      @default(AVAILABLE)
+  departmentId     String
+  department       Department         @relation(fields: [departmentId], references: [id])
+  transportRequest TransportRequest[]
 }
 
 enum JobStatus {
@@ -428,27 +415,6 @@ enum JobStatus {
   REJECTED
   REWORK_IN_PROGRESS
   VERIFIED
-}
-
-enum ChangeType {
-  STATUS_CHANGE
-  FIELD_UPDATE
-  ASSIGNMENT_CHANGE
-  REVIEWER_CHANGE
-  APPROVER_CHANGE
-  APPROVED
-  CANCELLED
-  CREATED
-  DELETION
-  RESTORED
-  ARCHIVED
-  ACTIVATED
-  RENAME
-  PERMISSION_CHANGE
-  VENUE_CHANGE
-  TIME_UPDATE
-  LOCATION_UPDATE
-  OTHER
 }
 
 enum EntityType {
@@ -466,26 +432,17 @@ enum EntityType {
 }
 
 enum JobType {
-  ROUTINE_MAINTENANCE
   REPAIRS
   INSTALLATION
   INSPECTION
-  EMERGENCY_REPAIR
   UPGRADES_RENOVATIONS
   PREVENTIVE_MAINTENANCE
   CALIBRATION_TESTING
   CLEANING_JANITORIAL
-  EVENT_SETUP_SUPPORT
-  SAFETY_COMPLIANCE_CHECKS
-  FURNITURE_ASSEMBLY_MOVING
   PAINTING_SURFACE_TREATMENT
   LANDSCAPING_GROUNDS_MAINTENANCE
-  IT_SUPPORT_TROUBLESHOOTING
-  SECURITY_SYSTEMS_MAINTENANCE
-  WASTE_MANAGEMENT_RECYCLING
+  TROUBLESHOOTING
   TRANSPORT_VEHICLE_MAINTENANCE
-  SPECIAL_PROJECTS
-  RESOURCE_SETUP_BREAKDOWN
 }
 
 enum NotificationType {
@@ -524,14 +481,6 @@ enum VenueType {
   CONFERENCE_ROOM
   LIBRARY
   OTHER
-}
-
-model MaintenanceRecord {
-  id        String   @id
-  date      DateTime
-  details   String
-  vehicleId String
-  vehicle   Vehicle  @relation(fields: [vehicleId], references: [id])
 }
 
 enum ClientType {

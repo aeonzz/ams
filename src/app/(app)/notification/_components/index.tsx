@@ -41,6 +41,7 @@ import Link from "next/link";
 import { cn, textTransform } from "@/lib/utils";
 import { socket } from "@/app/socket";
 import { Badge } from "@/components/ui/badge";
+import { useUserNotifications } from "@/lib/hooks/use-user-notifications";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -59,29 +60,14 @@ export default function NotificationScreen() {
   const { mutateAsync: updateStatusMutate, isPending: isUpdatePending } =
     useServerActionMutation(updateNotificationStatus);
 
-  const fetchNotifications = async ({ pageParam = 1 }) => {
-    const res = await axios.get(
-      `/api/notification/get-user-notification-with-params/${currentUser.id}?page=${pageParam}&limit=${ITEMS_PER_PAGE}`
-    );
-    return res.data;
-  };
-
   const {
-    data: notificationsData,
+    notificationsData,
     fetchNextPage,
     refetch,
     hasNextPage,
     isFetchingNextPage,
-    status: notificationsStatus,
-  } = useInfiniteQuery({
-    queryKey: ["get-user-notifications-with-params", currentUser.id, activeTab],
-    queryFn: fetchNotifications,
-    initialPageParam: 1,
-    getNextPageParam: (lastPage, pages) => {
-      if (lastPage.data.length < ITEMS_PER_PAGE) return undefined;
-      return pages.length + 1;
-    },
-  });
+    notificationsStatus,
+  } = useUserNotifications(currentUser.id);
 
   const handleNotification = React.useCallback(() => {
     console.log("Notification received in NotificationScreen");
@@ -96,22 +82,22 @@ export default function NotificationScreen() {
     };
   }, [handleNotification]);
 
-  const allNotifications = React.useMemo(() => {
-    return notificationsData?.pages.flatMap((page) => page.data) || [];
-  }, [notificationsData]);
+  // const allNotifications = React.useMemo(() => {
+  //   return notificationsData?.pages.flatMap((page) => page.data) || [];
+  // }, [notificationsData]);
 
   const filteredNotifications = React.useMemo(() => {
-    if (activeTab === "all") return allNotifications;
-    return allNotifications.filter((notification) =>
+    if (activeTab === "all") return notificationsData;
+    return notificationsData.filter((notification) =>
       activeTab === "unread" ? !notification.isRead : notification.isRead
     );
-  }, [allNotifications, activeTab]);
+  }, [notificationsData, activeTab]);
 
   const selectedNotification: Notification = React.useMemo(() => {
-    return allNotifications.find(
+    return notificationsData.find(
       (notification) => notification.id === selectedNotificationId
     );
-  }, [allNotifications, selectedNotificationId]);
+  }, [notificationsData, selectedNotificationId]);
 
   React.useEffect(() => {
     if (selectedNotification && !selectedNotification.isRead) {
@@ -133,10 +119,10 @@ export default function NotificationScreen() {
   }, [filteredNotifications, selectedNotificationId]);
 
   React.useEffect(() => {
-    if (allNotifications.length > 0 && !selectedNotificationId) {
-      setSelectedNotificationId(allNotifications[0].id);
+    if (notificationsData.length > 0 && !selectedNotificationId) {
+      setSelectedNotificationId(notificationsData[0].id);
     }
-  }, [allNotifications, selectedNotificationId]);
+  }, [notificationsData, selectedNotificationId]);
 
   const handleNotificationSelect = (notificationId: string) => {
     setSelectedNotificationId(notificationId);
@@ -187,7 +173,7 @@ export default function NotificationScreen() {
     setActiveTab(value);
     setSelectedNotificationId(null);
     queryClient.invalidateQueries({
-      queryKey: ["get-user-notifications-with-params", currentUser.id, value],
+      queryKey: ["get-user-notifications-with-params", currentUser.id],
     });
   };
 

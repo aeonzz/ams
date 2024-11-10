@@ -1,11 +1,14 @@
 "use client";
 
+import React from "react";
 import { type Table } from "@tanstack/react-table";
 
 import { Request } from "prisma/generated/zod";
 import { Button } from "@/components/ui/button";
 import { CirclePlus } from "lucide-react";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
+import { Skeleton } from "@/components/ui/skeleton";
+import { DateRangePicker } from "@/components/date-range-picker";
 
 interface CancelledRequestTableToolbarActionsProps {
   table: Table<Request>;
@@ -25,14 +28,14 @@ export function CancelledRequestTableToolbarActions({
           onSuccess={() => table.toggleAllRowsSelected(false)}
         />
       ) : null} */}
-      <Button
-        variant="shine"
-        size="sm"
-        onClick={() => dialogManager.setActiveDialog("requestDialog")}
-      >
-        <CirclePlus className="mr-2 size-5" />
-        Create request
-      </Button>
+      <React.Suspense fallback={<Skeleton className="h-7 w-52" />}>
+        <DateRangePicker
+          triggerVariant="secondary"
+          triggerSize="sm"
+          triggerClassName="ml-auto w-fit"
+          align="end"
+        />
+      </React.Suspense>
       {/**
        * Other actions can be added here.
        * For example, import, view, etc.

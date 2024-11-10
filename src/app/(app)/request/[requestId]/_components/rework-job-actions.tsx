@@ -65,7 +65,7 @@ export default function ReworkJobActions({
   }, [data.reworkAttempts]);
 
   useHotkeys(
-    "ctrl+s",
+    "mod+s",
     (event) => {
       event.preventDefault();
       setAlertOpen(true);

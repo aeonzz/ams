@@ -4,7 +4,7 @@ import SessionProvider from "@/components/providers/session-provider";
 import { redirect } from "next/navigation";
 import Error from "@/components/error";
 import AdminDashboardLayout from "./_components/admin-dashboard-layout";
-import { RoleGuard } from "@/components/role-guard";
+import UnauthorizedPage from "@/app/unauthorized/page";
 
 export default async function AppLayout({
   children,
@@ -17,13 +17,13 @@ export default async function AppLayout({
   if (!data) {
     return <Error />;
   }
-
+  if (!data.isAdmin) {
+    redirect('/unauthrorized')
+  }
   return (
     //@ts-ignore
     <SessionProvider user={data}>
-      {/* <RoleGuard allowedRoles={["ADMIN"]}> */}
       <AdminDashboardLayout>{children}</AdminDashboardLayout>
-      {/* </RoleGuard> */}
     </SessionProvider>
   );
 }

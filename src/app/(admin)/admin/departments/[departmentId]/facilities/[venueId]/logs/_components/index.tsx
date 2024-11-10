@@ -3,7 +3,6 @@
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import type { GenericAuditLogRelations } from "prisma/generated/zod";
 import { H1, H4, H5, P } from "@/components/typography/text";
 import SearchInput from "@/app/(app)/_components/search-input";
 import FetchDataError from "@/components/card/fetch-data-error";

@@ -83,7 +83,7 @@ export default function RequestActions({
   }
 
   useHotkeys(
-    "ctrl+shift+c",
+    "mod+shift+c",
     (event) => {
       event.preventDefault();
       setIsDialogOpen(true);

@@ -17,30 +17,32 @@ import { DataTableColumnHeader } from "@/components/data-table/data-table-column
 import { type Request } from "prisma/generated/zod";
 import { P } from "@/components/typography/text";
 import { Dot } from "lucide-react";
+import Link from "next/link";
+import { buttonVariants } from "@/components/ui/button";
+import { format } from "date-fns";
 
 export function getCancelledRequestColumns(): ColumnDef<Request>[] {
   return [
     {
       accessorKey: "type",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Type" />
+        <div className="flex justify-center px-2">
+          <DataTableColumnHeader column={column} title="Type" />
+        </div>
       ),
       cell: ({ row }) => {
-        const { color, stroke, variant } = getStatusColor(row.original.status);
+        const { icon: Icon, variant } = getRequestTypeIcon(row.original.type);
         return (
-          <div className="flex w-fit items-center">
-            <Badge variant={variant} className="pr-3.5">
-              <Dot className="mr-1 size-3" strokeWidth={stroke} color={color} />
-              {textTransform(row.original.status)}
+          <div className="flex items-center justify-center">
+            <Badge variant={variant}>
+              <Icon className="mr-1 size-4" />
+              {textTransform(row.original.type)}
             </Badge>
           </div>
         );
       },
       filterFn: (row, id, value) => {
         return Array.isArray(value) && value.includes(row.getValue(id));
-      },
-      meta: {
-        hidden: true,
       },
     },
     {
@@ -50,44 +52,62 @@ export function getCancelledRequestColumns(): ColumnDef<Request>[] {
       ),
       cell: ({ row }) => {
         return (
-          <div className="flex space-x-2">
-            <P className="truncate font-medium">{row.getValue("title")}</P>
+          <div className="flex w-[30vw] space-x-2">
+            <Link
+              href={`/request/${row.original.id}`}
+              className={cn(
+                buttonVariants({ variant: "link" }),
+                "p-0 text-foreground"
+              )}
+            >
+              <P className="truncate font-medium">{row.original.title}</P>
+            </Link>
           </div>
         );
       },
     },
-    {
-      accessorKey: "priority",
-      header: ({ column }) => <></>,
-      cell: ({ row }) => {
-        const Icon = getPriorityIcon(row.original.priority);
-        const priority = row.original.priority
-          .split("_")
-          .map(
-            (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-          )
-          .join(" ");
+    // {
+    //   accessorKey: "priority",
+    //   header: ({ column }) => <></>,
+    //   cell: ({ row }) => {
+    //     const Icon = getPriorityIcon(row.original.priority);
+    //     const priority = row.original.priority
+    //       .split("_")
+    //       .map(
+    //         (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+    //       )
+    //       .join(" ");
 
-        return (
-          <div className="flex items-center">
-            <Icon
-              className="mr-2 size-4 text-muted-foreground"
-              aria-hidden="true"
-            />
-            <P>{priority}</P>
-          </div>
-        );
-      },
-      filterFn: (row, id, value) => {
-        return Array.isArray(value) && value.includes(row.getValue(id));
-      },
-    },
+    //     return (
+    //       <div className="flex items-center">
+    //         <Icon
+    //           className="mr-2 size-4 text-muted-foreground"
+    //           aria-hidden="true"
+    //         />
+    //         <P>{priority}</P>
+    //       </div>
+    //     );
+    //   },
+    //   filterFn: (row, id, value) => {
+    //     return Array.isArray(value) && value.includes(row.getValue(id));
+    //   },
+    // },
     {
       accessorKey: "createdAt",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Created" />
+        <div className="flex justify-center px-2">
+          <DataTableColumnHeader column={column} title="Created" />
+        </div>
       ),
-      cell: ({ cell }) => formatDate(cell.getValue() as Date),
+      cell: ({ cell }) => {
+        return (
+          <div className="flex items-center justify-center">
+            <P className="text-muted-foreground">
+              {format(cell.getValue() as Date, "PP")}
+            </P>
+          </div>
+        );
+      },
     },
   ];
 }

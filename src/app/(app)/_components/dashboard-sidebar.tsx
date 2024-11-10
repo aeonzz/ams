@@ -8,13 +8,11 @@ import SidebarToggle from "../../../components/sidebar-toggle";
 interface DashboardSidebarProps {
   isOpen: boolean | undefined;
   setIsOpen: () => void;
-  hasUnreadNotifications: boolean | undefined;
 }
 
 export default function DashboardSidebar({
   isOpen,
   setIsOpen,
-  hasUnreadNotifications,
 }: DashboardSidebarProps) {
   return (
     <aside
@@ -25,10 +23,7 @@ export default function DashboardSidebar({
     >
       <SidebarToggle isOpen={isOpen} setIsOpen={setIsOpen} />
       <div className="relative flex h-full flex-col overflow-y-auto px-3 py-3">
-        <MainMenu
-          isOpen={isOpen}
-          hasUnreadNotifications={hasUnreadNotifications}
-        />
+        <MainMenu isOpen={isOpen} />
       </div>
     </aside>
   );

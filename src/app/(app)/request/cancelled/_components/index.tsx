@@ -7,6 +7,7 @@ import { DataTableSkeleton } from "@/components/data-table/data-table-skeleton";
 import { type GetRequestsSchema } from "@/lib/schema";
 import { CancelledRequestsTable } from "./cancelled-request-table";
 import { getCancelledRequests } from "@/lib/actions/requests";
+import SearchInput from "@/app/(app)/_components/search-input";
 interface CanceledRequestsScreenProps {
   search: GetRequestsSchema;
 }
@@ -21,14 +22,7 @@ export default function CanceledRequestsScreen({
       <div className="flex-1">
         <div className="flex h-[50px] items-center justify-between border-b px-3">
           <P className="font-medium">Cancelled Requests</P>
-          <React.Suspense fallback={<Skeleton className="h-7 w-52" />}>
-            <DateRangePicker
-              triggerVariant="secondary"
-              triggerSize="sm"
-              triggerClassName="ml-auto w-56 sm:w-60"
-              align="end"
-            />
-          </React.Suspense>
+          <SearchInput />
         </div>
         <div className="grid items-center py-3">
           <React.Suspense

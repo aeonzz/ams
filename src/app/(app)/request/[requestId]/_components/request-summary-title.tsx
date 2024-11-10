@@ -41,7 +41,7 @@ export default function RequestSummaryTitle() {
   };
 
   useHotkeys(
-    "ctrl+shift+l",
+    "mod+shift+l",
     (event) => {
       event.preventDefault();
       copyToClipboard();

@@ -4,7 +4,6 @@ import type { SettingWithRelations } from './SettingSchema'
 import type { RequestWithRelations } from './RequestSchema'
 import type { UserRoleWithRelations } from './UserRoleSchema'
 import type { JobRequestWithRelations } from './JobRequestSchema'
-import type { GenericAuditLogWithRelations } from './GenericAuditLogSchema'
 import type { UserDepartmentWithRelations } from './UserDepartmentSchema'
 import type { NotificationWithRelations } from './NotificationSchema'
 import { SessionWithRelationsSchema } from './SessionSchema'
@@ -12,7 +11,6 @@ import { SettingWithRelationsSchema } from './SettingSchema'
 import { RequestWithRelationsSchema } from './RequestSchema'
 import { UserRoleWithRelationsSchema } from './UserRoleSchema'
 import { JobRequestWithRelationsSchema } from './JobRequestSchema'
-import { GenericAuditLogWithRelationsSchema } from './GenericAuditLogSchema'
 import { UserDepartmentWithRelationsSchema } from './UserDepartmentSchema'
 import { NotificationWithRelationsSchema } from './NotificationSchema'
 
@@ -33,6 +31,7 @@ export const UserSchema = z.object({
   isArchived: z.boolean(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
+  isAdmin: z.boolean(),
 })
 
 export type User = z.infer<typeof UserSchema>
@@ -48,7 +47,6 @@ export type UserRelations = {
   requestAsReviewer: RequestWithRelations[];
   userRole: UserRoleWithRelations[];
   jobRequestsAsAssigned: JobRequestWithRelations[];
-  genericAuditLog: GenericAuditLogWithRelations[];
   userDepartments: UserDepartmentWithRelations[];
   notification: NotificationWithRelations[];
 };
@@ -62,7 +60,6 @@ export const UserWithRelationsSchema: z.ZodType<UserWithRelations> = UserSchema.
   requestAsReviewer: z.lazy(() => RequestWithRelationsSchema).array(),
   userRole: z.lazy(() => UserRoleWithRelationsSchema).array(),
   jobRequestsAsAssigned: z.lazy(() => JobRequestWithRelationsSchema).array(),
-  genericAuditLog: z.lazy(() => GenericAuditLogWithRelationsSchema).array(),
   userDepartments: z.lazy(() => UserDepartmentWithRelationsSchema).array(),
   notification: z.lazy(() => NotificationWithRelationsSchema).array(),
 }))

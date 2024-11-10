@@ -2,10 +2,8 @@ import { z } from 'zod';
 import { VehicleStatusSchema } from '../inputTypeSchemas/VehicleStatusSchema'
 import type { DepartmentWithRelations } from './DepartmentSchema'
 import type { TransportRequestWithRelations } from './TransportRequestSchema'
-import type { MaintenanceRecordWithRelations } from './MaintenanceRecordSchema'
 import { DepartmentWithRelationsSchema } from './DepartmentSchema'
 import { TransportRequestWithRelationsSchema } from './TransportRequestSchema'
-import { MaintenanceRecordWithRelationsSchema } from './MaintenanceRecordSchema'
 
 /////////////////////////////////////////
 // VEHICLE SCHEMA
@@ -34,7 +32,6 @@ export type Vehicle = z.infer<typeof VehicleSchema>
 export type VehicleRelations = {
   department: DepartmentWithRelations;
   transportRequest: TransportRequestWithRelations[];
-  maintenanceRecord: MaintenanceRecordWithRelations[];
 };
 
 export type VehicleWithRelations = z.infer<typeof VehicleSchema> & VehicleRelations
@@ -42,7 +39,6 @@ export type VehicleWithRelations = z.infer<typeof VehicleSchema> & VehicleRelati
 export const VehicleWithRelationsSchema: z.ZodType<VehicleWithRelations> = VehicleSchema.merge(z.object({
   department: z.lazy(() => DepartmentWithRelationsSchema),
   transportRequest: z.lazy(() => TransportRequestWithRelationsSchema).array(),
-  maintenanceRecord: z.lazy(() => MaintenanceRecordWithRelationsSchema).array(),
 }))
 
 export default VehicleSchema;

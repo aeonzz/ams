@@ -44,6 +44,7 @@ import { socket } from "@/app/socket";
 import DepartmentOverviewSkeleton from "./department-overview-skeleton";
 import OverviewNavigationMenu from "../../_components/navigation-menu";
 import { useDepartmentData } from "@/lib/hooks/use-department-data";
+import { useDepartmentNotifications } from "@/lib/hooks/use-department-notifications";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -64,33 +65,18 @@ export default function DepartmentOverviewScreen({
 
   const { data, isLoading, isError, refetch } = useDepartmentData(departmentId);
 
-  const fetchNotifications = async ({ pageParam = 1 }) => {
-    const res = await axios.get(
-      `/api/notification/get-department-notification-with-params/${departmentId}?page=${pageParam}&limit=${ITEMS_PER_PAGE}`
-    );
-    return res.data;
-  };
-
   const {
-    data: notificationsData,
+    notificationsData,
     fetchNextPage,
-    refetch: refetchNotifications,
     hasNextPage,
+    refetch: refetchNotifications,
     isFetchingNextPage,
-    status: notificationsStatus,
-  } = useInfiniteQuery({
-    queryKey: ["get-department-notifications-with-params", departmentId],
-    queryFn: fetchNotifications,
-    initialPageParam: 1,
-    getNextPageParam: (lastPage, pages) => {
-      if (lastPage.data.length < ITEMS_PER_PAGE) return undefined;
-      return pages.length + 1;
-    },
-  });
+    notificationsStatus,
+  } = useDepartmentNotifications(departmentId);
 
-  const allNotifications = React.useMemo(() => {
-    return notificationsData?.pages.flatMap((page) => page.data) || [];
-  }, [notificationsData]);
+  // const allNotifications = React.useMemo(() => {
+  //   return notificationsData?.pages.flatMap((page) => page.data) || [];
+  // }, [notificationsData]);
 
   const handleNotification = React.useCallback(() => {
     refetchNotifications();
@@ -106,20 +92,20 @@ export default function DepartmentOverviewScreen({
   }, [handleNotification]);
 
   React.useEffect(() => {
-    if (allNotifications.length > 0 && !selectedNotificationId) {
-      setSelectedNotificationId(allNotifications[0].id);
+    if (notificationsData.length > 0 && !selectedNotificationId) {
+      setSelectedNotificationId(notificationsData[0].id);
     }
-  }, [allNotifications, selectedNotificationId]);
+  }, [notificationsData, selectedNotificationId]);
 
   const handleNotificationSelect = (notificationId: string) => {
     setSelectedNotificationId(notificationId);
   };
 
   const selectedNotification: Notification = React.useMemo(() => {
-    return allNotifications.find(
+    return notificationsData.find(
       (notification) => notification.id === selectedNotificationId
     );
-  }, [allNotifications, selectedNotificationId]);
+  }, [notificationsData, selectedNotificationId]);
 
   React.useEffect(() => {
     if (selectedNotification && !selectedNotification.isRead) {
@@ -157,14 +143,6 @@ export default function DepartmentOverviewScreen({
     (request) => request.jobRequest?.status === "PENDING"
   );
 
-  const pendingJobsCount = pendingJobs.length;
-  const description =
-    pendingJobsCount === 1
-      ? "There is 1 pending job."
-      : pendingJobsCount > 1
-        ? `There are ${pendingJobsCount} pending jobs.`
-        : "No pending jobs at the moment.";
-
   return (
     <div className="container w-full p-0">
       <div className="grid grid-flow-row grid-cols-2 gap-3">
@@ -176,7 +154,7 @@ export default function DepartmentOverviewScreen({
             <Inbox
               key={departmentId}
               className="w-full"
-              notifications={allNotifications}
+              notifications={notificationsData}
               onNotificationSelect={handleNotificationSelect}
               selectedNotificationId={selectedNotificationId}
               status={notificationsStatus}

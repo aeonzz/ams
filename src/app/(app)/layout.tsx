@@ -22,17 +22,10 @@ export default async function AppLayout({
   //   return redirect("/admin");
   // }
 
-  const notification = await db.notification.findMany({
-    where: {
-      recepientId: data.id,
-      isRead: false,
-    },
-  });
-
   return (
     //@ts-ignore
     <SessionProvider user={data}>
-      <DashboardLayout notification={notification}>
+      <DashboardLayout>
         {/* <CommandLayout> */}
         {children}
         {/* </CommandLayout> */}

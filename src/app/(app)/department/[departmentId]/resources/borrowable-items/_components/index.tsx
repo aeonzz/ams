@@ -24,6 +24,7 @@ import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { cn, getReturnableItemStatusIcon, textTransform } from "@/lib/utils";
 import { format } from "date-fns";
+import DepartmentBorrowableItemsSkeleton from "./department-borrowable-items-skeleton";
 
 interface DepartmentBorrowableItemsScreen {
   departmentId: string;
@@ -92,7 +93,7 @@ export default function DepartmentBorrowableItemsScreen({
       </div>
       <div className="scroll-bar flex flex-1 justify-center overflow-y-auto">
         {isLoading ? (
-          <div>...Loading</div>
+          <DepartmentBorrowableItemsSkeleton />
         ) : isError ? (
           <div className="flex h-screen w-full items-center justify-center">
             <FetchDataError refetch={refetch} />

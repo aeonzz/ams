@@ -54,7 +54,7 @@ export default function RegularJobActions({
     useServerActionMutation(updateJobRequest);
 
   useHotkeys(
-    "ctrl+s",
+    "mod+s",
     (event) => {
       event.preventDefault();
       setAlertOpen(true);

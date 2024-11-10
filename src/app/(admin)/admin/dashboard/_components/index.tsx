@@ -38,6 +38,7 @@ import { toast } from "sonner";
 import { generateSystemReport } from "@/lib/fill-pdf/system-report";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
 import { useDashboardActions } from "@/lib/hooks/use-dashboard-actions";
+import { socket } from "@/app/socket";
 
 export default function AdminDashboardScreen() {
   const currentUser = useSession();
@@ -57,6 +58,18 @@ export default function AdminDashboardScreen() {
       return res.data.data;
     },
   });
+
+  React.useEffect(() => {
+    const handleUpdate = () => {
+      refetch();
+    };
+
+    socket.on("request_update", handleUpdate);
+
+    return () => {
+      socket.off("request_update", handleUpdate);
+    };
+  }, []);
 
   const filteredData = React.useMemo(() => {
     if (!data) return { requests: [], users: [] };

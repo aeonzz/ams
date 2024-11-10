@@ -20,12 +20,10 @@ import { useSession } from "@/lib/hooks/use-session";
 
 interface MainMenuProps {
   isOpen: boolean | undefined;
-  hasUnreadNotifications: boolean | undefined;
 }
 
 export default function MainMenu({
   isOpen,
-  hasUnreadNotifications,
 }: MainMenuProps) {
   const pathname = usePathname();
   const currentUser = useSession();
@@ -37,7 +35,7 @@ export default function MainMenu({
 
   return (
     <>
-      <UserNav isOpen={isOpen} />
+      <UserNav isOpen={isOpen} /> 
       <ScrollArea className="[&>div>div[style]]:!block">
         <nav className="h-full w-full">
           <ul className="flex flex-col items-start space-y-1">
@@ -76,7 +74,6 @@ export default function MainMenu({
                               active={active}
                               isOpen={isOpen}
                               href={href}
-                              hasUnreadNotifications={hasUnreadNotifications}
                             />
                           </TooltipTrigger>
                           {isOpen === false && (

@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
 import { LucideIcon } from "lucide-react";
@@ -5,6 +7,8 @@ import { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import { Button } from "./ui/button";
+import { useUserNotifications } from "@/lib/hooks/use-user-notifications";
+import { useSession } from "@/lib/hooks/use-session";
 
 interface MenuButtonProps {
   icon: LucideIcon;
@@ -12,7 +16,6 @@ interface MenuButtonProps {
   active: boolean;
   isOpen: boolean | undefined;
   href: string;
-  hasUnreadNotifications?: boolean | undefined;
 }
 
 export default function MenuButton({
@@ -21,8 +24,12 @@ export default function MenuButton({
   active,
   isOpen,
   href,
-  hasUnreadNotifications,
 }: MenuButtonProps) {
+  const currentUser = useSession();
+
+  const { unreadCount } = useUserNotifications(currentUser.id);
+
+  const hasUnreadNotifications = unreadCount > 0;
   return (
     <Button
       variant="ghost"

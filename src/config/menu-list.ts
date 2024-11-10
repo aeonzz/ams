@@ -32,7 +32,6 @@ export function getMenuList({
   const hasAllowedRole = userRole.some((role) =>
     roles.includes(role.role.name)
   );
-  const isPersonnel = userRole.some((role) => role.role.name === "PERSONNEL");
 
   const departmentLinks = currentUser.userDepartments.map((userDepartment) => {
     const baseSubmenus = [

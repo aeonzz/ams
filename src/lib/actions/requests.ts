@@ -134,6 +134,26 @@ export const createVenueRequest = authedProcedure
     const { path, ...rest } = input;
 
     try {
+      const overlappingReservation = await db.venueRequest.findFirst({
+        where: {
+          venueId: rest.venueId,
+          OR: [
+            {
+              startTime: {
+                lte: rest.endTime,
+              },
+              endTime: {
+                gte: rest.startTime,
+              },
+            },
+          ],
+        },
+      });
+
+      if (overlappingReservation) {
+        throw "The venue is already reserved for the selected time.";
+      }
+
       const { text } = await generateText({
         model: cohere("command-r-plus"),
         system: `You are an expert at creating concise, informative titles for work requests. 
@@ -222,6 +242,17 @@ export const createTransportRequest = authedProcedure
     const { path, ...rest } = input;
 
     try {
+      const conflictingTransportRequest = await db.transportRequest.findFirst({
+        where: {
+          vehicleId: rest.vehicleId,
+          dateAndTimeNeeded: rest.dateAndTimeNeeded,
+        },
+      });
+
+      if (conflictingTransportRequest) {
+        throw "The vehicle is already booked at the requested date and time.";
+      }
+
       const { text } = await generateText({
         model: cohere("command-r-plus"),
         system: `You are an expert at creating concise, informative titles for work requests. 
