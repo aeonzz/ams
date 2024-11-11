@@ -48,7 +48,7 @@ export default function ReturnableRequestCard({
           </div>
           <div className="flex items-center">
             <Users className="mr-2 h-4 w-4" />
-            <span>Quantity: {request.returnableRequest?.quantity}</span>
+            {/* <span>Quantity: {request.returnableRequest.}</span> */}
           </div>
           <div className="flex items-center">
             <Calendar className="mr-2 h-4 w-4" />

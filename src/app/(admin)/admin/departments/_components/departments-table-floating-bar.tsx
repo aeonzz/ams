@@ -105,6 +105,7 @@ export function DepartmentsTableFloatingBar({
                     setMethod("export");
                     startTransition(() => {
                       exportTableToCSV(table, {
+                        filename: "Departments",
                         excludeColumns: ["select", "actions"],
                         onlySelected: true,
                       });

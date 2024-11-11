@@ -1,4 +1,4 @@
-import { ChangeTypeSchema, VehicleStatusSchema } from "prisma/generated/zod";
+import { VehicleStatusSchema } from "prisma/generated/zod";
 import { z } from "zod";
 
 export const createVehicleSchemaServer = z.object({

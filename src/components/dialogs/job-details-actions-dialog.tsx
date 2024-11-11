@@ -19,11 +19,11 @@ import { P } from "../typography/text";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
 import { assignPersonnel } from "@/lib/actions/job";
 import { toast } from "sonner";
-import { type AssignPersonnelSchemaWithPath } from "@/app/(app)/(params)/request/[requestId]/_components/schema";
 import { usePathname } from "next/navigation";
 import { getGlobalRequest } from "@/lib/hooks/use-request-store";
 import { Button } from "@/components/ui/button";
 import { formatFullName } from "@/lib/utils";
+import { AssignPersonnelSchemaWithPath } from "@/app/(app)/request/[requestId]/_components/schema";
 
 export default function JobDetailsActionsDialog() {
   const dialogManager = useDialogManager();

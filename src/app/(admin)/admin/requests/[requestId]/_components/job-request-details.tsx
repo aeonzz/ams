@@ -26,7 +26,6 @@ import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
 import {
   cn,
   formatFullName,
-  getChangeTypeInfo,
   getJobStatusColor,
   isDateInPast,
   textTransform,

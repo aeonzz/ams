@@ -420,6 +420,7 @@ export default function SupplyItemsField({
                                         form.setValue("items", newItems);
                                       }}
                                       className="w-fit"
+                                      disabled={isPending}
                                     />
                                   </div>
                                   <Tooltip>

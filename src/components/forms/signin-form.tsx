@@ -55,7 +55,7 @@ export default function SignInForm() {
           render={({ field }) => (
             <FormItem>
               <MotionLayout>
-                <FormLabel>Email</FormLabel>
+                <FormLabel className="mb-1">Email</FormLabel>
                 <FormControl>
                   <Input
                     placeholder="m@example.com"

@@ -35,7 +35,7 @@ export default function MyReservationsScreen() {
   const transportRequests =
     data?.filter((request) => request.type === "TRANSPORT") || [];
   const returnableRequests =
-    data?.filter((request) => request.type === "RESOURCE") || [];
+    data?.filter((request) => request.type === "BORROW") || [];
 
   const NoDataMessage = ({ message }: { message: string }) => (
     <div className="flex min-h-[calc(100vh_-_200px)] flex-col items-center justify-center space-y-2 p-8 text-center">

@@ -197,6 +197,7 @@ export function VehiclesTableFloatingBar({
                     setMethod("export");
                     startTransition(() => {
                       exportTableToCSV(table, {
+                        filename: "Vehicles",
                         excludeColumns: ["select", "actions"],
                         onlySelected: true,
                       });

@@ -67,9 +67,6 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { Check, ChevronsUpDown, Dot } from "lucide-react";
 import { UpdateVehicleSheetSkeleton } from "./update-vehicle-sheet-skeleton";
-import ChangeTypeSchema, {
-  ChangeTypeType,
-} from "prisma/generated/zod/inputTypeSchemas/ChangeTypeSchema";
 import NumberInput from "@/components/number-input";
 import { useTransportDepartments } from "@/lib/hooks/use-transport-depratments";
 

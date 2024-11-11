@@ -43,7 +43,7 @@ export function DepartmentsTableToolbarActions({
         size="sm"
         onClick={() =>
           exportTableToCSV(table, {
-            filename: "tasks",
+            filename: "Departments",
             excludeColumns: ["select", "actions"],
           })
         }

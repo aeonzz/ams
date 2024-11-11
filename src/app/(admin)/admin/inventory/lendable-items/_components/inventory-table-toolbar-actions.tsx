@@ -54,7 +54,7 @@ export function InventoryTableToolbarActions({
         size="sm"
         onClick={() =>
           exportTableToCSV(table, {
-            filename: "tasks",
+            filename: "Lendable_Items",
             excludeColumns: ["select", "actions"],
           })
         }

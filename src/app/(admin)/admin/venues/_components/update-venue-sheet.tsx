@@ -69,11 +69,6 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { Check, ChevronsUpDown, Dot } from "lucide-react";
 import { UpdateVenueSheetSkeleton } from "./update-venue-sheet-skeleton";
-import VenueFeatures from "./venue-features";
-import { VenueFeaturesType } from "@/lib/types/venue";
-import ChangeTypeSchema, {
-  ChangeTypeType,
-} from "prisma/generated/zod/inputTypeSchemas/ChangeTypeSchema";
 import { TagInput } from "@/components/ui/tag-input";
 import NumberInput from "@/components/number-input";
 import { useFacilityDepartments } from "@/lib/hooks/use-facility-departments";

@@ -9,7 +9,7 @@ type Props = {
   value?: number;
   min?: number;
   max?: number;
-  disabled: boolean;
+  disabled?: boolean;
   onChange?: (value: number) => void;
   className?: string;
 };

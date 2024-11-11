@@ -190,6 +190,7 @@ export function VenuesTableFloatingBar({ table }: VenuesTableFloatingBarProps) {
                     setMethod("export");
                     startTransition(() => {
                       exportTableToCSV(table, {
+                        filename: "Facilities",
                         excludeColumns: ["select", "actions"],
                         onlySelected: true,
                       });

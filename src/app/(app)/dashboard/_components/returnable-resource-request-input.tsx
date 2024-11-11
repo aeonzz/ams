@@ -44,7 +44,6 @@ import { isOverlapping } from "@/lib/utils";
 import { InventoryItemWithRelations } from "prisma/generated/zod";
 import ReturnableResourceRequestSkeleton from "./returnable-resource-request-input-skeleton";
 import { socket } from "@/app/socket";
-import DepartmentBorrowingPolicyCard from "./department-borrowing-policy-card";
 
 interface ReturnableResourceRequestInputProps {
   mutateAsync: UseMutateAsyncFunction<

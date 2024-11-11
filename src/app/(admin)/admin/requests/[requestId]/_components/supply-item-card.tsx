@@ -26,7 +26,7 @@ export default function SupplyItemCard({ supplyRequest }: ItemCardProps) {
         <div className="flex flex-col">
           <P className="font-semibold">{supplyRequest.supplyItem.name}</P>
           <P className="font-normal text-muted-foreground">
-            {textTransform(supplyRequest.supplyItem.category)}
+            {textTransform(supplyRequest.supplyItem.category.name)}
           </P>
         </div>
       </div>

@@ -6,7 +6,7 @@ import { DateRange } from "react-day-picker";
 import { formatFullName } from "../utils";
 import type { RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTypeSchema";
 import html2canvas from "html2canvas";
-import ReactDOM from "react-dom";
+import { createRoot } from 'react-dom/client';
 import { DepartmentOverViewData } from "@/app/(app)/department/[departmentId]/insights/_components/types";
 import RequestChart, {
   processChartData,
@@ -145,7 +145,8 @@ async function captureChart(
     );
 
     // Render using ReactDOM
-    ReactDOM.render(chart, root);
+    const reactRoot = createRoot(root);
+    reactRoot.render(chart);
 
     // Wait longer for chart to render and capture
     setTimeout(() => {
@@ -171,7 +172,7 @@ async function captureChart(
           // Cleanup
           document.body.removeChild(container);
           document.head.removeChild(style);
-          ReactDOM.unmountComponentAtNode(root);
+          reactRoot.unmount(); 
 
           resolve(png);
         })
@@ -196,7 +197,8 @@ async function captureComponent(
     document.body.appendChild(container);
 
     const componentElement = React.createElement(Component, props);
-    ReactDOM.render(componentElement, container);
+    const root = createRoot(container);
+    root.render(componentElement);
 
     setTimeout(() => {
       html2canvas(container, {

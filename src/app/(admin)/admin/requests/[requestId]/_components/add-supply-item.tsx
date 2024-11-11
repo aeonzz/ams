@@ -422,6 +422,7 @@ export default function AddSupplyItem({
                                         );
                                         form.setValue("items", newItems);
                                       }}
+                                      disabled={isLoading}
                                       className="w-fit"
                                     />
                                   </div>

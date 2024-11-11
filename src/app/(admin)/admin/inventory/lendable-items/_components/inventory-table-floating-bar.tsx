@@ -191,6 +191,7 @@ export function InventoryTableFloatingBar({
                     setMethod("export");
                     startTransition(() => {
                       exportTableToCSV(table, {
+                        filename: "Lendable_Items",
                         excludeColumns: ["select", "actions"],
                         onlySelected: true,
                       });

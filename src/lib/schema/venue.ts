@@ -1,5 +1,4 @@
 import {
-  ChangeTypeSchema,
   VenueStatusSchema,
   VenueTypeSchema,
 } from "prisma/generated/zod";

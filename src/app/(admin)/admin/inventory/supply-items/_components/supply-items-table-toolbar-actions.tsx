@@ -54,7 +54,7 @@ export function SupplyItemsTableToolbarActions({
         size="sm"
         onClick={() =>
           exportTableToCSV(table, {
-            filename: "tasks",
+            filename: "Supply_Items",
             excludeColumns: ["select", "actions"],
           })
         }

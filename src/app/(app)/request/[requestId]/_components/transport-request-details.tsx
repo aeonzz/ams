@@ -25,7 +25,6 @@ import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   formatFullName,
-  getChangeTypeInfo,
   getVehicleStatusColor,
   textTransform,
 } from "@/lib/utils";

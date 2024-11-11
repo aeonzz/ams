@@ -180,6 +180,7 @@ export function UsersTableFloatingBar({ table }: UsersTableFloatingBarProps) {
                     setMethod("export");
                     startTransition(() => {
                       exportTableToCSV(table, {
+                        filename: "Users",
                         excludeColumns: ["select", "actions"],
                         onlySelected: true,
                       });

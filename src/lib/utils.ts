@@ -54,7 +54,6 @@ import { BadgeVariant } from "@/components/ui/badge";
 import { type VehicleStatusType } from "prisma/generated/zod/inputTypeSchemas/VehicleStatusSchema";
 import { type VenueStatusType } from "prisma/generated/zod/inputTypeSchemas/VenueStatusSchema";
 import { type ItemStatusType } from "prisma/generated/zod/inputTypeSchemas/ItemStatusSchema";
-import { ChangeTypeType } from "prisma/generated/zod/inputTypeSchemas/ChangeTypeSchema";
 import { User as UserType, type UserWithRelations } from "prisma/generated/zod";
 import { JobStatusType } from "prisma/generated/zod/inputTypeSchemas/JobStatusSchema";
 import { SupplyItemStatusType } from "prisma/generated/zod/inputTypeSchemas/SupplyItemStatusSchema";
@@ -445,7 +444,7 @@ export function getRequestTypeIcon(
       variant: "purple",
     },
     SUPPLY: {
-      icon: Package, 
+      icon: Package,
       variant: "blue",
     },
     VENUE: {
@@ -510,120 +509,6 @@ export function getReturnableItemStatusIcon(
   );
 }
 
-type ChangeTypeInfoConfig = {
-  icon: LucideIcon;
-  color: string;
-  message: string;
-};
-
-type ChangeTypeInfoMap = {
-  [key in ChangeTypeType]: ChangeTypeInfoConfig;
-};
-
-export function getChangeTypeInfo(
-  changeType: ChangeTypeType
-): ChangeTypeInfoConfig {
-  const ChangeTypeInfos: ChangeTypeInfoMap = {
-    STATUS_CHANGE: {
-      icon: RefreshCw,
-      color: "#3b82f6",
-      message: "Status changed",
-    },
-    FIELD_UPDATE: {
-      icon: PenTool,
-      color: "#22c55e",
-      message: "Field updated",
-    },
-    ASSIGNMENT_CHANGE: {
-      icon: User,
-      color: "#a855f7",
-      message: "Assignment changed",
-    },
-    REVIEWER_CHANGE: {
-      icon: UserCheck,
-      color: "#6366f1",
-      message: "Reviewer changed",
-    },
-    APPROVER_CHANGE: {
-      icon: UserCheck,
-      color: "#ec4899",
-      message: "Approver changed",
-    },
-    APPROVED: {
-      icon: CheckCircle,
-      color: "#22c55e",
-      message: "Approved",
-    },
-    CANCELLED: {
-      icon: XCircle,
-      color: "#ef4444",
-      message: "Cancelled",
-    },
-    CREATED: {
-      icon: Plus,
-      color: "#3b82f6",
-      message: "System created the request",
-    },
-    DELETION: {
-      icon: Trash2,
-      color: "#ef4444",
-      message: "Deleted",
-    },
-    RESTORED: {
-      icon: RotateCw,
-      color: "#10b981",
-      message: "Restored",
-    },
-    ARCHIVED: {
-      icon: Archive,
-      color: "#f97316",
-      message: "Archived",
-    },
-    ACTIVATED: {
-      icon: PlayCircle,
-      color: "#16a34a",
-      message: "Activated",
-    },
-    RENAME: {
-      icon: Edit,
-      color: "#eab308",
-      message: "Renamed",
-    },
-    PERMISSION_CHANGE: {
-      icon: Lock,
-      color: "#8b5cf6",
-      message: "Permission changed",
-    },
-    VENUE_CHANGE: {
-      icon: MapPin,
-      color: "#10b981",
-      message: "Venue changed",
-    },
-    TIME_UPDATE: {
-      icon: Clock,
-      color: "#f59e0b",
-      message: "Time updated",
-    },
-    LOCATION_UPDATE: {
-      icon: Map,
-      color: "#3b82f6",
-      message: "Location updated",
-    },
-    OTHER: {
-      icon: AlertCircle,
-      color: "#6b7280",
-      message: "Other change",
-    },
-  };
-
-  return (
-    ChangeTypeInfos[changeType] || {
-      icon: AlertCircle,
-      color: "#6b7280", // Default gray for unknown
-      message: "Unknown change",
-    }
-  );
-}
 export function isOverlapping(
   start1: Date,
   end1: Date,

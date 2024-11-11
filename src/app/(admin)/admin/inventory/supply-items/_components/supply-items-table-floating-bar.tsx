@@ -202,6 +202,7 @@ export function SupplyitemsTableFloatingBar({
                     setMethod("export");
                     startTransition(() => {
                       exportTableToCSV(table, {
+                        filename: "Supply_Items",
                         excludeColumns: ["select", "actions"],
                         onlySelected: true,
                       });

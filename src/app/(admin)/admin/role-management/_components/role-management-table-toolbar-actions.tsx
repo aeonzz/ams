@@ -59,7 +59,7 @@ export function RoleManagementTableToolbarActions({
           placeholder="Created"
         />
       </React.Suspense> */}
-      <Button
+      {/* <Button
         variant="secondary"
         size="sm"
         onClick={() =>
@@ -71,7 +71,7 @@ export function RoleManagementTableToolbarActions({
       >
         <DownloadIcon className="mr-2 size-4" aria-hidden="true" />
         Export
-      </Button>
+      </Button> */}
       {/**
        * Other actions can be added here.
        * For example, import, view, etc.

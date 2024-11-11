@@ -55,7 +55,7 @@ export function VenuesTableToolbarActions({
         size="sm"
         onClick={() =>
           exportTableToCSV(table, {
-            filename: "tasks",
+            filename: "Facilities",
             excludeColumns: ["select", "actions"],
           })
         }
