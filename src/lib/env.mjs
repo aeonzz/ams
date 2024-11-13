@@ -7,8 +7,13 @@ export const env = createEnv({
       .enum(["development", "test", "production"])
       .default("development"),
     DATABASE_URL: z.string().min(1),
-
     RESEND_API_KEY: z.string().min(1),
+    COHERE_API_KEY: z.string().min(1),
+    PGADMIN_DEFAULT_EMAIL: z.string().min(1),
+    PGADMIN_DEFAULT_PASSWORD: z.string().min(1),
+    POSTGRES_USER: z.string().min(1),
+    POSTGRES_DB: z.string().min(1),
+    POSTGRES_PASSWORD: z.string().min(1),
   },
   client: {
     // NEXT_PUBLIC_PUBLISHABLE_KEY: z.string().min(1),

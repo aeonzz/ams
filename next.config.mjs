@@ -4,7 +4,6 @@ const nextConfig = {
     config.externals.push("@node-rs/argon2", "@node-rs/bcrypt");
     return config;
   },
-  reactStrictMode: true,
   // output: "standalone",
   images: {
     remotePatterns: [
@@ -14,9 +13,9 @@ const nextConfig = {
       },
     ],
   },
-  // typescript: {
-  //   ignoreBuildErrors: true,
-  // },
+  compiler: {
+    removeConsole: process.env.NODE_ENV === "production"
+  }
 };
 
 export default nextConfig;

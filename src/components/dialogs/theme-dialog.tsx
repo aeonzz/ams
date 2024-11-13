@@ -75,7 +75,6 @@ export default function ThemeDialog() {
               <span>{item.name}</span>
               <div className="ml-auto flex items-center gap-1">
                 {item.value === theme && <Check />}
-                <CommandShortcut>{index + 1}</CommandShortcut>
               </div>
             </CommandItem>
           ))}

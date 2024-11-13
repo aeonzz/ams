@@ -102,7 +102,7 @@ export default function SignInForm() {
         <SubmitButton
           disabled={isLoading}
           className="w-full"
-          variant="ringHover"
+          variant="secondary"
         >
           Sign in
         </SubmitButton>

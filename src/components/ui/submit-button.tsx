@@ -76,7 +76,6 @@ const SubmitButton = forwardRef<HTMLButtonElement, SubmitButtonProps>(
                 animate={{ y: 0 }}
                 exit={{ y: 30 }}
                 transition={{ duration: 0.2, type: "spring" }}
-                className="text-slate-100 dark:text-foreground"
               >
                 <Slottable>{props.children}</Slottable>
               </motion.div>
