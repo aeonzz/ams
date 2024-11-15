@@ -49,7 +49,6 @@ import VenueRequestInputSkeleton from "./venue-request-input-skeleton";
 import { VenueFeaturesType } from "@/lib/types/venue";
 import ScheduledEventCardSkeleton from "./scheduled-event-card-skeleton";
 import MultiSelect from "@/components/multi-select";
-import { socket } from "@/app/socket";
 
 interface VenueRequestInputProps {
   mutateAsync: UseMutateAsyncFunction<
@@ -194,8 +193,6 @@ export default function VenueRequestInput({
     toast.promise(mutateAsync(data), {
       loading: "Submitting...",
       success: () => {
-        socket.emit("notifications");
-        socket.emit("request_update");
         handleOpenChange(false);
         return "Your request has been submitted and is awaiting approval.";
       },

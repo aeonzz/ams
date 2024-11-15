@@ -25,8 +25,8 @@ import {
 import { RequestTableFloatingBar } from "./request-table-floating-bar";
 import { ModifiedDataTable } from "@/components/data-table/modified-data-table";
 import { Dot } from "lucide-react";
-import { socket } from "@/app/socket";
 import { useRouter } from "next/navigation";
+import { pusherClient } from "@/lib/pusher-client";
 
 interface RequestTableProps {
   requestPromise: ReturnType<typeof getMyRequests>;
@@ -100,14 +100,15 @@ export function RequestTable({ requestPromise }: RequestTableProps) {
   });
 
   React.useEffect(() => {
-    socket.on("request_update", () => {
+    const channel = pusherClient.subscribe("request");
+    channel.bind("request_update", (data: { message: string }) => {
       router.refresh();
     });
 
     return () => {
-      socket.off("request_update");
+      pusherClient.unsubscribe("request");
     };
-  }, [router]);
+  }, []);
 
   return (
     <ModifiedDataTable

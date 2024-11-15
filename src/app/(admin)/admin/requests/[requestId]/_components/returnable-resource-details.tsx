@@ -35,7 +35,6 @@ import {
   type UpdateReturnableResourceRequestSchemaWithPath,
   type UpdateReturnableResourceRequestSchema,
 } from "@/lib/schema/resource/returnable-resource";
-import { socket } from "@/app/socket";
 import { toast } from "sonner";
 import { usePathname } from "next/navigation";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
@@ -147,8 +146,6 @@ export default function ReturnableResourceDetails({
       toast.promise(mutateAsync(data), {
         loading: "Saving...",
         success: () => {
-          socket.emit("notifications");
-          socket.emit("request_update", requestId);
           form.reset({
             location: data.location,
             dateAndTimeNeeded: data.dateAndTimeNeeded,

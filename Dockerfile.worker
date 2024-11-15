@@ -1,0 +1,21 @@
+# Use the same Node base image as the main app
+FROM node:18-alpine
+
+# Set the working directory
+WORKDIR /app
+
+# Copy package.json and install dependencies
+COPY package*.json ./
+RUN npm ci
+
+# Copy the rest of the application files
+COPY . .
+
+# Generate Prisma client (if Prisma is used)
+RUN npx prisma generate
+
+# Expose the WebSocket port if needed
+EXPOSE 8080
+
+# Run the worker script
+CMD ["npm", "run", "worker"]

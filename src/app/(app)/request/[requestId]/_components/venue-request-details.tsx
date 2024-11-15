@@ -53,7 +53,6 @@ import VenueEditTimeInput from "./venue-edit-time-input";
 import { Button } from "@/components/ui/button";
 import type { RequestStatusTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestStatusTypeSchema";
 import { udpateVenueRequest } from "@/lib/actions/requests";
-import { socket } from "@/app/socket";
 import { usePathname } from "next/navigation";
 import MultiSelect from "@/components/multi-select";
 import { Textarea } from "@/components/ui/text-area";
@@ -124,7 +123,6 @@ export default function VenueRequestDetails({
       toast.promise(mutateAsync(data), {
         loading: "Saving...",
         success: () => {
-          socket.emit("request_update", requestId);
           form.reset({
             startTime: data.startTime,
             endTime: data.endTime,
@@ -149,7 +147,7 @@ export default function VenueRequestDetails({
   const departmentHead = data.request.department.userRole.find(
     (role) => role.role.name === "DEPARTMENT_HEAD"
   )?.user;
-  console.log(data.request.department.userRole, departmentHead)
+  console.log(data.request.department.userRole, departmentHead);
 
   const existingFormFile = data.request.department.files.find(
     (file) => file.filePurpose === "VENUE_FORM"

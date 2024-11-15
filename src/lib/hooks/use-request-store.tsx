@@ -1,4 +1,4 @@
-import { create } from "zustand";
+import React from "react";
 import {
   useQuery,
   useQueryClient,
@@ -6,69 +6,51 @@ import {
 } from "@tanstack/react-query";
 import axios from "axios";
 import { RequestWithRelations } from "prisma/generated/zod";
-import { useEffect } from "react";
-import { socket } from "@/app/socket";
+import { pusherClient } from "../pusher-client";
 
-interface RequestState {
-  request: RequestWithRelations | null;
-  setRequest: (request: RequestWithRelations | null) => void;
-}
-
-const useRequestStore = create<RequestState>((set) => ({
-  request: null,
-  setRequest: (request: RequestWithRelations | null) => set({ request }),
-}));
-
-export function useRequest(id: string): UseQueryResult<
-  RequestWithRelations,
-  Error
-> & {
-  globalRequest: RequestWithRelations | null;
-} {
+export function useRequest(
+  id: string
+): UseQueryResult<RequestWithRelations, Error> {
   const queryClient = useQueryClient();
-  const { request: globalRequest, setRequest } = useRequestStore();
+  // Handle query for fetching request data
 
-  useEffect(() => {
-    socket.on("request_update", () => {
+  // Set up Pusher to listen for updates
+  React.useEffect(() => {
+    const channel = pusherClient.subscribe("request");
+    channel.bind("request_update", (data: { message: string }) => {
+      console.log(data.message);
       queryClient.invalidateQueries({ queryKey: [id] });
     });
 
     return () => {
-      socket.off("request_update");
+      pusherClient.unsubscribe("request");
     };
   }, []);
-
-  useEffect(() => {
-    const ws = new WebSocket("ws://localhost:8080");
-
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      console.log("yawa",data.queryKey);
-      if (data.type === "INVALIDATE_QUERIES") {
-        if (data.queryKey.includes(id)) {
-          queryClient.invalidateQueries({ queryKey: [id] });
-          socket.emit("notifications");
-          socket.emit("request_update");
-        }
-      }
-    };
-
-    return () => {
-      ws.close();
-    };
-  }, [queryClient, id]);
 
   const query = useQuery<RequestWithRelations, Error>({
     queryKey: [id],
     queryFn: async () => {
       const res = await axios.get(`/api/request/get-request/${id}`);
-      const data = res.data.data;
-      setRequest(data);
-      return data;
+      return res.data.data;
     },
   });
 
-  return { ...query, globalRequest };
-}
+  // React.useEffect(() => {
+  //   const ws = new WebSocket("ws://localhost:8080");
 
-export const getGlobalRequest = () => useRequestStore.getState().request;
+  //   ws.onmessage = (event) => {
+  //     const data = JSON.parse(event.data);
+  //     if (data.type === "INVALIDATE_QUERIES") {
+  //       if (data.queryKey.includes(id)) {
+  //         query.refetch();
+  //       }
+  //     }
+  //   };
+
+  //   return () => {
+  //     ws.close();
+  //   };
+  // }, [id]);
+
+  return query;
+}

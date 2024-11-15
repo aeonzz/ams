@@ -17,6 +17,7 @@ import {
   deleteSupplyRequestItemSchema,
   extendedUpdateSupplyRequestItemSchema,
 } from "../schema/resource/request-supply";
+import { pusher } from "../pusher";
 
 export const createReturnableResourceRequest = authedProcedure
   .createServerAction()
@@ -94,6 +95,14 @@ export const createReturnableResourceRequest = authedProcedure
         message: `A new borrow request titled "${createdRequest.title}" has been submitted. Please review the request and take the necessary actions.`,
         recepientIds: [createdRequest.departmentId],
         userId: user.id,
+      });
+
+      await pusher.trigger("request", "request_update", {
+        message: "Request created",
+      });
+
+      await pusher.trigger("request", "notifications", {
+        message: "",
       });
 
       return revalidatePath(path);
@@ -183,6 +192,14 @@ export const createSupplyResourceRequest = authedProcedure
         userId: user.id,
       });
 
+      await pusher.trigger("request", "request_update", {
+        message: "Request created",
+      });
+
+      await pusher.trigger("request", "notifications", {
+        message: "",
+      });
+
       return revalidatePath(path);
     } catch (error) {
       getErrorMessage(error);
@@ -203,6 +220,10 @@ export const updateSupplyRequest = authedProcedure
         data: {
           ...rest,
         },
+      });
+
+      await pusher.trigger("request", "request_update", {
+        message: "",
       });
 
       return revalidatePath(path);
@@ -227,6 +248,10 @@ export const updateRequestSupplyItem = authedProcedure
         },
       });
 
+      await pusher.trigger("request", "request_update", {
+        message: "",
+      });
+
       return revalidatePath(path);
     } catch (error) {
       return getErrorMessage(error);
@@ -244,6 +269,10 @@ export const deleteRequestSupplyItem = authedProcedure
         where: {
           id: id,
         },
+      });
+
+      await pusher.trigger("request", "request_update", {
+        message: "",
       });
 
       return revalidatePath(path);
@@ -271,6 +300,10 @@ export const createSupplyItemRequest = authedProcedure
           });
         })
       );
+
+      await pusher.trigger("request", "request_update", {
+        message: "",
+      });
 
       return revalidatePath(path);
     } catch (error) {

@@ -16,7 +16,6 @@ import { createSupplyItemRequest } from "@/lib/actions/resource";
 import { Form } from "@/components/ui/form";
 import { toast } from "sonner";
 import { usePathname } from "next/navigation";
-import { socket } from "@/app/socket";
 
 interface AddSupplyItemWrapperProps {
   departmentId: string;
@@ -59,7 +58,6 @@ export default function AddSupplyItemWrapper({
     toast.promise(mutateAsync(data), {
       loading: "Adding...",
       success: () => {
-        socket.emit("request_update");
         setEditField(null);
         return "The new item has been successfully added.";
       },

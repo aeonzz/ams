@@ -46,7 +46,6 @@ import { P } from "../typography/text";
 import { Info } from "lucide-react";
 import { toast } from "sonner";
 import { usePathname } from "next/navigation";
-import { socket } from "@/app/socket";
 
 const surveyQuestions = [
   "SQ0: I am satisfied with the service that I availed.",
@@ -136,10 +135,6 @@ export default function JobRequestEvaluationForm({
       toast.promise(mutateAsync(data), {
         loading: "Submitting your evaluation...",
         success: () => {
-          queryClient.invalidateQueries({
-            queryKey: [requestId],
-          });
-          socket.emit("request_update", requestId);
           handleOpenChange(false);
           return "Thank you! Your evaluation has been successfully submitted.";
         },
@@ -417,7 +412,8 @@ export default function JobRequestEvaluationForm({
                               <RadioGroupItem value="aware_and_saw" />
                             </FormControl>
                             <FormLabel className="font-normal">
-                              I know what a CC is and I saw this office&apos;s CC.
+                              I know what a CC is and I saw this office&apos;s
+                              CC.
                             </FormLabel>
                           </FormItem>
                           <FormItem className="flex items-center space-x-3 space-y-0">
@@ -434,8 +430,8 @@ export default function JobRequestEvaluationForm({
                               <RadioGroupItem value="learned_when_saw" />
                             </FormControl>
                             <FormLabel className="font-normal">
-                              I learned of the CC only when I saw this office&apos;s
-                              CC.
+                              I learned of the CC only when I saw this
+                              office&apos;s CC.
                             </FormLabel>
                           </FormItem>
                           <FormItem className="flex items-center space-x-3 space-y-0">

@@ -45,7 +45,6 @@ import {
 } from "@/components/ui/command";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { socket } from "@/app/socket";
 
 interface AddEstimatedTimeProps {
   data: RequestWithRelations;
@@ -55,8 +54,8 @@ const predefinedHours = [1, 2, 4, 8, 12, 20, 24];
 
 export default function AddEstimatedTime({ data }: AddEstimatedTimeProps) {
   const currentUser = useSession();
-  const pathname = usePathname();
   const queryClient = useQueryClient();
+  const pathname = usePathname();
   const [popoverOpen, setPopoverOpen] = React.useState(false);
   const [tooltipOpen, setTooltipOpen] = React.useState(false);
   const [showCustomInput, setShowCustomInput] = React.useState(false);
@@ -166,13 +165,7 @@ export default function AddEstimatedTime({ data }: AddEstimatedTimeProps) {
       {
         loading: "Updating estimated time...",
         success: () => {
-          queryClient.invalidateQueries({
-            queryKey: [data.id],
-          });
-          queryClient.invalidateQueries({
-            queryKey: ["activity", data.id],
-          });
-          socket.emit("request_update", data.id);
+          queryClient.invalidateQueries({ queryKey: [data.id] });
           return "Estimated time updated successfully";
         },
         error: (err) => {

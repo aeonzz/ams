@@ -31,7 +31,6 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { cancelOwnRequest } from "@/lib/actions/job";
 import type { CancelOwnRequestSchema } from "./schema";
 import { EntityTypeType } from "prisma/generated/zod/inputTypeSchemas/EntityTypeSchema";
-import { socket } from "@/app/socket";
 
 interface RequestActionsProps {
   data: RequestWithRelations;
@@ -45,7 +44,6 @@ export default function RequestActions({
   entityType,
 }: RequestActionsProps) {
   const pathname = usePathname();
-  const queryClient = useQueryClient();
   const { mutateAsync, isPending } = useServerActionMutation(cancelOwnRequest);
 
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
@@ -60,23 +58,11 @@ export default function RequestActions({
     toast.promise(mutateAsync(values), {
       loading: "Cancelling...",
       success: () => {
-        queryClient.invalidateQueries({
-          queryKey: [params],
-        });
-        queryClient.invalidateQueries({
-          queryKey: ["activity", data.id],
-        });
-        queryClient.invalidateQueries({
-          queryKey: ["user-dashboard-overview"],
-        });
-        socket.emit("request_update", data.id);
         setIsDialogOpen(false);
         return "Request cancelled successfully";
       },
       error: (err) => {
         console.error(err);
-        // Revert optimistic update on error
-        queryClient.setQueryData([params], data);
         return "Something went wrong, please try again later.";
       },
     });

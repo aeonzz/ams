@@ -2,21 +2,21 @@ import React from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import type { DepartmentWithRelations } from "prisma/generated/zod";
-import { socket } from "@/app/socket";
+import { pusherClient } from "../pusher-client";
 
 export const useDepartmentData = (departmentId: string) => {
   const queryClient = useQueryClient();
+
   React.useEffect(() => {
-    const handleUpdate = () => {
+    const channel = pusherClient.subscribe("request");
+    channel.bind("request_update", (data: { message: string }) => {
       queryClient.invalidateQueries({
         queryKey: [departmentId],
       });
-    };
-
-    socket.on("request_update", handleUpdate);
+    });
 
     return () => {
-      socket.off("request_update", handleUpdate);
+      pusherClient.unsubscribe("request");
     };
   }, []);
 

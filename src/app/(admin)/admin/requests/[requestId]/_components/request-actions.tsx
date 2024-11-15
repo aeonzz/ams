@@ -31,7 +31,6 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { cancelOwnRequest } from "@/lib/actions/job";
 import type { CancelOwnRequestSchema } from "./schema";
 import { EntityTypeType } from "prisma/generated/zod/inputTypeSchemas/EntityTypeSchema";
-import { socket } from "@/app/socket";
 
 interface RequestActionsProps {
   data: RequestWithRelations;
@@ -69,7 +68,6 @@ export default function RequestActions({
         queryClient.invalidateQueries({
           queryKey: ["user-dashboard-overview"],
         });
-        socket.emit("request_update", data.id);
         setIsDialogOpen(false);
         return "Request cancelled successfully";
       },

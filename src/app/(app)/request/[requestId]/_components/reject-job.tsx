@@ -30,7 +30,6 @@ import { usePathname } from "next/navigation";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { reworkJobRequest } from "@/lib/actions/job";
-import { socket } from "@/app/socket";
 
 const FormSchema = z.object({
   rejectionReason: z
@@ -76,8 +75,6 @@ export default function RejectJob({ requestId, disabled }: RejectJobProps) {
             queryClient.invalidateQueries({
               queryKey: ["activity", requestId],
             });
-            socket.emit("notifications");
-            socket.emit("request_update", requestId);
             setIsRejectAlertOpen(false);
             return "Request rejected successfully.";
           },

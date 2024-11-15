@@ -30,7 +30,6 @@ import type { JobRequestWithRelations } from "prisma/generated/zod";
 import { CommandShortcut } from "@/components/ui/command";
 import { P } from "@/components/typography/text";
 import { type JobStatusType } from "prisma/generated/zod/inputTypeSchemas/JobStatusSchema";
-import { socket } from "@/app/socket";
 
 interface RegularJobActionsProps {
   allowedDepartment?: string;
@@ -47,7 +46,6 @@ export default function RegularJobActions({
 }: RegularJobActionsProps) {
   const currentUser = useSession();
   const pathname = usePathname();
-  const queryClient = useQueryClient();
   const [alertOpen, setAlertOpen] = React.useState(false);
 
   const { isPending: isPendingMutation, mutateAsync } =
@@ -75,9 +73,6 @@ export default function RegularJobActions({
       {
         loading: "Loading...",
         success: () => {
-          queryClient.invalidateQueries({ queryKey: [requestId] });
-          socket.emit("request_update", requestId);
-          socket.emit("notifications", requestId);
           return `Job request is now ${status.toLowerCase().replace("_", " ")}`;
         },
         error: (err) => {

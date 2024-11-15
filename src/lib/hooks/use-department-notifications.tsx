@@ -1,8 +1,8 @@
 import React from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { socket } from "@/app/socket";
 import { Notification } from "prisma/generated/zod";
+import { pusherClient } from "../pusher-client";
 
 const ITEMS_PER_PAGE = 10; // Adjust as needed
 
@@ -38,14 +38,13 @@ export const useDepartmentNotifications = (departmentId: string) => {
   const unreadCount: number = notificationsData?.pages[0]?.unreadCount || 0;
 
   React.useEffect(() => {
-    const handleNotification = () => {
+    const channel = pusherClient.subscribe("request");
+    channel.bind("request_update", (data: { message: string }) => {
       refetch();
-    };
-
-    socket.on("notifications", handleNotification);
+    });
 
     return () => {
-      socket.off("notifications", handleNotification);
+      pusherClient.unsubscribe("request");
     };
   }, []);
 

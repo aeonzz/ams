@@ -18,7 +18,6 @@ import { Button } from "@/components/ui/button";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
 import { supplyRequestActions } from "@/lib/actions/supply";
 import { UpdateSupplyResourceRequestSchemaWithPath } from "@/lib/schema/resource/supply-resource";
-import { socket } from "@/app/socket";
 
 interface SupplyRequestActionsProps {
   requestId: string;
@@ -40,8 +39,6 @@ export default function SupplyRequestActions({
     toast.promise(mutateAsync(data), {
       loading: "Marking as picked up...",
       success: () => {
-        socket.emit("request_update");
-        socket.emit("notifications");
         return "The supply has been successfully marked as fulfilled and received by the recipient!";
       },
       error: (err) => {

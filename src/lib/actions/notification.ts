@@ -10,6 +10,7 @@ import {
   updateNotificationStatusSchema,
 } from "../schema/notification";
 import { revalidatePath } from "next/cache";
+import { pusher } from "../pusher";
 
 export const createNotification = authedProcedure
   .createServerAction()
@@ -49,6 +50,10 @@ export const updateNotificationStatus = authedProcedure
         data: {
           ...rest,
         },
+      });
+
+      await pusher.trigger("request", "notifications", {
+        message: "",
       });
 
       return result;

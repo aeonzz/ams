@@ -23,7 +23,6 @@ import {
   deleteRequestSupplyItem,
 } from "@/lib/actions/resource";
 import { toast } from "sonner";
-import { socket } from "@/app/socket";
 import { usePathname } from "next/navigation";
 import { PhotoProvider, PhotoView } from "react-photo-view";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
@@ -74,7 +73,6 @@ export default function SupplyRequestItemCard({
       {
         loading: "Saving...",
         success: () => {
-          socket.emit("request_update");
           setEditField(null);
           return "Request updated successfully";
         },
@@ -98,7 +96,6 @@ export default function SupplyRequestItemCard({
       {
         loading: "Deleting...",
         success: () => {
-          socket.emit("request_update");
           setEditField(null);
           return "Item deleted successfully";
         },

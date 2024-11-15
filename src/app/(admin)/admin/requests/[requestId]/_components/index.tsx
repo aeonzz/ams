@@ -57,7 +57,7 @@ interface RequestDetailsProps {
 export default function RequestDetails({ params }: RequestDetailsProps) {
   const currentUser = useSession();
   const dialogManager = useDialogManager();
-  const { data, isLoading, isError, refetch, globalRequest } =
+  const { data, isLoading, isError, refetch } =
     useRequest(params);
 
   if (isLoading) return <RequestDetailsSkeleton />;

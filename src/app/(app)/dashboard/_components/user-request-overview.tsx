@@ -13,11 +13,9 @@ import { Dot, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import FetchDataError from "@/components/card/fetch-data-error";
 import DashboardSkeleton from "./dashboard-skeleton";
-import EventsCalendar from "./events-calendar";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTypeSchema";
 import NumberFlow from "@number-flow/react";
-import { socket } from "@/app/socket";
+import { pusherClient } from "@/lib/pusher-client";
 
 export default function UserRequestOverview() {
   const { data, isLoading, refetch, isError } = useQuery<
@@ -39,18 +37,21 @@ export default function UserRequestOverview() {
   };
 
   React.useEffect(() => {
-    socket.on("request_update", () => {
+    const channel = pusherClient.subscribe("request");
+    channel.bind("request_update", (data: { message: string }) => {
+      console.log(data.message);
       refetch();
     });
 
     return () => {
-      socket.off("request_update");
+      pusherClient.unsubscribe("request");
     };
   }, []);
 
   if (isLoading) {
     return <DashboardSkeleton />;
   }
+
   if (isError) {
     return (
       <div className="flex h-[75%] w-full items-center justify-center">
@@ -125,15 +126,43 @@ export default function UserRequestOverview() {
         </div>
         <div className="flex flex-col gap-3 p-3">
           {getPendingRequests().length === 0 ? (
-            <p className="text-center text-muted-foreground">
-              No pending requests
-            </p>
+            <div className="flex flex-col items-center justify-center p-8 text-center">
+              <svg
+                className="mb-4 h-24 w-24 text-muted-foreground"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1}
+                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1}
+                  d="M12 12v4M12 8v.01"
+                />
+              </svg>
+              <p className="text-lg font-medium text-muted-foreground">
+                Nothing to show here
+              </p>
+              <p className="text-sm text-muted-foreground">
+                You don&apos;t have any pending requests at the moment.
+              </p>
+            </div>
           ) : (
             getPendingRequests().map((request) => {
               const { color, stroke, variant } = getStatusColor(request.status);
               return (
-                <Link key={request.id} href={`request/${request.id}`}>
-                  <Card className="bg-secondary">
+                <Link
+                  key={request.id}
+                  href={`request/${request.id}`}
+                  className="group"
+                >
+                  <Card className="bg-secondary group-hover:bg-tertiary">
                     <CardHeader className="pb-2">
                       <div className="flex items-center justify-between">
                         <CardTitle className="text-sm font-medium">

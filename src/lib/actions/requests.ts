@@ -25,6 +25,7 @@ import { UserCheck2Icon } from "lucide-react";
 import { createNotification } from "./notification";
 import { updateReturnableResourceRequestSchemaWithPath } from "../schema/resource/returnable-resource";
 import { updateRequestStatusSchemaWithPath } from "@/app/(app)/request/[requestId]/_components/schema";
+import { pusher } from "../pusher";
 
 const cohere = createCohere({
   apiKey: process.env.COHERE_API_KEY,
@@ -227,6 +228,14 @@ export const createVenueRequest = authedProcedure
         userId: user.id,
       });
 
+      await pusher.trigger("request", "request_update", {
+        message: "Request created",
+      });
+
+      await pusher.trigger("request", "notifications", {
+        message: "",
+      });
+
       return revalidatePath(path);
     } catch (error) {
       getErrorMessage(error);
@@ -322,6 +331,14 @@ export const createTransportRequest = authedProcedure
         message: `A new transport request titled "${createdRequest.title}" has been submitted. Please review the details and take the necessary actions.`,
         recepientIds: [createdRequest.departmentId],
         userId: user.id,
+      });
+
+      await pusher.trigger("request", "request_update", {
+        message: "Request created",
+      });
+
+      await pusher.trigger("request", "notifications", {
+        message: "",
       });
 
       return revalidatePath(path);
@@ -609,6 +626,10 @@ export const updateTransportRequest = authedProcedure
         },
       });
 
+      await pusher.trigger("request", "request_update", {
+        message: "",
+      });
+
       return revalidatePath(path);
     } catch (error) {
       getErrorMessage(error);
@@ -628,6 +649,10 @@ export const udpateVenueRequest = authedProcedure
         data: {
           ...rest,
         },
+      });
+
+      await pusher.trigger("request", "request_update", {
+        message: "",
       });
 
       return revalidatePath(path);
@@ -652,6 +677,14 @@ export const udpateReturnableResourceRequest = authedProcedure
         },
       });
 
+      await pusher.trigger("request", "request_update", {
+        message: "",
+      });
+
+      await pusher.trigger("request", "notifications", {
+        message: "",
+      });
+
       return revalidatePath(path);
     } catch (error) {
       getErrorMessage(error);
@@ -673,6 +706,11 @@ export const updateJobRequest = authedProcedure
           ...rest,
         },
       });
+
+      await pusher.trigger("request", "request_update", {
+        message: "",
+      });
+
       return revalidatePath(path);
     } catch (error) {
       getErrorMessage(error);
@@ -711,6 +749,14 @@ export const completeVenueRequest = authedProcedure
           data: {
             status: "AVAILABLE",
           },
+        });
+
+        await pusher.trigger("request", "request_update", {
+          message: "",
+        });
+
+        await pusher.trigger("request", "notifications", {
+          message: "",
         });
 
         return updatedVenueRequest;
@@ -754,6 +800,14 @@ export const completeTransportRequest = authedProcedure
           data: {
             status: "AVAILABLE",
           },
+        });
+
+        await pusher.trigger("request", "request_update", {
+          message: "",
+        });
+
+        await pusher.trigger("request", "notifications", {
+          message: "",
         });
 
         return updatedTransportRequest;

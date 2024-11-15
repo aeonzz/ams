@@ -39,9 +39,9 @@ import {
 import LoadingSpinner from "@/components/loaders/loading-spinner";
 import Link from "next/link";
 import { cn, textTransform } from "@/lib/utils";
-import { socket } from "@/app/socket";
 import { Badge } from "@/components/ui/badge";
 import { useUserNotifications } from "@/lib/hooks/use-user-notifications";
+import { pusherClient } from "@/lib/pusher-client";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -75,12 +75,15 @@ export default function NotificationScreen() {
   }, [queryClient, currentUser.id]);
 
   React.useEffect(() => {
-    socket.on("notifications", handleNotification);
+    const channel = pusherClient.subscribe("request");
+    channel.bind("notifications", (data: { message: string }) => {
+      handleNotification;
+    });
 
     return () => {
-      socket.off("notifications", handleNotification);
+      pusherClient.unsubscribe("request");
     };
-  }, [handleNotification]);
+  }, []);
 
   // const allNotifications = React.useMemo(() => {
   //   return notificationsData?.pages.flatMap((page) => page.data) || [];
@@ -106,8 +109,6 @@ export default function NotificationScreen() {
         isRead: true,
       }).then(() => {
         refetch();
-        socket.emit("notifications");
-        console.log("Notification updated and socket event emitted");
       });
     }
   }, [selectedNotification, updateStatusMutate, queryClient, currentUser.id]);

@@ -19,7 +19,6 @@ import { type UpdateReturnableResourceRequestSchemaWithPath } from "@/lib/schema
 import type { ItemStatusType } from "prisma/generated/zod/inputTypeSchemas/ItemStatusSchema";
 import { usePathname } from "next/navigation";
 import { toast } from "sonner";
-import { socket } from "@/app/socket";
 import type { ReturnableRequestWithRelations } from "prisma/generated/zod";
 import type { RequestStatusTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestStatusTypeSchema";
 import { Label } from "@/components/ui/label";
@@ -56,8 +55,6 @@ export default function ReturnableRequestActions({
     toast.promise(mutateAsync(data), {
       loading: "Loading...",
       success: () => {
-        socket.emit("request_update");
-        socket.emit("notifications");
         return values.itemStatus === "IN_USE"
           ? "The item has been successfully marked as picked up."
           : "The item has been successfully marked as returned.";

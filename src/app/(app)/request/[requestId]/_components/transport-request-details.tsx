@@ -2,9 +2,7 @@
 
 import React from "react";
 
-import {
-  type TransportRequestWithRelations,
-} from "prisma/generated/zod";
+import { type TransportRequestWithRelations } from "prisma/generated/zod";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { H4, H5, P } from "@/components/typography/text";
@@ -64,7 +62,6 @@ import EditInput from "./edit-input";
 import { TagInput } from "@/components/ui/tag-input";
 import TransportEditTimeInput from "./transport-edit-time-input";
 import type { RequestStatusTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestStatusTypeSchema";
-import { socket } from "@/app/socket";
 import RejectionReasonCard from "./rejection-reason-card";
 import CommandTooltip from "@/components/ui/command-tooltip";
 import { fillTransportRequestFormPDF } from "@/lib/fill-pdf/transport-request-form";
@@ -115,13 +112,6 @@ export default function TransportRequestDetails({
       toast.promise(mutateAsync(data), {
         loading: "Saving...",
         success: () => {
-          queryClient.invalidateQueries({
-            queryKey: ["activity", requestId],
-          });
-          queryClient.invalidateQueries({
-            queryKey: [requestId],
-          });
-          socket.emit("request_update", requestId);
           form.reset({
             department: data.department,
             description: data.description,

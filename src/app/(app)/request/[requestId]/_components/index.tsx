@@ -57,12 +57,13 @@ interface RequestDetailsProps {
 export default function RequestDetails({ params }: RequestDetailsProps) {
   const currentUser = useSession();
   const dialogManager = useDialogManager();
-  const { data, isLoading, isError, refetch, globalRequest } =
-    useRequest(params);
+  const { data, isLoading, isError, refetch } = useRequest(params);
 
   if (isLoading) return <RequestDetailsSkeleton />;
   if (isError) return <FetchDataError refetch={refetch} />;
   if (!data) return <NotFound />;
+
+  console.log(data);
 
   const statusColor = getStatusColor(data.status);
   const RequestTypeIcon = getRequestTypeIcon(data.type);

@@ -43,7 +43,6 @@ import ResourceDateTimePicker from "./resource-date-time-picker";
 import { isOverlapping } from "@/lib/utils";
 import { InventoryItemWithRelations } from "prisma/generated/zod";
 import ReturnableResourceRequestSkeleton from "./returnable-resource-request-input-skeleton";
-import { socket } from "@/app/socket";
 
 interface ReturnableResourceRequestInputProps {
   mutateAsync: UseMutateAsyncFunction<
@@ -152,8 +151,6 @@ export default function ReturnableResourceRequestInput({
     toast.promise(mutateAsync(data), {
       loading: "Submitting...",
       success: () => {
-        socket.emit("notifications");
-        socket.emit("request_update");
         handleOpenChange(false);
         return "Your request has been submitted and is awaiting approval.";
       },

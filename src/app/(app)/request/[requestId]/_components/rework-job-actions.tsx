@@ -30,7 +30,6 @@ import type { JobRequestWithRelations, Rework } from "prisma/generated/zod";
 import { CommandShortcut } from "@/components/ui/command";
 import { P } from "@/components/typography/text";
 import { type JobStatusType } from "prisma/generated/zod/inputTypeSchemas/JobStatusSchema";
-import { socket } from "@/app/socket";
 import { textTransform } from "@/lib/utils";
 
 interface ReworkJobActionsProps {
@@ -90,9 +89,6 @@ export default function ReworkJobActions({
       {
         loading: "Loading...",
         success: () => {
-          queryClient.invalidateQueries({ queryKey: [requestId] });
-          socket.emit("request_update", requestId);
-          socket.emit("notifications", requestId);
           return `Job request is now ${textTransform(status)}`;
         },
         error: (err) => {

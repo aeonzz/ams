@@ -6,7 +6,6 @@ import type { UpdateRequestStatusSchemaWithPath } from "./schema";
 import { usePathname } from "next/navigation";
 import type { RequestStatusTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestStatusTypeSchema";
 import { toast } from "sonner";
-import { socket } from "@/app/socket";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -42,8 +41,6 @@ export default function CompleteVenueRequest({
     toast.promise(mutateAsync(data), {
       loading: "Marking reservation as completed...",
       success: () => {
-        socket.emit("request_update");
-        socket.emit("notifications");
         return "The reservation has been marked as completed successfully.";
       },
       error: (err) => {

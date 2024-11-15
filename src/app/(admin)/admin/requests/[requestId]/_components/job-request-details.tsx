@@ -99,7 +99,6 @@ import {
 } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { Textarea } from "@/components/ui/text-area";
-import { socket } from "@/app/socket";
 import RejectionReasonCard from "./rejection-reason-card";
 
 interface JobRequestDetailsProps {
@@ -119,7 +118,6 @@ export default function JobRequestDetails({
 }: JobRequestDetailsProps) {
   const [editField, setEditField] = React.useState<string | null>(null);
   const pathname = usePathname();
-  const queryClient = useQueryClient();
   const form = useForm<UpdateJobRequestSchemaServer>({
     resolver: zodResolver(updateJobRequestSchemaServer),
     defaultValues: {
@@ -149,13 +147,6 @@ export default function JobRequestDetails({
       toast.promise(mutateAsync(data), {
         loading: "Saving...",
         success: () => {
-          queryClient.invalidateQueries({
-            queryKey: ["activity", requestId],
-          });
-          queryClient.invalidateQueries({
-            queryKey: [requestId],
-          });
-          socket.emit("request_update", requestId);
           form.reset({
             jobType: data.jobType,
             location: data.location,

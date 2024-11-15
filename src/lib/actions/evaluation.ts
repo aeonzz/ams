@@ -6,6 +6,7 @@ import { authedProcedure, getErrorMessage } from "./utils";
 import { db } from "@/lib/db/index";
 import { revalidatePath } from "next/cache";
 import { createJobEvaluationSchemaWithPath } from "../schema/evaluation/job";
+import { pusher } from "../pusher";
 
 export const createJobRequestEvaluation = authedProcedure
   .createServerAction()
@@ -17,10 +18,16 @@ export const createJobRequestEvaluation = authedProcedure
         data: {
           id: generateId(3),
           surveyResponses: surveyResponses,
-          position: position === "Others" && otherPosition ? otherPosition : position,
+          position:
+            position === "Others" && otherPosition ? otherPosition : position,
           ...rest,
         },
       });
+
+      await pusher.trigger("request", "request_update", {
+        message: "",
+      });
+
       return revalidatePath(path);
     } catch (error) {
       getErrorMessage(error);

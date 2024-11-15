@@ -9,7 +9,6 @@ import { UpdateRequestStatusSchemaWithPath } from "./schema";
 import { usePathname } from "next/navigation";
 import { toast } from "sonner";
 import { useSession } from "@/lib/hooks/use-session";
-import { socket } from "@/app/socket";
 
 interface RequestApproverActionsProps {
   request: RequestWithRelations;
@@ -40,8 +39,6 @@ export default function RequestApproverActions({
       toast.promise(updateStatusMutate(data), {
         loading: `${actionText} request...`,
         success: () => {
-          socket.emit("request_update");
-          socket.emit("notifications");
           return `Request ${successText} successfully.`;
         },
         error: (err) => {

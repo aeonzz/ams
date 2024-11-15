@@ -71,7 +71,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useHotkeys } from "react-hotkeys-hook";
 import AddEstimatedTime from "./add-estimated-time";
 import { Textarea } from "@/components/ui/text-area";
-import { socket } from "@/app/socket";
 import RejectJob from "./reject-job";
 
 interface JobRequestReviewerActionsProps {
@@ -180,8 +179,6 @@ export default function JobRequestReviewerActions({
         toast.promise(updateStatusMutate(data), {
           loading: `${actionText} request...`,
           success: () => {
-            socket.emit("notifications");
-            socket.emit("request_update");
             setIsRejectionAlertOpen(false);
             setRejectionReason("");
             return `Request ${successText} successfully.`;
@@ -197,8 +194,6 @@ export default function JobRequestReviewerActions({
           });
         }
 
-        socket.emit("notifications");
-        socket.emit("request_update");
         setIsRejectionAlertOpen(false);
         setRejectionReason("");
       } catch (err) {
@@ -234,7 +229,6 @@ export default function JobRequestReviewerActions({
       toast.promise(assignPersonnelMutate(data), {
         loading: "Assigning...",
         success: () => {
-          socket.emit("request_update", request.id);
           return "Personnel assigned successfully.";
         },
         error: (err) => {

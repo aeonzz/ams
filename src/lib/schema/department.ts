@@ -18,9 +18,7 @@ const baseDepartmentSchema = z.object({
 });
 
 export const createDepartmentSchema = baseDepartmentSchema.refine(
-  (data) =>
-    !data.acceptsJobs ||
-    (data.responsibilities && data.responsibilities.length > 0),
+  (data) => !data.acceptsJobs || data.responsibilities !== undefined,
   {
     path: ["responsibilities"],
     message: "Responsibilities are required if accepting jobs",
@@ -58,23 +56,23 @@ export const updateDepartmentSchema = baseUpdateDepartmentSchema
       path: ["responsibilities"],
       message: "Responsibilities are required if acceptsJobs is true",
     }
-  )
-  // .refine(
-  //   (data) =>
-  //     !data.managesBorrowRequest || data.maxBorrowDuration !== undefined,
-  //   {
-  //     path: ["maxBorrowDuration"],
-  //     message:
-  //       "Max Borrow Duration is required if managesBorrowRequest is true",
-  //   }
-  // )
-  // .refine(
-  //   (data) => !data.managesBorrowRequest || data.gracePeriod !== undefined,
-  //   {
-  //     path: ["gracePeriod"],
-  //     message: "Grace Period is required if managesBorrowRequest is true",
-  //   }
-  // );
+  );
+// .refine(
+//   (data) =>
+//     !data.managesBorrowRequest || data.maxBorrowDuration !== undefined,
+//   {
+//     path: ["maxBorrowDuration"],
+//     message:
+//       "Max Borrow Duration is required if managesBorrowRequest is true",
+//   }
+// )
+// .refine(
+//   (data) => !data.managesBorrowRequest || data.gracePeriod !== undefined,
+//   {
+//     path: ["gracePeriod"],
+//     message: "Grace Period is required if managesBorrowRequest is true",
+//   }
+// );
 
 export type UpdateDepartmentSchema = z.infer<typeof updateDepartmentSchema>;
 

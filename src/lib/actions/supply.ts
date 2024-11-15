@@ -15,6 +15,7 @@ import {
 } from "../schema/resource/supply-resource";
 import { revalidatePath } from "next/cache";
 import { createNotification } from "./notification";
+import { pusher } from "../pusher";
 
 export async function getSupply(input: GetSupplyItemSchema) {
   await checkAuth();
@@ -398,6 +399,15 @@ export const supplyRequestActions = authedProcedure
             });
           }
         }
+
+        await pusher.trigger("request", "request_update", {
+          message: "",
+        });
+
+        await pusher.trigger("request", "notifications", {
+          message: "",
+        });
+
         return updatedRequest;
       });
 

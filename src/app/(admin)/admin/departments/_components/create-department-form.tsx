@@ -127,26 +127,6 @@ export default function CreateDepartmentForm({
                 </FormItem>
               )}
             />
-            {/* <FormField
-              control={form.control}
-              name="responsibilities"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Responsibilities</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      rows={1}
-                      maxRows={10}
-                      placeholder="responsibilities..."
-                      className="min-h-[100px] flex-grow resize-none"
-                      disabled={isPending}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            /> */}
             <FormField
               control={form.control}
               name="departmentType"
@@ -229,6 +209,30 @@ export default function CreateDepartmentForm({
                 </FormItem>
               )}
             />
+            {form.watch("acceptsJobs") && (
+              <Card className="space-y-3 bg-secondary p-3">
+                <FormField
+                  control={form.control}
+                  name="responsibilities"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Responsibilities</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          rows={1}
+                          maxRows={10}
+                          placeholder="responsibilities..."
+                          className="min-h-[100px] flex-grow resize-none"
+                          disabled={isPending}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </Card>
+            )}
             <FormField
               control={form.control}
               name="managesTransport"

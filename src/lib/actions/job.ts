@@ -18,6 +18,7 @@ import {
   updateRequestStatusSchemaWithPath,
   updateReworkJobRequestSchema,
 } from "@/app/(admin)/admin/requests/[requestId]/_components/schema";
+import { pusher } from "../pusher";
 
 export const createJobRequest = authedProcedure
   .createServerAction()
@@ -98,6 +99,14 @@ export const createJobRequest = authedProcedure
         userId: user.id,
       });
 
+      await pusher.trigger("request", "request_update", {
+        message: "Request created",
+      });
+
+      await pusher.trigger("request", "notifications", {
+        message: "",
+      });
+
       return revalidatePath(path);
     } catch (error) {
       getErrorMessage(error);
@@ -127,6 +136,10 @@ export const assignPersonnel = authedProcedure
           include: {
             jobRequest: true,
           },
+        });
+
+        await pusher.trigger("request", "request_update", {
+          message: "asdasdas",
         });
 
         return updatedRequest;
@@ -274,6 +287,14 @@ export const updateRequestStatus = authedProcedure
         //   }
         // }
 
+        await pusher.trigger("request", "request_update", {
+          message: "",
+        });
+
+        await pusher.trigger("request", "notifications", {
+          message: "",
+        });
+
         return updatedRequest;
       });
 
@@ -300,6 +321,11 @@ export const cancelOwnRequest = authedProcedure
           },
           include: { jobRequest: true },
         });
+
+        await pusher.trigger("request", "request_update", {
+          message: "",
+        });
+
         return updatedRequest;
       });
 
@@ -399,6 +425,14 @@ export const updateJobRequest = authedProcedure
           });
         }
 
+        await pusher.trigger("request", "request_update", {
+          message: "Request update",
+        });
+
+        await pusher.trigger("request", "notifications", {
+          message: "Request notification",
+        });
+
         return updatedRequest;
       });
 
@@ -461,6 +495,14 @@ export const reworkJobRequest = authedProcedure
             userId: user.id,
           });
         }
+
+        await pusher.trigger("request", "request_update", {
+          message: "",
+        });
+
+        await pusher.trigger("request", "notifications", {
+          message: "",
+        });
 
         return updateJobRequestStatus;
       });
@@ -544,6 +586,14 @@ export const updateReworkJobRequest = authedProcedure
             userId: user.id,
           });
         }
+
+        await pusher.trigger("request", "request_update", {
+          message: "",
+        });
+
+        await pusher.trigger("request", "notifications", {
+          message: "",
+        });
 
         return updateJobRequestStatus;
       });

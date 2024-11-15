@@ -30,7 +30,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import RequestsTable from "./requests-table";
-import jsPDF from "jspdf";
 import "jspdf-autotable";
 import DashboardActions from "./dashboard-actions";
 import { Dot } from "lucide-react";
@@ -38,7 +37,7 @@ import { toast } from "sonner";
 import { generateSystemReport } from "@/lib/fill-pdf/system-report";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
 import { useDashboardActions } from "@/lib/hooks/use-dashboard-actions";
-import { socket } from "@/app/socket";
+import { pusherClient } from "@/lib/pusher-client";
 
 export default function AdminDashboardScreen() {
   const currentUser = useSession();
@@ -60,14 +59,13 @@ export default function AdminDashboardScreen() {
   });
 
   React.useEffect(() => {
-    const handleUpdate = () => {
+    const channel = pusherClient.subscribe("request");
+    channel.bind("request_update", (data: { message: string }) => {
       refetch();
-    };
-
-    socket.on("request_update", handleUpdate);
+    });
 
     return () => {
-      socket.off("request_update", handleUpdate);
+      pusherClient.unsubscribe("request");
     };
   }, []);
 

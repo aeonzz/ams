@@ -3,10 +3,9 @@
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
 import React from "react";
 import type { UpdateRequestStatusSchemaWithPath } from "./schema";
-import { usePathname } from "next/navigation"; 
+import { usePathname } from "next/navigation";
 import type { RequestStatusTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestStatusTypeSchema";
 import { toast } from "sonner";
-import { socket } from "@/app/socket";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -43,8 +42,6 @@ export default function CompleteTransportRequest({
     toast.promise(mutateAsync(data), {
       loading: "Marking transport request as completed...",
       success: () => {
-        socket.emit("request_update");
-        socket.emit("notifications");
         return "The transport request has been marked as completed successfully.";
       },
       error: (err) => {

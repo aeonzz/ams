@@ -61,7 +61,6 @@ import EditInput from "./edit-input";
 import { TagInput } from "@/components/ui/tag-input";
 import TransportEditTimeInput from "./transport-edit-time-input";
 import type { RequestStatusTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestStatusTypeSchema";
-import { socket } from "@/app/socket";
 import RejectionReasonCard from "./rejection-reason-card";
 import {
   updateSupplyResourceRequestSchema,
@@ -95,7 +94,6 @@ export default function SupplyResourceDetails({
 }: SupplyResourceDetailsProps) {
   const [editField, setEditField] = React.useState<string | null>(null);
   const pathname = usePathname();
-  const queryClient = useQueryClient();
   const form = useForm<UpdateSupplyResourceRequestSchema>({
     resolver: zodResolver(updateSupplyResourceRequestSchema),
     defaultValues: {
@@ -123,13 +121,6 @@ export default function SupplyResourceDetails({
       toast.promise(mutateAsync(payload), {
         loading: "Saving...",
         success: () => {
-          queryClient.invalidateQueries({
-            queryKey: ["activity", requestId],
-          });
-          queryClient.invalidateQueries({
-            queryKey: [requestId],
-          });
-          socket.emit("request_update", requestId);
           form.reset({
             items: payload.items,
             dateAndTimeNeeded: payload.dateAndTimeNeeded,

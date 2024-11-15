@@ -99,7 +99,6 @@ import {
 } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { Textarea } from "@/components/ui/text-area";
-import { socket } from "@/app/socket";
 import RejectionReasonCard from "./rejection-reason-card";
 
 interface JobRequestDetailsProps {
@@ -155,7 +154,6 @@ export default function JobRequestDetails({
           queryClient.invalidateQueries({
             queryKey: [requestId],
           });
-          socket.emit("request_update", requestId);
           form.reset({
             jobType: data.jobType,
             location: data.location,

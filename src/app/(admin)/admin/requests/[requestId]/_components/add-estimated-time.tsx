@@ -45,7 +45,6 @@ import {
 } from "@/components/ui/command";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { socket } from "@/app/socket";
 
 interface AddEstimatedTimeProps {
   data: RequestWithRelations;
@@ -169,10 +168,6 @@ export default function AddEstimatedTime({ data }: AddEstimatedTimeProps) {
           queryClient.invalidateQueries({
             queryKey: [data.id],
           });
-          queryClient.invalidateQueries({
-            queryKey: ["activity", data.id],
-          });
-          socket.emit("request_update", data.id);
           return "Estimated time updated successfully";
         },
         error: (err) => {

@@ -47,7 +47,6 @@ import type { EntityTypeType } from "prisma/generated/zod/inputTypeSchemas/Entit
 import { useHotkeys } from "react-hotkeys-hook";
 import { Textarea } from "@/components/ui/text-area";
 import { CommandShortcut } from "@/components/ui/command";
-import { socket } from "@/app/socket";
 
 interface RequestReviewerActionsProps {
   request: RequestWithRelations;
@@ -120,8 +119,6 @@ export default function RequestReviewerActions({
       toast.promise(updateStatusMutate(data), {
         loading: `${actionText} request...`,
         success: () => {
-          socket.emit("notifications");
-          socket.emit("request_update");
           setIsRejectionAlertOpen(false);
           setRejectionReason("");
           return `Request ${successText} successfully.`;

@@ -133,7 +133,7 @@ export default function DepartmentInsightsScreen({
           timeRange={timeRange}
           setTimeRange={setTimeRange}
         />
-        {requestType === "" || requestType === "BORROW" ? (
+        {data.managesBorrowRequest &&  requestType === "" || requestType === "BORROW" ? (
           <>
             {/* <OverdueItemsChart
               data={data}

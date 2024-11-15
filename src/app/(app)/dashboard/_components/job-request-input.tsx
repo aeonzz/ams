@@ -65,7 +65,6 @@ import axios from "axios";
 import JobRequestInputSkeleton from "./job-request-input-skeleton";
 import { ComboboxInput } from "@/components/ui/combobox-input";
 import { Input } from "@/components/ui/input";
-import { socket } from "@/app/socket";
 
 interface JobRequestInputProps {
   mutateAsync: UseMutateAsyncFunction<
@@ -129,8 +128,6 @@ export default function JobRequestInput({
       toast.promise(mutateAsync(data), {
         loading: "Submitting...",
         success: () => {
-          socket.emit("notifications");
-          socket.emit("request_update");
           handleOpenChange(false);
           return "Your request has been submitted and is awaiting approval.";
         },

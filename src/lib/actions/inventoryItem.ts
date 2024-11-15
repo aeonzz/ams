@@ -16,6 +16,7 @@ import {
   updateInventorySubItemStatusesSchema,
   updateReturnableResourceRequestSchemaWithPath,
 } from "../schema/resource/returnable-resource";
+import { pusher } from "../pusher";
 
 export async function getInventorySubItems(
   input: GetInventorySubItemSchema & { inventoryId: string }
@@ -224,6 +225,14 @@ export const returnableResourceActions = authedProcedure
               },
             },
           },
+        });
+
+        await pusher.trigger("request", "request_update", {
+          message: "",
+        });
+
+        await pusher.trigger("request", "notifications", {
+          message: "",
         });
 
         return updatedRequest;

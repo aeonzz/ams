@@ -44,7 +44,6 @@ import SupplyResourceRequestSkeleton from "./supply-resource-request-skeleton";
 import SupplyItemsField from "./supply-items-field";
 import FetchDataError from "@/components/card/fetch-data-error";
 import { useSupplyResourceData } from "@/lib/hooks/use-supply-resource-data";
-import { socket } from "@/app/socket";
 
 interface SupplyResourceRequestInputProps {
   mutateAsync: UseMutateAsyncFunction<
@@ -100,8 +99,6 @@ export default function SupplyResourceRequestInput({
     toast.promise(mutateAsync(data), {
       loading: "Submitting...",
       success: () => {
-        socket.emit("notifications");
-        socket.emit("request_update");
         handleOpenChange(false);
         return "Your request has been submitted and is awaiting approval.";
       },
