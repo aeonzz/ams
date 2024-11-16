@@ -60,10 +60,10 @@ export default function RequestReviewerActions({
   allowedRoles,
   allowedDepartment,
   allowedApproverRoles,
-  
 }: RequestReviewerActionsProps) {
   const currentUser = useSession();
   const pathname = usePathname();
+  const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = React.useState(false);
   const [isAlertOpen, setIsAlertOpen] = React.useState(false);
   const [isRejectionAlertOpen, setIsRejectionAlertOpen] = React.useState(false);
@@ -121,6 +121,7 @@ export default function RequestReviewerActions({
         success: () => {
           setIsRejectionAlertOpen(false);
           setRejectionReason("");
+          queryClient.invalidateQueries({ queryKey: [request.id] });
           return `Request ${successText} successfully.`;
         },
         error: (err) => {

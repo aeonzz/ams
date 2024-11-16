@@ -1,20 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { writeFile } from "fs/promises";
+import { mkdir, writeFile } from "fs/promises";
 import { generateId } from "lucia";
 import path from "path";
 import { withRoles } from "@/middleware/withRole";
+import { authMiddleware } from "@/app/lucia-middleware";
 
-export async function POST(request: NextRequest) {
+async function handler(request: NextRequest) {
   try {
-    // const uploadPath = '/app/uploads';
-    // const uploadPath = process.env.UPLOAD_PATH;
+    const uploadPath = path.join(process.cwd(), "uploads", "images");
 
-    // if (!uploadPath) {
-    //   return NextResponse.json(
-    //     { success: false, message: "Server error" },
-    //     { status: 500 }
-    //   );
-    // }
+    // Ensure the upload directory exists
+    await mkdir(uploadPath, { recursive: true });
 
     const { files } = await request.json();
 
@@ -40,32 +36,28 @@ export async function POST(request: NextRequest) {
         const buffer = Buffer.from(base64Data, "base64");
 
         // Generate a unique filename
-        const filename = `${generateId(10)}-${file.name}`;
-        const fullPath = path.join(
-          process.cwd(),
-          "public",
-          "uploads",
-          filename
-        );
-        const relativePath = path.posix.join("/uploads", filename);
+        const filename = `${generateId(3)}-${file.name}`;
+        const fullPath = path.join(uploadPath, filename);
 
         // Write the file
         await writeFile(fullPath, buffer);
         console.log(`File saved: ${fullPath}`);
 
-        return { name: file.name, success: true, filePath: relativePath };
+        return {
+          name: file.name,
+          success: true,
+          filePath: `/api/file/image/get-image/${filename}`,
+        };
       })
     );
 
     return NextResponse.json({ success: true, results });
   } catch (error) {
     console.error("Error processing files:", error);
-    return NextResponse.json(-
-      { success: false, message: "Server error" },
-      { status: 500 }
-    );
+    return NextResponse.json(-{ success: false, message: "Server error" }, {
+      status: 500,
+    });
   }
 }
 
-// export const POST = withRoles(handler, ['ADMIN'])
-
+export const POST = (request: NextRequest) => authMiddleware(request, handler);

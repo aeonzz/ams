@@ -1,6 +1,6 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db/index";
-import { checkAuth } from "@/lib/auth/utils";
+import { authMiddleware } from "@/app/lucia-middleware";
 
 interface Context {
   params: {
@@ -8,8 +8,7 @@ interface Context {
   };
 }
 
-export async function GET(req: Request, context: Context) {
-  await checkAuth();
+async function handler(req: NextRequest, user: any, context: Context) {
   try {
     const url = new URL(req.url);
     const page = parseInt(url.searchParams.get("page") || "1");
@@ -45,3 +44,6 @@ export async function GET(req: Request, context: Context) {
     );
   }
 }
+
+export const GET = (request: NextRequest, context: Context) =>
+  authMiddleware(request, handler, context);

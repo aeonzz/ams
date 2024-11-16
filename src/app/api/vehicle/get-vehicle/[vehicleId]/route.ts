@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db/index";
-import { checkAuth } from "@/lib/auth/utils";
+import { authMiddleware } from "@/app/lucia-middleware";
 
 interface Context {
   params: {
@@ -8,12 +8,12 @@ interface Context {
   };
 }
 
-export async function GET(request: NextRequest, params: Context) {
-  await checkAuth();
+async function handler(req: NextRequest, user: any, context: Context) {
+  const { vehicleId } = context.params;
   try {
     const isVehicleExist = await db.vehicle.findUnique({
       where: {
-        id: params.params.vehicleId,
+        id: vehicleId,
       },
     });
 
@@ -23,7 +23,7 @@ export async function GET(request: NextRequest, params: Context) {
 
     const result = await db.vehicle.findFirst({
       where: {
-        id: params.params.vehicleId,
+        id: isVehicleExist.id,
         isArchived: false,
       },
       include: {
@@ -45,3 +45,6 @@ export async function GET(request: NextRequest, params: Context) {
     );
   }
 }
+
+export const GET = (request: NextRequest, context: Context) =>
+  authMiddleware(request, handler, context);

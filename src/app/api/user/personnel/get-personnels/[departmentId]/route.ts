@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { withRoles } from "@/middleware/withRole";
 import { db } from "@/lib/db/index";
+import { authMiddleware } from "@/app/lucia-middleware";
 
 interface Context {
   params: {
@@ -8,11 +8,12 @@ interface Context {
   };
 }
 
-export async function GET(request: NextRequest, params: Context) {
+async function handler(req: NextRequest, user: any, context: Context) {
+  const { departmentId } = context.params;
   try {
     const result = await db.userDepartment.findMany({
       where: {
-        departmentId: params.params.departmentId,
+        departmentId: departmentId,
         user: {
           userRole: {
             some: {
@@ -41,3 +42,6 @@ export async function GET(request: NextRequest, params: Context) {
     );
   }
 }
+
+export const GET = (request: NextRequest, context: Context) =>
+  authMiddleware(request, handler, context);

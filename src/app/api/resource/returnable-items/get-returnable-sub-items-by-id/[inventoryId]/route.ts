@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { withRoles } from "@/middleware/withRole";
 import { db } from "@/lib/db/index";
-import { redirect } from "next/navigation";
-import { checkAuth } from "@/lib/auth/utils";
+import { authMiddleware } from "@/app/lucia-middleware";
 
 interface Context {
   params: {
@@ -10,12 +8,12 @@ interface Context {
   };
 }
 
-export async function GET(request: NextRequest, params: Context) {
-  await checkAuth();
+async function handler(req: NextRequest, user: any, context: Context) {
+  const { inventoryId } = context.params;
   try {
     const inventoryExist = await db.inventoryItem.findUnique({
       where: {
-        id: params.params.inventoryId,
+        id: inventoryId,
       },
     });
 
@@ -28,7 +26,7 @@ export async function GET(request: NextRequest, params: Context) {
     const result = await db.inventorySubItem.findMany({
       where: {
         isArchived: false,
-        inventoryId: params.params.inventoryId,
+        inventoryId: inventoryExist.id,
       },
       orderBy: {
         createdAt: "desc",
@@ -47,3 +45,6 @@ export async function GET(request: NextRequest, params: Context) {
     );
   }
 }
+
+export const GET = (request: NextRequest, context: Context) =>
+  authMiddleware(request, handler, context);

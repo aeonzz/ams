@@ -44,6 +44,7 @@ export default function RequestActions({
   entityType,
 }: RequestActionsProps) {
   const pathname = usePathname();
+  const queryClient = useQueryClient();
   const { mutateAsync, isPending } = useServerActionMutation(cancelOwnRequest);
 
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
@@ -59,6 +60,7 @@ export default function RequestActions({
       loading: "Cancelling...",
       success: () => {
         setIsDialogOpen(false);
+        queryClient.invalidateQueries({ queryKey: [data.id] });
         return "Request cancelled successfully";
       },
       error: (err) => {

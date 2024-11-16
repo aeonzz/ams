@@ -89,6 +89,7 @@ export default function ReworkJobActions({
       {
         loading: "Loading...",
         success: () => {
+          queryClient.invalidateQueries({ queryKey: [requestId] });
           return `Job request is now ${textTransform(status)}`;
         },
         error: (err) => {

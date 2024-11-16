@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { withRoles } from "@/middleware/withRole";
 import { db } from "@/lib/db/index";
+import { authMiddleware } from "@/app/lucia-middleware";
 
-export async function GET(request: NextRequest) {
+async function handler(request: NextRequest) {
   try {
     const result = await db.user.findMany({
       include: {
@@ -19,3 +19,5 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+
+export const GET = (request: NextRequest) => authMiddleware(request, handler);

@@ -1,10 +1,8 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db/index";
-import { checkAuth } from "@/lib/auth/utils";
-import { currentUser } from "@/lib/actions/users";
+import { authMiddleware } from "@/app/lucia-middleware";
 
-export async function GET(req: Request) {
-  await checkAuth();
+async function handler(req: Request) {
   try {
     const [requests, users] = await Promise.all([
       db.request.findMany({
@@ -28,3 +26,5 @@ export async function GET(req: Request) {
     );
   }
 }
+
+export const GET = (request: NextRequest) => authMiddleware(request, handler);

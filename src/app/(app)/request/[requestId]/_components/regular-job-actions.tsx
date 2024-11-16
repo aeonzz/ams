@@ -45,6 +45,7 @@ export default function RegularJobActions({
   data,
 }: RegularJobActionsProps) {
   const currentUser = useSession();
+  const queryClient = useQueryClient();
   const pathname = usePathname();
   const [alertOpen, setAlertOpen] = React.useState(false);
 
@@ -73,6 +74,7 @@ export default function RegularJobActions({
       {
         loading: "Loading...",
         success: () => {
+          queryClient.invalidateQueries({ queryKey: [requestId] });
           return `Job request is now ${status.toLowerCase().replace("_", " ")}`;
         },
         error: (err) => {

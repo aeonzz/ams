@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { completeVenueRequest } from "@/lib/actions/requests";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface CompleteVenueRequestProps {
   requestId: string;
@@ -28,6 +29,7 @@ export default function CompleteVenueRequest({
   requestId,
 }: CompleteVenueRequestProps) {
   const pathname = usePathname();
+  const queryClient = useQueryClient();
   const { mutateAsync, isPending } =
     useServerActionMutation(completeVenueRequest);
 
@@ -41,6 +43,7 @@ export default function CompleteVenueRequest({
     toast.promise(mutateAsync(data), {
       loading: "Marking reservation as completed...",
       success: () => {
+        queryClient.invalidateQueries({ queryKey: [requestId] });
         return "The reservation has been marked as completed successfully.";
       },
       error: (err) => {

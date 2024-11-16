@@ -1,16 +1,19 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db/index";
-import { checkAuth } from "@/lib/auth/utils";
-import { currentUser } from "@/lib/actions/users";
+import { authMiddleware } from "@/app/lucia-middleware";
+import { validateRequest } from "@/lib/auth/lucia";
 
-export async function GET(req: Request) {
-  await checkAuth();
+async function handler(req: Request) {
+  const { user, session } = await validateRequest();
+
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
-    const [data] = await currentUser();
-
     const result = await db.request.findMany({
       where: {
-        userId: data?.id,
+        userId: session.userId,
       },
       include: {
         jobRequest: true,
@@ -33,3 +36,5 @@ export async function GET(req: Request) {
     );
   }
 }
+
+export const GET = (request: NextRequest) => authMiddleware(request, handler);

@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db/index";
+import { authMiddleware } from "@/app/lucia-middleware";
 
 interface Context {
   params: {
@@ -7,7 +8,7 @@ interface Context {
   };
 }
 
-export async function GET(req: Request, context: Context) {
+async function handler(req: NextRequest, user: any, context: Context) {
   const { departmentId } = context.params;
   try {
     const result = await db.department.findUnique({
@@ -56,3 +57,6 @@ export async function GET(req: Request, context: Context) {
     );
   }
 }
+
+export const GET = (request: NextRequest, context: Context) =>
+  authMiddleware(request, handler, context);

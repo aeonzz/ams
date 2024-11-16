@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { completeTransportRequest } from "@/lib/actions/requests";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface CompleteTransportRequestProps {
   requestId: string;
@@ -28,6 +29,7 @@ export default function CompleteTransportRequest({
   requestId,
 }: CompleteTransportRequestProps) {
   const pathname = usePathname();
+  const queryClient = useQueryClient();
   const { mutateAsync, isPending } = useServerActionMutation(
     completeTransportRequest
   );
@@ -42,6 +44,7 @@ export default function CompleteTransportRequest({
     toast.promise(mutateAsync(data), {
       loading: "Marking transport request as completed...",
       success: () => {
+        queryClient.invalidateQueries({ queryKey: [requestId] });
         return "The transport request has been marked as completed successfully.";
       },
       error: (err) => {

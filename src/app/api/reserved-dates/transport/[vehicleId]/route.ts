@@ -1,6 +1,6 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db/index";
-import { errorMonitor } from "stream";
+import { authMiddleware } from "@/app/lucia-middleware";
 
 interface Context {
   params: {
@@ -8,8 +8,8 @@ interface Context {
   };
 }
 
-export async function GET(req: Request, params: Context) {
-  const { vehicleId } = params.params;
+async function handler(req: NextRequest, user: any, context: Context) {
+  const { vehicleId } = context.params;
   const today = new Date();
   try {
     const reservedDatesAndTimes = await db.transportRequest.findMany({
@@ -43,8 +43,8 @@ export async function GET(req: Request, params: Context) {
             transportRequest: {
               select: {
                 vehicle: true,
-              }
-            }
+              },
+            },
           },
         },
       },
@@ -55,10 +55,13 @@ export async function GET(req: Request, params: Context) {
 
     return NextResponse.json({ data: reservedDatesAndTimes }, { status: 200 });
   } catch (error) {
-    console.log(errorMonitor);
+    console.log(error);
     return NextResponse.json(
-      { error: "Form submission failed" },
+      { error: "Something went wrong! try again later" },
       { status: 500 }
     );
   }
 }
+
+export const GET = (request: NextRequest, context: Context) =>
+  authMiddleware(request, handler, context);

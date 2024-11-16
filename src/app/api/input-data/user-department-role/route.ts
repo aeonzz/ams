@@ -1,9 +1,8 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db/index";
-import { checkAuth } from "@/lib/auth/utils";
+import { authMiddleware } from "@/app/lucia-middleware";
 
-export async function GET(req: Request) {
-  await checkAuth();
+async function handler(req: Request) {
   try {
     const [roles, users, departments] = await Promise.all([
       db.role.findMany({
@@ -18,16 +17,6 @@ export async function GET(req: Request) {
           firstName: true,
           middleName: true,
           lastName: true,
-          // userDepartments: {
-          //   select: {
-          //     id: true,
-          //     department: {
-          //       select: {
-
-          //       }
-          //     }
-          //   },
-          // },
         },
       }),
       db.department.findMany({
@@ -45,8 +34,10 @@ export async function GET(req: Request) {
   } catch (error) {
     console.log(error);
     return NextResponse.json(
-      { error: "Form submission failed" },
+      { error: "Something went wrong! try again later" },
       { status: 500 }
     );
   }
 }
+
+export const GET = (request: NextRequest) => authMiddleware(request, handler);

@@ -1,7 +1,8 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db/index";
+import { authMiddleware } from "@/app/lucia-middleware";
 
-export async function GET(req: Request) {
+async function handler(req: Request) {
   try {
     const departments = await db.department.findMany({
       where: {
@@ -18,3 +19,5 @@ export async function GET(req: Request) {
     );
   }
 }
+
+export const GET = (request: NextRequest) => authMiddleware(request, handler);

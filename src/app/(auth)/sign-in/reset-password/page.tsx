@@ -1,12 +1,9 @@
-'use client'
-
 import React from "react";
 
 import { db } from "@/lib/db/index";
 
 import ForgotPassword from "../../_components/forgot-password";
 import ResetPasswordForm from "@/components/forms/reset-password-form";
-import { MotionLayout } from "@/components/layouts/motion-layout";
 
 interface ResetPasswordPageProps {
   searchParams: { [key: string]: string | string[] | undefined };
@@ -37,15 +34,13 @@ export default async function ResetPasswordPage({
 
   return (
     <div className="flex flex-col items-center justify-center space-y-2">
-      <MotionLayout className="flex flex-col items-center justify-center space-y-2">
-        <h1 className="scroll-m-20 text-xl font-semibold tracking-tight">
-          Reset Your Password
-        </h1>
-        <p className="text-center text-sm text-muted-foreground">
-          Please enter your new password and confirm it to complete the reset
-          process.
-        </p>
-      </MotionLayout>
+      <h1 className="scroll-m-20 text-xl font-semibold tracking-tight">
+        Reset Your Password
+      </h1>
+      <p className="text-center text-sm text-muted-foreground">
+        Please enter your new password and confirm it to complete the reset
+        process.
+      </p>
       <ResetPasswordForm resetPasswordToken={token} className="sm:w-[330px]" />
     </div>
   );

@@ -9,6 +9,7 @@ import { UpdateRequestStatusSchemaWithPath } from "./schema";
 import { usePathname } from "next/navigation";
 import { toast } from "sonner";
 import { useSession } from "@/lib/hooks/use-session";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface RequestApproverActionsProps {
   request: RequestWithRelations;
@@ -20,6 +21,7 @@ export default function RequestApproverActions({
   isPending,
 }: RequestApproverActionsProps) {
   const currentUser = useSession();
+  const queryClient = useQueryClient();
   const pathname = usePathname();
   const { mutateAsync: updateStatusMutate, isPending: isUpdateStatusPending } =
     useServerActionMutation(updateRequestStatus);
@@ -39,6 +41,7 @@ export default function RequestApproverActions({
       toast.promise(updateStatusMutate(data), {
         loading: `${actionText} request...`,
         success: () => {
+          queryClient.invalidateQueries({ queryKey: [request.id] });
           return `Request ${successText} successfully.`;
         },
         error: (err) => {

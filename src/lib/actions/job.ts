@@ -209,7 +209,7 @@ export const updateRequestStatus = authedProcedure
             title: `Request Approved: ${updatedRequest.title}`,
             resourceType: "REQUEST",
             notificationType: "SUCCESS",
-            message: `Congratulations! Your request for "${updatedRequest.title}" has been approved. Please check the request for further details.`,
+            message: `Your request for "${updatedRequest.title}" has been approved! Visit the request page for details and next steps.`,
             userId: user.id,
             recepientIds: [updatedRequest.userId],
           });
@@ -263,29 +263,6 @@ export const updateRequestStatus = authedProcedure
             });
           }
         }
-
-        // if (rest.status === "COMPLETED") {
-        //   const existingNotification = await prisma.notification.findFirst({
-        //     where: {
-        //       resourceId: `/request/${updatedRequest.id}`,
-        //       userId: user.id,
-        //       resourceType: "REQUEST",
-        //       recepientId: updatedRequest.userId,
-        //       title: `Request Completed: ${updatedRequest.title}`,
-        //     },
-        //   });
-
-        //   if (!existingNotification) {
-        //     await createNotification({
-        //       resourceId: `/request/${updatedRequest.id}`,
-        //       title: `Request Completed: ${updatedRequest.title}`,
-        //       resourceType: "REQUEST",
-        //       message: `Your request for "${updatedRequest.title}" has been successfully completed. Please review the final details.`,
-        //       userId: user.id,
-        //       recepientIds: [updatedRequest.userId],
-        //     });
-        //   }
-        // }
 
         await pusher.trigger("request", "request_update", {
           message: "",
@@ -605,55 +582,3 @@ export const updateReworkJobRequest = authedProcedure
     }
   });
 
-// export const assignSection = authedProcedure
-//   .createServerAction()
-//   .input(assignUserSchemaWithPath)
-//   .handler(async ({ input }) => {
-//     const { path, userId, ...rest } = input;
-//     try {
-//       const user = await db.user.findUnique({
-//         where: {
-//           id: userId,
-//         },
-//         select: {
-//           sectionId: true,
-//         },
-//       });
-
-//       if (user && user.sectionId !== null) {
-//         throw "User already assigned to a section";
-//       }
-
-//       await db.user.update({
-//         where: {
-//           id: userId,
-//         },
-//         data: {
-//           ...rest,
-//         },
-//       });
-//       revalidatePath(path);
-//     } catch (error) {
-//       getErrorMessage(error);
-//     }
-//   });
-
-// export const unassignSection = authedProcedure
-//   .createServerAction()
-//   .input(unassignUserWithPath)
-//   .handler(async ({ input }) => {
-//     const { path, userId } = input;
-//     try {
-//       await db.user.update({
-//         where: {
-//           id: userId,
-//         },
-//         data: {
-//           sectionId: null,
-//         },
-//       });
-//       revalidatePath(path);
-//     } catch (error) {
-//       getErrorMessage(error);
-//     }
-//   });

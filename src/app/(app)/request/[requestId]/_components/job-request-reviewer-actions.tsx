@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -88,6 +88,7 @@ export default function JobRequestReviewerActions({
 }: JobRequestReviewerActionsProps) {
   const currentUser = useSession();
   const pathname = usePathname();
+  const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = React.useState(false);
   const [selectedPerson, setSelectedPerson] = React.useState<
     string | undefined | null
@@ -180,6 +181,7 @@ export default function JobRequestReviewerActions({
           loading: `${actionText} request...`,
           success: () => {
             setIsRejectionAlertOpen(false);
+            queryClient.invalidateQueries({ queryKey: [request.id] });
             setRejectionReason("");
             return `Request ${successText} successfully.`;
           },
@@ -194,6 +196,7 @@ export default function JobRequestReviewerActions({
           });
         }
 
+        queryClient.invalidateQueries({ queryKey: [request.id] });
         setIsRejectionAlertOpen(false);
         setRejectionReason("");
       } catch (err) {
@@ -229,6 +232,7 @@ export default function JobRequestReviewerActions({
       toast.promise(assignPersonnelMutate(data), {
         loading: "Assigning...",
         success: () => {
+          queryClient.invalidateQueries({ queryKey: [request.id] });
           return "Personnel assigned successfully.";
         },
         error: (err) => {

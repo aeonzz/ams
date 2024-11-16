@@ -9,6 +9,7 @@ import {
   uploadVenueRulesFileWithPath,
 } from "../schema/file";
 import { generateId } from "lucia";
+import { pusher } from "../pusher";
 
 export const updateDepartmentFile = authedProcedure
   .createServerAction()
@@ -33,6 +34,10 @@ export const updateDepartmentFile = authedProcedure
         },
       });
 
+      await pusher.trigger("request", "request_update", {
+        message: "",
+      });
+
       return revalidatePath(path);
     } catch (error) {
       console.log(error);
@@ -54,6 +59,10 @@ export const updateVenueRulesFile = authedProcedure
         data: {
           rulesAndRegulations: url[0],
         },
+      });
+
+      await pusher.trigger("request", "request_update", {
+        message: "",
       });
 
       return revalidatePath(path);

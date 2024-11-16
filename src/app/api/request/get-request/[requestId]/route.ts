@@ -1,9 +1,6 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db/index";
-import { errorMonitor } from "stream";
-import { currentUser } from "@/lib/actions/users";
-import { checkAuth } from "@/lib/auth/utils";
-import placeholder from "public/placeholder.svg";
+import { authMiddleware } from "@/app/lucia-middleware";
 
 interface Context {
   params: {
@@ -11,9 +8,8 @@ interface Context {
   };
 }
 
-export async function GET(req: Request, params: Context) {
-  await checkAuth();
-  const { requestId } = params.params;
+async function handler(req: NextRequest, user: any, context: Context) {
+  const { requestId } = context.params;
   try {
     const result = await db.request.findFirst({
       where: {
@@ -129,8 +125,11 @@ export async function GET(req: Request, params: Context) {
   } catch (error) {
     console.error(error);
     return NextResponse.json(
-      { error: "Failed to fetch reserved dates" },
+      { error: "Something went wrong! try again later" },
       { status: 500 }
     );
   }
 }
+
+export const GET = (request: NextRequest, context: Context) =>
+  authMiddleware(request, handler, context);

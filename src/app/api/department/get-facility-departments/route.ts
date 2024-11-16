@@ -1,8 +1,8 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db/index";
-import { errorMonitor } from "stream";
+import { authMiddleware } from "@/app/lucia-middleware";
 
-export async function GET(req: Request) {
+async function handler(req: Request) {
   try {
     const departments = await db.department.findMany({
       where: {
@@ -13,10 +13,12 @@ export async function GET(req: Request) {
 
     return NextResponse.json({ data: departments }, { status: 200 });
   } catch (error) {
-    console.log(errorMonitor);
+    console.log(error);
     return NextResponse.json(
       { error: "Something went wrong! try again later" },
       { status: 500 }
     );
   }
 }
+
+export const GET = (request: NextRequest) => authMiddleware(request, handler);

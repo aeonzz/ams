@@ -84,11 +84,7 @@ export default function OverviewNavigationMenu({
   }
 
   if (isError || !data) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center">
-        <FetchDataError refetch={refetch} />
-      </div>
-    );
+    return null;
   }
 
   const {

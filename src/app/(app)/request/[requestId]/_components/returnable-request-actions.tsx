@@ -23,6 +23,7 @@ import type { ReturnableRequestWithRelations } from "prisma/generated/zod";
 import type { RequestStatusTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestStatusTypeSchema";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/text-area";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface ReturnableRequestActionsProps {
   requestId: string;
@@ -34,6 +35,7 @@ export default function ReturnableRequestActions({
   request,
 }: ReturnableRequestActionsProps) {
   const pathname = usePathname();
+  const queryClient = useQueryClient();
   const { mutateAsync, isPending } = useServerActionMutation(
     returnableResourceActions
   );
@@ -55,6 +57,7 @@ export default function ReturnableRequestActions({
     toast.promise(mutateAsync(data), {
       loading: "Loading...",
       success: () => {
+        queryClient.invalidateQueries({ queryKey: [requestId] });
         return values.itemStatus === "IN_USE"
           ? "The item has been successfully marked as picked up."
           : "The item has been successfully marked as returned.";

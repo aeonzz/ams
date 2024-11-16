@@ -33,7 +33,7 @@ export default function UploadProfileDialog() {
         setOpen(false);
       } catch (error) {
         toast.error("Uh oh! Something went wrong.", {
-          description: "Could not update user, please try again later.",
+          description: "Could not upload image, please try again later.",
         });
       }
     },
