@@ -28,7 +28,7 @@ export function getAdminMenuList(pathname: string): Group[] {
         {
           href: "/admin/dashboard",
           label: "Dashboard",
-          active: pathname === "/admin",
+          active: pathname === "/admin/dashboard",
           icon: LayoutGrid,
           submenus: [],
         },
@@ -41,57 +41,6 @@ export function getAdminMenuList(pathname: string): Group[] {
         },
       ],
     },
-    // {
-    //   groupLabel: "Resource Management",
-    //   menus: [
-    //     {
-    //       href: "/requests",
-    //       label: "Request Management",
-    //       active: pathname.includes("/requests"),
-    //       icon: ClipboardList,
-    //       submenus: [
-    //         {
-    //           href: "/requests/pending",
-    //           label: "Pending Requests",
-    //           active: pathname === "/requests/pending",
-    //         },
-    //         {
-    //           href: "/requests/approved",
-    //           label: "Approved Requests",
-    //           active: pathname === "/requests/approved",
-    //         },
-    //         {
-    //           href: "/requests/rejected",
-    //           label: "Rejected Requests",
-    //           active: pathname === "/requests/rejected",
-    //         },
-    //       ],
-    //     },
-    //     {
-    //       href: "/reservations",
-    //       label: "Reservation Management",
-    //       active: pathname.includes("/reservations"),
-    //       icon: Calendar,
-    //       submenus: [
-    //         {
-    //           href: "/reservations/pending",
-    //           label: "Pending Reservations",
-    //           active: pathname === "/reservations/pending",
-    //         },
-    //         {
-    //           href: "/reservations/approved",
-    //           label: "Approved Reservations",
-    //           active: pathname === "/reservations/approved",
-    //         },
-    //         {
-    //           href: "/reservations/rejected",
-    //           label: "Rejected Reservations",
-    //           active: pathname === "/reservations/rejected",
-    //         },
-    //       ],
-    //     },
-    //   ],
-    // },
     {
       groupLabel: "User Management",
       menus: [

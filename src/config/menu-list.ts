@@ -122,7 +122,7 @@ export function getMenuList({
               active: pathname === "/requests/my-requests",
             },
             {
-              href: "/request/cancelled",
+              href: "/request/cancelled?page=1&per_page=10&sort=createdAt.desc",
               label: "Cancelled Requests",
               active: pathname === "/requests/cancelled",
             },
