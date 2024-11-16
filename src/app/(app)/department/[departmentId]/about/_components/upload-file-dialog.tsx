@@ -80,8 +80,10 @@ export default function UploadFileDialog({
   const { dirtyFields } = useFormState({ control: form.control });
   const isFieldsDirty = Object.keys(dirtyFields).length > 0;
 
-  const { uploadFiles, progresses, isUploading, uploadedFiles } =
-    useUploadFile("/api/file/pdf");
+  const { onUpload, progresses, uploadedFiles, isUploading } = useUploadFile(
+    "documentUploader",
+    { defaultUploadedFiles: [] }
+  );
 
   const { mutateAsync, isPending } =
     useServerActionMutation(updateDepartmentFile);
@@ -94,20 +96,22 @@ export default function UploadFileDialog({
 
   async function onSubmit(values: UploadFileSchema) {
     try {
-      let uploadedFilesResult: { filePath: string }[] = [];
+      const uploadAndSubmit = async () => {
+        let currentFiles = uploadedFiles;
 
-      uploadedFilesResult = await uploadFiles(values.file);
+        currentFiles = await onUpload(values.file);
 
-      const data: UploadFileSchemaServerWithPath = {
-        path: pathname,
-        filePurpose: capability.filePurpose,
-        departmentId: departmentId,
-        url: uploadedFilesResult.map(
-          (result: { filePath: string }) => result.filePath
-        ),
+        const data: UploadFileSchemaServerWithPath = {
+          path: pathname,
+          filePurpose: capability.filePurpose,
+          departmentId: departmentId,
+          url: currentFiles.map((result) => result.url),
+        };
+
+        await mutateAsync(data);
       };
 
-      toast.promise(mutateAsync(data), {
+      toast.promise(uploadAndSubmit(), {
         loading: "Saving...",
         success: () => {
           handleOpenChange(false);

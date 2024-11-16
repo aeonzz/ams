@@ -102,7 +102,10 @@ export function UpdateVehicleSheet({
   const { dirtyFields } = useFormState({ control: form.control });
 
   const { isPending, mutateAsync } = useServerActionMutation(updateVehicle);
-  const { uploadFiles, progresses, isUploading } = useUploadFile();
+  const { onUpload, progresses, uploadedFiles, isUploading } = useUploadFile(
+    "imageUploader",
+    { defaultUploadedFiles: [] }
+  );
 
   React.useEffect(() => {
     form.reset({
@@ -118,27 +121,29 @@ export function UpdateVehicleSheet({
 
   async function onSubmit(values: UpdateVehicleSchema) {
     try {
-      let uploadedFilesResult: { filePath: string }[] = [];
+      const uploadAndSubmit = async () => {
+        let currentFiles = uploadedFiles;
 
-      if (values.imageUrl && values.imageUrl.length > 0) {
-        uploadedFilesResult = await uploadFiles(values.imageUrl);
-      }
+        if (values.imageUrl && values.imageUrl.length > 0) {
+          currentFiles = await onUpload(values.imageUrl);
+        }
 
-      const data: ExtendedUpdateVehicleServerSchema = {
-        id: vehicle.id,
-        path: pathname,
-        name: values.name,
-        type: values.type,
-        departmentId: values.departmentId,
-        capacity: values.capacity,
-        licensePlate: values.licensePlate,
-        status: values.status,
-        imageUrl: uploadedFilesResult.map(
-          (result: { filePath: string }) => result.filePath
-        ),
+        const data: ExtendedUpdateVehicleServerSchema = {
+          id: vehicle.id,
+          path: pathname,
+          name: values.name,
+          type: values.type,
+          departmentId: values.departmentId,
+          capacity: values.capacity,
+          licensePlate: values.licensePlate,
+          status: values.status,
+          imageUrl: currentFiles.map((result) => result.url),
+        };
+
+        await mutateAsync(data);
       };
 
-      toast.promise(mutateAsync(data), {
+      toast.promise(uploadAndSubmit(), {
         loading: "Updating...",
         success: () => {
           queryClient.invalidateQueries({

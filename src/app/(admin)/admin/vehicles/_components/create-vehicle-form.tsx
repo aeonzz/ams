@@ -78,29 +78,34 @@ export default function CreateVehicleForm({
   const pathname = usePathname();
   const queryClient = useQueryClient();
 
-  const { data, isLoading } = useTransportDepartments()
+  const { data, isLoading } = useTransportDepartments();
 
-  const { uploadFiles, progresses, isUploading } = useUploadFile();
+  const { onUpload, progresses, uploadedFiles, isUploading } = useUploadFile(
+    "imageUploader",
+    { defaultUploadedFiles: [] }
+  );
 
   async function onSubmit(values: CreateVehicleSchema) {
     try {
-      let uploadedFilesResult: { filePath: string }[] = [];
+      const uploadAndSubmit = async () => {
+        let currentFiles = uploadedFiles;
 
-      uploadedFilesResult = await uploadFiles(values.imageUrl);
+        currentFiles = await onUpload(values.imageUrl);
 
-      const data: CreateVehicleSchemaWithPath = {
-        name: values.name,
-        type: values.type,
-        departmentId: values.departmentId,
-        imageUrl: uploadedFilesResult.map(
-          (result: { filePath: string }) => result.filePath
-        ),
-        capacity: values.capacity,
-        licensePlate: values.licensePlate,
-        path: pathname,
+        const data: CreateVehicleSchemaWithPath = {
+          name: values.name,
+          type: values.type,
+          departmentId: values.departmentId,
+          imageUrl: currentFiles.map((result) => result.url),
+          capacity: values.capacity,
+          licensePlate: values.licensePlate,
+          path: pathname,
+        };
+
+        await mutateAsync(data);
       };
 
-      toast.promise(mutateAsync(data), {
+      toast.promise(uploadAndSubmit(), {
         loading: "Creating...",
         success: () => {
           queryClient.invalidateQueries({

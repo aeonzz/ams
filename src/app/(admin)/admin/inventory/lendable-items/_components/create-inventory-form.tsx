@@ -87,26 +87,31 @@ export default function CreateInventoryForm({
 
   const { data, isLoading } = useLendableDepartments();
 
-  const { uploadFiles, progresses, isUploading } = useUploadFile();
+  const { onUpload, progresses, uploadedFiles, isUploading } = useUploadFile(
+    "imageUploader",
+    { defaultUploadedFiles: [] }
+  );
 
   async function onSubmit(values: CreateInventoryItemSchema) {
     try {
-      let uploadedFilesResult: { filePath: string }[] = [];
+      const uploadAndSubmit = async () => {
+        let currentFiles = uploadedFiles;
 
-      uploadedFilesResult = await uploadFiles(values.imageUrl);
+        currentFiles = await onUpload(values.imageUrl);
 
-      const data: CreateInventoryItemSchemaWithPath = {
-        name: values.name,
-        description: values.description,
-        inventoryCount: values.inventoryCount,
-        departmentId: values.departmentId,
-        path: pathname,
-        imageUrl: uploadedFilesResult.map(
-          (result: { filePath: string }) => result.filePath
-        ),
+        const data: CreateInventoryItemSchemaWithPath = {
+          name: values.name,
+          description: values.description,
+          inventoryCount: values.inventoryCount,
+          departmentId: values.departmentId,
+          path: pathname,
+          imageUrl: currentFiles.map((result) => result.url),
+        };
+
+        await mutateAsync(data);
       };
 
-      toast.promise(mutateAsync(data), {
+      toast.promise(uploadAndSubmit(), {
         loading: "Creating...",
         success: () => {
           queryClient.invalidateQueries({

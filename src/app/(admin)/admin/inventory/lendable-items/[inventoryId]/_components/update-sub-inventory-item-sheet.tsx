@@ -63,8 +63,13 @@ export function UpdateInventorySubItemSheet({
 
   const { dirtyFields } = useFormState({ control: form.control });
 
-  const { isPending, mutateAsync } = useServerActionMutation(updateInventorySubItem);
-  const { uploadFiles, progresses, isUploading } = useUploadFile();
+  const { isPending, mutateAsync } = useServerActionMutation(
+    updateInventorySubItem
+  );
+  const { onUpload, progresses, uploadedFiles, isUploading } = useUploadFile(
+    "imageUploader",
+    { defaultUploadedFiles: [] }
+  );
 
   React.useEffect(() => {
     form.reset({
@@ -77,22 +82,24 @@ export function UpdateInventorySubItemSheet({
   async function onSubmit(values: UpdateInventorySubItemSchema) {
     const { imageUrl, ...rest } = values;
     try {
-      let uploadedFilesResult: { filePath: string }[] = [];
+      const uploadAndSubmit = async () => {
+        let currentFiles = uploadedFiles;
 
-      if (values.imageUrl && values.imageUrl.length > 0) {
-        uploadedFilesResult = await uploadFiles(values.imageUrl);
-      }
+        if (values.imageUrl && values.imageUrl.length > 0) {
+          currentFiles = await onUpload(values.imageUrl);
+        }
 
-      const data: ExtendedUpdateInventoryItemSchema = {
-        ...rest,
-        id: inventory.id,
-        path: pathname,
-        imageUrl: uploadedFilesResult.map(
-          (result: { filePath: string }) => result.filePath
-        ),
+        const data: ExtendedUpdateInventoryItemSchema = {
+          ...rest,
+          id: inventory.id,
+          path: pathname,
+          imageUrl: currentFiles.map((result) => result.url),
+        };
+
+        await mutateAsync(data);
       };
 
-      toast.promise(mutateAsync(data), {
+      toast.promise(uploadAndSubmit(), {
         loading: "Updating...",
         success: () => {
           props.onOpenChange?.(false);
