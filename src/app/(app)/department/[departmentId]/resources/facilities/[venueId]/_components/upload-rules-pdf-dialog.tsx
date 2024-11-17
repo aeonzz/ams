@@ -80,8 +80,10 @@ export default function UploadRulesPdfDialog({
   const { dirtyFields } = useFormState({ control: form.control });
   const isFieldsDirty = Object.keys(dirtyFields).length > 0;
 
-  const { uploadFiles, progresses, isUploading, uploadedFiles } =
-    useUploadFile("/api/file/pdf");
+  const { onUpload, progresses, uploadedFiles, isUploading } = useUploadFile(
+    "documentUploader",
+    { defaultUploadedFiles: [] }
+  );
 
   const { mutateAsync, isPending } =
     useServerActionMutation(updateVenueRulesFile);
@@ -94,19 +96,21 @@ export default function UploadRulesPdfDialog({
 
   async function onSubmit(values: UploadFileSchema) {
     try {
-      let uploadedFilesResult: { filePath: string }[] = [];
+      const uploadAndSubmit = async () => {
+        let currentFiles = uploadedFiles;
 
-      uploadedFilesResult = await uploadFiles(values.file);
+        currentFiles = await onUpload(values.file);
 
-      const data: UploadVenueRulesFileWithPath = {
-        path: pathname,
-        venueId: venueId,
-        url: uploadedFilesResult.map(
-          (result: { filePath: string }) => result.filePath
-        ),
+        const data: UploadVenueRulesFileWithPath = {
+          path: pathname,
+          venueId: venueId,
+          url: currentFiles.map((result) => result.url),
+        };
+
+        await mutateAsync(data);
       };
 
-      toast.promise(mutateAsync(data), {
+      toast.promise(uploadAndSubmit(), {
         loading: "Saving...",
         success: () => {
           handleOpenChange(false);

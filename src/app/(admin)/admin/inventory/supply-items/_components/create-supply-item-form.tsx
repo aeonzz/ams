@@ -106,26 +106,31 @@ export default function CreateSupplyItemForm({
   const { data: itemCategory, isLoading: isLoadingItemCategory } =
     useSupplyItemCategory();
 
-  const { uploadFiles, progresses, isUploading } = useUploadFile();
+  const { onUpload, progresses, uploadedFiles, isUploading } = useUploadFile(
+    "imageUploader",
+    { defaultUploadedFiles: [] }
+  );
 
   async function onSubmit(values: CreateSupplyItemSchema) {
     const { imageUrl, quantity, ...rest } = values;
     try {
-      let uploadedFilesResult: { filePath: string }[] = [];
+      const uploadAndSubmit = async () => {
+        let currentFiles = uploadedFiles;
 
-      uploadedFilesResult = await uploadFiles(values.imageUrl);
+        currentFiles = await onUpload(values.imageUrl);
 
-      const data: CreateSupplyItemSchemaServerWithPath = {
-        ...rest,
-        quantity: quantity,
-        departmentId: values.departmentId,
-        path: pathname,
-        imageUrl: uploadedFilesResult.map(
-          (result: { filePath: string }) => result.filePath
-        ),
+        const data: CreateSupplyItemSchemaServerWithPath = {
+          ...rest,
+          quantity: quantity,
+          departmentId: values.departmentId,
+          path: pathname,
+          imageUrl: currentFiles.map((result) => result.url),
+        };
+
+        await mutateAsync(data);
       };
 
-      toast.promise(mutateAsync(data), {
+      toast.promise(uploadAndSubmit(), {
         loading: "Creating...",
         success: () => {
           queryClient.invalidateQueries({

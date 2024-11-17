@@ -1,3 +1,5 @@
+import { type ClientUploadedFileData } from "uploadthing/types";
+
 export interface SearchParams {
   [key: string]: string | string[] | undefined;
 }
@@ -25,3 +27,5 @@ export interface DataTableFilterOption<TData> {
   filterOperator?: string;
   isMulti?: boolean;
 }
+
+export interface UploadedFile<T = unknown> extends ClientUploadedFileData<T> {}

@@ -51,25 +51,30 @@ export default function CreateInventoryItemForm({
 }: CreateInventoryFormProps) {
   const pathname = usePathname();
 
-  const { uploadFiles, progresses, isUploading } = useUploadFile();
+  const { onUpload, progresses, uploadedFiles, isUploading } = useUploadFile(
+    "imageUploader",
+    { defaultUploadedFiles: [] }
+  );
 
   async function onSubmit(values: CreateInventoryItemSchema) {
     const { imageUrl, ...rest } = values;
     try {
-      let uploadedFilesResult: { filePath: string }[] = [];
+      const uploadAndSubmit = async () => {
+        let currentFiles = uploadedFiles;
 
-      uploadedFilesResult = await uploadFiles(values.imageUrl);
+        currentFiles = await onUpload(values.imageUrl);
 
-      const data: ExtendCreateInventoryItemSchema = {
-        ...rest,
-        path: pathname,
-        imageUrl: uploadedFilesResult.map(
-          (result: { filePath: string }) => result.filePath
-        ),
-        inventoryId: inventoryId,
+        const data: ExtendCreateInventoryItemSchema = {
+          ...rest,
+          path: pathname,
+          imageUrl: currentFiles.map((result) => result.url),
+          inventoryId: inventoryId,
+        };
+
+        await mutateAsync(data);
       };
 
-      toast.promise(mutateAsync(data), {
+      toast.promise(uploadAndSubmit(), {
         loading: "Creating...",
         success: () => {
           dialogManager.setActiveDialog(null);

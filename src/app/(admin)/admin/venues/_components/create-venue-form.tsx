@@ -83,27 +83,33 @@ export default function CreateVenueForm({
   const [venueType, setVenueType] = React.useState(false);
 
   const { data, isLoading } = useFacilityDepartments();
-  const { uploadFiles, progresses, isUploading } = useUploadFile();
+  const { onUpload, progresses, uploadedFiles, isUploading } = useUploadFile(
+    "imageUploader",
+    { defaultUploadedFiles: [] }
+  );
 
   async function onSubmit(values: CreateVenueSchema) {
     try {
-      let uploadedFilesResult: { filePath: string }[] = [];
+      const uploadAndSubmit = async () => {
+        let currentFiles = uploadedFiles;
 
-      uploadedFilesResult = await uploadFiles(values.imageUrl);
+        currentFiles = await onUpload(values.imageUrl);
 
-      const data: CreateVenueSchemaWithPath = {
-        name: values.name,
-        capacity: values.capacity,
-        location: values.location,
-        venueType: values.venueType,
-        departmenId: values.departmentId,
-        setupRequirements: values.setupRequirements,
-        path: pathname,
-        imageUrl: uploadedFilesResult.map(
-          (result: { filePath: string }) => result.filePath
-        ),
+        const data: CreateVenueSchemaWithPath = {
+          name: values.name,
+          capacity: values.capacity,
+          location: values.location,
+          venueType: values.venueType,
+          departmenId: values.departmentId,
+          setupRequirements: values.setupRequirements,
+          path: pathname,
+          imageUrl: currentFiles.map((result) => result.url),
+        };
+
+        await mutateAsync(data);
       };
-      toast.promise(mutateAsync(data), {
+
+      toast.promise(uploadAndSubmit(), {
         loading: "Creating...",
         success: () => {
           queryClient.invalidateQueries({

@@ -111,7 +111,10 @@ export function UpdateVenueSheet({
   const { dirtyFields } = useFormState({ control: form.control });
 
   const { isPending, mutateAsync } = useServerActionMutation(updateVenue);
-  const { uploadFiles, progresses, isUploading } = useUploadFile();
+  const { onUpload, progresses, uploadedFiles, isUploading } = useUploadFile(
+    "imageUploader",
+    { defaultUploadedFiles: [] }
+  );
 
   React.useEffect(() => {
     form.reset({
@@ -129,28 +132,30 @@ export function UpdateVenueSheet({
 
   async function onSubmit(values: UpdateVenueSchema) {
     try {
-      let uploadedFilesResult: { filePath: string }[] = [];
+      const uploadAndSubmit = async () => {
+        let currentFiles = uploadedFiles;
 
-      if (values.imageUrl && values.imageUrl.length > 0) {
-        uploadedFilesResult = await uploadFiles(values.imageUrl);
-      }
+        if (values.imageUrl && values.imageUrl.length > 0) {
+          currentFiles = await onUpload(values.imageUrl);
+        }
 
-      const data: ExtendedUpdateVenueServerSchema = {
-        id: venue.id,
-        path: pathname,
-        name: values.name,
-        departmenId: values.departmentId,
-        venueType: values.venueType,
-        setupRequirements: values.setupRequirements,
-        location: values.location,
-        capacity: values.capacity,
-        status: values.status,
-        imageUrl: uploadedFilesResult.map(
-          (result: { filePath: string }) => result.filePath
-        ),
+        const data: ExtendedUpdateVenueServerSchema = {
+          id: venue.id,
+          path: pathname,
+          name: values.name,
+          departmenId: values.departmentId,
+          venueType: values.venueType,
+          setupRequirements: values.setupRequirements,
+          location: values.location,
+          capacity: values.capacity,
+          status: values.status,
+          imageUrl: currentFiles.map((result) => result.url),
+        };
+
+        await mutateAsync(data);
       };
 
-      toast.promise(mutateAsync(data), {
+      toast.promise(uploadAndSubmit(), {
         loading: "Updating...",
         success: () => {
           queryClient.invalidateQueries({

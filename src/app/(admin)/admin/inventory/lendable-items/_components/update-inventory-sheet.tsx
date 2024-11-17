@@ -83,7 +83,10 @@ export function UpdateInventorySheet({
   const { data, isLoading } = useLendableDepartments();
 
   const { isPending, mutateAsync } = useServerActionMutation(updateInventory);
-  const { uploadFiles, progresses, isUploading } = useUploadFile();
+  const { onUpload, progresses, uploadedFiles, isUploading } = useUploadFile(
+    "imageUploader",
+    { defaultUploadedFiles: [] }
+  );
 
   React.useEffect(() => {
     form.reset({
@@ -95,23 +98,25 @@ export function UpdateInventorySheet({
 
   async function onSubmit(values: UpdateInventoryItemSchema) {
     try {
-      let uploadedFilesResult: { filePath: string }[] = [];
+      const uploadAndSubmit = async () => {
+        let currentFiles = uploadedFiles;
 
-      if (values.imageUrl && values.imageUrl.length > 0) {
-        uploadedFilesResult = await uploadFiles(values.imageUrl);
-      }
+        if (values.imageUrl && values.imageUrl.length > 0) {
+          currentFiles = await onUpload(values.imageUrl);
+        }
 
-      const data: ExtendedUpdateInventoryItemServerSchema = {
-        id: inventory.id,
-        path: pathname,
-        name: values.name,
-        description: values.description,
-        imageUrl: uploadedFilesResult.map(
-          (result: { filePath: string }) => result.filePath
-        ),
+        const data: ExtendedUpdateInventoryItemServerSchema = {
+          id: inventory.id,
+          path: pathname,
+          name: values.name,
+          description: values.description,
+          imageUrl: currentFiles.map((result) => result.url),
+        };
+
+        await mutateAsync(data);
       };
 
-      toast.promise(mutateAsync(data), {
+      toast.promise(uploadAndSubmit(), {
         loading: "Updating...",
         success: () => {
           props.onOpenChange?.(false);

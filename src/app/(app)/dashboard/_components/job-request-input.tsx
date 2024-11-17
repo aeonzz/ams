@@ -98,34 +98,38 @@ export default function JobRequestInput({
     queryKey: ["get-input-job-departments"],
   });
 
-  const { uploadFiles, progresses, isUploading, uploadedFiles } =
-    useUploadFile();
+  const { onUpload, progresses, uploadedFiles, isUploading } = useUploadFile(
+    "imageUploader",
+    { defaultUploadedFiles: [] }
+  );
 
   async function onSubmit(values: CreateJobRequestSchema) {
     try {
-      let uploadedFilesResult: { filePath: string }[] = [];
+      const uploadAndSubmit = async () => {
+        let currentFiles = uploadedFiles;
 
-      if (values.images && values.images.length > 0) {
-        uploadedFilesResult = await uploadFiles(values.images);
-      }
+        if (values.images && values.images.length > 0) {
+          currentFiles = await onUpload(values.images);
+        }
 
-      const data: ExtendedJobRequestSchemaServer = {
-        description: values.description,
-        type: type,
-        departmentId: values.departmentId,
-        dueDate: values.dueDate,
-        jobType: values.jobtype,
-        location: values.location,
-        path: pathname,
-        priority: "LOW",
-        ...(uploadedFilesResult.length > 0 && {
-          images: uploadedFilesResult.map(
-            (result: { filePath: string }) => result.filePath
-          ),
-        }),
+        const data: ExtendedJobRequestSchemaServer = {
+          description: values.description,
+          type: type,
+          departmentId: values.departmentId,
+          dueDate: values.dueDate,
+          jobType: values.jobtype,
+          location: values.location,
+          path: pathname,
+          priority: "LOW",
+          ...(currentFiles.length > 0 && {
+            images: currentFiles.map((result) => result.url),
+          }),
+        };
+
+        await mutateAsync(data);
       };
 
-      toast.promise(mutateAsync(data), {
+      toast.promise(uploadAndSubmit(), {
         loading: "Submitting...",
         success: () => {
           handleOpenChange(false);
