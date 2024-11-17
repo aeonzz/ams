@@ -12,6 +12,7 @@ import {
   Dot,
   Download,
   Ellipsis,
+  Gauge,
   MapPin,
   PencilLine,
   Users,
@@ -112,6 +113,9 @@ export default function TransportRequestDetails({
       toast.promise(mutateAsync(data), {
         loading: "Saving...",
         success: () => {
+          queryClient.invalidateQueries({
+            queryKey: [requestId],
+          });
           form.reset({
             department: data.department,
             description: data.description,
@@ -255,21 +259,6 @@ export default function TransportRequestDetails({
                 </TooltipContent>
               </Tooltip>
             )}
-            {/* {data.inProgress && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="flex animate-pulse cursor-pointer items-center space-x-2 rounded-md p-2 hover:bg-tertiary">
-                  <div className="size-1.5 rounded-full bg-blue-500" />
-                  <P className="font-semibold leading-none text-blue-500">
-                    In Progress
-                  </P>
-                </div>
-              </TooltipTrigger>
-              <TooltipContent className="flex items-center gap-3" side="bottom">
-                Transport is in progress
-              </TooltipContent>
-            </Tooltip>
-          )} */}
           </div>
         </div>
         <div>
@@ -285,7 +274,7 @@ export default function TransportRequestDetails({
                     className="rounded-md border object-cover"
                   />
                 </div>
-                <div className="flex flex-grow flex-col justify-between">
+                <div className="flex flex-grow justify-between">
                   <div className="space-y-1 truncate">
                     <P className="truncate font-semibold">
                       {data.vehicle.name}
@@ -302,6 +291,9 @@ export default function TransportRequestDetails({
                       {textTransform(data.vehicle.status)}
                     </Badge>
                   </div>
+                  <p className="truncate text-xs text-muted-foreground">
+                    Capacity: {data.vehicle.capacity}
+                  </p>
                 </div>
               </div>
             </CardHeader>
@@ -428,20 +420,31 @@ export default function TransportRequestDetails({
                 <FormField
                   control={form.control}
                   name="passengersName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <TagInput
-                          placeholder="Enter passenger name"
-                          disabled={isPending}
-                          value={field.value || []}
-                          autoFocus
-                          onChange={field.onChange}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  render={({ field }) => {
+                    const maxCapacity = data.vehicle.capacity ?? 0;
+
+                    return (
+                      <FormItem className="flex flex-grow flex-col">
+                        <FormControl>
+                          <TagInput
+                            placeholder={`Enter passenger name (max: ${maxCapacity})`}
+                            disabled={isPending || maxCapacity === 0}
+                            value={field.value || []}
+                            onChange={(value) => {
+                              if (value.length <= maxCapacity) {
+                                field.onChange(value);
+                              } else {
+                                toast.error(
+                                  `Maximum capacity of ${maxCapacity} passengers reached.`
+                                );
+                              }
+                            }}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    );
+                  }}
                 />
               </EditInput>
             ) : (
@@ -564,10 +567,53 @@ export default function TransportRequestDetails({
                 )}
               </div>
             )}
+            {data.actualStart && (
+              <>
+                <div className="group flex items-center justify-between">
+                  <div className="flex w-full flex-col items-start">
+                    <div className="flex space-x-1 text-muted-foreground">
+                      <MapPin className="h-5 w-5" />
+                      <P className="font-semibold tracking-tight">
+                        Actual Start Time:
+                      </P>
+                    </div>
+                    <div className="w-full pl-5 pt-1">
+                      <P>{format(new Date(data.actualStart), "PPP p")}</P>
+                    </div>
+                  </div>
+                </div>
+                <div className="group flex items-center justify-between">
+                  <div className="flex w-full flex-col items-start">
+                    <div className="flex space-x-1 text-muted-foreground">
+                      <Gauge className="h-5 w-5" />
+                      <P className="font-semibold tracking-tight">
+                        Initial Odometer Reading:
+                      </P>
+                    </div>
+                    <div className="w-full pl-5 pt-1">
+                      <P>{data.odometerStart}</P>
+                    </div>
+                  </div>
+                </div>
+                <div className="group flex items-center justify-between">
+                  <div className="flex w-full flex-col items-start">
+                    <div className="flex space-x-1 text-muted-foreground">
+                      <Gauge className="h-5 w-5" />
+                      <P className="font-semibold tracking-tight">
+                        Final Odometer Reading:
+                      </P>
+                    </div>
+                    <div className="w-full pl-5 pt-1">
+                      <P>{data.odometerEnd ? data.odometerEnd : "-"}</P>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
           </form>
         </Form>
+        <Separator className="my-6" />
       </div>
-      <Separator className="my-6" />
     </>
   );
 }

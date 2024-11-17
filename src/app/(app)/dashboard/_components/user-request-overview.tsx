@@ -161,6 +161,7 @@ export default function UserRequestOverview() {
                   key={request.id}
                   href={`request/${request.id}`}
                   className="group"
+                  prefetch
                 >
                   <Card className="bg-secondary group-hover:bg-tertiary">
                     <CardHeader className="pb-2">

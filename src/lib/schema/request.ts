@@ -144,6 +144,10 @@ export const transportRequestSchema = z.object({
     .refine((date) => date.getHours() !== 0 || date.getMinutes() !== 0, {
       message: "Time cannot be exactly midnight (00:00)",
     }),
+  inProgress: z.boolean().optional(),
+  actualStart: z.date().optional(),
+  odometerStart: z.number().optional(),
+  odometerEnd: z.number().optional(),
 });
 
 export type TransportRequestSchema = z.infer<typeof transportRequestSchema>;

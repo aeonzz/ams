@@ -53,6 +53,8 @@ interface RequestReviewerActionsProps {
   allowedRoles: string[];
   allowedDepartment?: string;
   allowedApproverRoles: string[];
+  actionNeeded?: boolean;
+  children?: React.ReactNode;
 }
 
 export default function RequestReviewerActions({
@@ -60,12 +62,13 @@ export default function RequestReviewerActions({
   allowedRoles,
   allowedDepartment,
   allowedApproverRoles,
+  actionNeeded = false,
+  children,
 }: RequestReviewerActionsProps) {
   const currentUser = useSession();
   const pathname = usePathname();
   const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = React.useState(false);
-  const [isAlertOpen, setIsAlertOpen] = React.useState(false);
   const [isRejectionAlertOpen, setIsRejectionAlertOpen] = React.useState(false);
   const [rejectionReason, setRejectionReason] = React.useState("");
 
@@ -155,7 +158,10 @@ export default function RequestReviewerActions({
           <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
               <TooltipTrigger asChild>
-                <Button className="w-full" variant="secondary">
+                <Button className="relative w-full" variant="secondary">
+                  {actionNeeded && (
+                    <div className="absolute left-[28%] top-2.5 size-2.5 rounded-full border-2 border-tertiary bg-red-500" />
+                  )}
                   <FolderKanban className="mr-2 h-4 w-4" />
                   Manage Request
                 </Button>
@@ -220,42 +226,6 @@ export default function RequestReviewerActions({
                       </div>
                     </div>
                   )}
-                  {request.jobRequest?.status === "COMPLETED" && (
-                    <>
-                      <AlertDialog
-                        open={isAlertOpen}
-                        onOpenChange={setIsAlertOpen}
-                      >
-                        <AlertDialogTrigger asChild>
-                          <Button
-                            className="w-full"
-                            disabled={isUpdateStatusPending}
-                          >
-                            Complete Request
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>
-                              Complete Request
-                            </AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Are you sure you want to mark this request as
-                              completed? This action cannot be undone.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => handleReview("COMPLETED")}
-                            >
-                              Complete
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </>
-                  )}
                   {request.status === "REVIEWED" && (
                     <PermissionGuard
                       allowedRoles={allowedApproverRoles}
@@ -314,6 +284,7 @@ export default function RequestReviewerActions({
                       </AlertDialogContent>
                     </AlertDialog>
                   )}
+                  {children}
                 </div>
               </div>
               <Separator className="my-2" />

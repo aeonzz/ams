@@ -91,13 +91,13 @@ export default function CreateVehicleForm({
         let currentFiles = uploadedFiles;
 
         currentFiles = await onUpload(values.imageUrl);
-
         const data: CreateVehicleSchemaWithPath = {
           name: values.name,
           type: values.type,
           departmentId: values.departmentId,
           imageUrl: currentFiles.map((result) => result.url),
           capacity: values.capacity,
+          odometer: values.odometer,
           licensePlate: values.licensePlate,
           path: pathname,
         };
@@ -203,6 +203,28 @@ export default function CreateVehicleForm({
                       field.onChange(value);
                     }}
                     className="w-full justify-between"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="odometer"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>odometer</FormLabel>
+                <FormControl>
+                  <NumberInput
+                    value={field.value}
+                    min={0}
+                    disabled={isPending || isUploading}
+                    onChange={(value) => {
+                      field.onChange(value);
+                    }}
+                    className="w-full justify-between"
+                    isDecimal={true}
                   />
                 </FormControl>
                 <FormMessage />

@@ -91,6 +91,7 @@ export function UpdateVehicleSheet({
       name: vehicle.name,
       type: vehicle.type,
       capacity: vehicle.capacity,
+      odometer: vehicle.odometer,
       licensePlate: vehicle.licensePlate,
       status: vehicle.status,
       departmentId: vehicle.departmentId,
@@ -112,6 +113,7 @@ export function UpdateVehicleSheet({
       name: vehicle.name,
       type: vehicle.type,
       capacity: vehicle.capacity,
+      odometer: vehicle.odometer,
       licensePlate: vehicle.licensePlate,
       status: vehicle.status,
       departmentId: vehicle.departmentId,
@@ -135,6 +137,7 @@ export function UpdateVehicleSheet({
           type: values.type,
           departmentId: values.departmentId,
           capacity: values.capacity,
+          odometer: values.odometer,
           licensePlate: values.licensePlate,
           status: values.status,
           imageUrl: currentFiles.map((result) => result.url),
@@ -257,6 +260,28 @@ export function UpdateVehicleSheet({
                             field.onChange(value);
                           }}
                           className="w-full justify-between"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="odometer"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>odometer</FormLabel>
+                      <FormControl>
+                        <NumberInput
+                          value={field.value}
+                          min={0}
+                          disabled={isPending || isUploading}
+                          onChange={(value) => {
+                            field.onChange(value);
+                          }}
+                          className="w-full justify-between"
+                          isDecimal={true}
                         />
                       </FormControl>
                       <FormMessage />

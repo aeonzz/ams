@@ -11,6 +11,7 @@ export const createVehicleSchema = z.object({
     required_error: "Image is required",
   }),
   capacity: z.number().min(1, "Capacity is required"),
+  odometer: z.number().min(1, "odometer is required"),
   licensePlate: z.string().min(1, "License number is required"),
   status: VehicleStatusSchema.optional(),
 });

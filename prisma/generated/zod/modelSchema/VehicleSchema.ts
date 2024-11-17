@@ -17,6 +17,7 @@ export const VehicleSchema = z.object({
   imageUrl: z.string(),
   capacity: z.number().int(),
   licensePlate: z.string(),
+  odometer: z.number(),
   isArchived: z.boolean(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),

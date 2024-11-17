@@ -27,7 +27,7 @@ import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
-import { H3, P } from "@/components/typography/text";
+import { H3, H5, P } from "@/components/typography/text";
 import { UseFormReturn } from "react-hook-form";
 import {
   HoverCard,
@@ -84,7 +84,7 @@ export default function JobSectionField({
                 </Button>
               </FormControl>
             </PopoverTrigger>
-            <PopoverContent className="p-0" align="start">
+            <PopoverContent className="p-0">
               <Command>
                 <CommandInput placeholder="Search departments..." />
                 <CommandList>
@@ -112,14 +112,23 @@ export default function JobSectionField({
                             <P className="truncate">{department.name}</P>
                           </CommandItem>
                         </HoverCardTrigger>
-                        <HoverCardContent className="w-80" side="right">
+                        <HoverCardContent
+                          className="w-60"
+                          side="left"
+                          align="start"
+                        >
                           <div className="space-y-2">
-                            <H3 className="font-semibold">{department.name}</H3>
+                            <H5 className="truncate font-semibold">
+                              {department.name}
+                            </H5>
                             <div className="scroll-bar max-h-52 overflow-y-auto">
-                              {/* <P className="text-muted-foreground">
-                                {section.description ||
-                                  "No description available."}
-                              </P> */}
+                              <P className="tracking-tight text-muted-foreground">
+                                {department.responsibilities ||
+                                  "Nothing to show here!"}
+                                das dbasvdjhbdasj hkbashjdg ashjkdgahjks
+                                dgashjdgashdjasg dhjasgd ajshdga sdhjasg dhjasd
+                                gajkhsdgas ashjd
+                              </P>
                             </div>
                           </div>
                         </HoverCardContent>
