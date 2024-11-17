@@ -74,7 +74,8 @@ export default function TransportRequestActions({
             <AlertDialogTitle>Confirm Start Request</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to start this transport request? This action
-              will update the status to "In Progress" and cannot be undone.
+              will update the status to &quot;In Progress&quot; and cannot be
+              undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
