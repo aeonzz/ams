@@ -1,7 +1,6 @@
 {
   "git": {
     "deploymentEnabled": {
-      "main": false,
       "feature/cloud-deployment": false
     }
   }
