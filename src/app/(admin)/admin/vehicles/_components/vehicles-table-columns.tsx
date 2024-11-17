@@ -174,6 +174,25 @@ export function getVehiclesColumns(): ColumnDef<VehicleTableType>[] {
       },
     },
     {
+      accessorKey: "odometer",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Odometer" />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="flex space-x-2">
+            <NumberFlow
+              willChange
+              continuous
+              value={row.original.odometer}
+              format={{ useGrouping: false }}
+              aria-hidden
+            />
+          </div>
+        );
+      },
+    },
+    {
       accessorKey: "licensePlate",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="License" />

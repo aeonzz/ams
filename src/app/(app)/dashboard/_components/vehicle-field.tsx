@@ -128,6 +128,9 @@ export default function VehicleField({
                                   />
                                   {textTransform(vehicle.status)}
                                 </Badge>
+                                <p className="truncate text-xs text-muted-foreground">
+                                  Capacity: {vehicle.capacity}
+                                </p>
                               </div>
                             </div>
                           </div>

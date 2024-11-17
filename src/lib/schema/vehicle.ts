@@ -11,6 +11,7 @@ export const createVehicleSchemaServer = z.object({
     })
   ),
   capacity: z.number(),
+  odometer: z.number(),
   licensePlate: z.string(),
 });
 
@@ -28,6 +29,7 @@ export const updateVehicleSchemaServer = z.object({
   departmentId: z.string().optional(),
   imageUrl: z.array(z.string()).optional(),
   capacity: z.number().optional(),
+  odometer: z.number().optional(),
   licensePlate: z.string().optional(),
   status: VehicleStatusSchema.optional(),
 });

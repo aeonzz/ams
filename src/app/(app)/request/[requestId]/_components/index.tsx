@@ -49,6 +49,7 @@ import CompleteTransportRequest from "./complete-transport-request";
 import ReturnableRequestActions from "./returnable-request-actions";
 import SupplyResourceDetails from "./supply-resource-details";
 import SupplyRequestActions from "./supply-request-actions";
+import TransportRequestActions from "./transport-request-actions";
 
 interface RequestDetailsProps {
   params: string;
@@ -350,7 +351,17 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
               allowedRoles={["OPERATIONS_MANAGER"]}
               allowedDepartment={data.departmentId}
               allowedApproverRoles={["DEPARTMENT_HEAD"]}
-            />
+              actionNeeded={
+                new Date(data.transportRequest.dateAndTimeNeeded) <=
+                  new Date() && !data.transportRequest.inProgress
+              }
+            >
+              {new Date(data.transportRequest.dateAndTimeNeeded) <=
+                new Date() &&
+                !data.transportRequest.inProgress && (
+                  <TransportRequestActions data={data.transportRequest} />
+                )}
+            </RequestReviewerActions>
           )}
           {data.type === "VENUE" && data.venueRequest && (
             <RequestReviewerActions
@@ -381,16 +392,6 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
           {data.status === "APPROVED" &&
             data.type === "SUPPLY" &&
             data.supplyRequest && <SupplyRequestActions requestId={data.id} />}
-          {/* {data.type === "VENUE" && data.venueRequest && (
-            <JobRequestReviewerActions
-              request={data}
-              entityType="RETURNABLE_REQUEST"
-              allowedRoles={[""]}
-              allowedSection={data.venueRequest.sectionId}
-              allowedApproverRoles={["DEPARTMENT_HEAD"]}
-              requestTypeId={data.venueRequest.id}
-            />
-          )} */}
         </div>
       </div>
     </div>

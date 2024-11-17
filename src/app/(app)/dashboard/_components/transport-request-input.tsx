@@ -149,8 +149,8 @@ export default function TransportRequestInput({
     <>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <div className="flex px-4 gap-2">
-            <div className="scroll-bar flex max-h-[60vh] flex-1 overflow-y-auto py-1 px-1">
+          <div className="flex gap-2 px-4">
+            <div className="scroll-bar flex max-h-[60vh] flex-1 overflow-y-auto px-1 py-1">
               <div className="flex flex-col space-y-2">
                 <div className="flex">
                   <div className="mr-2 w-fit pt-[2px]">
@@ -218,22 +218,37 @@ export default function TransportRequestInput({
                 <FormField
                   control={form.control}
                   name="passengersName"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-grow flex-col">
-                      <FormLabel className="text-left">
-                        Passenger(s) Name
-                      </FormLabel>
-                      <FormControl>
-                        <TagInput
-                          placeholder="Enter passenger name"
-                          disabled={isPending}
-                          value={field.value || []}
-                          onChange={field.onChange}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  render={({ field }) => {
+                    const selectedVehicle = vehicleData?.find(
+                      (vehicle) => vehicle.id === vehicleId
+                    );
+                    const maxCapacity = selectedVehicle?.capacity ?? 0;
+
+                    return (
+                      <FormItem className="flex flex-grow flex-col">
+                        <FormLabel className="text-left">
+                          Passenger(s) Name
+                        </FormLabel>
+                        <FormControl>
+                          <TagInput
+                            placeholder={`Enter passenger name (max: ${maxCapacity})`}
+                            disabled={isPending || maxCapacity === 0}
+                            value={field.value || []}
+                            onChange={(value) => {
+                              if (value.length <= maxCapacity) {
+                                field.onChange(value);
+                              } else {
+                                toast.error(
+                                  `Maximum capacity of ${maxCapacity} passengers reached.`
+                                );
+                              }
+                            }}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    );
+                  }}
                 />
                 <FormField
                   control={form.control}
@@ -246,7 +261,7 @@ export default function TransportRequestInput({
                           rows={1}
                           maxRows={5}
                           placeholder="Purpose..."
-                          className="min-h-[200px] flex-grow resize-none placeholder:text-sm"
+                          className="min-h-[200px] flex-grow resize-none bg-transparent shadow-none placeholder:text-sm"
                           disabled={isPending}
                           {...field}
                         />
@@ -259,7 +274,9 @@ export default function TransportRequestInput({
             </div>
             {vehicleId && (
               <div
-                className={cn("scroll-bar max-h-[60vh] w-[300px] overflow-y-auto pr-1")}
+                className={cn(
+                  "scroll-bar max-h-[60vh] w-[300px] overflow-y-auto pr-1"
+                )}
               >
                 <P className="mb-2 font-semibold">Schedules</P>
                 {isLoading || isRefetching ? (

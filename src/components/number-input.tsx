@@ -3,7 +3,7 @@ import NumberFlow from "@number-flow/react";
 import clsx from "clsx/lite";
 import { Minus, Plus } from "lucide-react";
 import * as React from "react";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 
 type Props = {
   value?: number;
@@ -12,6 +12,7 @@ type Props = {
   disabled?: boolean;
   onChange?: (value: number) => void;
   className?: string;
+  isDecimal?: boolean;
 };
 
 export default function NumberInput({
@@ -21,12 +22,13 @@ export default function NumberInput({
   onChange,
   className,
   disabled,
+  isDecimal = false,
 }: Props) {
   const defaultValue = React.useRef(value);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const [animated, setAnimated] = React.useState(true);
-  // Hide the caret during transitions so you can't see it shifting around:
   const [showCaret, setShowCaret] = React.useState(true);
+
   const handleInput: React.ChangeEventHandler<HTMLInputElement> = ({
     currentTarget: el,
   }) => {
@@ -35,21 +37,19 @@ export default function NumberInput({
       onChange?.(defaultValue.current);
       return;
     }
-    const num = parseInt(el.value);
+    const num = isDecimal ? parseFloat(el.value) : parseInt(el.value);
     if (
       isNaN(num) ||
       (min != null && num < min) ||
       (max != null && num > max)
     ) {
-      // Revert input's value:
       el.value = String(value);
     } else {
-      // Manually update value in case they e.g. start with a "0" or end with a "."
-      // which won't trigger a DOM update (because the number is the same):
-      el.value = String(num);
+      el.value = isDecimal ? num.toFixed(2) : String(num);
       onChange?.(num);
     }
   };
+
   const handlePointerDown =
     (diff: number) => (event: React.PointerEvent<HTMLButtonElement>) => {
       setAnimated(true);
@@ -57,9 +57,11 @@ export default function NumberInput({
         event?.preventDefault();
         inputRef.current?.focus();
       }
-      const newVal = Math.min(Math.max(value + diff, min), max);
-      onChange?.(newVal);
+      const increment = isDecimal ? 0.01 : 1;
+      const newVal = Math.min(Math.max(value + diff * increment, min), max);
+      onChange?.(isDecimal ? parseFloat(newVal.toFixed(2)) : newVal);
     };
+
   return (
     <div
       className={cn(
@@ -71,8 +73,7 @@ export default function NumberInput({
         variant="ghost2"
         size="icon"
         type="button"
-        aria-hidden
-        tabIndex={-1}
+        aria-label="Decrease value"
         className="flex size-7 items-center pl-[.5em] pr-[.325em]"
         disabled={(min != null && value <= min) || disabled}
         onPointerDown={handlePointerDown(-1)}
@@ -84,23 +85,27 @@ export default function NumberInput({
           ref={inputRef}
           className={clsx(
             showCaret ? "caret-primary" : "caret-transparent",
-            "spin-hide w-[1.5em] bg-transparent text-center font-[inherit] text-transparent outline-none"
+            "spin-hide no-double-click-select w-[3em] bg-transparent text-center font-[inherit] text-transparent outline-none"
           )}
-          // Make sure to disable kerning, to match NumberFlow:
           style={{ fontKerning: "none" }}
-          type="number"
+          type={isDecimal ? "number" : "text"}
           min={min}
-          step={1}
+          step={isDecimal ? 0.01 : 1}
           autoComplete="off"
-          inputMode="numeric"
+          inputMode={isDecimal ? "decimal" : "numeric"}
           disabled={disabled}
           max={max}
-          value={value}
+          value={isDecimal ? value.toFixed(2) : value}
           onInput={handleInput}
+          aria-label="Number input"
         />
         <NumberFlow
           value={value}
-          format={{ useGrouping: false }}
+          format={{
+            useGrouping: false,
+            minimumFractionDigits: isDecimal ? 2 : 0,
+            maximumFractionDigits: isDecimal ? 2 : 0,
+          }}
           aria-hidden
           animated={animated}
           onAnimationsStart={() => setShowCaret(false)}
@@ -113,8 +118,7 @@ export default function NumberInput({
         type="button"
         variant="ghost2"
         size="icon"
-        aria-hidden
-        tabIndex={-1}
+        aria-label="Increase value"
         className="flex size-7 items-center pl-[.5em] pr-[.325em]"
         disabled={(max != null && value >= max) || disabled}
         onPointerDown={handlePointerDown(1)}

@@ -149,9 +149,6 @@ export default function JobRequestDetails({
         loading: "Saving...",
         success: () => {
           queryClient.invalidateQueries({
-            queryKey: ["activity", requestId],
-          });
-          queryClient.invalidateQueries({
             queryKey: [requestId],
           });
           form.reset({

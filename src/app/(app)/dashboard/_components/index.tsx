@@ -50,35 +50,6 @@ export default function DashboardScreen() {
           <UserRequestOverview />
         </div>
       </div>
-      {/* <Separator orientation="vertical" className="h-full" />
-      <div className="w-[30%]">
-        <div className="flex h-[50px] items-center justify-between border-b px-3">
-          <P className="font-medium">Notification</P>
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              className={cn(
-                buttonVariants({ variant: "ghost2", size: "icon" })
-              )}
-            >
-              <SlidersHorizontal className="size-5" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="end"
-              sideOffset={10}
-              loop
-              onCloseAutoFocus={(e) => e.preventDefault()}
-            >
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Profile</DropdownMenuItem>
-              <DropdownMenuItem>Billing</DropdownMenuItem>
-              <DropdownMenuItem>Team</DropdownMenuItem>
-              <DropdownMenuItem>Subscription</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-        <Inbox />
-      </div> */}
     </div>
   );
 }

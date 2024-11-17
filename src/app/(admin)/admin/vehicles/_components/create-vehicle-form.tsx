@@ -78,7 +78,7 @@ export default function CreateVehicleForm({
   const pathname = usePathname();
   const queryClient = useQueryClient();
 
-  const { data, isLoading } = useTransportDepartments()
+  const { data, isLoading } = useTransportDepartments();
 
   const { uploadFiles, progresses, isUploading } = useUploadFile();
 
@@ -96,6 +96,7 @@ export default function CreateVehicleForm({
           (result: { filePath: string }) => result.filePath
         ),
         capacity: values.capacity,
+        odometer: values.odometer,
         licensePlate: values.licensePlate,
         path: pathname,
       };
@@ -198,6 +199,28 @@ export default function CreateVehicleForm({
                       field.onChange(value);
                     }}
                     className="w-full justify-between"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="odometer"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>odometer</FormLabel>
+                <FormControl>
+                  <NumberInput
+                    value={field.value}
+                    min={0}
+                    disabled={isPending || isUploading}
+                    onChange={(value) => {
+                      field.onChange(value);
+                    }}
+                    className="w-full justify-between"
+                    isDecimal={true}
                   />
                 </FormControl>
                 <FormMessage />

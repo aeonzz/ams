@@ -310,7 +310,7 @@ export default function JobRequestInput({
                           maxRows={7}
                           minRows={3}
                           placeholder="Job description..."
-                          className="border-none p-0 focus-visible:ring-0"
+                          className="border-none p-0 focus-visible:ring-0 bg-transparent shadow-none"
                           disabled={isUploading || isPending}
                           {...field}
                         />
