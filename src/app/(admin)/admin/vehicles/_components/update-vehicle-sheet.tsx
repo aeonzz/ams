@@ -142,7 +142,7 @@ export function UpdateVehicleSheet({
           status: values.status,
           imageUrl: currentFiles.map((result) => result.url),
         };
-
+        
         await mutateAsync(data);
       };
 
