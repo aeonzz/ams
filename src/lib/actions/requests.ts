@@ -26,6 +26,7 @@ import { createNotification } from "./notification";
 import { updateReturnableResourceRequestSchemaWithPath } from "../schema/resource/returnable-resource";
 import { updateRequestStatusSchemaWithPath } from "@/app/(app)/request/[requestId]/_components/schema";
 import { pusher } from "../pusher";
+import { transportRequestActions } from "../schema/request/transport";
 
 const cohere = createCohere({
   apiKey: process.env.COHERE_API_KEY,
@@ -615,13 +616,18 @@ export const updateTransportRequest = authedProcedure
   .createServerAction()
   .input(updateTransportRequestSchemaWithPath)
   .handler(async ({ input }) => {
-    const { path, id, ...rest } = input;
+    const { path, id, vehicleStatus, vehicleId, ...rest } = input;
     try {
       const result = await db.transportRequest.update({
         where: {
           requestId: id,
         },
         data: {
+          vehicle: {
+            update: {
+              status: vehicleStatus,
+            },
+          },
           ...rest,
         },
       });
@@ -771,46 +777,141 @@ export const completeVenueRequest = authedProcedure
 
 export const completeTransportRequest = authedProcedure
   .createServerAction()
-  .input(updateRequestStatusSchemaWithPath)
+  .input(transportRequestActions)
   .handler(async ({ ctx, input }) => {
     const { user } = ctx;
-    const { path, requestId, reviewerId, ...rest } = input;
+    const { path, requestId, odometer, ...rest } = input;
 
     try {
-      const result = await db.$transaction(async (prisma) => {
-        const updatedTransportRequest = await prisma.transportRequest.update({
-          where: {
-            requestId: requestId,
-          },
-          data: {
-            request: {
-              update: {
-                completedAt: new Date(),
-                ...rest,
+      const result = await db.$transaction(
+        async (prisma) => {
+          const transportRequest = await prisma.transportRequest.findUnique({
+            where: {
+              requestId: requestId,
+            },
+            select: {
+              odometerStart: true,
+            },
+          });
+
+          if (!transportRequest || transportRequest.odometerStart === null) {
+            throw "Odometer start value is missing or invalid.";
+          }
+          const totalDistance = parseFloat(
+            (odometer - transportRequest.odometerStart).toFixed(2)
+          );
+
+          console.log(totalDistance, odometer, transportRequest.odometerStart);
+
+          if (totalDistance < 0) {
+            throw "Invalid odometer readings. End value must be greater than start value.";
+          }
+
+          const updatedTransportRequest = await prisma.transportRequest.update({
+            where: {
+              requestId: requestId,
+            },
+            data: {
+              request: {
+                update: {
+                  completedAt: new Date(),
+                  ...rest,
+                },
+              },
+              vehicle: {
+                update: {
+                  odometer: odometer,
+                },
+              },
+              inProgress: false,
+              odometerEnd: odometer,
+              totalDistanceTravelled: totalDistance,
+            },
+          });
+
+          await db.vehicle.update({
+            where: {
+              id: result.vehicleId,
+            },
+            data: {
+              status: "AVAILABLE",
+            },
+          });
+
+          const vehicle = await prisma.vehicle.findUnique({
+            where: {
+              id: updatedTransportRequest.vehicleId,
+            },
+            select: {
+              odometer: true,
+              maintenanceInterval: true,
+              name: true,
+              departmentId: true,
+              department: {
+                select: {
+                  userRole: {
+                    where: {
+                      role: {
+                        name: "DEPARTMENT_HEAD",
+                      },
+                    },
+                    select: {
+                      userId: true,
+                    },
+                  },
+                },
               },
             },
-            inProgress: false,
-          },
-        });
+          });
 
-        await db.vehicle.update({
-          where: {
-            id: updatedTransportRequest.vehicleId,
-          },
-          data: {
-            status: "AVAILABLE",
-          },
-        });
+          if (!vehicle) {
+            throw "Vehicle not found.";
+          }
 
-        await pusher.trigger("request", "request_update", {
-          message: "",
-        });
+          // Fetch the most recent maintenance record
+          const lastMaintenance = await prisma.maintenanceHistory.findFirst({
+            where: { vehicleId: updatedTransportRequest.vehicleId },
+            orderBy: { performedAt: "desc" },
+          });
 
-        await pusher.trigger("request", "notifications", {
-          message: "",
-        });
+          const lastMaintenanceOdometer = lastMaintenance?.odometer || 0;
+          const nextMaintenanceThreshold =
+            lastMaintenanceOdometer + (vehicle.maintenanceInterval || 200000);
 
-        return updatedTransportRequest;
+          // Check if maintenance is due
+          if (vehicle.odometer >= nextMaintenanceThreshold) {
+            await prisma.vehicle.update({
+              where: { id: updatedTransportRequest.vehicleId },
+              data: {
+                requiresMaintenance: true,
+                status: "UNDER_MAINTENANCE",
+              },
+            });
+
+            const departmentHeadUserId = vehicle.department.userRole[0].userId;
+
+            await createNotification({
+              resourceId: `/department/${vehicle.departmentId}/resources/transport/${updatedTransportRequest.vehicleId}`,
+              title: `Vehicle Maintenance Required`,
+              resourceType: "TASK",
+              notificationType: "ALERT",
+              message: `The vehicle "${vehicle.name}" requires maintenance. Please address this issue immediately.`,
+              userId: user.id,
+              recepientIds: [vehicle.departmentId, departmentHeadUserId],
+            });
+          }
+
+          return updatedTransportRequest;
+        },
+        { timeout: 10000 }
+      );
+
+      await pusher.trigger("request", "request_update", {
+        message: "",
+      });
+
+      await pusher.trigger("request", "notifications", {
+        message: "",
       });
 
       return revalidatePath(path);

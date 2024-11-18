@@ -214,7 +214,34 @@ export default function CreateVehicleForm({
             name="odometer"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>odometer</FormLabel>
+                <FormLabel>Odometer</FormLabel>
+                <FormControl>
+                  <NumberInput
+                    value={field.value}
+                    min={0}
+                    disabled={isPending || isUploading}
+                    onChange={(value) => {
+                      field.onChange(value);
+                    }}
+                    className="w-full justify-between"
+                    isDecimal={true}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="maintenanceInterval"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  Odometer maintenance Interval{" "}
+                  <span className="text-xs text-muted-foreground">
+                    (optional) default: 200000
+                  </span>
+                </FormLabel>
                 <FormControl>
                   <NumberInput
                     value={field.value}

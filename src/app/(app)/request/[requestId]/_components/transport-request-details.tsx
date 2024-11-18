@@ -13,6 +13,7 @@ import {
   Download,
   Ellipsis,
   Gauge,
+  LandPlot,
   MapPin,
   PencilLine,
   Users,
@@ -213,7 +214,7 @@ export default function TransportRequestDetails({
   React.useEffect(() => {
     form.reset();
   }, [editField]);
-
+  console.log(data.totalDistanceTravelled);
   const canEdit = requestStatus === "PENDING" && isCurrentUser;
 
   return (
@@ -605,6 +606,28 @@ export default function TransportRequestDetails({
                     </div>
                     <div className="w-full pl-5 pt-1">
                       <P>{data.odometerEnd ? data.odometerEnd : "-"}</P>
+                    </div>
+                  </div>
+                </div>
+                <div className="group flex items-center justify-between">
+                  <div className="flex w-full flex-col items-start">
+                    <div className="flex space-x-1 text-muted-foreground">
+                      <LandPlot className="h-5 w-5" />
+                      <P className="font-semibold tracking-tight">
+                        Total Distance Travelled:
+                      </P>
+                    </div>
+                    <div className="w-full pl-5 pt-1">
+                      <P>
+                        {data.totalDistanceTravelled ? (
+                          <>
+                            {data.totalDistanceTravelled}{" "}
+                            <span className="text-muted-foreground">km</span>
+                          </>
+                        ) : (
+                          "-"
+                        )}
+                      </P>
                     </div>
                   </div>
                 </div>

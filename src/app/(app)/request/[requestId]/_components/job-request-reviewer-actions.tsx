@@ -185,7 +185,10 @@ export default function JobRequestReviewerActions({
             setRejectionReason("");
             return `Request ${successText} successfully.`;
           },
-          error: `Failed to ${action.toLowerCase()} request. Please try again.`,
+          error: (err) => {
+            console.error(err);
+            return `Something went Wrong!. Please try again.`;
+          },
         });
 
         if (action === "COMPLETED") {

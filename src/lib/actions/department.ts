@@ -87,7 +87,7 @@ export const createDepartment = authedProcedure
     const { path, ...rest } = input;
 
     try {
-      const departmentId = generateId(3);
+      const departmentId = generateId(15);
 
       // a = managesBorrowRequest
       //   ? {

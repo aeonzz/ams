@@ -7,6 +7,11 @@ import CreateVehicleDialog from "@/app/(admin)/admin/vehicles/_components/create
 import RequestOption from "@/app/(app)/dashboard/_components/request-option";
 import NotFound from "@/app/not-found";
 import { RoleGuard } from "@/components/role-guard";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Vehicles",
+};
 
 export interface Props {
   params: {

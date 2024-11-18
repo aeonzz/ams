@@ -92,6 +92,7 @@ export function UpdateVehicleSheet({
       type: vehicle.type,
       capacity: vehicle.capacity,
       odometer: vehicle.odometer,
+      maintenanceInterval: vehicle.maintenanceInterval,
       licensePlate: vehicle.licensePlate,
       status: vehicle.status,
       departmentId: vehicle.departmentId,
@@ -114,6 +115,7 @@ export function UpdateVehicleSheet({
       type: vehicle.type,
       capacity: vehicle.capacity,
       odometer: vehicle.odometer,
+      maintenanceInterval: vehicle.maintenanceInterval,
       licensePlate: vehicle.licensePlate,
       status: vehicle.status,
       departmentId: vehicle.departmentId,
@@ -138,11 +140,12 @@ export function UpdateVehicleSheet({
           departmentId: values.departmentId,
           capacity: values.capacity,
           odometer: values.odometer,
+          maintenanceInterval: values.maintenanceInterval,
           licensePlate: values.licensePlate,
           status: values.status,
           imageUrl: currentFiles.map((result) => result.url),
         };
-        
+
         await mutateAsync(data);
       };
 
@@ -272,6 +275,28 @@ export function UpdateVehicleSheet({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>odometer</FormLabel>
+                      <FormControl>
+                        <NumberInput
+                          value={field.value}
+                          min={0}
+                          disabled={isPending || isUploading}
+                          onChange={(value) => {
+                            field.onChange(value);
+                          }}
+                          className="w-full justify-between"
+                          isDecimal={true}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="maintenanceInterval"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Odometer maintenance Interval</FormLabel>
                       <FormControl>
                         <NumberInput
                           value={field.value}

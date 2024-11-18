@@ -5,6 +5,11 @@ import CommandSearchDialog from "@/components/dialogs/command-search-dialog";
 import ThemeDialog from "@/components/dialogs/theme-dialog";
 import SettingsDialog from "@/components/dialogs/settings-dialog";
 import { RoleGuard } from "@/components/role-guard";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Users",
+};
 
 export default function CommandLayout({
   children,

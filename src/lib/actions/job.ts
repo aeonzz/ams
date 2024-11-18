@@ -264,15 +264,15 @@ export const updateRequestStatus = authedProcedure
           }
         }
 
-        await pusher.trigger("request", "request_update", {
-          message: "",
-        });
-
-        await pusher.trigger("request", "notifications", {
-          message: "",
-        });
-
         return updatedRequest;
+      });
+
+      await pusher.trigger("request", "request_update", {
+        message: "",
+      });
+
+      await pusher.trigger("request", "notifications", {
+        message: "",
       });
 
       return revalidatePath(path);
@@ -581,4 +581,3 @@ export const updateReworkJobRequest = authedProcedure
       getErrorMessage(error);
     }
   });
-

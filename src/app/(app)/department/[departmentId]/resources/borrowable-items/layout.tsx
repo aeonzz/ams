@@ -9,6 +9,11 @@ import { RoleGuard } from "@/components/role-guard";
 import { db } from "@/lib/db/index";
 import NotFound from "@/app/not-found";
 import CreateInventoryDialog from "@/app/(admin)/admin/inventory/lendable-items/_components/create-inventory-dialog";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Borrowable items",
+};
 
 interface Props {
   params: {

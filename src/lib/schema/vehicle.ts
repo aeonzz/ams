@@ -12,6 +12,7 @@ export const createVehicleSchemaServer = z.object({
   ),
   capacity: z.number(),
   odometer: z.number(),
+  maintenanceInterval: z.number().optional(),
   licensePlate: z.string(),
 });
 
@@ -31,6 +32,7 @@ export const updateVehicleSchemaServer = z.object({
   capacity: z.number().optional(),
   odometer: z.number().optional(),
   licensePlate: z.string().optional(),
+  maintenanceInterval: z.number().optional(),
   status: VehicleStatusSchema.optional(),
 });
 
