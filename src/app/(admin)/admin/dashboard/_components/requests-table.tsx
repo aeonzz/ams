@@ -76,6 +76,7 @@ export default function RequestsTable({ data, className }: RequestsTableProps) {
                   buttonVariants({ variant: "link" }),
                   "h-auto truncate p-0 text-foreground"
                 )}
+                prefetch
               >
                 <P className="truncate font-medium">{row.original.title}</P>
               </Link>

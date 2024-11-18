@@ -111,6 +111,7 @@ export default function DepartmentUsersTable({
           <Link
             href="/admin/users?page=1&per_page=10&sort=createdAt.desc"
             className={cn(buttonVariants({ variant: "link", size: "sm" }))}
+            prefetch
           >
             See all
           </Link>

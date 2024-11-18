@@ -23,7 +23,6 @@ import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { UpdateVehicleSheet } from "@/app/(admin)/admin/vehicles/_components/update-vehicle-sheet";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "@/lib/hooks/use-session";
 import { PermissionGuard } from "@/components/permission-guard";

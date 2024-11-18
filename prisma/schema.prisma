@@ -84,7 +84,7 @@ model UserDepartment {
 }
 
 model UserRole {
-  id           String     @default(uuid())
+  id           String     @unique @default(uuid())
   userId       String
   user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   roleId       String

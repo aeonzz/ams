@@ -112,6 +112,7 @@ export default function DepartmentBorrowableItemsScreen({
                       key={item.id}
                       href={`/department/${departmentId}/resources/borrowable-items/${item.id}?page=1&per_page=10&sort=createdAt.desc`}
                       className="flex h-auto w-full justify-between gap-3 overflow-hidden rounded-md p-3 transition-colors hover:bg-secondary-accent hover:text-secondary-accent-foreground"
+                      prefetch
                     >
                       <div className="relative aspect-square min-w-24 rounded-md">
                         <Image

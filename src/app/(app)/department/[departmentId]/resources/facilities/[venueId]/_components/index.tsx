@@ -35,8 +35,6 @@ import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
 import VenueRequestsTable from "./venue-requests-table";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { UpdateVenueSheet } from "@/app/(admin)/admin/venues/_components/update-venue-sheet";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import ManageVenueSkeleton from "./manage-venue-skeleton";
 import { useSession } from "@/lib/hooks/use-session";
@@ -172,15 +170,6 @@ export default function ManageVenueScreen({ params }: ManageVenueScreenProps) {
                     />
                     {textTransform(data.status)}
                   </Button>
-                  {/* <Link
-                    href={`/department/${departmentId}/facilities/${venueId}/logs`}
-                    className={cn(
-                      buttonVariants({ variant: "secondary" }),
-                      "flex-1"
-                    )}
-                  >
-                    <P>Logs</P>
-                  </Link> */}
                 </PermissionGuard>
               </div>
             </div>

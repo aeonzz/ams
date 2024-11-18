@@ -32,7 +32,7 @@ export default function DepartmentJobRequestsScreen({
       );
       return res.data.data;
     },
-    queryKey: ["department-job-requests",departmentId],
+    queryKey: ["department-job-requests", departmentId],
   });
 
   if (isLoading) {
@@ -79,7 +79,7 @@ export default function DepartmentJobRequestsScreen({
                   job.jobStatus
                 );
                 return (
-                  <Link key={job.id} href={`/request/${job.id}`}>
+                  <Link key={job.id} href={`/request/${job.id}`} prefetch>
                     <Card
                       key={job.id}
                       className="transition-colors hover:bg-secondary-accent"

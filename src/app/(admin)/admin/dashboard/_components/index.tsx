@@ -177,6 +177,7 @@ export default function AdminDashboardScreen() {
                               buttonVariants({ variant: "link" }),
                               "p-0 text-foreground"
                             )}
+                            prefetch
                           >
                             <P className="truncate font-medium">
                               {request.title}
@@ -219,6 +220,7 @@ export default function AdminDashboardScreen() {
                   className={cn(
                     buttonVariants({ variant: "default", size: "sm" })
                   )}
+                  prefetch
                 >
                   <P>View All Requests </P>
                 </Link>

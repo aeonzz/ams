@@ -81,6 +81,7 @@ export default function SignInForm() {
                   <Link
                     href="/sign-in/reset-password"
                     className="ml-auto inline-block text-sm text-blue-500 underline"
+                    prefetch
                   >
                     Forgot your password?
                   </Link>

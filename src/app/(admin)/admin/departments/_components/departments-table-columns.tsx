@@ -31,7 +31,6 @@ import { formatDate } from "date-fns";
 import { cn, textTransform } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import DataTableExpand from "@/components/data-table/data-table-expand";
-import Link from "next/link";
 
 export function getDepartmentsColumns(): ColumnDef<DepartmentsTableType>[] {
   return [

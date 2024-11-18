@@ -17,7 +17,7 @@ import {
   updateJobRequestSchemaWithPath,
   updateRequestStatusSchemaWithPath,
   updateReworkJobRequestSchema,
-} from "@/app/(admin)/admin/requests/[requestId]/_components/schema";
+} from "@/app/(app)/request/[requestId]/_components/schema";
 import { pusher } from "../pusher";
 
 export const createJobRequest = authedProcedure

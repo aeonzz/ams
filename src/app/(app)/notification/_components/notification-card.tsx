@@ -11,7 +11,6 @@ import {
 import type { NotificationWithRelations } from "prisma/generated/zod";
 import { format, formatDistanceToNow } from "date-fns";
 import { H4, H5, P } from "@/components/typography/text";
-import Link from "next/link";
 import { cn, textTransform } from "@/lib/utils";
 import {
   AlertCircle,

@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { LayoutGroup } from "framer-motion";
 
 import { MotionLayout } from "@/components/layouts/motion-layout";
