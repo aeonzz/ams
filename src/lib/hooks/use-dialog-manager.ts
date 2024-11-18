@@ -16,6 +16,7 @@ export type DialogType =
   | "jobDetailsDialog"
   | "adminCreateVenueDialog"
   | "adminCreateVehicleDialog"
+  | "adminUpdateVehicleSheet"
   | "adminUpdateVenueSheet"
   | "adminCreateInventoryItemDialog"
   | "adminUpdateInventoryItemSheet"

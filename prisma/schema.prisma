@@ -84,7 +84,7 @@ model UserDepartment {
 }
 
 model UserRole {
-  id           String     @id
+  id           String     @default(uuid())
   userId       String
   user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   roleId       String
@@ -374,40 +374,54 @@ model SupplyRequestItem {
 }
 
 model TransportRequest {
-  id                 String    @id
-  description        String
-  department         String
-  numberOfPassengers Int
-  passengersName     String[]
-  destination        String
-  inProgress         Boolean   @default(false)
-  actualStart        DateTime?
-  dateAndTimeNeeded  DateTime
-  odometerStart      Float?
-  odometerEnd        Float?
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
-  requestId          String    @unique
-  request            Request   @relation(fields: [requestId], references: [id], onDelete: Cascade)
-  vehicleId          String
-  vehicle            Vehicle   @relation(fields: [vehicleId], references: [id])
+  id                     String    @id
+  description            String
+  department             String
+  numberOfPassengers     Int
+  passengersName         String[]
+  destination            String
+  inProgress             Boolean   @default(false)
+  actualStart            DateTime?
+  dateAndTimeNeeded      DateTime
+  odometerStart          Float?
+  odometerEnd            Float?
+  totalDistanceTravelled Float?
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+  requestId              String    @unique
+  request                Request   @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  vehicleId              String
+  vehicle                Vehicle   @relation(fields: [vehicleId], references: [id])
 }
 
 model Vehicle {
-  id               String             @id
-  name             String
-  type             String
-  imageUrl         String
-  capacity         Int
-  licensePlate     String
-  odometer         Float              @default(0)
-  isArchived       Boolean            @default(false)
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @updatedAt
-  status           VehicleStatus      @default(AVAILABLE)
-  departmentId     String
-  department       Department         @relation(fields: [departmentId], references: [id])
-  transportRequest TransportRequest[]
+  id                  String               @id
+  name                String
+  type                String
+  imageUrl            String
+  capacity            Int
+  licensePlate        String
+  odometer            Float                @default(0)
+  maintenanceInterval Float                @default(200000)
+  requiresMaintenance Boolean              @default(false)
+  isArchived          Boolean              @default(false)
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  status              VehicleStatus        @default(AVAILABLE)
+  departmentId        String
+  department          Department           @relation(fields: [departmentId], references: [id])
+  transportRequest    TransportRequest[]
+  maintenanceHistory  MaintenanceHistory[]
+}
+
+model MaintenanceHistory {
+  id          String   @id
+  vehicleId   String
+  vehicle     Vehicle  @relation(fields: [vehicleId], references: [id])
+  performedAt DateTime @default(now())
+  odometer    Float
+  description String?
+  createdAt   DateTime @default(now())
 }
 
 enum JobStatus {

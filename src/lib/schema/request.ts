@@ -5,6 +5,7 @@ import {
   PriorityTypeSchema,
   RequestStatusTypeSchema,
   RequestTypeSchema,
+  VehicleStatusSchema,
 } from "prisma/generated/zod";
 
 export const requestSchemaBase = z.object({
@@ -148,6 +149,7 @@ export const transportRequestSchema = z.object({
   actualStart: z.date().optional(),
   odometerStart: z.number().optional(),
   odometerEnd: z.number().optional(),
+  vehicleStatus: VehicleStatusSchema.optional(),
 });
 
 export type TransportRequestSchema = z.infer<typeof transportRequestSchema>;
@@ -183,33 +185,6 @@ export const updateTransportRequestSchemaWithPath =
 export type UpdateTransportRequestSchemaWithPath = z.infer<
   typeof updateTransportRequestSchemaWithPath
 >;
-
-// export const updateRequestSchemaBase = z.object({
-//   notes: z.string().optional(),
-//   priority: PriorityTypeSchema.optional(),
-//   dueDate: z.date().optional(),
-//   type: RequestTypeSchema.optional(),
-//   status: RequestStatusTypeSchema.optional(),
-//   departmentId: z.string().optional(),
-// });
-
-// export const updateJobRequestSchema = updateRequestSchemaBase.extend({
-//   jobType: z.string().optional(),
-//   name: z.string().optional(),
-//   category: z.string().optional(),
-//   files: z.array(z.string()).optional(),
-// });
-
-// export type UpdateJobRequestSchema = z.infer<typeof updateJobRequestSchema>;
-
-// export const extendedUpdateJobRequestSchema = updateJobRequestSchema.extend({
-//   path: z.string(),
-//   id: z.string(),
-// });
-
-// export type ExtendedUpdateJobRequestSchema = z.infer<
-//   typeof extendedUpdateJobRequestSchema
-// >;
 
 export const createJobRequestServer = z.object({
   description: z

@@ -73,7 +73,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
       <div className="flex-1 overflow-hidden">
         <div className="flex h-[50px] items-center gap-16 border-b px-6">
           <H5 className="truncate font-semibold text-muted-foreground">
-            {data.title}
+            {params}
           </H5>
           <SearchInput />
         </div>
@@ -358,7 +358,8 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
             >
               {new Date(data.transportRequest.dateAndTimeNeeded) <=
                 new Date() &&
-                !data.transportRequest.inProgress && (
+                !data.transportRequest.inProgress &&
+                data.status === "APPROVED" && (
                   <TransportRequestActions data={data.transportRequest} />
                 )}
             </RequestReviewerActions>
@@ -379,7 +380,10 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
           {data.type === "TRANSPORT" &&
             data.transportRequest &&
             data.transportRequest.inProgress && (
-              <CompleteTransportRequest requestId={data.id} />
+              <CompleteTransportRequest
+                requestId={data.id}
+                initialOdometer={data.transportRequest.vehicle.odometer}
+              />
             )}
           {data.status === "APPROVED" &&
             data.type === "BORROW" &&

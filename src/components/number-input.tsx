@@ -85,7 +85,7 @@ export default function NumberInput({
           ref={inputRef}
           className={clsx(
             showCaret ? "caret-primary" : "caret-transparent",
-            "spin-hide no-double-click-select w-[3em] bg-transparent text-center font-[inherit] text-transparent outline-none"
+            "spin-hide no-double-click-select w-auto bg-transparent text-center font-[inherit] text-transparent outline-none"
           )}
           style={{ fontKerning: "none" }}
           type={isDecimal ? "number" : "text"}

@@ -129,7 +129,7 @@ export default function RequestReviewerActions({
         },
         error: (err) => {
           console.error(err);
-          return `Failed to ${action.toLowerCase()} request. Please try again.`;
+          return `Something went Wrong!. Please try again.`;
         },
       });
     },

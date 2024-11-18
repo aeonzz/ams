@@ -22,9 +22,7 @@ interface MainMenuProps {
   isOpen: boolean | undefined;
 }
 
-export default function MainMenu({
-  isOpen,
-}: MainMenuProps) {
+export default function MainMenu({ isOpen }: MainMenuProps) {
   const pathname = usePathname();
   const currentUser = useSession();
   const menuList = getMenuList({
@@ -35,7 +33,7 @@ export default function MainMenu({
 
   return (
     <>
-      <UserNav isOpen={isOpen} /> 
+      <UserNav isOpen={isOpen} />
       <ScrollArea className="[&>div>div[style]]:!block">
         <nav className="h-full w-full">
           <ul className="flex flex-col items-start space-y-1">

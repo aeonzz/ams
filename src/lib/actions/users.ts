@@ -481,7 +481,7 @@ export const createUser = authedProcedure
         throw "Email already exists";
       }
 
-      const userId = generateId(3);
+      const userId = generateId(15);
       const hashedPassword = await new Argon2id().hash(password);
 
       await db.user.create({

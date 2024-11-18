@@ -10,6 +10,11 @@ import { db } from "@/lib/db/index";
 import NotFound from "@/app/not-found";
 import CreateInventoryDialog from "@/app/(admin)/admin/inventory/lendable-items/_components/create-inventory-dialog";
 import CreateSupplyItemDialog from "@/app/(admin)/admin/inventory/supply-items/_components/create-supply-item-dialog";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Supply items",
+};
 
 interface Props {
   params: {

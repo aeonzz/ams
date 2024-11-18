@@ -8,6 +8,11 @@ import CreateVenueDialog from "@/app/(admin)/admin/venues/_components/create-ven
 import { RoleGuard } from "@/components/role-guard";
 import { db } from "@/lib/db/index";
 import NotFound from "@/app/not-found";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Facilities",
+};
 
 export interface Props {
   params: {

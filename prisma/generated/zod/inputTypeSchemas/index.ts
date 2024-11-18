@@ -24,6 +24,7 @@ export { SupplyItemCategoryScalarFieldEnumSchema } from './SupplyItemCategorySca
 export { SupplyRequestItemScalarFieldEnumSchema } from './SupplyRequestItemScalarFieldEnumSchema';
 export { TransportRequestScalarFieldEnumSchema } from './TransportRequestScalarFieldEnumSchema';
 export { VehicleScalarFieldEnumSchema } from './VehicleScalarFieldEnumSchema';
+export { MaintenanceHistoryScalarFieldEnumSchema } from './MaintenanceHistoryScalarFieldEnumSchema';
 export { SortOrderSchema } from './SortOrderSchema';
 export { JsonNullValueInputSchema } from './JsonNullValueInputSchema';
 export { QueryModeSchema } from './QueryModeSchema';

@@ -28,7 +28,7 @@ export default function SubMenuButton({
       )}
       asChild
     >
-      <Link href={href}>
+      <Link href={href} prefetch>
         <p
           className={cn(
             "max-w-[170px] truncate",

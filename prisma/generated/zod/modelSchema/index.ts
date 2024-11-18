@@ -23,3 +23,4 @@ export * from './SupplyItemCategorySchema';
 export * from './SupplyRequestItemSchema';
 export * from './TransportRequestSchema';
 export * from './VehicleSchema';
+export * from './MaintenanceHistorySchema';

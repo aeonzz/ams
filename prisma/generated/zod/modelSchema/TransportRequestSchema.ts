@@ -20,6 +20,7 @@ export const TransportRequestSchema = z.object({
   dateAndTimeNeeded: z.coerce.date(),
   odometerStart: z.number().nullable(),
   odometerEnd: z.number().nullable(),
+  totalDistanceTravelled: z.number().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
   requestId: z.string(),
