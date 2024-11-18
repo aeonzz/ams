@@ -100,7 +100,7 @@ export default function CollapseMenuButton({
               </div>
             </Button>
           </CollapsibleTrigger>
-          <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down pl-10">
+          <CollapsibleContent className="overflow-hidden pl-10 data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
             {submenus.map(({ href, label, active }, index) => (
               <SubMenuButton
                 key={index}
@@ -158,7 +158,7 @@ export default function CollapseMenuButton({
             <DropdownMenuSeparator />
             {submenus.map(({ href, label }, index) => (
               <DropdownMenuItem key={index} asChild>
-                <Link className="cursor-pointer" href={href}>
+                <Link className="cursor-pointer" href={href} prefetch>
                   <p className="max-w-[180px] truncate">{label}</p>
                 </Link>
               </DropdownMenuItem>

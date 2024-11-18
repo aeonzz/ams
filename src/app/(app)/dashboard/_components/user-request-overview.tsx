@@ -79,6 +79,7 @@ export default function UserRequestOverview() {
               buttonVariants({ variant: "link", size: "sm" }),
               "text-sm"
             )}
+            prefetch
           >
             See all
           </Link>
@@ -120,6 +121,7 @@ export default function UserRequestOverview() {
               buttonVariants({ variant: "link", size: "sm" }),
               "text-sm"
             )}
+            prefetch
           >
             See all
           </Link>

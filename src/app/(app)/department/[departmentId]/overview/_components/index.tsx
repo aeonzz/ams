@@ -179,6 +179,7 @@ export default function DepartmentOverviewScreen({
                     <Link
                       href={selectedNotification.resourceId}
                       className={cn(buttonVariants({ size: "sm" }), "text-sm")}
+                      prefetch
                     >
                       View
                     </Link>

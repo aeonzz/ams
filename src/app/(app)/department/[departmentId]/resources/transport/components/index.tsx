@@ -106,6 +106,7 @@ export default function DepartmentVehicleScreen({
                   <Link
                     key={vehicle.id}
                     href={`/department/${departmentId}/resources/transport/${vehicle.id}`}
+                    prefetch
                   >
                     <Card className="relative cursor-pointer overflow-hidden shadow-md transition-all hover:border-primary">
                       <div className="relative aspect-video h-48 w-full">

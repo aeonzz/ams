@@ -51,6 +51,7 @@ export default function VenueRequestsTable({
                 buttonVariants({ variant: "link" }),
                 "p-0 text-foreground"
               )}
+              prefetch
             >
               {row.getValue("requestsTitle")}
             </Link>

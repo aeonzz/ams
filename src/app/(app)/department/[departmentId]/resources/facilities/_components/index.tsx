@@ -122,6 +122,7 @@ export default function DepartmentVenuesScreen({
                   <Link
                     key={venue.id}
                     href={`/department/${departmentId}/resources/facilities/${venue.id}`}
+                    prefetch
                   >
                     <Card className="relative cursor-pointer overflow-hidden shadow-md transition-all hover:border-primary">
                       <div className="relative aspect-video h-48 w-full">

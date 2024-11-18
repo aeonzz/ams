@@ -156,6 +156,7 @@ export default function SubItemsTable({
           <Link
             href={`/admin/inventory/lendable-items/${inventoryId}?page=1&per_page=10&sort=createdAt.desc`}
             className={cn(buttonVariants({ variant: "link", size: "sm" }))}
+            prefetch
           >
             See all
           </Link>

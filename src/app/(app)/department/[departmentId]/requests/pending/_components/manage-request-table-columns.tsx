@@ -63,6 +63,7 @@ export function getManageRequestsColumns(): ColumnDef<RequestTableType>[] {
                 buttonVariants({ variant: "link" }),
                 "p-0 text-foreground"
               )}
+              prefetch
             >
               <P className="truncate font-medium">{row.original.title}</P>
             </Link>
@@ -99,7 +100,7 @@ export function getManageRequestsColumns(): ColumnDef<RequestTableType>[] {
               {format(cell.getValue() as Date, "PP")}
             </P>
             <Avatar className="size-5 rounded-full">
-              <AvatarImage src={`${row.original.user.profileUrl}` ?? ""} />
+              <AvatarImage src={`${row.original.user.profileUrl}`} />
               <AvatarFallback className="rounded-full">
                 {row.original.user.firstName.charAt(0).toUpperCase()}
               </AvatarFallback>

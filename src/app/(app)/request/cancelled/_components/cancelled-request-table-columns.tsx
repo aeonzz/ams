@@ -59,6 +59,7 @@ export function getCancelledRequestColumns(): ColumnDef<Request>[] {
                 buttonVariants({ variant: "link" }),
                 "p-0 text-foreground"
               )}
+              prefetch
             >
               <P className="truncate font-medium">{row.original.title}</P>
             </Link>
