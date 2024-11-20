@@ -214,7 +214,7 @@ export default function TransportRequestDetails({
   React.useEffect(() => {
     form.reset();
   }, [editField]);
-  console.log(data.totalDistanceTravelled);
+  
   const canEdit = requestStatus === "PENDING" && isCurrentUser;
 
   return (
