@@ -783,20 +783,18 @@ export const completeTransportRequest = authedProcedure
     const { path, requestId, odometer, ...rest } = input;
 
     try {
+      // Core transaction operations
       const result = await db.$transaction(
         async (prisma) => {
           const transportRequest = await prisma.transportRequest.findUnique({
-            where: {
-              requestId: requestId,
-            },
-            select: {
-              odometerStart: true,
-            },
+            where: { requestId },
+            select: { odometerStart: true, vehicleId: true },
           });
 
           if (!transportRequest || transportRequest.odometerStart === null) {
             throw "Odometer start value is missing or invalid.";
           }
+
           const totalDistance = parseFloat(
             (odometer - transportRequest.odometerStart).toFixed(2)
           );
@@ -807,10 +805,9 @@ export const completeTransportRequest = authedProcedure
             throw "Invalid odometer readings. End value must be greater than start value.";
           }
 
+          // Update transport request and vehicle in one transaction
           const updatedTransportRequest = await prisma.transportRequest.update({
-            where: {
-              requestId: requestId,
-            },
+            where: { requestId },
             data: {
               request: {
                 update: {
@@ -820,7 +817,8 @@ export const completeTransportRequest = authedProcedure
               },
               vehicle: {
                 update: {
-                  odometer: odometer,
+                  odometer,
+                  status: "AVAILABLE",
                 },
               },
               inProgress: false,
@@ -829,69 +827,62 @@ export const completeTransportRequest = authedProcedure
             },
           });
 
-          await db.vehicle.update({
-            where: {
-              id: result.vehicleId,
-            },
-            data: {
-              status: "AVAILABLE",
-            },
-          });
+          return {
+            updatedTransportRequest,
+            vehicleId: transportRequest.vehicleId,
+          };
+        },
+        { timeout: 10000 }
+      );
 
-          const vehicle = await prisma.vehicle.findUnique({
-            where: {
-              id: updatedTransportRequest.vehicleId,
-            },
+      // Move maintenance check and notification logic outside the transaction
+      const { updatedTransportRequest, vehicleId } = result;
+
+      // Fetch vehicle details outside transaction
+      const vehicle = await db.vehicle.findUnique({
+        where: { id: vehicleId },
+        select: {
+          odometer: true,
+          maintenanceInterval: true,
+          name: true,
+          departmentId: true,
+          department: {
             select: {
-              odometer: true,
-              maintenanceInterval: true,
-              name: true,
-              departmentId: true,
-              department: {
-                select: {
-                  userRole: {
-                    where: {
-                      role: {
-                        name: "DEPARTMENT_HEAD",
-                      },
-                    },
-                    select: {
-                      userId: true,
-                    },
-                  },
+              userRole: {
+                where: {
+                  role: { name: "DEPARTMENT_HEAD" },
                 },
+                select: { userId: true },
               },
+            },
+          },
+        },
+      });
+
+      if (vehicle) {
+        // Check maintenance status
+        const lastMaintenance = await db.maintenanceHistory.findFirst({
+          where: { vehicleId },
+          orderBy: { performedAt: "desc" },
+        });
+
+        const lastMaintenanceOdometer = lastMaintenance?.odometer || 0;
+        const nextMaintenanceThreshold =
+          lastMaintenanceOdometer + (vehicle.maintenanceInterval || 200000);
+
+        if (vehicle.odometer >= nextMaintenanceThreshold) {
+          await db.vehicle.update({
+            where: { id: vehicleId },
+            data: {
+              requiresMaintenance: true,
+              status: "UNDER_MAINTENANCE",
             },
           });
 
-          if (!vehicle) {
-            throw "Vehicle not found.";
-          }
-
-          // Fetch the most recent maintenance record
-          const lastMaintenance = await prisma.maintenanceHistory.findFirst({
-            where: { vehicleId: updatedTransportRequest.vehicleId },
-            orderBy: { performedAt: "desc" },
-          });
-
-          const lastMaintenanceOdometer = lastMaintenance?.odometer || 0;
-          const nextMaintenanceThreshold =
-            lastMaintenanceOdometer + (vehicle.maintenanceInterval || 200000);
-
-          // Check if maintenance is due
-          if (vehicle.odometer >= nextMaintenanceThreshold) {
-            await prisma.vehicle.update({
-              where: { id: updatedTransportRequest.vehicleId },
-              data: {
-                requiresMaintenance: true,
-                status: "UNDER_MAINTENANCE",
-              },
-            });
-
-            const departmentHeadUserId = vehicle.department.userRole[0].userId;
-
+          const departmentHeadUserId = vehicle.department.userRole[0]?.userId;
+          if (departmentHeadUserId) {
             await createNotification({
-              resourceId: `/department/${vehicle.departmentId}/resources/transport/${updatedTransportRequest.vehicleId}`,
+              resourceId: `/department/${vehicle.departmentId}/resources/transport/${vehicleId}`,
               title: `Vehicle Maintenance Required`,
               resourceType: "TASK",
               notificationType: "ALERT",
@@ -900,19 +891,14 @@ export const completeTransportRequest = authedProcedure
               recepientIds: [vehicle.departmentId, departmentHeadUserId],
             });
           }
+        }
+      }
 
-          return updatedTransportRequest;
-        },
-        { timeout: 10000 }
-      );
-
-      await pusher.trigger("request", "request_update", {
-        message: "",
-      });
-
-      await pusher.trigger("request", "notifications", {
-        message: "",
-      });
+      // Trigger pusher events outside transaction
+      await Promise.all([
+        pusher.trigger("request", "request_update", { message: "" }),
+        pusher.trigger("request", "notifications", { message: "" }),
+      ]);
 
       return revalidatePath(path);
     } catch (error) {
