@@ -74,7 +74,7 @@ export default function UserRequestOverview() {
         <div className="flex items-center justify-between bg-tertiary px-3 py-1">
           <H5 className="font-semibold text-muted-foreground">Your Requests</H5>
           <Link
-            href="/requests/my-requests?page=1&per_page=10&sort=createdAt.desc"
+            href="/request/my-requests?page=1&per_page=10&sort=createdAt.desc"
             className={cn(
               buttonVariants({ variant: "link", size: "sm" }),
               "text-sm"
@@ -115,16 +115,6 @@ export default function UserRequestOverview() {
           <H5 className="font-semibold text-muted-foreground">
             Pending Requests
           </H5>
-          <Link
-            href="/requests/my-requests?page=1&per_page=10&sort=createdAt.desc&status=PENDING"
-            className={cn(
-              buttonVariants({ variant: "link", size: "sm" }),
-              "text-sm"
-            )}
-            prefetch
-          >
-            See all
-          </Link>
         </div>
         <div className="flex flex-col gap-3 p-3">
           {getPendingRequests().length === 0 ? (

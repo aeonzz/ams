@@ -334,243 +334,250 @@ export default function JobRequestReviewerActions({
     );
   };
 
-  return (
-    <PermissionGuard
-      allowedRoles={allowedRoles}
-      allowedDepartment={allowedDepartment}
-      currentUser={currentUser}
-    >
-      <Tooltip>
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-          <DialogTrigger asChild>
-            <TooltipTrigger asChild>
-              <Button className="w-full" variant="secondary">
-                <FolderKanban className="mr-2 h-4 w-4" />
-                Manage Request
-              </Button>
-            </TooltipTrigger>
-          </DialogTrigger>
-          <DialogContent
-            onInteractOutside={(e) => {
-              if (isUpdateStatusPending || isAssignPersonnelPending) {
-                e.preventDefault();
-              }
-            }}
-            onCloseAutoFocus={(e) => e.preventDefault()}
-            className="sm:max-w-[425px]"
-          >
-            <DialogHeader>
-              <DialogTitle>Manage Request</DialogTitle>
-              <DialogDescription>
-                Review and take action on this request.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="scroll-bar max-h-[55vh] gap-3 space-y-1 overflow-y-auto px-4 py-1">
-              {request.status !== "APPROVED" && <>{renderPersonnelList()}</>}
-              <AddEstimatedTime data={request} />
-              {request.jobRequest?.assignedUser && (
-                <div>
-                  <P className="text-xs text-muted-foreground">
-                    Assigned Personnel:
-                  </P>
-                  <div className="flex w-full items-center p-2">
-                    <Avatar className="mr-2 h-8 w-8">
-                      <AvatarImage
-                        src={request.jobRequest.assignedUser.profileUrl ?? ""}
-                        alt={formatFullName(
-                          request.jobRequest.assignedUser.firstName,
-                          request.jobRequest.assignedUser.middleName,
-                          request.jobRequest.assignedUser.lastName
-                        )}
-                      />
-                      <AvatarFallback>
-                        {request.jobRequest.assignedUser.firstName
-                          .charAt(0)
-                          .toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <P className="font-medium">
-                        {formatFullName(
-                          request.jobRequest.assignedUser.firstName,
-                          request.jobRequest.assignedUser.middleName,
-                          request.jobRequest.assignedUser.lastName
-                        )}
-                      </P>
-                    </div>
-                  </div>
-                </div>
-              )}
-              {request.status === "PENDING" && (
-                <div className="flex space-x-2">
-                  <Button
-                    onClick={() => handleReview("REVIEWED")}
-                    disabled={
-                      !selectedPerson ||
-                      isUpdateStatusPending ||
-                      isAssignPersonnelPending
-                    }
-                    className="flex-1"
-                  >
-                    Approve
-                  </Button>
-                </div>
-              )}
-              <div className="flex flex-col gap-3">
-                {request.reviewer && (
+  if (allowedRoles.find((f) => f === "OPERATIONS_MANAGER")) {
+    return (
+      <PermissionGuard
+        allowedRoles={allowedRoles}
+        allowedDepartment={allowedDepartment}
+        currentUser={currentUser}
+      >
+        <Tooltip>
+          <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <DialogTrigger asChild>
+              <TooltipTrigger asChild>
+                <Button className="w-full" variant="secondary">
+                  <FolderKanban className="mr-2 h-4 w-4" />
+                  Manage Request
+                </Button>
+              </TooltipTrigger>
+            </DialogTrigger>
+            <DialogContent
+              onInteractOutside={(e) => {
+                if (isUpdateStatusPending || isAssignPersonnelPending) {
+                  e.preventDefault();
+                }
+              }}
+              onCloseAutoFocus={(e) => e.preventDefault()}
+              className="sm:max-w-[425px]"
+            >
+              <DialogHeader>
+                <DialogTitle>Manage Request</DialogTitle>
+                <DialogDescription>
+                  Review and take action on this request.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="scroll-bar max-h-[55vh] gap-3 space-y-1 overflow-y-auto px-4 py-1">
+                {request.status !== "APPROVED" && <>{renderPersonnelList()}</>}
+                <AddEstimatedTime data={request} />
+                {request.jobRequest?.assignedUser && (
                   <div>
                     <P className="text-xs text-muted-foreground">
-                      Reviewed By:
+                      Assigned Personnel:
                     </P>
                     <div className="flex w-full items-center p-2">
                       <Avatar className="mr-2 h-8 w-8">
                         <AvatarImage
-                          src={request.reviewer.profileUrl ?? ""}
+                          src={request.jobRequest.assignedUser.profileUrl ?? ""}
                           alt={formatFullName(
-                            request.reviewer.firstName,
-                            request.reviewer.middleName,
-                            request.reviewer.lastName
+                            request.jobRequest.assignedUser.firstName,
+                            request.jobRequest.assignedUser.middleName,
+                            request.jobRequest.assignedUser.lastName
                           )}
                         />
                         <AvatarFallback>
-                          {request.reviewer.firstName.charAt(0).toUpperCase()}
+                          {request.jobRequest.assignedUser.firstName
+                            .charAt(0)
+                            .toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
                         <P className="font-medium">
                           {formatFullName(
-                            request.reviewer.firstName,
-                            request.reviewer.middleName,
-                            request.reviewer.lastName
+                            request.jobRequest.assignedUser.firstName,
+                            request.jobRequest.assignedUser.middleName,
+                            request.jobRequest.assignedUser.lastName
                           )}
                         </P>
                       </div>
                     </div>
                   </div>
                 )}
-                {request.jobRequest?.status === "COMPLETED" && (
-                  <>
+                {request.status === "PENDING" && (
+                  <div className="flex space-x-2">
+                    <Button
+                      onClick={() => handleReview("REVIEWED")}
+                      disabled={
+                        !selectedPerson ||
+                        isUpdateStatusPending ||
+                        isAssignPersonnelPending
+                      }
+                      className="flex-1"
+                    >
+                      Approve
+                    </Button>
+                  </div>
+                )}
+                <div className="flex flex-col gap-3">
+                  {request.reviewer && (
+                    <div>
+                      <P className="text-xs text-muted-foreground">
+                        Reviewed By:
+                      </P>
+                      <div className="flex w-full items-center p-2">
+                        <Avatar className="mr-2 h-8 w-8">
+                          <AvatarImage
+                            src={request.reviewer.profileUrl ?? ""}
+                            alt={formatFullName(
+                              request.reviewer.firstName,
+                              request.reviewer.middleName,
+                              request.reviewer.lastName
+                            )}
+                          />
+                          <AvatarFallback>
+                            {request.reviewer.firstName.charAt(0).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1">
+                          <P className="font-medium">
+                            {formatFullName(
+                              request.reviewer.firstName,
+                              request.reviewer.middleName,
+                              request.reviewer.lastName
+                            )}
+                          </P>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  {request.jobRequest?.status === "COMPLETED" && (
+                    <>
+                      <AlertDialog
+                        open={isAlertOpen}
+                        onOpenChange={setIsAlertOpen}
+                      >
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            className="w-full"
+                            disabled={
+                              isUpdateStatusPending ||
+                              isAssignPersonnelPending ||
+                              isPendingMutation
+                            }
+                          >
+                            Verify and Complete Request
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>
+                              Complete Request
+                            </AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to mark this request as
+                              completed? This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleReview("COMPLETED")}
+                            >
+                              Complete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                      <RejectJob
+                        requestId={request.id}
+                        disabled={isUpdateStatusPending || isPendingMutation}
+                      />
+                    </>
+                  )}
+                  {request.status === "PENDING" && (
                     <AlertDialog
-                      open={isAlertOpen}
-                      onOpenChange={setIsAlertOpen}
+                      open={isRejectionAlertOpen}
+                      onOpenChange={setIsRejectionAlertOpen}
                     >
                       <AlertDialogTrigger asChild>
                         <Button
                           className="w-full"
+                          variant="destructive"
                           disabled={
-                            isUpdateStatusPending ||
-                            isAssignPersonnelPending ||
-                            isPendingMutation
+                            isUpdateStatusPending || isAssignPersonnelPending
                           }
                         >
-                          Verify and Complete Request
+                          Reject Request
                         </Button>
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>
-                          <AlertDialogTitle>Complete Request</AlertDialogTitle>
+                          <AlertDialogTitle className="">
+                            Reject Request
+                          </AlertDialogTitle>
                           <AlertDialogDescription>
-                            Are you sure you want to mark this request as
-                            completed? This action cannot be undone.
+                            Are you sure you want to reject this request? This
+                            action cannot be undone. Please provide a reason for
+                            rejection.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
+                        <Textarea
+                          maxRows={6}
+                          minRows={3}
+                          placeholder="Rejection reason..."
+                          value={rejectionReason}
+                          onChange={(e) => setRejectionReason(e.target.value)}
+                          className="text-sm placeholder:text-sm"
+                        />
                         <AlertDialogFooter>
                           <AlertDialogCancel>Cancel</AlertDialogCancel>
                           <AlertDialogAction
-                            onClick={() => handleReview("COMPLETED")}
+                            className="bg-destructive hover:bg-destructive/90"
+                            onClick={() => handleReview("REJECTED")}
+                            disabled={!rejectionReason.trim()}
                           >
-                            Complete
+                            Continue
                           </AlertDialogAction>
                         </AlertDialogFooter>
                       </AlertDialogContent>
                     </AlertDialog>
-                    <RejectJob
-                      requestId={request.id}
-                      disabled={isUpdateStatusPending || isPendingMutation}
-                    />
-                  </>
-                )}
-                {request.status === "REVIEWED" && (
-                  <PermissionGuard
-                    allowedRoles={allowedApproverRoles}
-                    allowedDepartment={allowedDepartment}
-                    currentUser={currentUser}
-                  >
-                    <RequestApproverActions
-                      request={request}
-                      isPending={
-                        isUpdateStatusPending || isAssignPersonnelPending
-                      }
-                    />
-                  </PermissionGuard>
-                )}
-                {request.status === "PENDING" && (
-                  <AlertDialog
-                    open={isRejectionAlertOpen}
-                    onOpenChange={setIsRejectionAlertOpen}
-                  >
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        className="w-full"
-                        variant="destructive"
-                        disabled={
-                          isUpdateStatusPending || isAssignPersonnelPending
-                        }
-                      >
-                        Reject Request
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle className="">
-                          Reject Request
-                        </AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Are you sure you want to reject this request? This
-                          action cannot be undone. Please provide a reason for
-                          rejection.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <Textarea
-                        maxRows={6}
-                        minRows={3}
-                        placeholder="Rejection reason..."
-                        value={rejectionReason}
-                        onChange={(e) => setRejectionReason(e.target.value)}
-                        className="text-sm placeholder:text-sm"
-                      />
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                          className="bg-destructive hover:bg-destructive/90"
-                          onClick={() => handleReview("REJECTED")}
-                          disabled={!rejectionReason.trim()}
-                        >
-                          Continue
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                )}
+                  )}
+                </div>
               </div>
-            </div>
-            <Separator className="my-2" />
-            <DialogFooter>
-              <Button
-                variant="secondary"
-                disabled={isAssignPersonnelPending || isUpdateStatusPending}
-                onClick={() => setIsOpen(false)}
-              >
-                Close
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-        <TooltipContent className="flex items-center gap-3" side="bottom">
-          <P>Manage request</P>
-          <CommandShortcut>M</CommandShortcut>
-        </TooltipContent>
-      </Tooltip>
-    </PermissionGuard>
+              <Separator className="my-2" />
+              <DialogFooter>
+                <Button
+                  variant="secondary"
+                  disabled={isAssignPersonnelPending || isUpdateStatusPending}
+                  onClick={() => setIsOpen(false)}
+                >
+                  Close
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+          <TooltipContent className="flex items-center gap-3" side="bottom">
+            <P>Manage request</P>
+            <CommandShortcut>M</CommandShortcut>
+          </TooltipContent>
+        </Tooltip>
+      </PermissionGuard>
+    );
+  }
+
+  return (
+    <>
+      {request.status === "REVIEWED" && (
+        <PermissionGuard
+          allowedRoles={allowedApproverRoles}
+          allowedDepartment={allowedDepartment}
+          currentUser={currentUser}
+        >
+          <RequestApproverActions
+            request={request}
+            isPending={isUpdateStatusPending || isAssignPersonnelPending}
+          />
+        </PermissionGuard>
+      )}
+    </>
   );
 }

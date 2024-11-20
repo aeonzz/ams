@@ -121,13 +121,13 @@ export default function CollapseMenuButton({
                   variant="ghost"
                   className={cn(
                     active && "bg-tertiary hover:bg-tertiary",
-                    "mb-1 h-10 w-full justify-start"
+                    "group mb-1 h-8 w-full justify-start"
                   )}
                 >
                   <div className="flex w-full items-center justify-between">
                     <div className="flex items-center">
                       <span className={cn(isOpen === false ? "" : "mr-4")}>
-                        <Icon size={18} />
+                        <Icon className="size-5 opacity-70 transition-opacity group-hover:opacity-100" />
                       </span>
                       <p
                         className={cn(

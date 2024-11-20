@@ -18,7 +18,7 @@ export default async function AppLayout({
     return redirect("/sign-in");
   }
 
-  // if (data.role === "SYSTEMADMIN") {
+  // if (data.isAdmin) {
   //   return redirect("/admin");
   // }
 

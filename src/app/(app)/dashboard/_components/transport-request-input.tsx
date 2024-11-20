@@ -21,11 +21,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { DialogFooter } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/text-area";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -33,21 +29,25 @@ import { SubmitButton } from "@/components/ui/submit-button";
 import { Input } from "@/components/ui/input";
 import { usePathname } from "next/navigation";
 import { toast } from "sonner";
-import { useSession } from "@/lib/hooks/use-session";
 import { type RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTypeSchema";
 import axios from "axios";
 import { ReservedTransportDateAndTime } from "@/lib/schema/utils";
 import DateTimePicker from "@/components/ui/date-time-picker";
 import VehicleField from "./vehicle-field";
-import LoadingSpinner from "@/components/loaders/loading-spinner";
 import { P } from "@/components/typography/text";
-import { cn } from "@/lib/utils";
-import VehicleScheduleCard from "./vehicle-schedule-card";
 import { Vehicle } from "prisma/generated/zod";
 import TransportRequestInputSkeleton from "./transport-request-input-skeleton";
-import ScheduledEventCardSkeleton from "./scheduled-event-card-skeleton";
 import { TagInput } from "@/components/ui/tag-input";
 import { Info } from "lucide-react";
+import { useMediaQuery } from "usehooks-ts";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import ScheduledEventCardSkeleton from "./scheduled-event-card-skeleton";
+import VehicleScheduleCard from "./vehicle-schedule-card";
 
 interface VenueRequestInputProps {
   mutateAsync: UseMutateAsyncFunction<
@@ -72,6 +72,7 @@ export default function TransportRequestInput({
   isFieldsDirty,
 }: VenueRequestInputProps) {
   const pathname = usePathname();
+  const isDesktop = useMediaQuery("(min-width: 769px)");
   const queryClient = useQueryClient();
   const vehicleId = form.watch("vehicleId");
 
@@ -151,15 +152,67 @@ export default function TransportRequestInput({
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="flex gap-2 px-4">
             <div className="scroll-bar flex max-h-[60vh] flex-1 overflow-y-auto px-1 py-1">
-              <div className="flex flex-col space-y-2">
-                <div className="flex">
-                  <div className="mr-2 w-fit pt-[2px]">
-                    <Info className="size-4 text-primary" />
+              <div className="flex w-full flex-col space-y-2">
+                <div>
+                  <div className="flex">
+                    <div className="mr-2 w-fit pt-[2px]">
+                      <Info className="size-4 text-primary" />
+                    </div>
+                    <P className="text-muted-foreground">
+                      Request should be submitted not later than 2 days prior to
+                      the requested date.
+                    </P>
                   </div>
-                  <P className="text-muted-foreground">
-                    Request should be submitted not later than 2 days prior to
-                    the requested date.
-                  </P>
+                  {!isDesktop && (
+                    <Popover modal>
+                      <PopoverTrigger asChild>
+                        <Button variant="outline" className="w-full">
+                          Schedules
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[calc(100vw_-_45px)]">
+                        {vehicleId && (
+                          <div
+                            className={cn(
+                              "scroll-bar max-h-[60vh] w-[300px] overflow-y-auto pr-1"
+                            )}
+                          >
+                            <P className="mb-2 font-semibold">Schedules</P>
+                            {isLoading || isRefetching ? (
+                              <ScheduledEventCardSkeleton />
+                            ) : !data || data.length === 0 ? (
+                              <div className="grid h-32 w-full place-items-center">
+                                <P>No schedules</P>
+                              </div>
+                            ) : (
+                              <>
+                                {(() => {
+                                  const filteredData = data.filter(
+                                    (item) =>
+                                      item.request.transportRequest.vehicle
+                                        .id === vehicleId
+                                  );
+                                  return filteredData.length === 0 ? (
+                                    <div className="grid h-32 w-full place-items-center">
+                                      <P>No reserved schedules</P>
+                                    </div>
+                                  ) : (
+                                    filteredData.map((item, index) => (
+                                      <VehicleScheduleCard
+                                        className="w-full"
+                                        key={index}
+                                        data={item}
+                                      />
+                                    ))
+                                  );
+                                })()}
+                              </>
+                            )}
+                          </div>
+                        )}
+                      </PopoverContent>
+                    </Popover>
+                  )}
                 </div>
                 <div className="flex gap-2">
                   <VehicleField
@@ -272,7 +325,7 @@ export default function TransportRequestInput({
                 />
               </div>
             </div>
-            {vehicleId && (
+            {/* {vehicleId && (
               <div
                 className={cn(
                   "scroll-bar max-h-[60vh] w-[300px] overflow-y-auto pr-1"
@@ -305,7 +358,7 @@ export default function TransportRequestInput({
                   </>
                 )}
               </div>
-            )}
+            )} */}
           </div>
           <Separator className="my-4" />
           <DialogFooter>

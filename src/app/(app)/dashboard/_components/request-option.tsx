@@ -11,10 +11,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTypeSchema";
 import { CarFront, Lightbulb, LucideIcon, Theater, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
+  DialogState,
   type DialogType,
   useDialogManager,
 } from "@/lib/hooks/use-dialog-manager";
@@ -23,6 +23,17 @@ import JobDialog from "@/components/dialogs/job-dialog";
 import VenueDialog from "@/components/dialogs/venue-dialog";
 import TransportDialog from "@/components/dialogs/transport-dialog";
 import ResourceOption from "./resource-option";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+import { useMediaQuery } from "usehooks-ts";
 
 type ReqType = {
   value: "JOB" | "VENUE" | "RESOURCE" | "TRANSPORT";
@@ -60,6 +71,7 @@ const RequestTypes: ReqType[] = [
 
 export default function RequestOption() {
   const dialogManager = useDialogManager();
+  const isDesktop = useMediaQuery("(min-width: 769px)");
 
   useHotkeys(
     "c",
@@ -77,35 +89,69 @@ export default function RequestOption() {
     }
   };
 
+  if (isDesktop) {
+    return (
+      <>
+        <Dialog
+          open={dialogManager.activeDialog === "requestDialog"}
+          onOpenChange={handleOpenChange}
+        >
+          <DialogContent className="max-w-3xl">
+            <DialogHeader>
+              <DialogTitle>New Request</DialogTitle>
+              <Component dialogManager={dialogManager} />
+            </DialogHeader>
+          </DialogContent>
+        </Dialog>
+        <JobDialog />
+        <VenueDialog />
+        <TransportDialog />
+        <ResourceOption />
+      </>
+    );
+  }
+
   return (
     <>
-      <Dialog
+      <Drawer
         open={dialogManager.activeDialog === "requestDialog"}
         onOpenChange={handleOpenChange}
       >
-        <DialogContent className="max-w-3xl">
-          <DialogHeader>
-            <DialogTitle>New Request</DialogTitle>
-            <div className="flex h-full items-center space-x-4 pb-4">
-              {RequestTypes.map(({ icon: Icon, ...type }, index) => (
-                <Button
-                  key={index}
-                  variant="ringHover"
-                  onClick={() => dialogManager.setActiveDialog(type.dialog)}
-                  className="aspect-square h-auto flex-1 flex-col gap-2 bg-secondary-accent"
-                >
-                  <Icon className="size-12 text-muted-foreground" />
-                  {type.label}
-                </Button>
-              ))}
-            </div>
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>
+        <DrawerContent>
+          <DrawerHeader className="text-left">
+            <DrawerTitle>New Request</DrawerTitle>
+            <Component dialogManager={dialogManager} />
+          </DrawerHeader>
+        </DrawerContent>
+      </Drawer>
       <JobDialog />
       <VenueDialog />
       <TransportDialog />
       <ResourceOption />
     </>
+  );
+}
+
+function Component({
+  className,
+  dialogManager,
+}: {
+  className?: React.ComponentProps<"div">;
+  dialogManager: DialogState;
+}) {
+  return (
+    <div className="grid h-full grid-flow-row grid-cols-2 place-items-center gap-4 pb-4 lg:grid-cols-4">
+      {RequestTypes.map(({ icon: Icon, ...type }, index) => (
+        <Button
+          key={index}
+          variant="ringHover"
+          onClick={() => dialogManager.setActiveDialog(type.dialog)}
+          className="lg:h-44 aspect-square h-32 w-full flex-col bg-secondary-accent"
+        >
+          <Icon className="size-12 text-muted-foreground" />
+          {type.label}
+        </Button>
+      ))}
+    </div>
   );
 }

@@ -83,7 +83,7 @@ export default function UserNav({ isOpen }: UserNavProps) {
         </DropdownMenuTrigger>
         <DropdownMenuContent
           align="start"
-          className="w-[264px]"
+          className="w-[calc(100vw_-_10px)] lg:w-[264px]"
           side={isOpen ? "bottom" : "right"}
         >
           <DropdownMenuLabel>

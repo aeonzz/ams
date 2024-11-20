@@ -197,7 +197,7 @@ export default function CreateUserForm({
                       (optional)
                     </span>
                   </FormLabel>
-                  <Popover open={open} onOpenChange={setOpen}>
+                  <Popover open={open} onOpenChange={setOpen} modal>
                     <PopoverTrigger asChild>
                       <FormControl>
                         <Button

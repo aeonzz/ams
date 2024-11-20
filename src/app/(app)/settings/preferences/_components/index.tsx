@@ -4,6 +4,7 @@ import { H2, P } from "@/components/typography/text";
 import ThemeItem from "./theme-item";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Section, SectionTitle } from "../../_components/section";
+import SideBarItem from "./sidebar-item";
 
 export default function PreferencesScreen() {
   return (
@@ -22,6 +23,10 @@ export default function PreferencesScreen() {
           <Section>
             <SectionTitle>Theme</SectionTitle>
             <ThemeItem />
+          </Section>
+          <Section>
+            <SectionTitle>Behavior</SectionTitle>
+            <SideBarItem />
           </Section>
         </div>
       </div>

@@ -99,13 +99,10 @@ export const createJobRequest = authedProcedure
         userId: user.id,
       });
 
-      await pusher.trigger("request", "request_update", {
-        message: "Request created",
-      });
-
-      await pusher.trigger("request", "notifications", {
-        message: "",
-      });
+      await Promise.all([
+        pusher.trigger("request", "request_update", { message: "" }),
+        pusher.trigger("request", "notifications", { message: "" }),
+      ]);
 
       return revalidatePath(path);
     } catch (error) {
@@ -267,13 +264,10 @@ export const updateRequestStatus = authedProcedure
         return updatedRequest;
       });
 
-      await pusher.trigger("request", "request_update", {
-        message: "",
-      });
-
-      await pusher.trigger("request", "notifications", {
-        message: "",
-      });
+      await Promise.all([
+        pusher.trigger("request", "request_update", { message: "" }),
+        pusher.trigger("request", "notifications", { message: "" }),
+      ]);
 
       return revalidatePath(path);
     } catch (error) {
@@ -402,13 +396,10 @@ export const updateJobRequest = authedProcedure
           });
         }
 
-        await pusher.trigger("request", "request_update", {
-          message: "Request update",
-        });
-
-        await pusher.trigger("request", "notifications", {
-          message: "Request notification",
-        });
+        await Promise.all([
+          pusher.trigger("request", "request_update", { message: "" }),
+          pusher.trigger("request", "notifications", { message: "" }),
+        ]);
 
         return updatedRequest;
       });
@@ -473,13 +464,10 @@ export const reworkJobRequest = authedProcedure
           });
         }
 
-        await pusher.trigger("request", "request_update", {
-          message: "",
-        });
-
-        await pusher.trigger("request", "notifications", {
-          message: "",
-        });
+        await Promise.all([
+          pusher.trigger("request", "request_update", { message: "" }),
+          pusher.trigger("request", "notifications", { message: "" }),
+        ]);
 
         return updateJobRequestStatus;
       });
@@ -564,13 +552,10 @@ export const updateReworkJobRequest = authedProcedure
           });
         }
 
-        await pusher.trigger("request", "request_update", {
-          message: "",
-        });
-
-        await pusher.trigger("request", "notifications", {
-          message: "",
-        });
+        await Promise.all([
+          pusher.trigger("request", "request_update", { message: "" }),
+          pusher.trigger("request", "notifications", { message: "" }),
+        ]);
 
         return updateJobRequestStatus;
       });

@@ -97,13 +97,10 @@ export const createReturnableResourceRequest = authedProcedure
         userId: user.id,
       });
 
-      await pusher.trigger("request", "request_update", {
-        message: "Request created",
-      });
-
-      await pusher.trigger("request", "notifications", {
-        message: "",
-      });
+      await Promise.all([
+        pusher.trigger("request", "request_update", { message: "" }),
+        pusher.trigger("request", "notifications", { message: "" }),
+      ]);
 
       return revalidatePath(path);
     } catch (error) {
@@ -192,13 +189,10 @@ export const createSupplyResourceRequest = authedProcedure
         userId: user.id,
       });
 
-      await pusher.trigger("request", "request_update", {
-        message: "Request created",
-      });
-
-      await pusher.trigger("request", "notifications", {
-        message: "",
-      });
+      await Promise.all([
+        pusher.trigger("request", "request_update", { message: "" }),
+        pusher.trigger("request", "notifications", { message: "" }),
+      ]);
 
       return revalidatePath(path);
     } catch (error) {
