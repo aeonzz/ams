@@ -16,17 +16,16 @@ export function PermissionGuard({
   allowedDepartment,
   currentUser,
 }: PermissionGuardProps) {
-  const hasAllowedRole = currentUser.userRole.some((role) =>
-    allowedRoles.includes(role.role.name)
-  );
+  // Check if the user has the required role in the allowed department
+  const hasPermission = currentUser.userRole.some((userRole) => {
+    const isAllowedRole = allowedRoles.includes(userRole.role.name);
+    const isInAllowedDepartment =
+      !allowedDepartment || userRole.departmentId === allowedDepartment;
 
-  const hasAllowedDepartment =
-    !allowedDepartment ||
-    currentUser.userDepartments.some(
-      (department) => department.departmentId === allowedDepartment
-    );
+    return isAllowedRole && isInAllowedDepartment;
+  });
 
-  if (!hasAllowedRole || !hasAllowedDepartment) {
+  if (!hasPermission) {
     return null;
   }
 

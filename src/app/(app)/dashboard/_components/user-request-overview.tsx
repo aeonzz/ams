@@ -5,19 +5,27 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { H5 } from "@/components/typography/text";
 import Link from "next/link";
 import { cn, getStatusColor, textTransform } from "@/lib/utils";
-import { buttonVariants } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { type RequestWithRelations } from "prisma/generated/zod";
-import { Dot, Loader2 } from "lucide-react";
+import { CirclePlus, Dot, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import FetchDataError from "@/components/card/fetch-data-error";
 import DashboardSkeleton from "./dashboard-skeleton";
 import { RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTypeSchema";
 import NumberFlow from "@number-flow/react";
 import { pusherClient } from "@/lib/pusher-client";
+import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 
-export default function UserRequestOverview() {
+interface UserRequestOverviewProps {
+  isDesktop: boolean;
+}
+
+export default function UserRequestOverview({
+  isDesktop,
+}: UserRequestOverviewProps) {
+  const dialogManager = useDialogManager();
   const { data, isLoading, refetch, isError } = useQuery<
     RequestWithRelations[]
   >({
@@ -74,7 +82,7 @@ export default function UserRequestOverview() {
         <div className="flex items-center justify-between bg-tertiary px-3 py-1">
           <H5 className="font-semibold text-muted-foreground">Your Requests</H5>
           <Link
-            href="/requests/my-requests?page=1&per_page=10&sort=createdAt.desc"
+            href="/request/my-requests?page=1&per_page=10&sort=createdAt.desc"
             className={cn(
               buttonVariants({ variant: "link", size: "sm" }),
               "text-sm"
@@ -84,7 +92,7 @@ export default function UserRequestOverview() {
             See all
           </Link>
         </div>
-        <div className="grid grid-cols-5 gap-3 p-3">
+        <div className="grid grid-cols-2 gap-3 p-3 sm:grid-cols-3 lg:grid-cols-5">
           {requestTypes.map((type) => (
             <Card key={type}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -108,6 +116,16 @@ export default function UserRequestOverview() {
               </CardContent>
             </Card>
           ))}
+          {!isDesktop && (
+            <Button
+              variant="shine"
+              onClick={() => dialogManager.setActiveDialog("requestDialog")}
+              className="h-full flex-col truncate text-slate-100 dark:text-foreground"
+            >
+              <CirclePlus className="mb-5 size-7" />
+              Create request
+            </Button>
+          )}
         </div>
       </div>
       <div className="border-t">
@@ -115,16 +133,6 @@ export default function UserRequestOverview() {
           <H5 className="font-semibold text-muted-foreground">
             Pending Requests
           </H5>
-          <Link
-            href="/requests/my-requests?page=1&per_page=10&sort=createdAt.desc&status=PENDING"
-            className={cn(
-              buttonVariants({ variant: "link", size: "sm" }),
-              "text-sm"
-            )}
-            prefetch
-          >
-            See all
-          </Link>
         </div>
         <div className="flex flex-col gap-3 p-3">
           {getPendingRequests().length === 0 ? (

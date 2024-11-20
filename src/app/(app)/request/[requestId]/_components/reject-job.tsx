@@ -72,9 +72,6 @@ export default function RejectJob({ requestId, disabled }: RejectJobProps) {
             queryClient.invalidateQueries({
               queryKey: [requestId],
             });
-            queryClient.invalidateQueries({
-              queryKey: ["activity", requestId],
-            });
             setIsRejectAlertOpen(false);
             return "Request rejected successfully.";
           },
@@ -94,7 +91,11 @@ export default function RejectJob({ requestId, disabled }: RejectJobProps) {
   return (
     <AlertDialog open={isRejectAlertOpen} onOpenChange={setIsRejectAlertOpen}>
       <AlertDialogTrigger asChild>
-        <Button variant="destructive" className="flex-1" disabled={disabled}>
+        <Button
+          variant="destructive"
+          className="w-full flex-1"
+          disabled={disabled}
+        >
           Reject
         </Button>
       </AlertDialogTrigger>

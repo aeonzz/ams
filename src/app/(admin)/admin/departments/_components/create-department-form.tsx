@@ -133,7 +133,7 @@ export default function CreateDepartmentForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Department Type</FormLabel>
-                  <Popover open={open} onOpenChange={setOpen}>
+                  <Popover open={open} onOpenChange={setOpen} modal>
                     <PopoverTrigger asChild>
                       <FormControl>
                         <Button

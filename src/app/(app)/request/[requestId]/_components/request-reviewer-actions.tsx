@@ -183,8 +183,43 @@ export default function RequestReviewerActions({
                 </DialogDescription>
               </DialogHeader>
               <div className="scroll-bar flex max-h-[60vh] flex-col gap-3 overflow-y-auto px-4 py-1">
+                {request.reviewer && (
+                  <div>
+                    <P className="text-xs text-muted-foreground">
+                      Reviewed By:
+                    </P>
+                    <div className="flex w-full items-center p-2">
+                      <Avatar className="mr-2 h-8 w-8">
+                        <AvatarImage
+                          src={request.reviewer.profileUrl ?? ""}
+                          alt={formatFullName(
+                            request.reviewer.firstName,
+                            request.reviewer.middleName,
+                            request.reviewer.lastName
+                          )}
+                        />
+                        <AvatarFallback>
+                          {request.reviewer.firstName.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <P className="font-medium">
+                          {formatFullName(
+                            request.reviewer.firstName,
+                            request.reviewer.middleName,
+                            request.reviewer.lastName
+                          )}
+                        </P>
+                      </div>
+                    </div>
+                  </div>
+                )}
                 {request.status === "PENDING" && (
-                  <div className="flex space-x-2">
+                  <PermissionGuard
+                    allowedRoles={["OPERATIONS_MANAGER"]}
+                    allowedDepartment={allowedDepartment}
+                    currentUser={currentUser}
+                  >
                     <Button
                       onClick={() => handleReview("REVIEWED")}
                       disabled={isUpdateStatusPending}
@@ -192,53 +227,6 @@ export default function RequestReviewerActions({
                     >
                       Approve
                     </Button>
-                  </div>
-                )}
-                <div className="flex flex-col gap-3">
-                  {request.reviewer && (
-                    <div>
-                      <P className="text-xs text-muted-foreground">
-                        Reviewed By:
-                      </P>
-                      <div className="flex w-full items-center p-2">
-                        <Avatar className="mr-2 h-8 w-8">
-                          <AvatarImage
-                            src={request.reviewer.profileUrl ?? ""}
-                            alt={formatFullName(
-                              request.reviewer.firstName,
-                              request.reviewer.middleName,
-                              request.reviewer.lastName
-                            )}
-                          />
-                          <AvatarFallback>
-                            {request.reviewer.firstName.charAt(0).toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1">
-                          <P className="font-medium">
-                            {formatFullName(
-                              request.reviewer.firstName,
-                              request.reviewer.middleName,
-                              request.reviewer.lastName
-                            )}
-                          </P>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  {request.status === "REVIEWED" && (
-                    <PermissionGuard
-                      allowedRoles={allowedApproverRoles}
-                      allowedDepartment={allowedDepartment}
-                      currentUser={currentUser}
-                    >
-                      <RequestApproverActions
-                        request={request}
-                        isPending={isUpdateStatusPending}
-                      />
-                    </PermissionGuard>
-                  )}
-                  {request.status === "PENDING" && (
                     <AlertDialog
                       open={isRejectionAlertOpen}
                       onOpenChange={setIsRejectionAlertOpen}
@@ -283,6 +271,20 @@ export default function RequestReviewerActions({
                         </AlertDialogFooter>
                       </AlertDialogContent>
                     </AlertDialog>
+                  </PermissionGuard>
+                )}
+                <div className="flex flex-col gap-3">
+                  {request.status === "REVIEWED" && (
+                    <PermissionGuard
+                      allowedRoles={allowedApproverRoles}
+                      allowedDepartment={allowedDepartment}
+                      currentUser={currentUser}
+                    >
+                      <RequestApproverActions
+                        request={request}
+                        isPending={isUpdateStatusPending}
+                      />
+                    </PermissionGuard>
                   )}
                   {children}
                 </div>

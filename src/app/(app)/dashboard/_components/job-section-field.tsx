@@ -125,9 +125,6 @@ export default function JobSectionField({
                               <P className="tracking-tight text-muted-foreground">
                                 {department.responsibilities ||
                                   "Nothing to show here!"}
-                                das dbasvdjhbdasj hkbashjdg ashjkdgahjks
-                                dgashjdgashdjasg dhjasgd ajshdga sdhjasg dhjasd
-                                gajkhsdgas ashjd
                               </P>
                             </div>
                           </div>

@@ -58,7 +58,7 @@ export default function SignInForm() {
                 <FormLabel className="mb-1">Email</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="m@example.com"
+                    placeholder="Your Email"
                     type="email"
                     disabled={isLoading}
                     autoFocus

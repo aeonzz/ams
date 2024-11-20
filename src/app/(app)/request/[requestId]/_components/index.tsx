@@ -314,7 +314,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
             <JobRequestReviewerActions
               request={data}
               allowedDepartment={data.departmentId}
-              allowedRoles={["OPERATIONS_MANAGER"]}
+              allowedRoles={["OPERATIONS_MANAGER", "DEPARTMENT_HEAD"]}
               allowedApproverRoles={["DEPARTMENT_HEAD"]}
             />
           )}
@@ -332,7 +332,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
           {data.type === "BORROW" && data.returnableRequest && (
             <RequestReviewerActions
               request={data}
-              allowedRoles={["OPERATIONS_MANAGER"]}
+              allowedRoles={["OPERATIONS_MANAGER", "DEPARTMENT_HEAD"]}
               allowedDepartment={data.departmentId}
               allowedApproverRoles={["DEPARTMENT_HEAD"]}
             />
@@ -340,7 +340,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
           {data.type === "SUPPLY" && data.supplyRequest && (
             <RequestReviewerActions
               request={data}
-              allowedRoles={["OPERATIONS_MANAGER"]}
+              allowedRoles={["OPERATIONS_MANAGER", "DEPARTMENT_HEAD"]}
               allowedDepartment={data.departmentId}
               allowedApproverRoles={["DEPARTMENT_HEAD"]}
             />
@@ -348,7 +348,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
           {data.type === "TRANSPORT" && data.transportRequest && (
             <RequestReviewerActions
               request={data}
-              allowedRoles={["OPERATIONS_MANAGER"]}
+              allowedRoles={["OPERATIONS_MANAGER", "DEPARTMENT_HEAD"]}
               allowedDepartment={data.departmentId}
               allowedApproverRoles={["DEPARTMENT_HEAD"]}
               actionNeeded={

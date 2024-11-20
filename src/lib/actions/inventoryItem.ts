@@ -227,14 +227,11 @@ export const returnableResourceActions = authedProcedure
           },
         });
 
-        await pusher.trigger("request", "request_update", {
-          message: "",
-        });
-
-        await pusher.trigger("request", "notifications", {
-          message: "",
-        });
-
+        await Promise.all([
+          pusher.trigger("request", "request_update", { message: "" }),
+          pusher.trigger("request", "notifications", { message: "" }),
+        ]);
+        
         return updatedRequest;
       });
 

@@ -99,13 +99,10 @@ export const createJobRequest = authedProcedure
         userId: user.id,
       });
 
-      await pusher.trigger("request", "request_update", {
-        message: "Request created",
-      });
-
-      await pusher.trigger("request", "notifications", {
-        message: "",
-      });
+      await Promise.all([
+        pusher.trigger("request", "request_update", { message: "" }),
+        pusher.trigger("request", "notifications", { message: "" }),
+      ]);
 
       return revalidatePath(path);
     } catch (error) {
@@ -160,120 +157,120 @@ export const updateRequestStatus = authedProcedure
     const { path, requestId, reviewerId, ...rest } = input;
 
     try {
-      const result = await db.$transaction(async (prisma) => {
-        const updatedRequest = await prisma.request.update({
-          where: { id: requestId },
-          data: {
-            ...rest,
-            reviewedBy: reviewerId,
-          },
-          include: {
-            jobRequest: true,
-            department: {
-              include: {
-                userRole: {
-                  where: {
-                    role: {
-                      name: "DEPARTMENT_HEAD",
+      const result = await db.$transaction(
+        async (prisma) => {
+          const updatedRequest = await prisma.request.update({
+            where: { id: requestId },
+            data: {
+              ...rest,
+              reviewedBy: reviewerId,
+            },
+            include: {
+              jobRequest: true,
+              department: {
+                include: {
+                  userRole: {
+                    where: {
+                      role: {
+                        name: "DEPARTMENT_HEAD",
+                      },
                     },
-                  },
-                  select: {
-                    user: true,
-                    role: true,
+                    select: {
+                      user: true,
+                      role: true,
+                    },
                   },
                 },
               },
             },
-          },
-        });
-
-        const departmentHeads = updatedRequest.department.userRole
-          ?.filter((role) => role.role.name === "DEPARTMENT_HEAD")
-          .map((role) => role.user.id);
-
-        if (rest.status === "REVIEWED") {
-          await createNotification({
-            resourceId: `/request/${updatedRequest.id}`,
-            title: `Request Reviewed: ${updatedRequest.title}`,
-            resourceType: "REQUEST",
-            notificationType: "APPROVAL",
-            message: `The request titled "${updatedRequest.title}" has been reviewed and is awaiting your approval. Please review the details and take the necessary actions.`,
-            userId: user.id,
-            recepientIds: departmentHeads,
-          });
-        }
-
-        if (rest.status === "APPROVED") {
-          await createNotification({
-            resourceId: `/request/${updatedRequest.id}`,
-            title: `Request Approved: ${updatedRequest.title}`,
-            resourceType: "REQUEST",
-            notificationType: "SUCCESS",
-            message: `Your request for "${updatedRequest.title}" has been approved! Visit the request page for details and next steps.`,
-            userId: user.id,
-            recepientIds: [updatedRequest.userId],
           });
 
-          await createNotification({
-            resourceId: `/request/${updatedRequest.id}`,
-            title: `Request Approved: ${updatedRequest.title}`,
-            resourceType: "REQUEST",
-            notificationType: "APPROVAL",
-            message: `The request titled "${updatedRequest.title}" has been approved. Please check the request for further details.`,
-            userId: user.id,
-            recepientIds: [updatedRequest.departmentId],
-          });
+          const departmentHeads = updatedRequest.department.userRole
+            ?.filter((role) => role.role.name === "DEPARTMENT_HEAD")
+            .map((role) => role.user.id);
 
-          if (
-            updatedRequest.type === "JOB" &&
-            updatedRequest.jobRequest?.assignedTo
-          ) {
+          if (rest.status === "REVIEWED") {
             await createNotification({
               resourceId: `/request/${updatedRequest.id}`,
-              title: `New Job Assignment: ${updatedRequest.title}`,
-              resourceType: "TASK",
-              notificationType: "REMINDER",
-              message: `You have been assigned to a new job: ${updatedRequest.title}. Please review the details and take the necessary actions.`,
+              title: `Request Reviewed: ${updatedRequest.title}`,
+              resourceType: "REQUEST",
+              notificationType: "APPROVAL",
+              message: `The request titled "${updatedRequest.title}" has been reviewed and is awaiting your approval. Please review the details and take the necessary actions.`,
               userId: user.id,
-              recepientIds: [updatedRequest.jobRequest?.assignedTo],
+              recepientIds: departmentHeads,
             });
           }
-        }
 
-        if (rest.status === "REJECTED") {
-          const existingNotification = await prisma.notification.findFirst({
-            where: {
-              resourceId: `/request/${updatedRequest.id}`,
-              userId: user.id,
-              resourceType: "REQUEST",
-              recepientId: updatedRequest.userId,
-              title: `Request Rejected: ${updatedRequest.title}`,
-            },
-          });
-
-          if (!existingNotification) {
+          if (rest.status === "APPROVED") {
             await createNotification({
               resourceId: `/request/${updatedRequest.id}`,
-              title: `Request Rejected: ${updatedRequest.title}`,
+              title: `Request Approved: ${updatedRequest.title}`,
               resourceType: "REQUEST",
-              notificationType: "WARNING",
-              message: `Your request for "${updatedRequest.title}" has been rejected. Please check the request for further details.`,
+              notificationType: "SUCCESS",
+              message: `Your request for "${updatedRequest.title}" has been approved! Visit the request page for details and next steps.`,
               userId: user.id,
               recepientIds: [updatedRequest.userId],
             });
+
+            await createNotification({
+              resourceId: `/request/${updatedRequest.id}`,
+              title: `Request Approved: ${updatedRequest.title}`,
+              resourceType: "REQUEST",
+              notificationType: "APPROVAL",
+              message: `The request titled "${updatedRequest.title}" has been approved. Please check the request for further details.`,
+              userId: user.id,
+              recepientIds: [updatedRequest.departmentId],
+            });
+
+            if (
+              updatedRequest.type === "JOB" &&
+              updatedRequest.jobRequest?.assignedTo
+            ) {
+              await createNotification({
+                resourceId: `/request/${updatedRequest.id}`,
+                title: `New Job Assignment: ${updatedRequest.title}`,
+                resourceType: "TASK",
+                notificationType: "REMINDER",
+                message: `You have been assigned to a new job: ${updatedRequest.title}. Please review the details and take the necessary actions.`,
+                userId: user.id,
+                recepientIds: [updatedRequest.jobRequest?.assignedTo],
+              });
+            }
           }
-        }
 
-        return updatedRequest;
-      });
+          if (rest.status === "REJECTED") {
+            const existingNotification = await prisma.notification.findFirst({
+              where: {
+                resourceId: `/request/${updatedRequest.id}`,
+                userId: user.id,
+                resourceType: "REQUEST",
+                recepientId: updatedRequest.userId,
+                title: `Request Rejected: ${updatedRequest.title}`,
+              },
+            });
 
-      await pusher.trigger("request", "request_update", {
-        message: "",
-      });
+            if (!existingNotification) {
+              await createNotification({
+                resourceId: `/request/${updatedRequest.id}`,
+                title: `Request Rejected: ${updatedRequest.title}`,
+                resourceType: "REQUEST",
+                notificationType: "WARNING",
+                message: `Your request for "${updatedRequest.title}" has been rejected. Please check the request for further details.`,
+                userId: user.id,
+                recepientIds: [updatedRequest.userId],
+              });
+            }
+          }
 
-      await pusher.trigger("request", "notifications", {
-        message: "",
-      });
+          return updatedRequest;
+        },
+        { timeout: 10000 }
+      );
+
+      await Promise.all([
+        pusher.trigger("request", "request_update", { message: "" }),
+        pusher.trigger("request", "notifications", { message: "" }),
+      ]);
 
       return revalidatePath(path);
     } catch (error) {
@@ -402,13 +399,10 @@ export const updateJobRequest = authedProcedure
           });
         }
 
-        await pusher.trigger("request", "request_update", {
-          message: "Request update",
-        });
-
-        await pusher.trigger("request", "notifications", {
-          message: "Request notification",
-        });
+        await Promise.all([
+          pusher.trigger("request", "request_update", { message: "" }),
+          pusher.trigger("request", "notifications", { message: "" }),
+        ]);
 
         return updatedRequest;
       });
@@ -473,13 +467,10 @@ export const reworkJobRequest = authedProcedure
           });
         }
 
-        await pusher.trigger("request", "request_update", {
-          message: "",
-        });
-
-        await pusher.trigger("request", "notifications", {
-          message: "",
-        });
+        await Promise.all([
+          pusher.trigger("request", "request_update", { message: "" }),
+          pusher.trigger("request", "notifications", { message: "" }),
+        ]);
 
         return updateJobRequestStatus;
       });
@@ -564,13 +555,10 @@ export const updateReworkJobRequest = authedProcedure
           });
         }
 
-        await pusher.trigger("request", "request_update", {
-          message: "",
-        });
-
-        await pusher.trigger("request", "notifications", {
-          message: "",
-        });
+        await Promise.all([
+          pusher.trigger("request", "request_update", { message: "" }),
+          pusher.trigger("request", "notifications", { message: "" }),
+        ]);
 
         return updateJobRequestStatus;
       });

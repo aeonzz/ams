@@ -1,41 +1,37 @@
 "use client";
 
-
 import { useSidebarToggle } from "@/lib/hooks/use-sidebar-toggle";
 import { useStore } from "@/lib/hooks/use-store";
 import { cn } from "@/lib/utils";
 
 import AdminDashboardSidebar from "./admin-dashboard-sidebar";
+import { useSidebar } from "@/lib/hooks/use-sidebar";
 
 interface AdminDashboardLayoutProps {
   children: React.ReactNode;
 }
 
-export default function AdminDashboardLayout({ children }: AdminDashboardLayoutProps) {
-  const sidebar = useStore(useSidebarToggle, (state) => state);
+export default function AdminDashboardLayout({
+  children,
+}: AdminDashboardLayoutProps) {
+  const sidebar = useStore(useSidebar, (x) => x);
 
   if (!sidebar) return null;
 
   return (
     <>
-      <AdminDashboardSidebar isOpen={sidebar.isOpen} setIsOpen={sidebar.setIsOpen} />
+      <AdminDashboardSidebar sidebar={sidebar} />
       <main
+        vaul-drawer-wrapper=""
         className={cn(
-          "h-auto bg-background p-2 pl-0 transition-[margin-left] duration-300 ease-out-expo",
-          sidebar?.isOpen === false ? "lg:ml-[76px]" : "lg:ml-72"
+          "h-screen bg-background transition-[margin-left] duration-300 ease-in-out lg:h-auto lg:p-2 lg:pl-0",
+          !sidebar.getOpenState() ? "lg:ml-[76px]" : "lg:ml-72"
         )}
       >
-        <div className="h-[calc(100vh_-_16px)] w-full overflow-hidden rounded-md border bg-secondary">
+        <div className="h-full w-full overflow-hidden bg-secondary lg:h-[calc(100vh_-_16px)] lg:rounded-md lg:border">
           {children}
         </div>
       </main>
-      {/* <footer
-        className={cn(
-          "transition-[margin-left] ease-in-out duration-300",
-          sidebar?.isOpen === false ? "lg:ml-[90px]" : "lg:ml-72"
-        )}
-      >
-      </footer> */}
     </>
   );
 }

@@ -187,7 +187,7 @@ export default function JobRequestInput({
                   render={({ field }) => (
                     <FormItem className="flex flex-1 flex-col">
                       <FormLabel>Due date</FormLabel>
-                      <Popover>
+                      <Popover modal>
                         <PopoverTrigger asChild>
                           <FormControl>
                             <Button
@@ -243,7 +243,7 @@ export default function JobRequestInput({
                   control={form.control}
                   name="jobtype"
                   render={({ field }) => (
-                    <FormItem className="flex flex-col">
+                    <FormItem className="flex flex-1 flex-col">
                       <FormLabel>Job type</FormLabel>
                       <Popover modal>
                         <PopoverTrigger asChild>
@@ -253,7 +253,7 @@ export default function JobRequestInput({
                               disabled={isUploading || isPending}
                               role="combobox"
                               className={cn(
-                                "w-[230px] justify-between",
+                                "w-full justify-between",
                                 !field.value && "text-muted-foreground"
                               )}
                             >
@@ -314,7 +314,7 @@ export default function JobRequestInput({
                           maxRows={7}
                           minRows={3}
                           placeholder="Job description..."
-                          className="border-none p-0 focus-visible:ring-0 bg-transparent shadow-none"
+                          className="border-none bg-transparent p-0 shadow-none focus-visible:ring-0"
                           disabled={isUploading || isPending}
                           {...field}
                         />

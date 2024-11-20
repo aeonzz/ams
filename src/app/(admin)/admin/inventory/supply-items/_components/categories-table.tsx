@@ -171,7 +171,7 @@ export default function CategoriesTable({
           />
         </div>
         <div className="flex items-center gap-1">
-          <Popover open={open} onOpenChange={setOpen}>
+          <Popover open={open} onOpenChange={setOpen} modal>
             <PopoverTrigger asChild>
               <Button variant="secondary" size="sm">
                 <PlusIcon className="mr-2 size-4" aria-hidden="true" />

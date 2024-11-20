@@ -229,13 +229,10 @@ export const createVenueRequest = authedProcedure
         userId: user.id,
       });
 
-      await pusher.trigger("request", "request_update", {
-        message: "Request created",
-      });
-
-      await pusher.trigger("request", "notifications", {
-        message: "",
-      });
+      await Promise.all([
+        pusher.trigger("request", "request_update", { message: "" }),
+        pusher.trigger("request", "notifications", { message: "" }),
+      ]);
 
       return revalidatePath(path);
     } catch (error) {
@@ -334,13 +331,10 @@ export const createTransportRequest = authedProcedure
         userId: user.id,
       });
 
-      await pusher.trigger("request", "request_update", {
-        message: "Request created",
-      });
-
-      await pusher.trigger("request", "notifications", {
-        message: "",
-      });
+      await Promise.all([
+        pusher.trigger("request", "request_update", { message: "" }),
+        pusher.trigger("request", "notifications", { message: "" }),
+      ]);
 
       return revalidatePath(path);
     } catch (error) {
@@ -683,13 +677,10 @@ export const udpateReturnableResourceRequest = authedProcedure
         },
       });
 
-      await pusher.trigger("request", "request_update", {
-        message: "",
-      });
-
-      await pusher.trigger("request", "notifications", {
-        message: "",
-      });
+      await Promise.all([
+        pusher.trigger("request", "request_update", { message: "" }),
+        pusher.trigger("request", "notifications", { message: "" }),
+      ]);
 
       return revalidatePath(path);
     } catch (error) {
@@ -757,13 +748,10 @@ export const completeVenueRequest = authedProcedure
           },
         });
 
-        await pusher.trigger("request", "request_update", {
-          message: "",
-        });
-
-        await pusher.trigger("request", "notifications", {
-          message: "",
-        });
+        await Promise.all([
+          pusher.trigger("request", "request_update", { message: "" }),
+          pusher.trigger("request", "notifications", { message: "" }),
+        ]);
 
         return updatedVenueRequest;
       });

@@ -12,15 +12,17 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { P } from "@/components/typography/text";
 
 interface VehicleScheduleCardProps {
+  className?: string;
   data: ReservedTransportDateAndTime;
 }
 
 export default function VehicleScheduleCard({
+  className,
   data,
 }: VehicleScheduleCardProps) {
   const { color, stroke, variant } = getStatusColor(data.request.status);
   return (
-    <Card className="mb-2 bg-secondary">
+    <Card className={cn("mb-2 bg-secondary", className)}>
       <CardHeader>
         <div className="relative aspect-video h-20">
           <Image
@@ -34,7 +36,7 @@ export default function VehicleScheduleCard({
         <div className="flex flex-col space-y-2">
           <div className="flex items-center space-x-2 rounded-sm border p-2">
             <Avatar className="size-10 rounded-full">
-              <AvatarImage src={`${data.request.user.profileUrl}` ?? ""} />
+              <AvatarImage src={`${data.request.user.profileUrl}`} />
               <AvatarFallback className="rounded-md">
                 {data.request.user.firstName.charAt(0).toUpperCase()}
               </AvatarFallback>
