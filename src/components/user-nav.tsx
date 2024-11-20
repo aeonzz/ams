@@ -35,7 +35,7 @@ export default function UserNav({ isOpen }: UserNavProps) {
 
   return (
     <div className="items-centere flex h-auto w-full">
-      <DropdownMenu>
+      <DropdownMenu modal>
         <DropdownMenuTrigger
           className="data-[state=open]:bg-accent [&[data-state=open]>svg]:rotate-180"
           asChild
@@ -84,7 +84,7 @@ export default function UserNav({ isOpen }: UserNavProps) {
         <DropdownMenuContent
           align="start"
           className="w-[calc(100vw_-_10px)] lg:w-[264px]"
-          side={isOpen ? "bottom" : "right"}
+          side={"bottom"}
         >
           <DropdownMenuLabel>
             {formatFullName(

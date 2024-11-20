@@ -22,11 +22,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       <main
         vaul-drawer-wrapper=""
         className={cn(
-          "lg:h-auto lg:p-2 lg:pl-0 h-screen bg-background transition-[margin-left] duration-300 ease-out-expo",
+          "h-screen bg-background transition-[margin-left] duration-300 ease-in-out lg:h-auto lg:p-2 lg:pl-0",
           !sidebar.getOpenState() ? "lg:ml-[76px]" : "lg:ml-72"
         )}
       >
-        <div className="lg:h-[calc(100vh_-_16px)] lg:rounded-md lg:border h-full w-full overflow-hidden bg-secondary">
+        <div className="h-full w-full overflow-hidden bg-secondary lg:h-[calc(100vh_-_16px)] lg:rounded-md lg:border">
           {children}
         </div>
       </main>

@@ -10,28 +10,26 @@ interface Context {
 
 async function handler(req: NextRequest, user: any, context: Context) {
   const { departmentId } = context.params;
+
   try {
-    const result = await db.userDepartment.findMany({
+    const result = await db.userRole.findMany({
       where: {
-        departmentId: departmentId,
-        user: {
-          userRole: {
-            some: {
-              role: {
-                name: "PERSONNEL",
-              },
-            },
-          },
+        role: {
+          name: "PERSONNEL",
         },
+        departmentId: departmentId,
       },
       include: {
         user: {
           include: {
-            userRole: true,
+            userDepartments: true,
           },
         },
       },
     });
+
+    // Extract users and their details
+    const personnelUsers = result.map((role) => role.user);
 
     return NextResponse.json({ data: result }, { status: 200 });
   } catch (error) {

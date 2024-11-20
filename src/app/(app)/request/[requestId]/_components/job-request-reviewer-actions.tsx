@@ -334,8 +334,8 @@ export default function JobRequestReviewerActions({
     );
   };
 
-  if (allowedRoles.find((f) => f === "OPERATIONS_MANAGER")) {
-    return (
+  return (
+    <>
       <PermissionGuard
         allowedRoles={allowedRoles}
         allowedDepartment={allowedDepartment}
@@ -367,8 +367,6 @@ export default function JobRequestReviewerActions({
                 </DialogDescription>
               </DialogHeader>
               <div className="scroll-bar max-h-[55vh] gap-3 space-y-1 overflow-y-auto px-4 py-1">
-                {request.status !== "APPROVED" && <>{renderPersonnelList()}</>}
-                <AddEstimatedTime data={request} />
                 {request.jobRequest?.assignedUser && (
                   <div>
                     <P className="text-xs text-muted-foreground">
@@ -402,96 +400,60 @@ export default function JobRequestReviewerActions({
                     </div>
                   </div>
                 )}
-                {request.status === "PENDING" && (
-                  <div className="flex space-x-2">
-                    <Button
-                      onClick={() => handleReview("REVIEWED")}
-                      disabled={
-                        !selectedPerson ||
-                        isUpdateStatusPending ||
-                        isAssignPersonnelPending
-                      }
-                      className="flex-1"
-                    >
-                      Approve
-                    </Button>
-                  </div>
-                )}
-                <div className="flex flex-col gap-3">
-                  {request.reviewer && (
-                    <div>
-                      <P className="text-xs text-muted-foreground">
-                        Reviewed By:
-                      </P>
-                      <div className="flex w-full items-center p-2">
-                        <Avatar className="mr-2 h-8 w-8">
-                          <AvatarImage
-                            src={request.reviewer.profileUrl ?? ""}
-                            alt={formatFullName(
-                              request.reviewer.firstName,
-                              request.reviewer.middleName,
-                              request.reviewer.lastName
-                            )}
-                          />
-                          <AvatarFallback>
-                            {request.reviewer.firstName.charAt(0).toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1">
-                          <P className="font-medium">
-                            {formatFullName(
-                              request.reviewer.firstName,
-                              request.reviewer.middleName,
-                              request.reviewer.lastName
-                            )}
-                          </P>
-                        </div>
+                {request.reviewer && (
+                  <div>
+                    <P className="text-xs text-muted-foreground">
+                      Reviewed By:
+                    </P>
+                    <div className="flex w-full items-center p-2">
+                      <Avatar className="mr-2 h-8 w-8">
+                        <AvatarImage
+                          src={request.reviewer.profileUrl ?? ""}
+                          alt={formatFullName(
+                            request.reviewer.firstName,
+                            request.reviewer.middleName,
+                            request.reviewer.lastName
+                          )}
+                        />
+                        <AvatarFallback>
+                          {request.reviewer.firstName.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <P className="font-medium">
+                          {formatFullName(
+                            request.reviewer.firstName,
+                            request.reviewer.middleName,
+                            request.reviewer.lastName
+                          )}
+                        </P>
                       </div>
                     </div>
+                  </div>
+                )}
+                <PermissionGuard
+                  allowedRoles={["OPERATIONS_MANAGER"]}
+                  allowedDepartment={allowedDepartment}
+                  currentUser={currentUser}
+                >
+                  {request.status !== "APPROVED" && (
+                    <>{renderPersonnelList()}</>
                   )}
-                  {request.jobRequest?.status === "COMPLETED" && (
-                    <>
-                      <AlertDialog
-                        open={isAlertOpen}
-                        onOpenChange={setIsAlertOpen}
+                  <AddEstimatedTime data={request} />
+                  {request.status === "PENDING" && (
+                    <div className="flex space-x-2">
+                      <Button
+                        onClick={() => handleReview("REVIEWED")}
+                        disabled={
+                          !selectedPerson ||
+                          isUpdateStatusPending ||
+                          isAssignPersonnelPending
+                        }
+                        className="flex-1"
                       >
-                        <AlertDialogTrigger asChild>
-                          <Button
-                            className="w-full"
-                            disabled={
-                              isUpdateStatusPending ||
-                              isAssignPersonnelPending ||
-                              isPendingMutation
-                            }
-                          >
-                            Verify and Complete Request
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>
-                              Complete Request
-                            </AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Are you sure you want to mark this request as
-                              completed? This action cannot be undone.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => handleReview("COMPLETED")}
-                            >
-                              Complete
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                      <RejectJob
-                        requestId={request.id}
-                        disabled={isUpdateStatusPending || isPendingMutation}
-                      />
-                    </>
+                        Approve
+                      </Button>
+                    </div>
                   )}
                   {request.status === "PENDING" && (
                     <AlertDialog
@@ -541,7 +503,65 @@ export default function JobRequestReviewerActions({
                       </AlertDialogContent>
                     </AlertDialog>
                   )}
-                </div>
+                  {request.jobRequest?.status === "COMPLETED" && (
+                    <>
+                      <AlertDialog
+                        open={isAlertOpen}
+                        onOpenChange={setIsAlertOpen}
+                      >
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            className="w-full"
+                            disabled={
+                              isUpdateStatusPending ||
+                              isAssignPersonnelPending ||
+                              isPendingMutation
+                            }
+                          >
+                            Verify and Complete Request
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>
+                              Complete Request
+                            </AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to mark this request as
+                              completed? This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleReview("COMPLETED")}
+                            >
+                              Complete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                      <RejectJob
+                        requestId={request.id}
+                        disabled={isUpdateStatusPending || isPendingMutation}
+                      />
+                    </>
+                  )}
+                </PermissionGuard>
+                {request.status === "REVIEWED" && (
+                  <PermissionGuard
+                    allowedRoles={allowedApproverRoles}
+                    allowedDepartment={allowedDepartment}
+                    currentUser={currentUser}
+                  >
+                    <RequestApproverActions
+                      request={request}
+                      isPending={
+                        isUpdateStatusPending || isAssignPersonnelPending
+                      }
+                    />
+                  </PermissionGuard>
+                )}
               </div>
               <Separator className="my-2" />
               <DialogFooter>
@@ -561,23 +581,6 @@ export default function JobRequestReviewerActions({
           </TooltipContent>
         </Tooltip>
       </PermissionGuard>
-    );
-  }
-
-  return (
-    <>
-      {request.status === "REVIEWED" && (
-        <PermissionGuard
-          allowedRoles={allowedApproverRoles}
-          allowedDepartment={allowedDepartment}
-          currentUser={currentUser}
-        >
-          <RequestApproverActions
-            request={request}
-            isPending={isUpdateStatusPending || isAssignPersonnelPending}
-          />
-        </PermissionGuard>
-      )}
     </>
   );
 }

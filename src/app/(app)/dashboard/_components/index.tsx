@@ -41,17 +41,19 @@ export default function DashboardScreen() {
                 )}
               </span>
             </H2>
-            <Button
-              variant="shine"
-              onClick={() => dialogManager.setActiveDialog("requestDialog")}
-              className="text-slate-100 dark:text-foreground"
-            >
-              <CirclePlus className="mr-2 size-5" />
-              Create request
-            </Button>
+            {isDesktop && (
+              <Button
+                variant="shine"
+                onClick={() => dialogManager.setActiveDialog("requestDialog")}
+                className="text-slate-100 dark:text-foreground"
+              >
+                <CirclePlus className="mr-2 size-5" />
+                Create request
+              </Button>
+            )}
           </div>
           <Separator className="mb-3" />
-          <UserRequestOverview />
+          <UserRequestOverview isDesktop={isDesktop} />
         </div>
       </div>
     </div>
