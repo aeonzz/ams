@@ -64,6 +64,10 @@ export const createJobRequest = authedProcedure
                Now, create a title for the request using the provided details above.`,
       });
 
+      if (!text || text.trim().length === 0) {
+        throw "Something went wrong while generating the request title. Please check your internet connection or try again.";
+      }
+
       const createdRequest = await db.request.create({
         data: {
           id: `REQ-${generateId(3)}`,

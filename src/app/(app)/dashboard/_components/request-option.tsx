@@ -24,15 +24,11 @@ import VenueDialog from "@/components/dialogs/venue-dialog";
 import TransportDialog from "@/components/dialogs/transport-dialog";
 import ResourceOption from "./resource-option";
 import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { useMediaQuery } from "usehooks-ts";
 
 type ReqType = {
@@ -113,17 +109,17 @@ export default function RequestOption() {
 
   return (
     <>
-      <Drawer
+      <Sheet
         open={dialogManager.activeDialog === "requestDialog"}
         onOpenChange={handleOpenChange}
       >
-        <DrawerContent>
-          <DrawerHeader className="text-left">
-            <DrawerTitle>New Request</DrawerTitle>
+        <SheetContent className="rounded-t-[10px]" side="bottom" hideClose>
+          <SheetHeader className="text-left">
+            <SheetTitle>New Request</SheetTitle>
             <Component dialogManager={dialogManager} />
-          </DrawerHeader>
-        </DrawerContent>
-      </Drawer>
+          </SheetHeader>
+        </SheetContent>
+      </Sheet>
       <JobDialog />
       <VenueDialog />
       <TransportDialog />
@@ -146,7 +142,7 @@ function Component({
           key={index}
           variant="ringHover"
           onClick={() => dialogManager.setActiveDialog(type.dialog)}
-          className="lg:h-44 aspect-square h-32 w-full flex-col bg-secondary-accent"
+          className="aspect-square h-32 w-full flex-col bg-secondary-accent lg:h-44"
         >
           <Icon className="size-12 text-muted-foreground" />
           {type.label}

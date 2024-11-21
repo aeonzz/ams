@@ -138,7 +138,6 @@
   }
   body {
     @apply bg-background text-foreground;
-    pointer-events: all !important;
   }
   .scroll-bar {
     @apply scrollbar-thin scrollbar-track-transparent scrollbar-thumb-black/20 dark:scrollbar-thumb-white/20;

@@ -76,9 +76,11 @@ export default function JobSectionField({
                   )}
                 >
                   {field.value ? (
-                    <span className="truncate">{selectedDepartment?.name}</span>
+                    <span className="max-w-44 truncate">
+                      {selectedDepartment?.name}
+                    </span>
                   ) : (
-                    "Select department"
+                    <span className="max-w-44 truncate">Select department</span>
                   )}
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>

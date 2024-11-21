@@ -92,7 +92,7 @@ export default function UserRequestOverview({
             See all
           </Link>
         </div>
-        <div className="grid grid-cols-2 gap-3 p-3 sm:grid-cols-3 lg:grid-cols-5">
+        <div className="grid grid-cols-2 gap-3 p-3 md:grid-cols-3 lg:grid-cols-5">
           {requestTypes.map((type) => (
             <Card key={type}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

@@ -9,7 +9,7 @@ export default function SearchInput() {
   return (
     <div
       onClick={() => dialogManager.setActiveDialog("commandDialog")}
-      className="ml-auto flex w-[200px] cursor-pointer rounded-md border bg-tertiary px-3 py-1.5 text-sm ring-offset-background lg:w-[280px]"
+      className="ml-auto flex w-[180px] cursor-pointer rounded-md border bg-tertiary px-3 py-1.5 text-sm ring-offset-background lg:w-[280px]"
     >
       <p className="text-sm text-muted-foreground">Search...</p>
       <div className="ml-auto flex gap-1">

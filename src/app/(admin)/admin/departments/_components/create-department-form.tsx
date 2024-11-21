@@ -222,7 +222,7 @@ export default function CreateDepartmentForm({
                           rows={1}
                           maxRows={10}
                           placeholder="responsibilities..."
-                          className="min-h-[100px] flex-grow resize-none"
+                          className="min-h-[100px] flex-grow resize-none text-sm"
                           disabled={isPending}
                           {...field}
                         />

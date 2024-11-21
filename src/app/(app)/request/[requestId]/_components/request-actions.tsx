@@ -79,7 +79,7 @@ export default function RequestActions({
     { enableOnFormTags: false }
   );
 
-  if (data.status !== "PENDING" || isPending) {
+  if (!["PENDING", "APPROVED", "REVIEWED"].includes(data.status) || isPending) {
     return null;
   }
 

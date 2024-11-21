@@ -27,6 +27,8 @@ import {
 import { useRouter } from "next/navigation";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
+import { cn } from "@/lib/utils";
+import { useMediaQuery } from "usehooks-ts";
 
 const NavigationLinks = [
   { name: "Go to notifications", href: "/notification" },
@@ -45,6 +47,7 @@ export default function CommandSearchDialog({
 }: CommandSearchDialogProps) {
   const dialogManager = useDialogManager();
   const sidebar = useSidebarToggle();
+  const isDesktop = useMediaQuery("(min-width: 769px)");
   const router = useRouter();
 
   React.useEffect(() => {
@@ -80,6 +83,7 @@ export default function CommandSearchDialog({
       <CommandDialog
         open={dialogManager.activeDialog === "commandDialog"}
         onOpenChange={handleOpenChange}
+        className={cn(!isDesktop && "max-w-[calc(100vw_-_20px)]")}
       >
         <CommandInput placeholder="Type a command or search..." />
         <CommandList>

@@ -250,52 +250,50 @@ export default function CreateSupplyItemForm({
               )}
             />
           )}
-          <div className="flex gap-3">
-            <FormField
-              control={form.control}
-              name="quantity"
-              render={({ field }) => (
-                <FormItem className="flex-1">
-                  <FormLabel>Quantity</FormLabel>
-                  <FormControl>
-                    <NumberInput
-                      value={field.value}
-                      min={0}
-                      max={200}
-                      disabled={isPending || isUploading}
-                      onChange={(value) => {
-                        field.onChange(value);
-                      }}
-                      className="w-full justify-between"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="lowStockThreshold"
-              render={({ field }) => (
-                <FormItem className="flex-1">
-                  <FormLabel>Low Stock Threshhold</FormLabel>
-                  <FormControl>
-                    <NumberInput
-                      value={field.value}
-                      min={0}
-                      max={200}
-                      disabled={isPending || isUploading}
-                      onChange={(value) => {
-                        field.onChange(value);
-                      }}
-                      className="w-full justify-between"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+          <FormField
+            control={form.control}
+            name="quantity"
+            render={({ field }) => (
+              <FormItem className="flex-1">
+                <FormLabel>Quantity</FormLabel>
+                <FormControl>
+                  <NumberInput
+                    value={field.value}
+                    min={0}
+                    max={200}
+                    disabled={isPending || isUploading}
+                    onChange={(value) => {
+                      field.onChange(value);
+                    }}
+                    className="w-full justify-between"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="lowStockThreshold"
+            render={({ field }) => (
+              <FormItem className="flex-1">
+                <FormLabel>Low Stock Threshhold</FormLabel>
+                <FormControl>
+                  <NumberInput
+                    value={field.value}
+                    min={0}
+                    max={200}
+                    disabled={isPending || isUploading}
+                    onChange={(value) => {
+                      field.onChange(value);
+                    }}
+                    className="w-full justify-between"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <div className="flex gap-3">
             <FormField
               control={form.control}
@@ -491,7 +489,12 @@ export default function CreateSupplyItemForm({
             name="description"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Description</FormLabel>
+                <FormLabel>
+                  Description{" "}
+                  <span className="text-xs text-muted-foreground">
+                    (Optional)
+                  </span>
+                </FormLabel>
                 <FormControl>
                   <Textarea
                     rows={1}

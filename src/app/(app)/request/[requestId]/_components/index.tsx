@@ -367,7 +367,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
           {data.type === "VENUE" && data.venueRequest && (
             <RequestReviewerActions
               request={data}
-              allowedRoles={["OPERATIONS_MANAGER"]}
+              allowedRoles={["OPERATIONS_MANAGER", "DEPARTMENT_HEAD"]}
               allowedDepartment={data.departmentId}
               allowedApproverRoles={["DEPARTMENT_HEAD"]}
             />
@@ -389,13 +389,21 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
             data.type === "BORROW" &&
             data.returnableRequest && (
               <ReturnableRequestActions
+                allowedRoles={["OPERATIONS_MANAGER"]}
+                allowedDepartment={data.departmentId}
                 request={data.returnableRequest}
                 requestId={data.id}
               />
             )}
           {data.status === "APPROVED" &&
             data.type === "SUPPLY" &&
-            data.supplyRequest && <SupplyRequestActions requestId={data.id} />}
+            data.supplyRequest && (
+              <SupplyRequestActions
+                requestId={data.id}
+                allowedRoles={["OPERATIONS_MANAGER", "DEPARTMENT_HEAD"]}
+                allowedDepartment={data.departmentId}
+              />
+            )}
         </div>
       </div>
     </div>

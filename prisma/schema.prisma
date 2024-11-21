@@ -61,13 +61,13 @@ model Department {
   responsibilities     String?
   departmentType       DepartmentType
   isArchived           Boolean          @default(false)
-  userRole             UserRole[]
-  inventoryItem        InventoryItem[]
-  userDepartments      UserDepartment[]
-  request              Request[]
-  venue                Venue[]
-  vehicle              Vehicle[]
-  supplyItem           SupplyItem[]
+  userRole             UserRole[]       @relation("DepartmentToUserRole")
+  inventoryItem        InventoryItem[]  @relation("DepartmentToInventoryItem")
+  userDepartments      UserDepartment[] @relation("DepartmentToUserDepartment")
+  request              Request[]        @relation("DepartmentToRequest")
+  venue                Venue[]          @relation("DepartmentToVenue")
+  vehicle              Vehicle[]        @relation("DepartmentToVehicle")
+  supplyItem           SupplyItem[]     @relation("DepartmentToSupplyItem")
   files                File[]
 }
 
@@ -76,7 +76,7 @@ model UserDepartment {
   userId       String
   user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   departmentId String
-  department   Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  department   Department @relation("DepartmentToUserDepartment", fields: [departmentId], references: [id], onDelete: Cascade)
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 
@@ -90,7 +90,7 @@ model UserRole {
   roleId       String
   role         Role       @relation(fields: [roleId], references: [id])
   departmentId String
-  department   Department @relation(fields: [departmentId], references: [id])
+  department   Department @relation("DepartmentToUserRole", fields: [departmentId], references: [id], onDelete: Cascade)
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 
@@ -163,7 +163,7 @@ model Request {
   userId            String
   user              User               @relation(name: "UserRelation", fields: [userId], references: [id], onDelete: Cascade)
   departmentId      String
-  department        Department         @relation(fields: [departmentId], references: [id])
+  department        Department         @relation("DepartmentToRequest", fields: [departmentId], references: [id], onDelete: Cascade)
   reviewedBy        String?
   reviewer          User?              @relation(name: "ReviewerRelation", fields: [reviewedBy], references: [id])
   jobRequest        JobRequest?
@@ -258,7 +258,7 @@ model Venue {
   updatedAt             DateTime                @updatedAt
   status                VenueStatus             @default(AVAILABLE)
   departmentId          String
-  department            Department              @relation(fields: [departmentId], references: [id])
+  department            Department              @relation("DepartmentToVenue", fields: [departmentId], references: [id], onDelete: Cascade)
   requests              VenueRequest[]
   venueSetupRequirement VenueSetupRequirement[]
 }
@@ -317,7 +317,7 @@ model InventoryItem {
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
   departmentId      String
-  department        Department         @relation(fields: [departmentId], references: [id])
+  department        Department         @relation("DepartmentToInventoryItem", fields: [departmentId], references: [id], onDelete: Cascade)
 }
 
 model SupplyRequest {
@@ -344,7 +344,7 @@ model SupplyItem {
   categoryId         String
   category           SupplyItemCategory  @relation(fields: [categoryId], references: [id])
   departmentId       String
-  department         Department          @relation(fields: [departmentId], references: [id])
+  department         Department          @relation("DepartmentToSupplyItem", fields: [departmentId], references: [id], onDelete: Cascade)
   createdAt          DateTime            @default(now())
   isArchived         Boolean             @default(false)
   updatedAt          DateTime            @updatedAt
@@ -409,7 +409,7 @@ model Vehicle {
   updatedAt           DateTime             @updatedAt
   status              VehicleStatus        @default(AVAILABLE)
   departmentId        String
-  department          Department           @relation(fields: [departmentId], references: [id])
+  department          Department           @relation("DepartmentToVehicle", fields: [departmentId], references: [id], onDelete: Cascade)
   transportRequest    TransportRequest[]
   maintenanceHistory  MaintenanceHistory[]
 }

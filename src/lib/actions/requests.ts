@@ -138,6 +138,9 @@ export const createVenueRequest = authedProcedure
     try {
       const overlappingReservation = await db.venueRequest.findFirst({
         where: {
+          request: {
+            status: "PENDING",
+          },
           venueId: rest.venueId,
           OR: [
             {
@@ -190,6 +193,10 @@ export const createVenueRequest = authedProcedure
                  
                  Now, create a title for the request using the provided details above.`,
       });
+
+      if (!text || text.trim().length === 0) {
+        throw "Something went wrong while generating the request title. Please check your internet connection or try again.";
+      }
 
       const requestId = `REQ-${generateId(3)}`;
       const venuRequestId = `VRQ-${generateId(3)}`;
@@ -294,6 +301,10 @@ export const createTransportRequest = authedProcedure
                  
                  Now, create a title for the request using the provided details above.`,
       });
+
+      if (!text || text.trim().length === 0) {
+        throw "Something went wrong while generating the request title. Please check your internet connection or try again.";
+      }
 
       const requestId = `REQ-${generateId(3)}`;
       const transportRequestId = `TRQ-${generateId(3)}`;
@@ -877,6 +888,38 @@ export const completeTransportRequest = authedProcedure
               message: `The vehicle "${vehicle.name}" requires maintenance. Please address this issue immediately.`,
               userId: user.id,
               recepientIds: [vehicle.departmentId, departmentHeadUserId],
+            });
+          }
+
+          const futureRequests = await db.transportRequest.findMany({
+            where: {
+              vehicleId,
+              dateAndTimeNeeded: { gte: new Date() }, // Filter for future requests
+              request: {
+                status: "APPROVED",
+              },
+            },
+            select: {
+              id: true,
+              requestId: true,
+              dateAndTimeNeeded: true,
+              request: {
+                select: {
+                  userId: true,
+                },
+              },
+            },
+          });
+
+          // Notify users about the maintenance and suggest canceling their requests
+          for (const request of futureRequests) {
+            await createNotification({
+              title: "Vehicle Unavailable for Your Transport Request",
+              resourceType: "TASK",
+              notificationType: "WARNING",
+              message: `The vehicle for your transport request on ${request.dateAndTimeNeeded.toLocaleDateString()} is currently under maintenance and its availability is uncertain. We recommend that you review your request and cancel it if possible, as we cannot guarantee when the vehicle will be available.`,
+              userId: user.id,
+              recepientIds: [request.request.userId], // Send to the requester
             });
           }
         }
