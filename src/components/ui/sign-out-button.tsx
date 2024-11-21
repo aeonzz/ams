@@ -8,6 +8,7 @@ import { Button } from "./button";
 
 export default function SignOutBtn() {
   return (
+    //@ts-ignore
     <form action={signOutAction} className="w-full text-left">
       <Btn />
     </form>
