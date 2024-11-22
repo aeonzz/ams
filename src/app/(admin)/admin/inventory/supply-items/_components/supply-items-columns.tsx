@@ -48,6 +48,11 @@ import SupplyItemStatusSchema, {
   SupplyItemStatusType,
 } from "prisma/generated/zod/inputTypeSchemas/SupplyItemStatusSchema";
 import NumberFlow from "@number-flow/react";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 
 type SupplyItemColumnProps = {
   queryKey?: string[];
@@ -154,6 +159,19 @@ export function getSupllyItemColumns(
       },
     },
     {
+      accessorKey: "stockNumber",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Stock Number" />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="flex space-x-2">
+            <P className="truncate font-medium">{row.original.stockNumber}</P>
+          </div>
+        );
+      },
+    },
+    {
       accessorKey: "categoryName",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Category" />
@@ -213,9 +231,18 @@ export function getSupllyItemColumns(
       cell: ({ row }) => {
         return (
           <div className="flex space-x-2">
-            <P className="truncate font-medium">
-              {row.original.description ? row.original.description : "-"}
-            </P>
+            <HoverCard>
+              <HoverCardTrigger>
+                <P className="truncate font-medium">
+                  {row.original.description ? row.original.description : "-"}
+                </P>
+              </HoverCardTrigger>
+              <HoverCardContent className="flex flex-col">
+                <p>
+                  {row.original.description ? row.original.description : "-"}
+                </p>
+              </HoverCardContent>
+            </HoverCard>
           </div>
         );
       },
@@ -233,6 +260,48 @@ export function getSupllyItemColumns(
               willChange
               continuous
               value={row.original.quantity}
+              format={{ useGrouping: false }}
+              aria-hidden
+            />
+          </div>
+        );
+      },
+      size: 0,
+    },
+    {
+      accessorKey: "unitValue",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Unit Value" />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="flex space-x-2">
+            ₱{" "}
+            <NumberFlow
+              willChange
+              continuous
+              value={row.original.unitValue}
+              format={{ useGrouping: false }}
+              aria-hidden
+            />
+          </div>
+        );
+      },
+      size: 0,
+    },
+    {
+      accessorKey: "total",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Total" />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="flex space-x-2">
+            ₱{" "}
+            <NumberFlow
+              willChange
+              continuous
+              value={row.original.total}
               format={{ useGrouping: false }}
               aria-hidden
             />
@@ -274,6 +343,19 @@ export function getSupllyItemColumns(
         );
       },
       size: 0,
+    },
+    {
+      accessorKey: "location",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Location/Whereabouts" />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="flex space-x-2">
+            <P className="truncate font-medium">{row.original.location}</P>
+          </div>
+        );
+      },
     },
     {
       accessorKey: "expirationDate",

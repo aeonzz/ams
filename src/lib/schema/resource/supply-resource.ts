@@ -71,12 +71,24 @@ export const createSupplyItemSchemaServer = z.object({
       required_error: "Image is required",
     })
   ),
-  quantity: z.number().int().min(1, "Low stock threshold must be at least 1"),
-  unit: z.string().min(1, "Unit is required"),
+  stockNumber: z.string().min(1, "Stock number is required"),
+  unitValue: z
+    .number({
+      required_error: "Unit value is required",
+    })
+    .nonnegative("Unit value cannot be negative"),
+  quantity: z
+    .number()
+    .min(1, "Quantity is required")
+    .nonnegative("Quantity cannot be negative"),
+  unit: z.string({
+    required_error: "Unit is required",
+  }),
+  location: z.string({ required_error: "Location is required" }),
   lowStockThreshold: z
     .number()
-    .int()
-    .min(1, "Low stock threshold must be at least 1"),
+    .min(1, "Low stock threshold is required")
+    .nonnegative("Low stock threshold cannot be negative"),
   expirationDate: z.date().optional(),
   categoryId: z.string().min(1, "Category is required"),
   departmentId: z.string().min(1, "Department is required"),
@@ -142,4 +154,3 @@ export const addSupplyItemWithPath = addSupplyItem.extend({
 });
 
 export type AddSupplyItemWithPath = z.infer<typeof addSupplyItemWithPath>;
-

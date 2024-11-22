@@ -111,6 +111,9 @@ export default function OverviewNavigationMenu({
     if (item.title === "Supply Management") {
       return { ...item, condition: managesSupplyRequest };
     }
+    if (item.title === "User Management") {
+      return { ...item, condition: true };
+    }
     return item;
   });
 
@@ -143,20 +146,7 @@ export default function OverviewNavigationMenu({
             <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
               {managementWithConditions.map((manage) => (
                 <li key={manage.title}>
-                  {manage.condition === false ? (
-                    <div
-                      className={cn(
-                        "block cursor-not-allowed select-none space-y-1 rounded-md p-3 leading-none opacity-50 outline-none transition-colors"
-                      )}
-                    >
-                      <div className="text-sm font-medium leading-none">
-                        {manage.title}
-                      </div>
-                      <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                        {manage.description}
-                      </p>
-                    </div>
-                  ) : (
+                  {manage.condition ? (
                     <Link
                       href={`/department/${departmentId}/${manage.href}`}
                       legacyBehavior
@@ -176,7 +166,7 @@ export default function OverviewNavigationMenu({
                         </p>
                       </NavigationMenuLink>
                     </Link>
-                  )}
+                  ) : null}
                 </li>
               ))}
             </ul>

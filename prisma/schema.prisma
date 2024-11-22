@@ -334,6 +334,10 @@ model SupplyRequest {
 model SupplyItem {
   id                 String              @id
   name               String
+  stockNumber        String
+  unitValue          Float
+  total              Float
+  location           String
   description        String?
   status             SupplyItemStatus    @default(IN_STOCK)
   imageUrl           String

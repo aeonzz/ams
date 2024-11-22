@@ -95,7 +95,11 @@ export async function getSupply(input: GetSupplyItemSchema) {
         },
       }),
       db.supplyItem.count({ where }),
-      db.department.findMany(),
+      db.department.findMany({
+        where: {
+          managesSupplyRequest: true,
+        },
+      }),
       db.supplyItemCategory.findMany({
         where: {
           isArchived: false,
@@ -237,11 +241,13 @@ export const createSupplyitem = authedProcedure
   .handler(async ({ input, ctx }) => {
     const { path, imageUrl, ...rest } = input;
 
+    const total = rest.quantity * rest.unitValue;
     try {
       const result = await db.supplyItem.create({
         data: {
           id: generateId(3),
           imageUrl: imageUrl[0],
+          total: total,
           ...rest,
         },
       });
@@ -257,6 +263,11 @@ export const updateSupplyItem = authedProcedure
   .input(extendedUpdateSupplyItemSchema)
   .handler(async ({ ctx, input }) => {
     const { path, id, imageUrl, ...rest } = input;
+    const validQuantity = rest.quantity ?? 0;
+    const validUnitValue = rest.unitValue ?? 0;
+
+    const total = validQuantity * validUnitValue;
+
     try {
       await db.supplyItem.update({
         where: {
@@ -264,6 +275,7 @@ export const updateSupplyItem = authedProcedure
         },
         data: {
           imageUrl: imageUrl && imageUrl[0],
+          total: total,
           ...rest,
         },
       });

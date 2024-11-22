@@ -139,7 +139,7 @@ export const createVenueRequest = authedProcedure
       const overlappingReservation = await db.venueRequest.findFirst({
         where: {
           request: {
-            status: "PENDING",
+            status: "APPROVED",
           },
           venueId: rest.venueId,
           OR: [

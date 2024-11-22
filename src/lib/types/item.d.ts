@@ -31,6 +31,10 @@ export type InventorySubItemType = {
 export type SupplyItemType = {
   id: string;
   name: string;
+  stockNumber: string;
+  unitValue: number;
+  total: number;
+  location: string;
   description: string | null;
   status: SupplyItemStatusType;
   imageUrl: string;

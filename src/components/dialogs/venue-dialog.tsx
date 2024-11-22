@@ -197,7 +197,7 @@ function Component({
           </AlertDialogTrigger>
         )}
         <AlertDialogContent
-          className={cn(isDesktop && "max-w-[calc(100vw_-_20px)]")}
+          className={cn(!isDesktop && "max-w-[calc(100vw_-_20px)]")}
         >
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>

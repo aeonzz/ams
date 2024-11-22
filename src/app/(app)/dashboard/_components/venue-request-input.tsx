@@ -151,7 +151,7 @@ export default function VenueRequestInput({
       startDate.toDateString() === endDate.toDateString()
     ) {
       toast.error(
-        "Start time and end time cannot be the same on the same day."
+        "Start time and end time cannot be the same on the same time."
       );
       return;
     }

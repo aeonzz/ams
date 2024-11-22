@@ -97,6 +97,9 @@ export function UpdateSupplyItemSheet({
       expirationDate: item.expirationDate ?? undefined,
       lowStockThreshold: item.lowStockThreshold,
       quantity: item.quantity,
+      stockNumber: item.stockNumber,
+      unitValue: item.unitValue,
+      location: item.location,
       unit: item.unit,
       imageUrl: undefined,
     },
@@ -124,6 +127,9 @@ export function UpdateSupplyItemSheet({
       expirationDate: item.expirationDate ?? undefined,
       lowStockThreshold: item.lowStockThreshold,
       quantity: item.quantity,
+      stockNumber: item.stockNumber,
+      unitValue: item.unitValue,
+      location: item.location,
       unit: item.unit,
       imageUrl: undefined,
     });
@@ -287,52 +293,6 @@ export function UpdateSupplyItemSheet({
               <div className="flex gap-3">
                 <FormField
                   control={form.control}
-                  name="quantity"
-                  render={({ field }) => (
-                    <FormItem className="flex-1">
-                      <FormLabel>Quantity</FormLabel>
-                      <FormControl>
-                        <NumberInput
-                          value={field.value}
-                          min={0}
-                          max={200}
-                          disabled={isPending || isUploading}
-                          onChange={(value) => {
-                            field.onChange(value);
-                          }}
-                          className="w-full justify-between"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="lowStockThreshold"
-                  render={({ field }) => (
-                    <FormItem className="flex-1">
-                      <FormLabel>Low Stock Threshhold</FormLabel>
-                      <FormControl>
-                        <NumberInput
-                          value={field.value}
-                          min={0}
-                          max={200}
-                          disabled={isPending || isUploading}
-                          onChange={(value) => {
-                            field.onChange(value);
-                          }}
-                          className="w-full justify-between"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <div className="flex gap-3">
-                <FormField
-                  control={form.control}
                   name="unit"
                   render={({ field }) => (
                     <FormItem className="flex flex-1 flex-col">
@@ -458,6 +418,114 @@ export function UpdateSupplyItemSheet({
                   )}
                 />
               </div>
+              <FormField
+                control={form.control}
+                name="quantity"
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormLabel>Quantity</FormLabel>
+                    <FormControl>
+                      <NumberInput
+                        value={field.value}
+                        min={0}
+                        max={200}
+                        disabled={isPending || isUploading}
+                        onChange={(value) => {
+                          field.onChange(value);
+                        }}
+                        className="w-full justify-between"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="lowStockThreshold"
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormLabel>Low Stock Threshhold</FormLabel>
+                    <FormControl>
+                      <NumberInput
+                        value={field.value}
+                        min={0}
+                        max={200}
+                        disabled={isPending || isUploading}
+                        onChange={(value) => {
+                          field.onChange(value);
+                        }}
+                        className="w-full justify-between"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="unitValue"
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormLabel>
+                      Unit Value{" "}
+                      <span className="text-xs text-muted-foreground">
+                        (Pesos)
+                      </span>
+                    </FormLabel>
+                    <FormControl>
+                      <NumberInput
+                        value={field.value}
+                        min={0}
+                        disabled={isPending || isUploading}
+                        onChange={(value) => {
+                          field.onChange(value);
+                        }}
+                        className="w-full justify-between"
+                        isDecimal
+                        isCurrencY
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="stockNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Stock Number</FormLabel>
+                    <FormControl>
+                      <Input
+                        autoComplete="off"
+                        placeholder="B-001-U"
+                        disabled={isPending || isUploading}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="location"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Location/Whereabouts</FormLabel>
+                    <FormControl>
+                      <Input
+                        autoComplete="off"
+                        placeholder="RACK # 05-B06"
+                        disabled={isPending || isUploading}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="expirationDate"
