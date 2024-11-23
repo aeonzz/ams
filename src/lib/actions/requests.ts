@@ -787,7 +787,15 @@ export const completeTransportRequest = authedProcedure
         async (prisma) => {
           const transportRequest = await prisma.transportRequest.findUnique({
             where: { requestId },
-            select: { odometerStart: true, vehicleId: true },
+            select: {
+              odometerStart: true,
+              vehicleId: true,
+              request: {
+                select: {
+                  userId: true,
+                },
+              },
+            },
           });
 
           if (!transportRequest || transportRequest.odometerStart === null) {
@@ -797,8 +805,6 @@ export const completeTransportRequest = authedProcedure
           const totalDistance = parseFloat(
             (odometer - transportRequest.odometerStart).toFixed(2)
           );
-
-          console.log(totalDistance, odometer, transportRequest.odometerStart);
 
           if (totalDistance < 0) {
             throw "Invalid odometer readings. End value must be greater than start value.";
@@ -824,6 +830,16 @@ export const completeTransportRequest = authedProcedure
               odometerEnd: odometer,
               totalDistanceTravelled: totalDistance,
             },
+          });
+
+          await createNotification({
+            resourceId: `/request/${requestId}`,
+            title: "Transport Request Completed",
+            resourceType: "REQUEST",
+            notificationType: "SUCCESS",
+            message: `Your transport request has been successfully completed. Please check the request details for more information.`,
+            userId: user.id,
+            recepientIds: [transportRequest.request.userId],
           });
 
           return {
@@ -862,7 +878,7 @@ export const completeTransportRequest = authedProcedure
         // Check maintenance status
         const lastMaintenance = await db.maintenanceHistory.findFirst({
           where: { vehicleId },
-          orderBy: { performedAt: "desc" },
+          orderBy: { createdAt: "desc" },
         });
 
         const lastMaintenanceOdometer = lastMaintenance?.odometer || 0;
@@ -896,7 +912,9 @@ export const completeTransportRequest = authedProcedure
               vehicleId,
               dateAndTimeNeeded: { gte: new Date() }, // Filter for future requests
               request: {
-                status: "APPROVED",
+                status: {
+                  in: ["APPROVED", "REVIEWED"], 
+                },
               },
             },
             select: {

@@ -27,6 +27,12 @@ import NumberInput from "@/components/number-input";
 import { Separator } from "@/components/ui/separator";
 import { useForm, useFormState } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   Form,
   FormControl,
@@ -35,6 +41,9 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
 
 interface MaintenanceDialogProps {
   vehicleId: string;
@@ -74,6 +83,7 @@ export default function MaintenanceDialog({
       description: values.description,
       odometer: values.odometer,
       vehicleId: vehicleId,
+      performedAt: values.performedAt,
     };
 
     toast.promise(mutateAsync(data), {
@@ -100,7 +110,7 @@ export default function MaintenanceDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button disabled={isPending} className="flex-1" variant="outline">
-          Log Maintenance
+          Complete Maintenance
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-sm">
@@ -130,6 +140,47 @@ export default function MaintenanceDialog({
                         {...field}
                       />
                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="performedAt"
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormLabel>Repair Date</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "w-full pl-3 text-left font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value ? (
+                              format(field.value, "PPP")
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          disabled={(date) =>
+                            date > new Date() || date < new Date("1900-01-01")
+                          }
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
                     <FormMessage />
                   </FormItem>
                 )}

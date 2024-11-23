@@ -422,7 +422,7 @@ model MaintenanceHistory {
   id          String   @id
   vehicleId   String
   vehicle     Vehicle  @relation(fields: [vehicleId], references: [id])
-  performedAt DateTime @default(now())
+  performedAt DateTime 
   odometer    Float
   description String?
   createdAt   DateTime @default(now())

@@ -11,6 +11,9 @@ export const createMaintenanceRecordSchema = z.object({
       required_error: "Odometer value is required",
     })
     .min(1, "Odometer value is required"),
+  performedAt: z.date({
+    required_error:"Repair date is required"
+  })
 });
 
 export type CreateMaintenanceRecordSchema = z.infer<

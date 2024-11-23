@@ -7,15 +7,20 @@ export const env = createEnv({
       .enum(["development", "test", "production"])
       .default("development"),
     DATABASE_URL: z.string().min(1),
-    RESEND_API_KEY: z.string().min(1),
     COHERE_API_KEY: z.string().min(1),
     PUSHER_APP_ID: z.string().min(1),
     PUSHER_SECRET: z.string().min(1),
     NEXT_PUBLIC_PUSHER_KEY: z.string().min(1),
     NEXT_PUBLIC_PUSHER_CLUSTER: z.string().min(1),
+    SMTP_HOST: z.string().min(1),
+    SMTP_PORT: z.string().min(1),
+    SMTP_USER: z.string().email().min(1),
+    SMTP_PASS: z.string().min(1),
+    SMTP_FROM: z.string().email().min(1),
   },
   client: {
     // NEXT_PUBLIC_PUBLISHABLE_KEY: z.string().min(1),
+    NEXT_PUBLIC_APP_URL: z.string().min(1)
   },
   // If you're using Next.js < 13.4.4, you'll need to specify the runtimeEnv manually
   // runtimeEnv: {

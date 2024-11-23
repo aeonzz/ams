@@ -31,7 +31,7 @@ export default function ForgotPassword() {
     };
 
     axios
-      .post("/api/email", payload)
+      .post("/api/email/reset-password", payload)
       .then((res) => {
         if (res.data.error) {
           console.log(res.data.error);

@@ -4,7 +4,6 @@ import { generateId } from "lucia";
 import { authedProcedure, getErrorMessage } from "./utils";
 
 import { db } from "@/lib/db/index";
-import { type GetJobSectionSchema } from "../schema";
 import { revalidatePath } from "next/cache";
 import { generateText } from "ai";
 import { cohere } from "@ai-sdk/cohere";

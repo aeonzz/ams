@@ -35,6 +35,7 @@ import { AlertCard } from "@/components/ui/alert-card";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import MaintenanceDialog from "./maintenance-dialog";
+import Link from "next/link";
 
 interface ManageVehicleScreenProps {
   params: {
@@ -107,7 +108,12 @@ export default function ManageVehicleScreen({
     <div className="flex h-full w-full flex-col">
       <div className="flex h-[50px] items-center justify-between border-b px-3">
         <div className="flex items-center gap-1">
-          <Button variant="ghost2" size="icon" onClick={() => router.back()}>
+          <Button
+            variant="ghost2"
+            size="icon"
+            className="size-7"
+            onClick={() => router.back()}
+          >
             <ChevronLeft className="size-4" />
           </Button>
           <H5 className="truncate font-semibold">{data.name}</H5>
@@ -195,23 +201,36 @@ export default function ManageVehicleScreen({
                     allowedDepartment={departmentId}
                     currentUser={currentUser}
                   >
-                    {data.requiresMaintenance ? (
+                    {data.requiresMaintenance ||
+                    data.status === "UNDER_MAINTENANCE" ? (
                       <MaintenanceDialog
                         vehicleId={data.id}
                         initialOdometer={data.odometer}
                       />
                     ) : (
-                      <Button
-                        className="flex-1"
-                        variant="outline"
-                        onClick={() =>
-                          dialogManager.setActiveDialog(
-                            "adminUpdateVehicleSheet"
-                          )
-                        }
-                      >
-                        Edit
-                      </Button>
+                      <div className="flex w-full space-x-2">
+                        <Button
+                          className="flex-1"
+                          variant="outline"
+                          onClick={() =>
+                            dialogManager.setActiveDialog(
+                              "adminUpdateVehicleSheet"
+                            )
+                          }
+                        >
+                          Edit
+                        </Button>
+                        <Link
+                          href={``}
+                          prefetch
+                          className={cn(
+                            "flex-1 text-sm",
+                            buttonVariants({ variant: "outline" })
+                          )}
+                        >
+                          Maintenance Logs
+                        </Link>
+                      </div>
                     )}
                   </PermissionGuard>
                 </div>
@@ -291,7 +310,10 @@ export default function ManageVehicleScreen({
           </div>
           <Separator orientation="vertical" className="mx-6 h-full" />
           <div className="flex-1">
-            <VehicleRequestsTable requests={formattedRequests} />
+            <VehicleRequestsTable
+              requests={formattedRequests}
+              logsUrl={`/department/${departmentId}/resources/transport/${vehicleId}/logs?page=1&per_page=10&sort=createdAt.desc`}
+            />
           </div>
         </div>
       </div>

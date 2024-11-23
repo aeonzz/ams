@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { useSidebarToggle } from "@/lib/hooks/use-sidebar-toggle";
 import { useStore } from "@/lib/hooks/use-store";
 import { cn } from "@/lib/utils";
 import DashboardSidebar from "./dashboard-sidebar";

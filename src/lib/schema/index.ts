@@ -138,13 +138,15 @@ export type GetRoleManagementSchema = z.infer<
   typeof roleManagementSearchParamsSchema
 >;
 
-export const jobSectionSearchParamsSchema = z.object({
+export const vehicleMaintenanceHistoryParamsSchema = z.object({
   page: z.coerce.number().default(1),
   per_page: z.coerce.number().default(10),
   sort: z.string().optional(),
-  name: z.string().optional(),
+  status: z.string().optional(),
   from: z.string().optional(),
   to: z.string().optional(),
 });
 
-export type GetJobSectionSchema = z.infer<typeof jobSectionSearchParamsSchema>;
+export type GetVehicleMaintenanceHistory = z.infer<
+  typeof vehicleMaintenanceHistoryParamsSchema
+>;

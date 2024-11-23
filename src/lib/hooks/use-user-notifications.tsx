@@ -41,6 +41,7 @@ export const useUserNotifications = (userId: string) => {
   React.useEffect(() => {
     const channel = pusherClient.subscribe("request");
     channel.bind("notifications", (data: { message: string }) => {
+      console.log('asdasdasd')
       refetch();
     });
 
