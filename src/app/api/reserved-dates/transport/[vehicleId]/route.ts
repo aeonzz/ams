@@ -43,6 +43,7 @@ async function handler(req: NextRequest, user: any, context: Context) {
             transportRequest: {
               select: {
                 vehicle: true,
+                inProgress: true,
               },
             },
           },

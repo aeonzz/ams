@@ -13,6 +13,7 @@ type Props = {
   onChange?: (value: number) => void;
   className?: string;
   isDecimal?: boolean;
+  isCurrencY?: boolean;
 };
 
 export default function NumberInput({
@@ -23,6 +24,7 @@ export default function NumberInput({
   className,
   disabled,
   isDecimal = false,
+  isCurrencY = false,
 }: Props) {
   const defaultValue = React.useRef(value);
   const inputRef = React.useRef<HTMLInputElement>(null);

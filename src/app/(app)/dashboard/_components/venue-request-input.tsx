@@ -151,7 +151,7 @@ export default function VenueRequestInput({
       startDate.toDateString() === endDate.toDateString()
     ) {
       toast.error(
-        "Start time and end time cannot be the same on the same day."
+        "Start time and end time cannot be the same on the same time."
       );
       return;
     }
@@ -257,7 +257,7 @@ export default function VenueRequestInput({
                         rows={1}
                         maxRows={5}
                         placeholder="Purpose..."
-                        className="min-h-[150px] flex-grow resize-none placeholder:text-sm"
+                        className="min-h-[150px] flex-grow resize-none text-sm"
                         disabled={isPending}
                         {...field}
                       />
@@ -276,7 +276,7 @@ export default function VenueRequestInput({
                         rows={1}
                         maxRows={5}
                         placeholder="Other info..."
-                        className="min-h-[120px] flex-grow resize-none placeholder:text-sm"
+                        className="min-h-[120px] flex-grow resize-none text-sm"
                         disabled={isPending}
                         {...field}
                       />

@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { useSidebarToggle } from "@/lib/hooks/use-sidebar-toggle";
 import { useStore } from "@/lib/hooks/use-store";
 import { cn } from "@/lib/utils";
 import DashboardSidebar from "./dashboard-sidebar";
@@ -20,7 +19,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     <>
       <DashboardSidebar sidebar={sidebar} />
       <main
-        vaul-drawer-wrapper=""
         className={cn(
           "h-screen bg-background transition-[margin-left] duration-300 ease-in-out lg:h-auto lg:p-2 lg:pl-0",
           !sidebar.getOpenState() ? "lg:ml-[76px]" : "lg:ml-72"

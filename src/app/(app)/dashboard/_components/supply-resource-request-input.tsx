@@ -151,7 +151,7 @@ export default function SupplyResourceRequestInput({
                       rows={1}
                       maxRows={5}
                       placeholder="Purpose..."
-                      className="min-h-[100px] flex-grow resize-none text-sm placeholder:text-sm"
+                      className="min-h-[100px] flex-grow resize-none text-sm"
                       disabled={isPending}
                       {...field}
                     />

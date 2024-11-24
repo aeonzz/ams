@@ -314,7 +314,7 @@ export default function TransportRequestInput({
                           rows={1}
                           maxRows={5}
                           placeholder="Purpose..."
-                          className="min-h-[200px] flex-grow resize-none bg-transparent shadow-none placeholder:text-sm"
+                          className="min-h-[200px] flex-grow resize-none bg-transparent shadow-none text-sm"
                           disabled={isPending}
                           {...field}
                         />
@@ -325,7 +325,7 @@ export default function TransportRequestInput({
                 />
               </div>
             </div>
-            {/* {vehicleId && (
+            {vehicleId && (
               <div
                 className={cn(
                   "scroll-bar max-h-[60vh] w-[300px] overflow-y-auto pr-1"
@@ -358,7 +358,7 @@ export default function TransportRequestInput({
                   </>
                 )}
               </div>
-            )} */}
+            )}
           </div>
           <Separator className="my-4" />
           <DialogFooter>

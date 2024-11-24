@@ -34,7 +34,6 @@ const cohere = createCohere({
 
 export async function getRequests(input: GetRequestsSchema) {
   await checkAuth();
-  const user = await currentUser();
   const {
     page,
     per_page,
@@ -138,6 +137,9 @@ export const createVenueRequest = authedProcedure
     try {
       const overlappingReservation = await db.venueRequest.findFirst({
         where: {
+          request: {
+            status: "APPROVED",
+          },
           venueId: rest.venueId,
           OR: [
             {
@@ -190,6 +192,10 @@ export const createVenueRequest = authedProcedure
                  
                  Now, create a title for the request using the provided details above.`,
       });
+
+      if (!text || text.trim().length === 0) {
+        throw "Something went wrong while generating the request title. Please check your internet connection or try again.";
+      }
 
       const requestId = `REQ-${generateId(3)}`;
       const venuRequestId = `VRQ-${generateId(3)}`;
@@ -253,6 +259,9 @@ export const createTransportRequest = authedProcedure
         where: {
           vehicleId: rest.vehicleId,
           dateAndTimeNeeded: rest.dateAndTimeNeeded,
+          request: {
+            status: "APPROVED",
+          },
         },
       });
 
@@ -294,6 +303,10 @@ export const createTransportRequest = authedProcedure
                  
                  Now, create a title for the request using the provided details above.`,
       });
+
+      if (!text || text.trim().length === 0) {
+        throw "Something went wrong while generating the request title. Please check your internet connection or try again.";
+      }
 
       const requestId = `REQ-${generateId(3)}`;
       const transportRequestId = `TRQ-${generateId(3)}`;
@@ -609,7 +622,8 @@ export async function getCancelledRequests(input: GetRequestsSchema) {
 export const updateTransportRequest = authedProcedure
   .createServerAction()
   .input(updateTransportRequestSchemaWithPath)
-  .handler(async ({ input }) => {
+  .handler(async ({ ctx, input }) => {
+    const { user } = ctx;
     const { path, id, vehicleStatus, vehicleId, ...rest } = input;
     try {
       const result = await db.transportRequest.update({
@@ -624,7 +638,28 @@ export const updateTransportRequest = authedProcedure
           },
           ...rest,
         },
+        select: {
+          request: {
+            select: {
+              userId: true,
+              title: true,
+            },
+          },
+          requestId: true,
+        },
       });
+
+      if (rest.inProgress !== undefined && rest.inProgress) {
+        await createNotification({
+          resourceId: `/request/${result.requestId}`,
+          title: `Transport Request Started: ${result.requestId}`,
+          resourceType: "REQUEST",
+          notificationType: "INFO",
+          message: `Your request for "${result.request.title}" has started. Please ensure that everything is prepared and proceed as scheduled.`,
+          userId: user.id,
+          recepientIds: [result.request.userId],
+        });
+      }
 
       await pusher.trigger("request", "request_update", {
         message: "",
@@ -776,7 +811,15 @@ export const completeTransportRequest = authedProcedure
         async (prisma) => {
           const transportRequest = await prisma.transportRequest.findUnique({
             where: { requestId },
-            select: { odometerStart: true, vehicleId: true },
+            select: {
+              odometerStart: true,
+              vehicleId: true,
+              request: {
+                select: {
+                  userId: true,
+                },
+              },
+            },
           });
 
           if (!transportRequest || transportRequest.odometerStart === null) {
@@ -786,8 +829,6 @@ export const completeTransportRequest = authedProcedure
           const totalDistance = parseFloat(
             (odometer - transportRequest.odometerStart).toFixed(2)
           );
-
-          console.log(totalDistance, odometer, transportRequest.odometerStart);
 
           if (totalDistance < 0) {
             throw "Invalid odometer readings. End value must be greater than start value.";
@@ -813,6 +854,16 @@ export const completeTransportRequest = authedProcedure
               odometerEnd: odometer,
               totalDistanceTravelled: totalDistance,
             },
+          });
+
+          await createNotification({
+            resourceId: `/request/${requestId}`,
+            title: "Transport Request Completed",
+            resourceType: "REQUEST",
+            notificationType: "SUCCESS",
+            message: `Your transport request has been successfully completed. Please check the request details for more information.`,
+            userId: user.id,
+            recepientIds: [transportRequest.request.userId],
           });
 
           return {
@@ -851,7 +902,7 @@ export const completeTransportRequest = authedProcedure
         // Check maintenance status
         const lastMaintenance = await db.maintenanceHistory.findFirst({
           where: { vehicleId },
-          orderBy: { performedAt: "desc" },
+          orderBy: { createdAt: "desc" },
         });
 
         const lastMaintenanceOdometer = lastMaintenance?.odometer || 0;
@@ -877,6 +928,40 @@ export const completeTransportRequest = authedProcedure
               message: `The vehicle "${vehicle.name}" requires maintenance. Please address this issue immediately.`,
               userId: user.id,
               recepientIds: [vehicle.departmentId, departmentHeadUserId],
+            });
+          }
+
+          const futureRequests = await db.transportRequest.findMany({
+            where: {
+              vehicleId,
+              dateAndTimeNeeded: { gte: new Date() }, // Filter for future requests
+              request: {
+                status: {
+                  in: ["APPROVED", "REVIEWED"],
+                },
+              },
+            },
+            select: {
+              id: true,
+              requestId: true,
+              dateAndTimeNeeded: true,
+              request: {
+                select: {
+                  userId: true,
+                },
+              },
+            },
+          });
+
+          // Notify users about the maintenance and suggest canceling their requests
+          for (const request of futureRequests) {
+            await createNotification({
+              title: "Vehicle Unavailable for Your Transport Request",
+              resourceType: "TASK",
+              notificationType: "WARNING",
+              message: `The vehicle for your transport request on ${request.dateAndTimeNeeded.toLocaleDateString()} is currently under maintenance and its availability is uncertain. We recommend that you review your request and cancel it if possible, as we cannot guarantee when the vehicle will be available.`,
+              userId: user.id,
+              recepientIds: [request.request.userId], // Send to the requester
             });
           }
         }

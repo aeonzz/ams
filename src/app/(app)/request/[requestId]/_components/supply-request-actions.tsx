@@ -19,15 +19,22 @@ import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
 import { supplyRequestActions } from "@/lib/actions/supply";
 import { UpdateSupplyResourceRequestSchemaWithPath } from "@/lib/schema/resource/supply-resource";
 import { useQueryClient } from "@tanstack/react-query";
+import { PermissionGuard } from "@/components/permission-guard";
+import { useSession } from "@/lib/hooks/use-session";
 
 interface SupplyRequestActionsProps {
   requestId: string;
+  allowedRoles: string[];
+  allowedDepartment?: string;
 }
 
 export default function SupplyRequestActions({
   requestId,
+  allowedRoles,
+  allowedDepartment,
 }: SupplyRequestActionsProps) {
   const pathname = usePathname();
+  const currentUser = useSession();
   const queryClient = useQueryClient();
   const { mutateAsync, isPending } =
     useServerActionMutation(supplyRequestActions);
@@ -52,24 +59,30 @@ export default function SupplyRequestActions({
   };
 
   return (
-    <AlertDialog>
-      <AlertDialogTrigger asChild>
-        <Button disabled={isPending}>Mark as Picked Up</Button>
-      </AlertDialogTrigger>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Confirm Pickup</AlertDialogTitle>
-          <AlertDialogDescription>
-            Are you sure you want to mark this item as picked up?
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={handleUpdate} disabled={isPending}>
-            Confirm
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+    <PermissionGuard
+      allowedRoles={allowedRoles}
+      allowedDepartment={allowedDepartment}
+      currentUser={currentUser}
+    >
+      <AlertDialog>
+        <AlertDialogTrigger asChild>
+          <Button disabled={isPending}>Mark as Picked Up</Button>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Pickup</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to mark this item as picked up?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleUpdate} disabled={isPending}>
+              Confirm
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </PermissionGuard>
   );
 }

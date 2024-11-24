@@ -10,10 +10,21 @@ export const createVehicleSchema = z.object({
   imageUrl: z.array(z.instanceof(File), {
     required_error: "Image is required",
   }),
-  capacity: z.number().min(1, "Capacity is required"),
-  odometer: z.number().min(1, "odometer is required"),
+  capacity: z
+    .number()
+    .min(1, "Capacity is required")
+    .nonnegative("Capacity cannot be negative"),
+  odometer: z
+    .number({
+      required_error: "Odometer is required",
+      invalid_type_error: "Odometer must be a number",
+    })
+    .nonnegative("Odometer cannot be negative"),
   licensePlate: z.string().min(1, "License number is required"),
-  maintenanceInterval: z.number().optional(),
+  maintenanceInterval: z
+    .number()
+    .nonnegative("Maintenance Interval cannot be negative")
+    .optional(),
   status: VehicleStatusSchema.optional(),
 });
 

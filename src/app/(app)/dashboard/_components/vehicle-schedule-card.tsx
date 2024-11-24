@@ -55,14 +55,19 @@ export default function VehicleScheduleCard({
           <Badge variant="outline" className="w-fit">
             {data.request.department.name}
           </Badge>
-          <Badge variant={variant} className="w-fit pr-3.5">
-            <Dot
-              className={cn("mr-1 size-3")}
-              strokeWidth={stroke}
-              color={color}
-            />
-            {textTransform(data.request.status)}
-          </Badge>
+          <div>
+            <Badge variant={variant} className="w-fit pr-3.5">
+              <Dot
+                className={cn("mr-1 size-3")}
+                strokeWidth={stroke}
+                color={color}
+              />
+              {textTransform(data.request.status)}
+            </Badge>
+            {data.request.transportRequest.inProgress && (
+              <Badge>In Progress</Badge>
+            )}
+          </div>
         </div>
       </CardHeader>
       <CardContent>

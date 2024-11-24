@@ -21,7 +21,7 @@ type CheckmarkPosition = {
 export async function fillJobRequestEvaluationPDF(
   data: JobRequestEvaluation
 ): Promise<Blob> {
-  const pdfPath = "/resources/job-request-evaluation.pdf";
+  const pdfPath = "/job-request-evaluation.pdf";
   const pdfBytes = await fetch(pdfPath).then((res) => res.arrayBuffer());
 
   const pdfDoc = await PDFDocument.load(pdfBytes);

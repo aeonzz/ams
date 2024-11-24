@@ -26,8 +26,6 @@ import {
   getStatusColor,
   textTransform,
 } from "@/lib/utils";
-import RequestActions from "./request-actions";
-import SupplyItemCard from "./supply-item-card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import RequestDetailsSkeleton from "./request-details-skeleton";
 import SearchInput from "@/app/(app)/_components/search-input";
@@ -50,6 +48,7 @@ import ReturnableRequestActions from "./returnable-request-actions";
 import SupplyResourceDetails from "./supply-resource-details";
 import SupplyRequestActions from "./supply-request-actions";
 import TransportRequestActions from "./transport-request-actions";
+import CancelRequest from "./cancel-request";
 
 interface RequestDetailsProps {
   params: string;
@@ -164,6 +163,8 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                 data={data.transportRequest}
                 requestId={data.id}
                 rejectionReason={data.rejectionReason}
+                cancellationReason={data.cancellationReason}
+                onHoldReason={data.onHoldReason}
                 requestStatus={data.status}
                 isCurrentUser={currentUser.id === data.userId}
               />
@@ -290,7 +291,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
         <Separator className="my-6" />
         <div className="flex flex-col gap-3">
           {currentUser.id === data.userId && (
-            <RequestActions data={data} params={data.id} entityType="OTHER" />
+            <CancelRequest requestId={data.id} requestStatus={data.status} />
           )}
           {data.type === "JOB" &&
             data.jobRequest &&
@@ -353,9 +354,18 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
               allowedApproverRoles={["DEPARTMENT_HEAD"]}
               actionNeeded={
                 new Date(data.transportRequest.dateAndTimeNeeded) <=
-                  new Date() && !data.transportRequest.inProgress
+                  new Date() &&
+                !data.transportRequest.inProgress &&
+                data.status === "APPROVED"
               }
             >
+              {data.status === "APPROVED" ||
+                (data.status === "ON_HOLD" && (
+                  <CancelRequest
+                    requestId={data.id}
+                    requestStatus={data.status}
+                  />
+                ))}
               {new Date(data.transportRequest.dateAndTimeNeeded) <=
                 new Date() &&
                 !data.transportRequest.inProgress &&
@@ -367,7 +377,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
           {data.type === "VENUE" && data.venueRequest && (
             <RequestReviewerActions
               request={data}
-              allowedRoles={["OPERATIONS_MANAGER"]}
+              allowedRoles={["OPERATIONS_MANAGER", "DEPARTMENT_HEAD"]}
               allowedDepartment={data.departmentId}
               allowedApproverRoles={["DEPARTMENT_HEAD"]}
             />
@@ -389,13 +399,21 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
             data.type === "BORROW" &&
             data.returnableRequest && (
               <ReturnableRequestActions
+                allowedRoles={["OPERATIONS_MANAGER"]}
+                allowedDepartment={data.departmentId}
                 request={data.returnableRequest}
                 requestId={data.id}
               />
             )}
           {data.status === "APPROVED" &&
             data.type === "SUPPLY" &&
-            data.supplyRequest && <SupplyRequestActions requestId={data.id} />}
+            data.supplyRequest && (
+              <SupplyRequestActions
+                requestId={data.id}
+                allowedRoles={["OPERATIONS_MANAGER", "DEPARTMENT_HEAD"]}
+                allowedDepartment={data.departmentId}
+              />
+            )}
         </div>
       </div>
     </div>

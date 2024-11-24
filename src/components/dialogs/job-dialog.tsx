@@ -31,8 +31,14 @@ import {
 } from "@/app/(app)/dashboard/_components/schema";
 import { X } from "lucide-react";
 import { useMediaQuery } from "usehooks-ts";
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "../ui/drawer";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { UseMutateAsyncFunction } from "@tanstack/react-query";
+import { cn } from "@/lib/utils";
 
 export default function JobDialog() {
   const dialogManager = useDialogManager();
@@ -90,6 +96,7 @@ export default function JobDialog() {
             form={form}
             mutateAsync={mutateAsync}
             handleOpenChange={handleOpenChange}
+            isDesktop={isDesktop}
           >
             <DialogHeader>
               <DialogTitle>Job Request</DialogTitle>
@@ -101,11 +108,11 @@ export default function JobDialog() {
   }
 
   return (
-    <Drawer
+    <Sheet
       open={dialogManager.activeDialog === "jobDialog"}
       onOpenChange={handleOpenChange}
     >
-      <DrawerContent
+      <SheetContent
         onInteractOutside={(e) => {
           if (isPending) {
             e.preventDefault();
@@ -115,6 +122,9 @@ export default function JobDialog() {
             setAlertOpen(true);
           }
         }}
+        className="rounded-t-[10px]"
+        side="bottom"
+        hideClose
       >
         <Component
           alertOpen={alertOpen}
@@ -125,13 +135,14 @@ export default function JobDialog() {
           form={form}
           mutateAsync={mutateAsync}
           handleOpenChange={handleOpenChange}
+          isDesktop={isDesktop}
         >
-          <DrawerHeader>
-            <DrawerTitle>Job Request</DrawerTitle>
-          </DrawerHeader>
+          <SheetHeader>
+            <SheetTitle>Job Request</SheetTitle>
+          </SheetHeader>
         </Component>
-      </DrawerContent>
-    </Drawer>
+      </SheetContent>
+    </Sheet>
   );
 }
 
@@ -145,6 +156,7 @@ function Component({
   form,
   mutateAsync,
   handleOpenChange,
+  isDesktop,
 }: {
   children: React.ReactNode;
   alertOpen: boolean;
@@ -160,11 +172,12 @@ function Component({
     unknown
   >;
   handleOpenChange: (open: boolean) => void;
+  isDesktop: boolean;
 }) {
   return (
     <>
       <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
-        {isFieldsDirty && !isPending && (
+        {isDesktop && isFieldsDirty && !isPending && (
           <AlertDialogTrigger disabled={isPending} asChild>
             <button
               disabled={isPending}
@@ -174,7 +187,9 @@ function Component({
             </button>
           </AlertDialogTrigger>
         )}
-        <AlertDialogContent>
+        <AlertDialogContent
+          className={cn(!isDesktop && "max-w-[calc(100vw_-_20px)]")}
+        >
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>

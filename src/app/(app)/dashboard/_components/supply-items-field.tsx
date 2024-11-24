@@ -419,7 +419,7 @@ export default function SupplyItemsField({
                                         );
                                         form.setValue("items", newItems);
                                       }}
-                                      className="w-fit"
+                                      className=""
                                       disabled={isPending}
                                     />
                                   </div>

@@ -61,7 +61,6 @@ import EditInput from "./edit-input";
 import { TagInput } from "@/components/ui/tag-input";
 import TransportEditTimeInput from "./transport-edit-time-input";
 import type { RequestStatusTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestStatusTypeSchema";
-import RejectionReasonCard from "./rejection-reason-card";
 import {
   updateSupplyResourceRequestSchema,
   UpdateSupplyResourceRequestSchemaWithPath,
@@ -179,16 +178,21 @@ export default function SupplyResourceDetails({
       <div className="space-y-4 pb-10">
         <div className="space-y-1">
           {requestStatus === "APPROVED" && (
-            <div>
-              <AlertCard
-                variant="success"
-                title="Ready for Pickup"
-                description="The items is now ready to be picked up."
-              />
-              <Separator className="my-6" />
-            </div>
+            <AlertCard
+              variant="success"
+              title="Ready for Pickup"
+              description="The items is now ready to be picked up."
+              className="mb-6"
+            />
           )}
-          <RejectionReasonCard rejectionReason={rejectionReason} />
+          {requestStatus === "REJECTED" && rejectionReason && (
+            <AlertCard
+              variant="destructive"
+              title="Request Rejected"
+              description={rejectionReason}
+              className="mb-6"
+            />
+          )}
           <H4 className="font-semibold text-muted-foreground">
             Supply Request Details
           </H4>

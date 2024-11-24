@@ -5,7 +5,7 @@ const baseDepartmentSchema = z.object({
   name: z
     .string()
     .min(1, "name is required")
-    .max(30, "Cannot be more than 30 characters long"),
+    .max(100, "Cannot be more than 100 characters long"),
   description: z.string().optional(),
   acceptsJobs: z.boolean().default(false).optional(),
   managesTransport: z.boolean().default(false).optional(),

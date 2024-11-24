@@ -64,7 +64,6 @@ import EditInput from "./edit-input";
 import { TagInput } from "@/components/ui/tag-input";
 import TransportEditTimeInput from "./transport-edit-time-input";
 import type { RequestStatusTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestStatusTypeSchema";
-import RejectionReasonCard from "./rejection-reason-card";
 import CommandTooltip from "@/components/ui/command-tooltip";
 import { fillTransportRequestFormPDF } from "@/lib/fill-pdf/transport-request-form";
 import { AlertCard } from "@/components/ui/alert-card";
@@ -73,6 +72,8 @@ interface TransportRequestDetailsProps {
   data: TransportRequestWithRelations;
   requestId: string;
   rejectionReason: string | null;
+  cancellationReason: string | null;
+  onHoldReason: string | null;
   requestStatus: RequestStatusTypeType;
   isCurrentUser: boolean;
 }
@@ -83,6 +84,8 @@ export default function TransportRequestDetails({
   rejectionReason,
   requestStatus,
   isCurrentUser,
+  cancellationReason,
+  onHoldReason,
 }: TransportRequestDetailsProps) {
   const [editField, setEditField] = React.useState<string | null>(null);
   const pathname = usePathname();
@@ -214,24 +217,55 @@ export default function TransportRequestDetails({
   React.useEffect(() => {
     form.reset();
   }, [editField]);
-  
-  const canEdit = requestStatus === "PENDING" && isCurrentUser;
+
+  const canEdit =
+    (requestStatus === "PENDING" || requestStatus === "ON_HOLD") &&
+    isCurrentUser;
 
   return (
     <>
       <div className="space-y-4 pb-10">
         <div className="space-y-1">
-          {data.inProgress && (
+          {data.inProgress && requestStatus === "APPROVED" && (
+            <AlertCard
+              variant="info"
+              title="Transport Request in Progress"
+              description="This transport request is currently underway."
+              className="mb-6"
+            />
+          )}
+          {requestStatus === "CANCELLED" && cancellationReason && (
+            <AlertCard
+              variant="destructive"
+              title="Request Cancelled"
+              description={cancellationReason}
+              className="mb-6"
+            />
+          )}
+          {requestStatus === "REJECTED" && rejectionReason && (
+            <AlertCard
+              variant="destructive"
+              title="Request Rejected"
+              description={rejectionReason}
+              className="mb-6"
+            />
+          )}
+          {requestStatus === "ON_HOLD" && onHoldReason && (
             <div>
               <AlertCard
-                variant="info"
-                title="Transport Request in Progress"
-                description="This transport request is currently underway."
+                variant="warning"
+                title="Request On Hold"
+                description={onHoldReason}
+                className="mb-6"
               />
-              <Separator className="my-6" />
+              <AlertCard
+                variant="info"
+                title="Next Steps"
+                description="You can update your request to address the issue, cancel it if no longer needed, or contact support for assistance."
+                className="mb-6"
+              />
             </div>
           )}
-          <RejectionReasonCard rejectionReason={rejectionReason} />
           <div className="flex h-7 items-center justify-between">
             <H4 className="font-semibold text-muted-foreground">
               Transport Request Details

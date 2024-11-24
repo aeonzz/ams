@@ -6,17 +6,24 @@ export const createSupplyItemSchema = z.object({
   imageUrl: z.array(z.instanceof(File), {
     required_error: "Image is required",
   }),
+  stockNumber: z.string().min(1, "Stock number is required"),
+  unitValue: z
+    .number({
+      required_error: "Unit value is required",
+    })
+    .nonnegative("Unit value cannot be negative"),
+  location: z.string({ required_error: "Location is required" }),
   quantity: z
     .number()
     .min(1, "Quantity is required")
-    .max(200, "Cannot exceed 200 "),
+    .nonnegative("Quantity cannot be negative"),
   unit: z.string({
     required_error: "Unit is required",
   }),
   lowStockThreshold: z
     .number()
-    .min(1, "lowStockThreshold is required")
-    .max(200, "Cannot exceed 200 "),
+    .min(1, "Low stock threshold is required")
+    .nonnegative("Low stock threshold cannot be negative"),
   expirationDate: z.date().optional(),
   categoryId: z.string({
     required_error: "Category is required",

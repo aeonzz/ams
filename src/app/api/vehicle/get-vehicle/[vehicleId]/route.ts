@@ -32,6 +32,9 @@ async function handler(req: NextRequest, user: any, context: Context) {
           include: {
             request: true,
           },
+          orderBy: {
+            createdAt: "desc",
+          },
         },
       },
     });

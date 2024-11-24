@@ -39,14 +39,9 @@ export default function MenuButton({
       )}
       asChild
     >
-      <Link href={href} prefetch>
+      <Link href={href} prefetch className="relative">
         <span className={cn(isOpen === false ? "" : "mr-2")}>
-          <div className="relative">
-            {label === "Notifications" && hasUnreadNotifications && (
-              <span className="absolute left-2.5 top-0 h-2 w-2 rounded-full bg-red-500"></span>
-            )}
-            <Icon className="size-5 opacity-70 transition-opacity group-hover:opacity-100" />
-          </div>
+          <Icon className="size-5 opacity-70 transition-opacity group-hover:opacity-100" />
         </span>
         <p
           className={cn(
@@ -56,6 +51,11 @@ export default function MenuButton({
         >
           {label}
         </p>
+        {label === "Notifications" && hasUnreadNotifications && (
+          <div className="absolute right-2 grid size-4 place-items-center rounded-full bg-red-500">
+            <span className="text-[9px] leading-[1rem] text-white">{unreadCount}</span>
+          </div>
+        )}
       </Link>
     </Button>
   );

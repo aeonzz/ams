@@ -209,6 +209,11 @@ export function getStatusColor(
       variant: "purple",
       stroke: 10,
     },
+    ON_HOLD: {
+      color: "#ff9800",
+      variant: "orange",
+      stroke: 10,
+    },
   };
 
   return (

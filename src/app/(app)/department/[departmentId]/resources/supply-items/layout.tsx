@@ -29,7 +29,7 @@ export default async function CommandLayout({ children, params }: Props) {
       id: params.departmentId,
     },
     select: {
-      managesBorrowRequest: true,
+      managesSupplyRequest: true,
     },
   });
 
@@ -37,7 +37,7 @@ export default async function CommandLayout({ children, params }: Props) {
     return <NotFound />;
   }
 
-  if (!department.managesBorrowRequest) {
+  if (!department.managesSupplyRequest) {
     return <NotFound />;
   }
 

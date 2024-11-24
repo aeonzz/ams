@@ -13,7 +13,6 @@ import {
   UserRound,
 } from "lucide-react";
 
-import { useSidebarToggle } from "@/lib/hooks/use-sidebar-toggle";
 import {
   CommandDialog,
   CommandEmpty,
@@ -27,6 +26,8 @@ import {
 import { useHotkeys } from "react-hotkeys-hook";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import { useRouter } from "next/navigation";
+import { useSidebar } from "@/lib/hooks/use-sidebar";
+import { useStore } from "@/lib/hooks/use-store";
 
 const NavigationLinks = [
   {
@@ -72,7 +73,7 @@ export default function AdminCommandSearchDialog({
 }: AdminCommandSearchDialogProps) {
   const router = useRouter();
   const dialogManager = useDialogManager();
-  const sidebar = useSidebarToggle();
+  const sidebar = useStore(useSidebar, (x) => x);
 
   useHotkeys(
     "mod+k",
@@ -101,6 +102,8 @@ export default function AdminCommandSearchDialog({
       router.prefetch(link.href);
     });
   }, [router]);
+
+  if (!sidebar) return null;
 
   return (
     <>
@@ -145,7 +148,7 @@ export default function AdminCommandSearchDialog({
             <CommandItem
               onSelect={() => {
                 dialogManager.setActiveDialog(null);
-                sidebar.setIsOpen();
+                sidebar.toggleOpen();
               }}
             >
               <PanelRight className="mr-2 h-4 w-4" />

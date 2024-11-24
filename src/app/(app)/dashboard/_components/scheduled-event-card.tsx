@@ -30,7 +30,7 @@ export default function ScheduledEventCard({ data }: ScheduledEventCardProps) {
         <div className="flex flex-col space-y-2">
           <div className="flex items-center space-x-2 rounded-sm border p-2">
             <Avatar className="size-10 rounded-full">
-              <AvatarImage src={`${data.request.user.profileUrl}` ?? ""} />
+              <AvatarImage src={`${data.request.user.profileUrl}`} />
               <AvatarFallback className="rounded-md">
                 {data.request.user.firstName.charAt(0).toUpperCase()}
               </AvatarFallback>

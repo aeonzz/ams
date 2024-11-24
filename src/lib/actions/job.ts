@@ -4,7 +4,6 @@ import { generateId } from "lucia";
 import { authedProcedure, getErrorMessage } from "./utils";
 
 import { db } from "@/lib/db/index";
-import { type GetJobSectionSchema } from "../schema";
 import { revalidatePath } from "next/cache";
 import { generateText } from "ai";
 import { cohere } from "@ai-sdk/cohere";
@@ -12,7 +11,7 @@ import { extendedJobRequestSchemaServer } from "../db/schema/job";
 import { createNotification } from "./notification";
 import {
   assignPersonnelSchemaWithPath,
-  cancelOwnRequestSchema,
+  cancelRequestSchema,
   reworkJobRequestSchema,
   updateJobRequestSchemaWithPath,
   updateRequestStatusSchemaWithPath,
@@ -63,6 +62,10 @@ export const createJobRequest = authedProcedure
                
                Now, create a title for the request using the provided details above.`,
       });
+
+      if (!text || text.trim().length === 0) {
+        throw "Something went wrong while generating the request title. Please check your internet connection or try again.";
+      }
 
       const createdRequest = await db.request.create({
         data: {
@@ -239,27 +242,27 @@ export const updateRequestStatus = authedProcedure
           }
 
           if (rest.status === "REJECTED") {
-            const existingNotification = await prisma.notification.findFirst({
-              where: {
-                resourceId: `/request/${updatedRequest.id}`,
-                userId: user.id,
-                resourceType: "REQUEST",
-                recepientId: updatedRequest.userId,
-                title: `Request Rejected: ${updatedRequest.title}`,
-              },
+            await createNotification({
+              resourceId: `/request/${updatedRequest.id}`,
+              title: `Request Rejected: ${updatedRequest.title}`,
+              resourceType: "REQUEST",
+              notificationType: "WARNING",
+              message: `Your request for "${updatedRequest.title}" has been rejected. Please check the request for further details.`,
+              userId: user.id,
+              recepientIds: [updatedRequest.userId],
             });
+          }
 
-            if (!existingNotification) {
-              await createNotification({
-                resourceId: `/request/${updatedRequest.id}`,
-                title: `Request Rejected: ${updatedRequest.title}`,
-                resourceType: "REQUEST",
-                notificationType: "WARNING",
-                message: `Your request for "${updatedRequest.title}" has been rejected. Please check the request for further details.`,
-                userId: user.id,
-                recepientIds: [updatedRequest.userId],
-              });
-            }
+          if (rest.status === "ON_HOLD") {
+            await createNotification({
+              resourceId: `/request/${updatedRequest.id}`,
+              title: `Request On Hold: ${updatedRequest.title}`,
+              resourceType: "REQUEST",
+              notificationType: "WARNING",
+              message: `Your request for "${updatedRequest.title}" is currently on hold. Please review the request for further details and take the necessary actions.`,
+              userId: user.id,
+              recepientIds: [updatedRequest.userId],
+            });
           }
 
           return updatedRequest;
@@ -279,9 +282,9 @@ export const updateRequestStatus = authedProcedure
     }
   });
 
-export const cancelOwnRequest = authedProcedure
+export const cancelRequest = authedProcedure
   .createServerAction()
-  .input(cancelOwnRequestSchema)
+  .input(cancelRequestSchema)
   .handler(async ({ ctx, input }) => {
     const { user } = ctx;
     const { path, requestId, ...rest } = input;
@@ -293,8 +296,19 @@ export const cancelOwnRequest = authedProcedure
           data: {
             ...rest,
           },
-          include: { jobRequest: true },
         });
+
+        if (rest.cancellationReason) {
+          await createNotification({
+            resourceId: `/request/${updatedRequest.id}`,
+            title: `Request Cancelled: ${updatedRequest.title}`,
+            resourceType: "REQUEST",
+            notificationType: "ALERT",
+            message: `Your request for "${updatedRequest.title}" has been cancelled. Please contact support or the relevant authority if you need further assistance.`,
+            userId: user.id,
+            recepientIds: [updatedRequest.userId],
+          });
+        }
 
         await pusher.trigger("request", "request_update", {
           message: "",

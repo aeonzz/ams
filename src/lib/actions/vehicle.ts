@@ -3,17 +3,22 @@
 import { checkAuth } from "../auth/utils";
 
 import { db } from "@/lib/db/index";
-import { GetVehicleSchema } from "../schema";
+import {
+  GetInventorySubItemSchema,
+  GetRequestsSchema,
+  GetVehicleSchema,
+} from "../schema";
 import { authedProcedure, getErrorMessage } from "./utils";
 import { revalidatePath } from "next/cache";
 import { generateId } from "lucia";
-import { type Vehicle } from "prisma/generated/zod";
+import { Request, type Vehicle } from "prisma/generated/zod";
 import {
   createVehicleSchemaWithPath,
   deleteVehiclesSchema,
   extendedUpdateVehicleServerSchema,
   updateVehicleStatusesSchema,
 } from "../schema/vehicle";
+import { formatFullName } from "../utils";
 
 export async function getVehicles(input: GetVehicleSchema) {
   await checkAuth();
@@ -70,6 +75,220 @@ export async function getVehicles(input: GetVehicleSchema) {
     });
 
     return { data: formattedData, pageCount };
+  } catch (err) {
+    console.error(err);
+    return { data: [], pageCount: 0 };
+  }
+}
+
+export async function getRequestByVehicleId(
+  input: GetVehicleSchema & { vehicleId: string }
+) {
+  await checkAuth();
+  const { page, per_page, sort, name, from, title, to, vehicleId } = input;
+
+  try {
+    const skip = (page - 1) * per_page;
+
+    const [column, order] = (sort?.split(".") ?? ["createdAt", "desc"]) as [
+      keyof Vehicle | undefined,
+      "asc" | "desc" | undefined,
+    ];
+
+    const where: any = {
+      vehicleId: vehicleId,
+    };
+
+    if (title) {
+      where.title = { contains: title, mode: "insensitive" };
+    }
+
+    if (from && to) {
+      where.createdAt = {
+        gte: new Date(from),
+        lte: new Date(to),
+      };
+    }
+
+    const [data, total, vehicle] = await db.$transaction([
+      db.transportRequest.findMany({
+        where,
+        take: per_page,
+        skip,
+        orderBy: {
+          [column || "createdAt"]: order || "desc",
+        },
+        include: {
+          request: {
+            include: {
+              user: true,
+              reviewer: true,
+            },
+          },
+          vehicle: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      }),
+      db.transportRequest.count({ where }),
+      db.vehicle.findUnique({
+        where: {
+          id: vehicleId,
+        },
+        select: {
+          name: true,
+        },
+      }),
+    ]);
+    const pageCount = Math.ceil(total / per_page);
+
+    const formattedData = data.map((data) => {
+      const { request, id, createdAt, updatedAt, vehicle, ...rest } = data;
+      return {
+        ...rest,
+        id: request.id,
+        completedAt: request.completedAt,
+        title: request.title,
+        requester: formatFullName(
+          request.user.firstName,
+          request.user.middleName,
+          request.user.lastName
+        ),
+        reviewer: request.reviewer
+          ? formatFullName(
+              request.reviewer.firstName,
+              request.reviewer.middleName,
+              request.reviewer.lastName
+            )
+          : undefined,
+        status: request.status,
+        createdAt: request.createdAt,
+        updatedAt: request.updatedAt,
+        vehicleName: vehicle.name,
+      };
+    });
+
+    return { data: formattedData, pageCount, vehicle };
+  } catch (err) {
+    console.error(err);
+    return { data: [], pageCount: 0 };
+  }
+}
+
+export async function getDepartmentTransportRequests(input: GetRequestsSchema) {
+  await checkAuth();
+  const { page, per_page, sort, from, title, status, to, departmentId } = input;
+
+  try {
+    const skip = (page - 1) * per_page;
+
+    const [column, order] = (sort?.split(".") ?? ["createdAt", "desc"]) as [
+      keyof Request | undefined,
+      "asc" | "desc" | undefined,
+    ];
+
+    const where: any = {
+      request: {
+        departmentId: departmentId,
+      },
+    };
+
+    if (title) {
+      where.title = { contains: title, mode: "insensitive" };
+    }
+
+    if (status) {
+      where.status = status;
+    }
+
+    if (from && to) {
+      where.createdAt = {
+        gte: new Date(from),
+        lte: new Date(to),
+      };
+    }
+
+    const [data, total, department, allRequest] = await db.$transaction([
+      db.transportRequest.findMany({
+        where,
+        take: per_page,
+        skip,
+        orderBy: {
+          [column || "createdAt"]: order || "desc",
+        },
+        include: {
+          request: {
+            include: {
+              user: true,
+              reviewer: true,
+            },
+          },
+          vehicle: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      }),
+      db.transportRequest.count({ where }),
+      db.department.findUnique({
+        where: {
+          id: departmentId,
+        },
+        select: {
+          name: true,
+        },
+      }),
+      db.transportRequest.findMany({
+        where,
+        orderBy: {
+          [column || "createdAt"]: order || "desc",
+        },
+        select: {
+          actualStart: true,
+          request: {
+            select: {
+              id: true,
+              title: true,
+              status: true,
+              createdAt: true,
+              completedAt: true,
+            },
+          },
+        },
+      }),
+    ]);
+    const pageCount = Math.ceil(total / per_page);
+
+    const formattedData = data.map((data) => {
+      const { request, id, createdAt, updatedAt, vehicle, ...rest } = data;
+      return {
+        ...rest,
+        id: request.id,
+        completedAt: request.completedAt,
+        title: request.title,
+        requester: formatFullName(
+          request.user.firstName,
+          request.user.middleName,
+          request.user.lastName
+        ),
+        reviewer: request.reviewer
+          ? formatFullName(
+              request.reviewer.firstName,
+              request.reviewer.middleName,
+              request.reviewer.lastName
+            )
+          : undefined,
+        status: request.status,
+        createdAt: request.createdAt,
+        updatedAt: request.updatedAt,
+        vehicleName: vehicle.name,
+      };
+    });
+
+    return { data: formattedData, pageCount, department, allRequest };
   } catch (err) {
     console.error(err);
     return { data: [], pageCount: 0 };

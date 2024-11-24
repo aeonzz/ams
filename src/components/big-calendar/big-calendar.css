@@ -407,7 +407,7 @@ button.rbc-input::-moz-focus-inner {
 }
 .rbc-timeslot-group {
   border-bottom: 1px solid hsl(var(--border));
-  min-height: 40px;
+  min-height: 100px;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
@@ -439,12 +439,12 @@ button.rbc-input::-moz-focus-inner {
   right: 0;
 }
 .rbc-day-slot .rbc-event {
-  border: 1px solid hsla(var(--primary), 0.9);
+  border: 1px solid hsla(var(--border));
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   max-height: 100%;
-  min-height: 20px;
+  min-height: 60px;
   -webkit-flex-flow: column wrap;
   -ms-flex-flow: column wrap;
   flex-flow: column wrap;
@@ -453,6 +453,8 @@ button.rbc-input::-moz-focus-inner {
   align-items: flex-start;
   overflow: hidden;
   position: absolute;
+  padding: 4px;
+  width: fit-content !important;
 }
 .rbc-day-slot .rbc-event-label {
   -webkit-flex: none;
@@ -472,12 +474,13 @@ button.rbc-input::-moz-focus-inner {
   min-height: 1em;
 }
 .rbc-day-slot .rbc-time-slot {
-  border-top: 1px solid hsla(var(--border), 0.5);
+  border-top: 1px solid hsla(var(--border));
 }
 .rbc-time-slot {
   -webkit-flex: 1 0 0;
   -ms-flex: 1 0 0px;
   flex: 1 0 0;
+  
 }
 .rbc-time-slot.rbc-now {
   font-weight: bold;
@@ -586,10 +589,10 @@ button.rbc-input::-moz-focus-inner {
   border-left: 1px solid hsl(var(--border));
 }
 .rbc-rtl .rbc-time-content > * + * > * {
-  border-left-width: 0;
   border-right: 1px solid hsl(var(--border));
 }
 .rbc-time-content > .rbc-day-slot {
+  border-left-width: 0;
   width: 100%;
   -moz-user-select: none;
   -ms-user-select: none;

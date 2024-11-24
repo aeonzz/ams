@@ -1,4 +1,6 @@
-import { type Table } from "@tanstack/react-table"
+import { type Table } from "@tanstack/react-table";
+import { format } from "date-fns";
+import * as XLSX from "xlsx";
 
 export function exportTableToCSV<TData>(
   /**
@@ -12,28 +14,32 @@ export function exportTableToCSV<TData>(
      * @default "table"
      * @example "tasks"
      */
-    filename?: string
+    filename?: string;
     /**
      * The columns to exclude from the CSV file.
      * @default []
      * @example ["select", "actions"]
      */
-    excludeColumns?: (keyof TData | "select" | "actions")[]
+    excludeColumns?: (keyof TData | "select" | "actions")[];
 
     /**
      * Whether to export only the selected rows.
      * @default false
      */
-    onlySelected?: boolean
+    onlySelected?: boolean;
   } = {}
 ): void {
-  const { filename = "table", excludeColumns = [], onlySelected = false } = opts
+  const {
+    filename = "table",
+    excludeColumns = [],
+    onlySelected = false,
+  } = opts;
 
   // Retrieve headers (column names)
   const headers = table
     .getAllLeafColumns()
     .map((column) => column.id)
-    .filter((id) => !excludeColumns.includes(id as any))
+    .filter((id) => !excludeColumns.includes(id as any));
 
   // Build CSV content
   const csvContent = [
@@ -44,26 +50,90 @@ export function exportTableToCSV<TData>(
     ).map((row) =>
       headers
         .map((header) => {
-          const cellValue = row.getValue(header)
-          // Handle values that might contain commas or newlines
-          return typeof cellValue === "string"
-            ? `"${cellValue.replace(/"/g, '""')}"`
-            : cellValue
+          const cellValue = row.getValue(header);
+          if (cellValue instanceof Date) {
+            return `"${format(cellValue, "PP p")}"`; // Format as 'Nov 11, 2024 4:00 PM'
+          }
+
+          // Handle array values
+          if (Array.isArray(cellValue)) {
+            return `"${cellValue.join(", ")}"`; // Join array values with commas
+          }
+
+          // Handle object values
+          if (typeof cellValue === "object" && cellValue !== null) {
+            return `"${JSON.stringify(cellValue).replace(/"/g, '""')}"`; // Escape quotes
+          }
+
+          // Handle string values
+          if (typeof cellValue === "string") {
+            return `"${cellValue.replace(/"/g, '""')}"`; // Escape quotes in strings
+          }
+
+          // Handle numbers or other primitive values
+          return `"${cellValue ?? ""}"`;
         })
         .join(",")
     ),
-  ].join("\n")
+  ].join("\n");
 
   // Create a Blob with CSV content
-  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
 
   // Create a link and trigger the download
-  const url = URL.createObjectURL(blob)
-  const link = document.createElement("a")
-  link.setAttribute("href", url)
-  link.setAttribute("download", `${filename}.csv`)
-  link.style.visibility = "hidden"
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.setAttribute("href", url);
+  link.setAttribute("download", `${filename}.csv`);
+  link.style.visibility = "hidden";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+export function exportTableToXLSX<TData>(
+  table: Table<TData>,
+  opts: {
+    filename?: string;
+    excludeColumns?: (keyof TData | "select" | "actions")[];
+    onlySelected?: boolean;
+  } = {}
+): void {
+  const {
+    filename = "table",
+    excludeColumns = [],
+    onlySelected = false,
+  } = opts;
+
+  const headers = table
+    .getAllLeafColumns()
+    .map((column) => column.id)
+    .filter((id) => !excludeColumns.includes(id as any));
+
+  const data = [
+    headers,
+    ...(onlySelected
+      ? table.getFilteredSelectedRowModel().rows
+      : table.getRowModel().rows
+    ).map((row) =>
+      headers.map((header) => {
+        const cellValue = row.getValue(header);
+        if (cellValue instanceof Date) {
+          return `${format(cellValue, "PP p")}`;
+        } else if (Array.isArray(cellValue)) {
+          return cellValue.join(", ");
+        } else if (typeof cellValue === "object" && cellValue !== null) {
+          return JSON.stringify(cellValue);
+        } else {
+          return cellValue;
+        }
+      })
+    ),
+  ];
+
+  const ws = XLSX.utils.aoa_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+
+  XLSX.writeFile(wb, `${filename}.xlsx`);
 }

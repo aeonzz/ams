@@ -31,6 +31,8 @@ export const RequestSchema = z.object({
   updatedAt: z.coerce.date(),
   title: z.string(),
   rejectionReason: z.string().nullable(),
+  cancellationReason: z.string().nullable(),
+  onHoldReason: z.string().nullable(),
   userId: z.string(),
   departmentId: z.string(),
   reviewedBy: z.string().nullable(),

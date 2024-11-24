@@ -264,7 +264,7 @@ export default function VenueDateTimePicker<T extends FieldValues>({
                         ))}
                       </div>
                     </div>
-                    {/* {reservationsForSelectedDate.length > 0 && (
+                    {reservationsForSelectedDate.length > 0 && (
                       <div className="w-48 p-3">
                         <P className="mb-2 font-semibold">
                           Reservations for{" "}
@@ -310,7 +310,7 @@ export default function VenueDateTimePicker<T extends FieldValues>({
                           )}
                         </div>
                       </div>
-                    )} */}
+                    )}
                   </div>
                 </div>
               </PopoverContent>

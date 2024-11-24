@@ -26,6 +26,7 @@ export const updateRequestStatusSchema = z.object({
   reviewerId: z.string().optional(),
   status: RequestStatusTypeSchema,
   rejectionReason: z.string().optional(),
+  onHoldReason: z.string().optional(),
 });
 
 export type UpdateRequestStatusSchema = z.infer<
@@ -78,10 +79,11 @@ export type UpdateReworkJobRequestSchema = z.infer<
   typeof updateReworkJobRequestSchema
 >;
 
-export const cancelOwnRequestSchema = z.object({
+export const cancelRequestSchema = z.object({
   requestId: z.string(),
   path: z.string(),
   status: RequestStatusTypeSchema,
+  cancellationReason: z.string().optional(),
 });
 
-export type CancelOwnRequestSchema = z.infer<typeof cancelOwnRequestSchema>;
+export type CancelRequestSchema = z.infer<typeof cancelRequestSchema>;

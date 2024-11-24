@@ -65,6 +65,7 @@ import axios from "axios";
 import JobRequestInputSkeleton from "./job-request-input-skeleton";
 import { ComboboxInput } from "@/components/ui/combobox-input";
 import { Input } from "@/components/ui/input";
+import { useMediaQuery } from "usehooks-ts";
 
 interface JobRequestInputProps {
   mutateAsync: UseMutateAsyncFunction<
@@ -89,6 +90,7 @@ export default function JobRequestInput({
   isFieldsDirty,
 }: JobRequestInputProps) {
   const pathname = usePathname();
+  const isDesktop = useMediaQuery("(min-width: 769px)");
 
   const { data, isLoading } = useQuery<Department[]>({
     queryFn: async () => {
@@ -154,7 +156,12 @@ export default function JobRequestInput({
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="scroll-bar flex max-h-[60vh] gap-6 overflow-y-auto px-4 py-1">
             <div className="flex flex-1 flex-col space-y-2">
-              <div className="flex items-center gap-2 py-1">
+              <div
+                className={cn(
+                  "flex w-full gap-2 py-1",
+                  isDesktop ? "flex-row items-center" : "flex-col"
+                )}
+              >
                 <JobSectionField
                   form={form}
                   name="departmentId"
@@ -180,7 +187,12 @@ export default function JobRequestInput({
                   )}
                 />
               </div>
-              <div className="flex flex-wrap gap-2 py-1">
+              <div
+                className={cn(
+                  "flex gap-2 py-1",
+                  isDesktop ? "flex-row items-center" : "flex-col"
+                )}
+              >
                 <FormField
                   control={form.control}
                   name="dueDate"
@@ -314,7 +326,7 @@ export default function JobRequestInput({
                           maxRows={7}
                           minRows={3}
                           placeholder="Job description..."
-                          className="border-none bg-transparent p-0 shadow-none focus-visible:ring-0"
+                          className="border-none bg-transparent p-0 text-sm shadow-none focus-visible:ring-0"
                           disabled={isUploading || isPending}
                           {...field}
                         />

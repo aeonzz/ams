@@ -42,7 +42,7 @@ export default function TransportRequestActions({
         inProgress: true,
         odometerStart: data.vehicle.odometer,
         actualStart: new Date(),
-        vehicleStatus: "IN_USE"
+        vehicleStatus: "IN_USE",
       }),
       {
         loading: "Loading...",

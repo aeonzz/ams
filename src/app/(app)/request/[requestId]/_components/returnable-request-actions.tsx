@@ -24,18 +24,25 @@ import type { RequestStatusTypeType } from "prisma/generated/zod/inputTypeSchema
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/text-area";
 import { useQueryClient } from "@tanstack/react-query";
+import { PermissionGuard } from "@/components/permission-guard";
+import { useSession } from "@/lib/hooks/use-session";
 
 interface ReturnableRequestActionsProps {
   requestId: string;
   request: ReturnableRequestWithRelations;
+  allowedRoles: string[];
+  allowedDepartment?: string;
 }
 
 export default function ReturnableRequestActions({
   requestId,
   request,
+  allowedRoles,
+  allowedDepartment,
 }: ReturnableRequestActionsProps) {
   const pathname = usePathname();
   const queryClient = useQueryClient();
+  const currentUser = useSession();
   const { mutateAsync, isPending } = useServerActionMutation(
     returnableResourceActions
   );
@@ -70,7 +77,11 @@ export default function ReturnableRequestActions({
   }
 
   return (
-    <>
+    <PermissionGuard
+      allowedRoles={allowedRoles}
+      allowedDepartment={allowedDepartment}
+      currentUser={currentUser}
+    >
       {request.inProgress && request.item.status !== "IN_USE" && (
         <AlertDialog>
           <AlertDialogTrigger asChild>
@@ -139,6 +150,6 @@ export default function ReturnableRequestActions({
           </AlertDialogContent>
         </AlertDialog>
       )}
-    </>
+    </PermissionGuard>
   );
 }

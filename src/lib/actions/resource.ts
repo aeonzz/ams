@@ -62,6 +62,10 @@ export const createReturnableResourceRequest = authedProcedure
                  Now, create a title for the request using the provided details above.`,
       });
 
+      if (!text || text.trim().length === 0) {
+        throw "Something went wrong while generating the request title. Please check your internet connection or try again.";
+      }
+
       const requestId = `REQ-${generateId(3)}`;
       const resourceRequestId = `RRQ-${generateId(3)}`;
 
@@ -150,6 +154,10 @@ export const createSupplyResourceRequest = authedProcedure
                  
                  Now, create a title for the request using the provided details above.`,
       });
+
+      if (!text || text.trim().length === 0) {
+        throw "Something went wrong while generating the request title. Please check your internet connection or try again.";
+      }
 
       const requestId = `REQ-${generateId(3)}`;
       const resourceRequestId = `RRQ-${generateId(3)}`;

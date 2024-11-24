@@ -57,7 +57,6 @@ import { usePathname } from "next/navigation";
 import MultiSelect from "@/components/multi-select";
 import { Textarea } from "@/components/ui/text-area";
 import { useHotkeys } from "react-hotkeys-hook";
-import RejectionReasonCard from "./rejection-reason-card";
 import { AlertCard } from "@/components/ui/alert-card";
 import CommandTooltip from "@/components/ui/command-tooltip";
 import { CommandShortcut } from "@/components/ui/command";
@@ -238,17 +237,21 @@ export default function VenueRequestDetails({
       <div className="space-y-4 pb-10">
         <div className="space-y-1">
           {data.inProgress && (
-            <div>
-              <AlertCard
-                variant="info"
-                title="Ongoing Venue Reservation"
-                description="This venue reservation is currently active. Please ensure that all necessary preparations and arrangements are in place."
-              />
-
-              <Separator className="my-6" />
-            </div>
+            <AlertCard
+              variant="info"
+              title="Ongoing Venue Reservation"
+              description="This venue reservation is currently active. Please ensure that all necessary preparations and arrangements are in place."
+              className="mb-6"
+            />
           )}
-          <RejectionReasonCard rejectionReason={rejectionReason} />
+          {requestStatus === "REJECTED" && rejectionReason && (
+            <AlertCard
+              variant="destructive"
+              title="Request Rejected"
+              description={rejectionReason}
+              className="mb-6"
+            />
+          )}
           <div className="flex h-7 items-center justify-between">
             <H4 className="font-semibold text-muted-foreground">
               Venue Request Details

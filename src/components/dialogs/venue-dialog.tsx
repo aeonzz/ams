@@ -35,7 +35,12 @@ import {
 } from "@/lib/schema/request";
 import { cn } from "@/lib/utils";
 import { useMediaQuery } from "usehooks-ts";
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "../ui/drawer";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { UseMutateAsyncFunction } from "@tanstack/react-query";
 
 export default function VenueDialog() {
@@ -100,6 +105,7 @@ export default function VenueDialog() {
             form={form}
             mutateAsync={mutateAsync}
             handleOpenChange={handleOpenChange}
+            isDesktop={isDesktop}
           >
             <DialogHeader>
               <DialogTitle>Venue Request</DialogTitle>
@@ -111,11 +117,11 @@ export default function VenueDialog() {
   }
 
   return (
-    <Drawer
+    <Sheet
       open={dialogManager.activeDialog === "venueDialog"}
       onOpenChange={handleOpenChange}
     >
-      <DrawerContent
+      <SheetContent
         onInteractOutside={(e) => {
           if (isPending) {
             e.preventDefault();
@@ -125,6 +131,9 @@ export default function VenueDialog() {
             setAlertOpen(true);
           }
         }}
+        className="rounded-t-[10px]"
+        side="bottom"
+        hideClose
       >
         <Component
           alertOpen={alertOpen}
@@ -135,13 +144,14 @@ export default function VenueDialog() {
           form={form}
           mutateAsync={mutateAsync}
           handleOpenChange={handleOpenChange}
+          isDesktop={isDesktop}
         >
-          <DrawerHeader>
-            <DrawerTitle>Venue Request</DrawerTitle>
-          </DrawerHeader>
+          <SheetHeader>
+            <SheetTitle>Venue Request</SheetTitle>
+          </SheetHeader>
         </Component>
-      </DrawerContent>
-    </Drawer>
+      </SheetContent>
+    </Sheet>
   );
 }
 
@@ -155,6 +165,7 @@ function Component({
   form,
   mutateAsync,
   handleOpenChange,
+  isDesktop,
 }: {
   children: React.ReactNode;
   alertOpen: boolean;
@@ -170,11 +181,12 @@ function Component({
     unknown
   >;
   handleOpenChange: (open: boolean) => void;
+  isDesktop: boolean;
 }) {
   return (
     <>
       <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
-        {isFieldsDirty && !isPending && (
+        {isDesktop && isFieldsDirty && !isPending && (
           <AlertDialogTrigger disabled={isPending} asChild>
             <button
               disabled={isPending}
@@ -184,7 +196,9 @@ function Component({
             </button>
           </AlertDialogTrigger>
         )}
-        <AlertDialogContent>
+        <AlertDialogContent
+          className={cn(!isDesktop && "max-w-[calc(100vw_-_20px)]")}
+        >
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
