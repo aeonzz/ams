@@ -28,7 +28,7 @@ import { CommandShortcut } from "@/components/ui/command";
 import { P } from "@/components/typography/text";
 import { usePathname } from "next/navigation";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
-import { TransportRequest } from "../../../_components/types";
+import { TransportRequest } from "../../../../_components/types";
 
 interface VehicleLogsTableFloatingBarProps {
   table: Table<TransportRequest>;

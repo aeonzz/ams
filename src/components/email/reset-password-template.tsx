@@ -40,7 +40,7 @@ export const ResetPasswordTemplate = ({
           Hello {email},
         </Text>
         <Text style={text}>
-          We received a request to reset the password for AMS your account. If you didn't make this request, you can safely ignore this email.
+          We received a request to reset the password for AMS your account. If you didn&apos;t make this request, you can safely ignore this email.
         </Text>
         <Section style={buttonContainer}>
           <Button
@@ -55,7 +55,7 @@ export const ResetPasswordTemplate = ({
         </Text>
         <Hr style={hr} />
         <Text style={footer}>
-          If you're having trouble clicking the "Reset Password" button, copy and paste the following URL into your web browser:
+          If you&apos;re having trouble clicking the &quot;Reset Password&quot; button, copy and paste the following URL into your web browser:
         </Text>
         <Link
           href={`http://localhost:3000/sign-in/reset-password?token=${resetPasswordToken}`}
@@ -64,7 +64,7 @@ export const ResetPasswordTemplate = ({
           {`http://localhost:3000/sign-in/reset-password?token=${resetPasswordToken}`}
         </Link>
         <Text style={footer}>
-          If you didn't request a password reset, please ignore this email or <Link href="mailto:support@sync.com" style={link}>contact support</Link> if you have questions.
+          If you didn&apos;t request a password reset, please ignore this email or <Link href="mailto:support@sync.com" style={link}>contact support</Link> if you have questions.
         </Text>
       </Container>
     </Body>

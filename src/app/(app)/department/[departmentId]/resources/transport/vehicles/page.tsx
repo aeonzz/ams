@@ -13,7 +13,7 @@ export default function DepartmentVehiclePage({
 }: DepartmentVehiclePage) {
   return (
     <ContentLayout title="Vehicles">
-      <DepartmentLayout departmentId={params.departmentId} name="Vehicles">
+      <DepartmentLayout departmentId={params.departmentId} name="Vehicles" withBackButton>
         <DepartmentVehicleScreen departmentId={params.departmentId} />
       </DepartmentLayout>
     </ContentLayout>
