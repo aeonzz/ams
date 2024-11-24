@@ -10,17 +10,23 @@ import { useDataTable } from "@/lib/hooks/use-data-table";
 import { type DataTableFilterField } from "@/lib/types";
 import { getDepartmentTransportRequests } from "@/lib/actions/vehicle";
 import { TransportRequest } from "./types";
-import { VehicleLogsTableFloatingBar } from "../[vehicleId]/logs/_components/vehicle-logs-table-floating-bar";
-import { VehicleLogsTableToolbarActions } from "../[vehicleId]/logs/_components/vehicle-logs-table-toolbar-actions";
+import { VehicleLogsTableFloatingBar } from "../vehicles/[vehicleId]/logs/_components/vehicle-logs-table-floating-bar";
+import { VehicleLogsTableToolbarActions } from "../vehicles/[vehicleId]/logs/_components/vehicle-logs-table-toolbar-actions";
 import { getTransportRequestColumns } from "./transport-request-table-columns";
 import TranpsortRequestCalendar from "./transport-request-calendar";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button";
+import { P } from "@/components/typography/text";
 
 interface TransportRequestTableProps {
   transportRequestPromise: ReturnType<typeof getDepartmentTransportRequests>;
+  departmentId: string;
 }
 
 export function TransportRequestTable({
   transportRequestPromise,
+  departmentId,
 }: TransportRequestTableProps) {
   const { data, pageCount, department, allRequest } = React.use(
     transportRequestPromise
@@ -75,7 +81,17 @@ export function TransportRequestTable({
             <VehicleLogsTableToolbarActions
               table={table}
               fileName={`${department?.name} Transport Requests`}
-            />
+            >
+              <Link
+                prefetch
+                className={cn(
+                  buttonVariants({ variant: "secondary", size: "sm" })
+                )}
+                href={`/department/${departmentId}/resources/transport/vehicles`}
+              >
+                <P>Vehicles</P>
+              </Link>
+            </VehicleLogsTableToolbarActions>
           </DataTableToolbar>
         </DataTable>
       </div>

@@ -27,14 +27,6 @@ export default function VehicleMaintenanceScreen({
   return (
     <div className="flex h-full w-full">
       <div className="flex-1">
-        <div className="flex h-[50px] items-center justify-between border-b px-3">
-          <div className="flex items-center gap-1">
-            <BackButton />
-            <P className="font-medium">Vehicle Request History</P>
-          </div>
-          <P className="font-medium">Vehicle Maintenance History</P>
-          <SearchInput />
-        </div>
         <div className="grid min-h-[calc(100vh_-_100px)] place-items-center items-center py-3">
           <React.Suspense
             fallback={

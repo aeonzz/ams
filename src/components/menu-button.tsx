@@ -26,7 +26,6 @@ export default function MenuButton({
   href,
 }: MenuButtonProps) {
   const currentUser = useSession();
-
   const { unreadCount } = useUserNotifications(currentUser.id);
 
   const hasUnreadNotifications = unreadCount > 0;

@@ -18,7 +18,7 @@ export default function DepartmentTransportPage({
   const search = requestSearchParamsSchema.parse(searchParams);
   return (
     <ContentLayout title="Transport">
-      <DepartmentLayout departmentId={params.departmentId} name="Transport">
+      <DepartmentLayout departmentId={params.departmentId} name="Transport" withBackButton>
         <DepartmentTransportScreen departmentId={params.departmentId} searchParams={search} />
       </DepartmentLayout>
     </ContentLayout>

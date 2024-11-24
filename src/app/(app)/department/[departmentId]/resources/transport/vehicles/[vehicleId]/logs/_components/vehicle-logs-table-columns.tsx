@@ -18,7 +18,7 @@ import Link from "next/link";
 import { Dot } from "lucide-react";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
-import { TransportRequest } from "../../../_components/types";
+import { TransportRequest } from "../../../../_components/types";
 import { babelIncludeRegexes } from "next/dist/build/webpack-config";
 
 export function getVehicleLogsColumns(): ColumnDef<TransportRequest>[] {

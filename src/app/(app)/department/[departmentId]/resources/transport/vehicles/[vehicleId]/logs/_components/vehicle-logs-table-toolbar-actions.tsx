@@ -15,20 +15,23 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { TransportRequest } from "../../../_components/types";
+import { TransportRequest } from "../../../../_components/types";
 import { ChevronDownIcon } from "lucide-react";
 
 interface VehicleLogsTableToolbarActionsProps {
   table: Table<TransportRequest>;
   fileName: string;
+  children?: React.ReactNode
 }
 
 export function VehicleLogsTableToolbarActions({
   table,
   fileName,
+  children
 }: VehicleLogsTableToolbarActionsProps) {
   return (
     <div className="flex items-center gap-2">
+      {children}
       <React.Suspense fallback={<Skeleton className="h-7 w-52" />}>
         <DateRangePicker
           triggerVariant="secondary"

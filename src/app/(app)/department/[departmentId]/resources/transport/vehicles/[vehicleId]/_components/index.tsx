@@ -107,13 +107,6 @@ export default function ManageVehicleScreen({
 
   return (
     <div className="flex h-full w-full flex-col">
-      <div className="flex h-[50px] items-center justify-between border-b px-3">
-        <div className="flex items-center gap-1">
-          <BackButton />
-          <H5 className="truncate font-semibold">{data.name}</H5>
-        </div>
-        <SearchInput />
-      </div>
       <div className="scroll-bar container h-full overflow-y-auto p-0">
         {data.requiresMaintenance && (
           <div>
@@ -215,7 +208,7 @@ export default function ManageVehicleScreen({
                           Edit
                         </Button>
                         <Link
-                          href={`/department/${departmentId}/resources/transport/${vehicleId}/maintenance?page=1&per_page=10&sort=createdAt.desc`}
+                          href={`/department/${departmentId}/resources/transport/vehicles/${vehicleId}/maintenance?page=1&per_page=10&sort=createdAt.desc`}
                           prefetch
                           className={cn(
                             "flex-1 text-sm",
@@ -306,7 +299,7 @@ export default function ManageVehicleScreen({
           <div className="flex-1">
             <VehicleRequestsTable
               requests={formattedRequests}
-              logsUrl={`/department/${departmentId}/resources/transport/${vehicleId}/logs?page=1&per_page=10&sort=createdAt.desc`}
+              logsUrl={`/department/${departmentId}/resources/transport/vehicles/${vehicleId}/logs?page=1&per_page=10&sort=createdAt.desc`}
             />
           </div>
         </div>

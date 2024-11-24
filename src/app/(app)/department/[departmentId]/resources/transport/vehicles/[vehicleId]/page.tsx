@@ -1,5 +1,6 @@
 import ContentLayout from "@/components/layouts/content-layout";
 import ManageVehicleScreen from "./_components";
+import DepartmentLayout from "../../../../_components/department-layout";
 
 export interface ManageVehiclePage {
   params: {
@@ -11,7 +12,13 @@ export interface ManageVehiclePage {
 export default function ManageVehiclePage({ params }: ManageVehiclePage) {
   return (
     <ContentLayout title="Vehicle">
-      <ManageVehicleScreen params={params} />
+      <DepartmentLayout
+        departmentId={params.departmentId}
+        name="Vehicle Details"
+        withBackButton
+      >
+        <ManageVehicleScreen params={params} />
+      </DepartmentLayout>
     </ContentLayout>
   );
 }

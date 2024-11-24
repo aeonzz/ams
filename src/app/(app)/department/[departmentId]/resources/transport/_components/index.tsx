@@ -32,6 +32,7 @@ export default function DepartmentTransportScreen({
     >
       <TransportRequestTable
         transportRequestPromise={transportRequestPromise}
+        departmentId={departmentId}
       />
     </React.Suspense>
   );

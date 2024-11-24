@@ -4,7 +4,7 @@ import { generateId } from "lucia";
 import { authedProcedure, getErrorMessage } from "./utils";
 import { db } from "@/lib/db/index";
 import { revalidatePath } from "next/cache";
-import { createMaintenanceRecordSchemaWithPath } from "@/app/(app)/department/[departmentId]/resources/transport/[vehicleId]/_components/schema";
+import { createMaintenanceRecordSchemaWithPath } from "@/app/(app)/department/[departmentId]/resources/transport/vehicles/[vehicleId]/_components/schema";
 import { GetVehicleMaintenanceHistory } from "../schema";
 import type { MaintenanceHistory } from "prisma/generated/zod";
 import { checkAuth } from "../auth/utils";
