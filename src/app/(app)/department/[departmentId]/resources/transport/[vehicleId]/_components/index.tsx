@@ -36,6 +36,7 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import MaintenanceDialog from "./maintenance-dialog";
 import Link from "next/link";
+import BackButton from "@/components/back-button";
 
 interface ManageVehicleScreenProps {
   params: {
@@ -108,14 +109,7 @@ export default function ManageVehicleScreen({
     <div className="flex h-full w-full flex-col">
       <div className="flex h-[50px] items-center justify-between border-b px-3">
         <div className="flex items-center gap-1">
-          <Button
-            variant="ghost2"
-            size="icon"
-            className="size-7"
-            onClick={() => router.back()}
-          >
-            <ChevronLeft className="size-4" />
-          </Button>
+          <BackButton />
           <H5 className="truncate font-semibold">{data.name}</H5>
         </div>
         <SearchInput />
@@ -221,7 +215,7 @@ export default function ManageVehicleScreen({
                           Edit
                         </Button>
                         <Link
-                          href={``}
+                          href={`/department/${departmentId}/resources/transport/${vehicleId}/maintenance?page=1&per_page=10&sort=createdAt.desc`}
                           prefetch
                           className={cn(
                             "flex-1 text-sm",

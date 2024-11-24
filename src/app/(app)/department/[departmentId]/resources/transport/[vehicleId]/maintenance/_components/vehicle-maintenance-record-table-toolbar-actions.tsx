@@ -15,18 +15,18 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { TransportRequest } from "../../../_components/types";
 import { ChevronDownIcon } from "lucide-react";
+import type { MaintenanceHistory } from "prisma/generated/zod";
 
-interface VehicleLogsTableToolbarActionsProps {
-  table: Table<TransportRequest>;
+interface VehicleMaintenanceRecordTableToolbarActionsProps {
+  table: Table<MaintenanceHistory>;
   fileName: string;
 }
 
-export function VehicleLogsTableToolbarActions({
+export function VehicleMaintenanceRecordTableToolbarActions({
   table,
   fileName,
-}: VehicleLogsTableToolbarActionsProps) {
+}: VehicleMaintenanceRecordTableToolbarActionsProps) {
   return (
     <div className="flex items-center gap-2">
       <React.Suspense fallback={<Skeleton className="h-7 w-52" />}>

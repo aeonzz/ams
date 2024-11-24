@@ -51,8 +51,6 @@ export default function DepartmentJobRequestsScreen({
     );
   }
 
-  console.log(data);
-
   const formattedData = data.map((request) => ({
     id: request.requestId,
     title: request.request.title,

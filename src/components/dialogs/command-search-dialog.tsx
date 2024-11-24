@@ -13,7 +13,6 @@ import {
   UserRound,
 } from "lucide-react";
 
-import { useSidebarToggle } from "@/lib/hooks/use-sidebar-toggle";
 import {
   CommandDialog,
   CommandEmpty,
@@ -29,6 +28,8 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import { cn } from "@/lib/utils";
 import { useMediaQuery } from "usehooks-ts";
+import { useStore } from "@/lib/hooks/use-store";
+import { useSidebar } from "@/lib/hooks/use-sidebar";
 
 const NavigationLinks = [
   { name: "Go to notifications", href: "/notification" },
@@ -45,8 +46,9 @@ interface CommandSearchDialogProps {
 export default function CommandSearchDialog({
   children,
 }: CommandSearchDialogProps) {
+  const sidebar = useStore(useSidebar, (x) => x);
+
   const dialogManager = useDialogManager();
-  const sidebar = useSidebarToggle();
   const isDesktop = useMediaQuery("(min-width: 769px)");
   const router = useRouter();
 
@@ -77,6 +79,8 @@ export default function CommandSearchDialog({
     dialogManager.setActiveDialog(null);
     router.push(href);
   };
+
+  if (!sidebar) return null;
 
   return (
     <>
@@ -137,7 +141,7 @@ export default function CommandSearchDialog({
             <CommandItem
               onSelect={() => {
                 dialogManager.setActiveDialog(null);
-                sidebar.setIsOpen();
+                sidebar.toggleOpen();
               }}
             >
               <PanelRight className="mr-2 h-4 w-4" />

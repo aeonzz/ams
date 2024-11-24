@@ -7,12 +7,12 @@ import { DataTable } from "@/components/data-table/data-table";
 import { DataTableToolbar } from "@/components/data-table/data-table-toolbar";
 
 import { useDataTable } from "@/lib/hooks/use-data-table";
-import { type DataTableFilterField } from "@/lib/types";
-import { getVehicleLogsColumns } from "./vehicle-logs-table-columns";
-import { VehicleLogsTableFloatingBar } from "./vehicle-logs-table-floating-bar";
-import { VehicleLogsTableToolbarActions } from "./vehicle-logs-table-toolbar-actions";
 import { getVehicleMaintenanceRecord } from "@/lib/actions/maintenance-history";
-import type { MaintenanceHistory } from "prisma/generated/zod";
+import { getMaintenanceRecordColumns } from "./vehicle-maintenance-record-table-columns";
+import { VehicleMaintenanceRecordTableFloatingBar } from "./vehicle-maintenance-record-table-floating-bar";
+import { MaintenanceHistory } from "prisma/generated/zod";
+import { DataTableFilterField } from "@/lib/types";
+import { VehicleMaintenanceRecordTableToolbarActions } from "./vehicle-maintenance-record-table-toolbar-actions";
 
 interface VehicleMaintenanceRecordTableProps {
   vehicleMaintenancePromise: ReturnType<typeof getVehicleMaintenanceRecord>;
@@ -23,20 +23,21 @@ export function VehicleMaintenanceRecordTable({
 }: VehicleMaintenanceRecordTableProps) {
   const { data, pageCount, vehicle } = React.use(vehicleMaintenancePromise);
 
-  const columns = React.useMemo(() => getVehicleLogsColumns(), []);
+  const columns = React.useMemo(() => getMaintenanceRecordColumns(), []);
 
-//   const filterFields: DataTableFilterField<MaintenanceHistory>[] = [
-//     {
-//       label: "Name",
-//       value: "title",
-//       placeholder: "Filter title...",
-//     },
-//   ];
+  const filterFields: DataTableFilterField<MaintenanceHistory>[] = [
+    {
+      label: "Description",
+      value: "description",
+      placeholder: "Filter description...",
+    },
+  ];
 
   const { table } = useDataTable({
     data,
     columns,
     pageCount,
+    filterFields,
     initialState: {
       sorting: [{ id: "createdAt", desc: true }],
       columnPinning: { right: ["actions"] },
@@ -48,16 +49,16 @@ export function VehicleMaintenanceRecordTable({
     <DataTable
       table={table}
       floatingBar={
-        <VehicleLogsTableFloatingBar
+        <VehicleMaintenanceRecordTableFloatingBar
           table={table}
-          fileName={`${vehicle?.name} - Requests`}
+          fileName={`${vehicle?.name} - Maintenance_Logs`}
         />
       }
     >
       <DataTableToolbar table={table} filterFields={filterFields}>
-        <VehicleLogsTableToolbarActions
+        <VehicleMaintenanceRecordTableToolbarActions
           table={table}
-          fileName={`${vehicle?.name} - Requests`}
+          fileName={`${vehicle?.name} - Maintenance_Logs`}
         />
       </DataTableToolbar>
     </DataTable>

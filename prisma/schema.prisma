@@ -151,26 +151,28 @@ model Notification {
 }
 
 model Request {
-  id                String             @id
-  completedAt       DateTime?
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
-  priority          PriorityType
-  type              RequestType
-  title             String
-  rejectionReason   String?
-  status            RequestStatusType  @default(PENDING)
-  userId            String
-  user              User               @relation(name: "UserRelation", fields: [userId], references: [id], onDelete: Cascade)
-  departmentId      String
-  department        Department         @relation("DepartmentToRequest", fields: [departmentId], references: [id], onDelete: Cascade)
-  reviewedBy        String?
-  reviewer          User?              @relation(name: "ReviewerRelation", fields: [reviewedBy], references: [id])
-  jobRequest        JobRequest?
-  venueRequest      VenueRequest?
-  returnableRequest ReturnableRequest?
-  supplyRequest     SupplyRequest?
-  transportRequest  TransportRequest?
+  id                 String             @id
+  completedAt        DateTime?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  priority           PriorityType
+  type               RequestType
+  title              String
+  rejectionReason    String?
+  cancellationReason String?
+  onHoldReason       String?
+  status             RequestStatusType  @default(PENDING)
+  userId             String
+  user               User               @relation(name: "UserRelation", fields: [userId], references: [id], onDelete: Cascade)
+  departmentId       String
+  department         Department         @relation("DepartmentToRequest", fields: [departmentId], references: [id], onDelete: Cascade)
+  reviewedBy         String?
+  reviewer           User?              @relation(name: "ReviewerRelation", fields: [reviewedBy], references: [id])
+  jobRequest         JobRequest?
+  venueRequest       VenueRequest?
+  returnableRequest  ReturnableRequest?
+  supplyRequest      SupplyRequest?
+  transportRequest   TransportRequest?
 }
 
 model JobRequest {
@@ -422,7 +424,7 @@ model MaintenanceHistory {
   id          String   @id
   vehicleId   String
   vehicle     Vehicle  @relation(fields: [vehicleId], references: [id])
-  performedAt DateTime 
+  performedAt DateTime
   odometer    Float
   description String?
   createdAt   DateTime @default(now())
@@ -572,4 +574,5 @@ enum RequestStatusType {
   COMPLETED
   REJECTED
   CANCELLED
+  ON_HOLD
 }

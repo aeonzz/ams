@@ -7,7 +7,7 @@ import SettingsDialog from "@/components/dialogs/settings-dialog";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "My requests",
+  title: "Job requests",
 };
 
 export default function CommandLayout({

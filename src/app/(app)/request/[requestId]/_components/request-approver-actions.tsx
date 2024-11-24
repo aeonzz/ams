@@ -68,7 +68,7 @@ export default function RequestApproverActions({
         onClick={() => handleReview("APPROVED")}
         className="flex-1"
       >
-        Finalize Approval
+        Approve
       </Button>
     </div>
   );

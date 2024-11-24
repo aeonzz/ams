@@ -6,6 +6,7 @@ import { DataTableSkeleton } from "@/components/data-table/data-table-skeleton";
 import { getVehicleMaintenanceRecord } from "@/lib/actions/maintenance-history";
 import SearchInput from "@/app/(app)/_components/search-input";
 import { VehicleMaintenanceRecordTable } from "./vehicle-maintenance-record-table";
+import BackButton from "@/components/back-button";
 
 interface VehicleMaintenanceScreenProps {
   params: {
@@ -27,6 +28,10 @@ export default function VehicleMaintenanceScreen({
     <div className="flex h-full w-full">
       <div className="flex-1">
         <div className="flex h-[50px] items-center justify-between border-b px-3">
+          <div className="flex items-center gap-1">
+            <BackButton />
+            <P className="font-medium">Vehicle Request History</P>
+          </div>
           <P className="font-medium">Vehicle Maintenance History</P>
           <SearchInput />
         </div>
@@ -42,7 +47,9 @@ export default function VehicleMaintenanceScreen({
               />
             }
           >
-            <VehicleMaintenanceRecordTable vehicleMaintenancePromise={vehicleMaintenancePromise} />
+            <VehicleMaintenanceRecordTable
+              vehicleMaintenancePromise={vehicleMaintenancePromise}
+            />
           </React.Suspense>
         </div>
       </div>

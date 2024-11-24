@@ -34,7 +34,6 @@ const cohere = createCohere({
 
 export async function getRequests(input: GetRequestsSchema) {
   await checkAuth();
-  const user = await currentUser();
   const {
     page,
     per_page,
@@ -260,6 +259,9 @@ export const createTransportRequest = authedProcedure
         where: {
           vehicleId: rest.vehicleId,
           dateAndTimeNeeded: rest.dateAndTimeNeeded,
+          request: {
+            status: "APPROVED",
+          },
         },
       });
 
@@ -620,7 +622,8 @@ export async function getCancelledRequests(input: GetRequestsSchema) {
 export const updateTransportRequest = authedProcedure
   .createServerAction()
   .input(updateTransportRequestSchemaWithPath)
-  .handler(async ({ input }) => {
+  .handler(async ({ ctx, input }) => {
+    const { user } = ctx;
     const { path, id, vehicleStatus, vehicleId, ...rest } = input;
     try {
       const result = await db.transportRequest.update({
@@ -635,7 +638,28 @@ export const updateTransportRequest = authedProcedure
           },
           ...rest,
         },
+        select: {
+          request: {
+            select: {
+              userId: true,
+              title: true,
+            },
+          },
+          requestId: true,
+        },
       });
+
+      if (rest.inProgress !== undefined && rest.inProgress) {
+        await createNotification({
+          resourceId: `/request/${result.requestId}`,
+          title: `Transport Request Started: ${result.requestId}`,
+          resourceType: "REQUEST",
+          notificationType: "INFO",
+          message: `Your request for "${result.request.title}" has started. Please ensure that everything is prepared and proceed as scheduled.`,
+          userId: user.id,
+          recepientIds: [result.request.userId],
+        });
+      }
 
       await pusher.trigger("request", "request_update", {
         message: "",
@@ -913,7 +937,7 @@ export const completeTransportRequest = authedProcedure
               dateAndTimeNeeded: { gte: new Date() }, // Filter for future requests
               request: {
                 status: {
-                  in: ["APPROVED", "REVIEWED"], 
+                  in: ["APPROVED", "REVIEWED"],
                 },
               },
             },

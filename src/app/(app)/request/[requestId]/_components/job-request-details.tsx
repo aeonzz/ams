@@ -99,7 +99,7 @@ import {
 } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { Textarea } from "@/components/ui/text-area";
-import RejectionReasonCard from "./rejection-reason-card";
+import { AlertCard } from "@/components/ui/alert-card";
 
 interface JobRequestDetailsProps {
   data: JobRequestWithRelations;
@@ -295,7 +295,14 @@ export default function JobRequestDetails({
     <div className="pb-10">
       <div className="space-y-4">
         <div className="">
-          <RejectionReasonCard rejectionReason={rejectionReason} />
+          {requestStatus === "REJECTED" && rejectionReason && (
+            <AlertCard
+              variant="destructive"
+              title="Request Rejected"
+              description={rejectionReason}
+              className="mb-6"
+            />
+          )}
           <div className="flex h-7 items-center justify-between">
             <H4 className="font-semibold text-muted-foreground">
               Job Request Details

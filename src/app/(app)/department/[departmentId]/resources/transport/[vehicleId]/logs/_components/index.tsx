@@ -6,6 +6,7 @@ import { DataTableSkeleton } from "@/components/data-table/data-table-skeleton";
 import { getRequestByVehicleId } from "@/lib/actions/vehicle";
 import { VehicleLogsTable } from "./vehicle-logs-table";
 import SearchInput from "@/app/(app)/_components/search-input";
+import BackButton from "@/components/back-button";
 
 interface VehicleLogsScreenProps {
   params: {
@@ -27,7 +28,10 @@ export default function VehicleLogsScreen({
     <div className="flex h-full w-full">
       <div className="flex-1">
         <div className="flex h-[50px] items-center justify-between border-b px-3">
-          <P className="font-medium">Vehicle Request History</P>
+          <div className="flex items-center gap-1">
+            <BackButton />
+            <P className="font-medium">Vehicle Request History</P>
+          </div>
           <SearchInput />
         </div>
         <div className="grid min-h-[calc(100vh_-_100px)] place-items-center items-center py-3">

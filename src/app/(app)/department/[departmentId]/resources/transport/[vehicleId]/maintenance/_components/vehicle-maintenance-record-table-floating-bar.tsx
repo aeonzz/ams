@@ -28,17 +28,17 @@ import { CommandShortcut } from "@/components/ui/command";
 import { P } from "@/components/typography/text";
 import { usePathname } from "next/navigation";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
-import { TransportRequest } from "../../../_components/types";
+import type { MaintenanceHistory } from "prisma/generated/zod";
 
-interface VehicleLogsTableFloatingBarProps {
-  table: Table<TransportRequest>;
+interface VehicleMaintenanceRecordTableFloatingBarProps {
+  table: Table<MaintenanceHistory>;
   fileName: string;
 }
 
-export function VehicleLogsTableFloatingBar({
+export function VehicleMaintenanceRecordTableFloatingBar({
   table,
   fileName,
-}: VehicleLogsTableFloatingBarProps) {
+}: VehicleMaintenanceRecordTableFloatingBarProps) {
   const rows = table.getFilteredSelectedRowModel().rows;
   const pathname = usePathname();
 

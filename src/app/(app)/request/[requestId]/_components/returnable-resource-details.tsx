@@ -47,7 +47,6 @@ import { ReservedReturnableItemDateAndTime } from "@/lib/schema/utils";
 import axios from "axios";
 import { Textarea } from "@/components/ui/text-area";
 import { Input } from "@/components/ui/input";
-import RejectionReasonCard from "./rejection-reason-card";
 import { AlertCard } from "@/components/ui/alert-card";
 
 interface ReturnableResourceDetailsProps {
@@ -174,36 +173,37 @@ export default function ReturnableResourceDetails({
       <div className="space-y-4 pb-10">
         <div className="space-y-1">
           {data.inProgress && data.item.status !== "IN_USE" && (
-            <div>
-              <AlertCard
-                variant="success"
-                title="Ready for Pickup"
-                description="The item is now ready to be picked up."
-              />
-              <Separator className="my-6" />
-            </div>
+            <AlertCard
+              variant="success"
+              title="Ready for Pickup"
+              description="The item is now ready to be picked up."
+              className="mb-6"
+            />
           )}
           {data.inProgress && data.isOverdue && (
-            <div>
-              <AlertCard
-                variant="warning"
-                title="Request Overdue"
-                description="This request is overdue. The item has not been returned yet. Please return it as soon as possible."
-              />
-              <Separator className="my-6" />
-            </div>
+            <AlertCard
+              variant="warning"
+              title="Request Overdue"
+              description="This request is overdue. The item has not been returned yet. Please return it as soon as possible."
+              className="mb-6"
+            />
           )}
           {data.isOverdue && (
-            <div>
-              <AlertCard
-                variant="warning"
-                title="Request Overdue"
-                description="This request is overdue."
-              />
-              <Separator className="my-6" />
-            </div>
+            <AlertCard
+              variant="warning"
+              title="Request Overdue"
+              description="This request is overdue."
+              className="mb-6"
+            />
           )}
-          <RejectionReasonCard rejectionReason={rejectionReason} />
+          {requestStatus === "REJECTED" && rejectionReason && (
+            <AlertCard
+              variant="destructive"
+              title="Request Rejected"
+              description={rejectionReason}
+              className="mb-6"
+            />
+          )}
           <H4 className="font-semibold text-muted-foreground">
             Borrow Request Details
           </H4>

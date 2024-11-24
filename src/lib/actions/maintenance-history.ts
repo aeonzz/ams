@@ -13,7 +13,7 @@ export async function getVehicleMaintenanceRecord(
   input: GetVehicleMaintenanceHistory & { vehicleId: string }
 ) {
   await checkAuth();
-  const { page, per_page, sort, from, to, vehicleId } = input;
+  const { page, per_page, sort, from, to, description, vehicleId } = input;
 
   try {
     const skip = (page - 1) * per_page;
@@ -26,6 +26,10 @@ export async function getVehicleMaintenanceRecord(
     const where: any = {
       vehicleId: vehicleId,
     };
+
+    if (description) {
+      where.description = { contains: description, mode: "insensitive" };
+    }
 
     if (from && to) {
       where.createdAt = {

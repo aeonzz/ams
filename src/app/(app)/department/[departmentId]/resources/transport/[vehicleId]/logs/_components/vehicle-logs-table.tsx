@@ -10,7 +10,7 @@ import { useDataTable } from "@/lib/hooks/use-data-table";
 import { type DataTableFilterField } from "@/lib/types";
 import { getRequestByVehicleId } from "@/lib/actions/vehicle";
 import { getVehicleLogsColumns } from "./vehicle-logs-table-columns";
-import { VehicleRequests } from "./types";
+import { TransportRequest } from "../../../_components/types";
 import { VehicleLogsTableFloatingBar } from "./vehicle-logs-table-floating-bar";
 import { VehicleLogsTableToolbarActions } from "./vehicle-logs-table-toolbar-actions";
 
@@ -25,9 +25,9 @@ export function VehicleLogsTable({
 
   const columns = React.useMemo(() => getVehicleLogsColumns(), []);
 
-  const filterFields: DataTableFilterField<VehicleRequests>[] = [
+  const filterFields: DataTableFilterField<TransportRequest>[] = [
     {
-      label: "Name",
+      label: "Title",
       value: "title",
       placeholder: "Filter title...",
     },

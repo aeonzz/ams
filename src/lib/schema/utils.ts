@@ -33,6 +33,7 @@ export const reservedTransportDateAndTime = z.object({
     user: UserSchema,
     transportRequest: z.object({
       vehicle: VehicleSchema,
+      inProgress: z.boolean(),
     }),
   }),
 });

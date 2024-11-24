@@ -18,10 +18,9 @@ import Link from "next/link";
 import { Dot } from "lucide-react";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
-import { TransportRequest } from "../../../_components/types";
-import { babelIncludeRegexes } from "next/dist/build/webpack-config";
+import { TransportRequest } from "./types";
 
-export function getVehicleLogsColumns(): ColumnDef<TransportRequest>[] {
+export function getTransportRequestColumns(): ColumnDef<TransportRequest>[] {
   return [
     {
       id: "select",
@@ -101,6 +100,19 @@ export function getVehicleLogsColumns(): ColumnDef<TransportRequest>[] {
       },
     },
     {
+      accessorKey: "vehicleName",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Vehicle" />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="flex space-x-2">
+            <P className="truncate font-medium">{row.original.vehicleName}</P>
+          </div>
+        );
+      },
+    },
+    {
       accessorKey: "status",
       header: ({ column }) => (
         <div className="flex justify-center px-2">
@@ -174,7 +186,11 @@ export function getVehicleLogsColumns(): ColumnDef<TransportRequest>[] {
         return (
           <div className="flex w-[20vw] flex-wrap gap-1">
             {row.original.passengersName.map((p, index) => (
-              <Badge key={index} variant="outline" className="truncate font-medium">
+              <Badge
+                key={index}
+                variant="outline"
+                className="truncate font-medium"
+              >
                 {p}
               </Badge>
             ))}
