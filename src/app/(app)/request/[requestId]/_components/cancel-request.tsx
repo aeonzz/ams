@@ -35,11 +35,13 @@ import type { RequestStatusTypeType } from "prisma/generated/zod/inputTypeSchema
 interface CancelRequestProps {
   requestStatus: RequestStatusTypeType;
   requestId: string;
+  inProgress?: boolean;
 }
 
 export default function CancelRequest({
   requestStatus,
   requestId,
+  inProgress = false,
 }: CancelRequestProps) {
   const pathname = usePathname();
   const queryClient = useQueryClient();
@@ -83,7 +85,7 @@ export default function CancelRequest({
 
   if (
     !["PENDING", "APPROVED", "REVIEWED", "ON_HOLD"].includes(requestStatus) ||
-    isPending
+    inProgress
   ) {
     return null;
   }

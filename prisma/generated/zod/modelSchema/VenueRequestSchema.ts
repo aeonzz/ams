@@ -15,7 +15,7 @@ export const VenueRequestSchema = z.object({
   setupRequirements: z.string().array(),
   startTime: z.coerce.date(),
   endTime: z.coerce.date(),
-  actualEndtime: z.coerce.date().nullable(),
+  actualStart: z.coerce.date().nullable(),
   inProgress: z.boolean(),
   requestId: z.string(),
   venueId: z.string(),

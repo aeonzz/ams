@@ -15,20 +15,20 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { TransportRequest } from "../../../../_components/types";
+import { DepartmentVenueRequest } from "./types";
 import { ChevronDownIcon } from "lucide-react";
 
-interface VehicleLogsTableToolbarActionsProps {
-  table: Table<TransportRequest>;
+interface VenueRequestTableToolbarActionsProps {
+  table: Table<DepartmentVenueRequest>;
   fileName: string;
   children?: React.ReactNode
 }
 
-export function VehicleLogsTableToolbarActions({
+export function VenueRequestTableToolbarActions({
   table,
   fileName,
   children
-}: VehicleLogsTableToolbarActionsProps) {
+}: VenueRequestTableToolbarActionsProps) {
   return (
     <div className="flex items-center gap-2">
       {children}

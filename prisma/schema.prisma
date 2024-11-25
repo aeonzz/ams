@@ -161,6 +161,7 @@ model Request {
   rejectionReason    String?
   cancellationReason String?
   onHoldReason       String?
+  isUrgent           Boolean            @default(false)
   status             RequestStatusType  @default(PENDING)
   userId             String
   user               User               @relation(name: "UserRelation", fields: [userId], references: [id], onDelete: Cascade)
@@ -231,20 +232,20 @@ model JobRequestEvaluation {
 }
 
 model VenueRequest {
-  id                String    @id
+  id                String   @id
   notes             String?
   purpose           String
   setupRequirements String[]
   startTime         DateTime
   endTime           DateTime
-  actualEndtime     DateTime?
-  inProgress        Boolean   @default(false)
-  requestId         String    @unique
-  request           Request   @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  actualStart       DateTime?
+  inProgress        Boolean  @default(false)
+  requestId         String   @unique
+  request           Request  @relation(fields: [requestId], references: [id], onDelete: Cascade)
   venueId           String
-  venue             Venue     @relation(fields: [venueId], references: [id])
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+  venue             Venue    @relation(fields: [venueId], references: [id])
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }
 
 model Venue {

@@ -126,6 +126,7 @@ export async function getRequests(input: GetRequestsSchema) {
     return { data: [], pageCount: 0 };
   }
 }
+
 export const createVenueRequest = authedProcedure
   .createServerAction()
   .input(extendedVenueRequestSchema)
@@ -674,17 +675,44 @@ export const updateTransportRequest = authedProcedure
 export const udpateVenueRequest = authedProcedure
   .createServerAction()
   .input(updateVenueRequestSchemaWithPath)
-  .handler(async ({ input }) => {
-    const { path, id, ...rest } = input;
+  .handler(async ({ ctx, input }) => {
+    const { user } = ctx;
+    const { path, id, venueStatus, venueId, ...rest } = input;
     try {
       const result = await db.venueRequest.update({
         where: {
           requestId: id,
         },
         data: {
+          venue: {
+            update: {
+              status: venueStatus,
+            },
+          },
           ...rest,
         },
+        select: {
+          request: {
+            select: {
+              userId: true,
+              title: true,
+            },
+          },
+          requestId: true,
+        },
       });
+
+      if (rest.inProgress !== undefined && rest.inProgress) {
+        await createNotification({
+          resourceId: `/request/${result.requestId}`,
+          title: `Venue Booking In Progress: ${result.requestId}`,
+          resourceType: "REQUEST",
+          notificationType: "INFO",
+          message: `Your venue booking for "${result.request.title}" is now in progress. Please ensure you arrive on time and follow the booking guidelines.`,
+          userId: user.id,
+          recepientIds: [result.request.userId],
+        });
+      }
 
       await pusher.trigger("request", "request_update", {
         message: "",
@@ -770,7 +798,6 @@ export const completeVenueRequest = authedProcedure
               },
             },
             inProgress: false,
-            actualEndtime: new Date(),
           },
         });
 

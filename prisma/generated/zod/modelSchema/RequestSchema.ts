@@ -33,6 +33,7 @@ export const RequestSchema = z.object({
   rejectionReason: z.string().nullable(),
   cancellationReason: z.string().nullable(),
   onHoldReason: z.string().nullable(),
+  isUrgent: z.boolean(),
   userId: z.string(),
   departmentId: z.string(),
   reviewedBy: z.string().nullable(),

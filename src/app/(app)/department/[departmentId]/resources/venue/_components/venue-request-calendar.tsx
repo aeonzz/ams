@@ -6,8 +6,8 @@ import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import { dateFnsLocalizer, Views } from "react-big-calendar";
 import { enUS } from "date-fns/locale/en-US";
 import { format, getDay, parse, startOfWeek } from "date-fns";
-import { TransportRequestCalendar } from "./types";
-import TransportRequestCalendarDetailCard from "./transport-request-calendar-detail-card";
+import { VenueRequestCalendarType } from "./types";
+import VenueRequestCalendarDetailCard from "./venue-request-calendar-detail-card";
 
 const locales = {
   "en-US": enUS,
@@ -21,13 +21,13 @@ const localizer = dateFnsLocalizer({
 });
 const DnDCalendar = withDragAndDrop(ShadcnBigCalendar);
 
-interface TranpsortRequestCalendarProps {
-  data: TransportRequestCalendar[] | undefined;
+interface VenueRequestCalendarProps {
+  data: VenueRequestCalendarType[] | undefined;
 }
 
-export default function TranpsortRequestCalendar({
+export default function VenueRequestCalendar({
   data,
-}: TranpsortRequestCalendarProps) {
+}: VenueRequestCalendarProps) {
   const [view, setView] = React.useState(Views.MONTH);
   const [date, setDate] = React.useState(new Date());
 
@@ -41,9 +41,9 @@ export default function TranpsortRequestCalendar({
 
   const events = data?.map((item) => ({
     title: item.title,
-    start: new Date(item.dateAndTimeNeeded),
-    end: new Date(item.dateAndTimeNeeded),
-    allDay: true,
+    start: new Date(item.startTime),
+    end: new Date(item.endTime),
+    allDay: false,
     resource: item,
   }));
 
@@ -62,7 +62,7 @@ export default function TranpsortRequestCalendar({
         view={view}
         onView={handleViewChange}
         components={{
-          event: TransportRequestCalendarDetailCard,
+          event: VenueRequestCalendarDetailCard,
         }}
         tooltipAccessor={null}
       />

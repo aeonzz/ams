@@ -195,31 +195,29 @@ export default function ManageVehicleScreen({
                         initialOdometer={data.odometer}
                       />
                     ) : (
-                      <div className="flex w-full space-x-2">
-                        <Button
-                          className="flex-1"
-                          variant="outline"
-                          onClick={() =>
-                            dialogManager.setActiveDialog(
-                              "adminUpdateVehicleSheet"
-                            )
-                          }
-                        >
-                          Edit
-                        </Button>
-                        <Link
-                          href={`/department/${departmentId}/resources/transport/vehicles/${vehicleId}/maintenance?page=1&per_page=10&sort=createdAt.desc`}
-                          prefetch
-                          className={cn(
-                            "flex-1 text-sm",
-                            buttonVariants({ variant: "outline" })
-                          )}
-                        >
-                          Maintenance Logs
-                        </Link>
-                      </div>
+                      <Button
+                        className="flex-1"
+                        variant="outline"
+                        onClick={() =>
+                          dialogManager.setActiveDialog(
+                            "adminUpdateVehicleSheet"
+                          )
+                        }
+                      >
+                        Edit
+                      </Button>
                     )}
                   </PermissionGuard>
+                  <Link
+                    href={`/department/${departmentId}/resources/transport/vehicles/${vehicleId}/maintenance?page=1&per_page=10&sort=createdAt.desc`}
+                    prefetch
+                    className={cn(
+                      "flex-1 text-sm",
+                      buttonVariants({ variant: "outline" })
+                    )}
+                  >
+                    Maintenance Logs
+                  </Link>
                 </div>
               </div>
               <div className="w-full">

@@ -3,7 +3,7 @@
 import { checkAuth } from "../auth/utils";
 
 import { db } from "@/lib/db/index";
-import { GetVenuesSchema } from "../schema";
+import { GetRequestsSchema, GetVenuesSchema } from "../schema";
 import { authedProcedure, convertToBase64, getErrorMessage } from "./utils";
 import {
   createVenueSchemaWithPath,
@@ -15,6 +15,7 @@ import {
 import { revalidatePath } from "next/cache";
 import { generateId } from "lucia";
 import { Venue } from "prisma/generated/zod";
+import { formatFullName } from "../utils";
 
 export async function getVenues(input: GetVenuesSchema) {
   await checkAuth();
@@ -76,6 +77,222 @@ export async function getVenues(input: GetVenuesSchema) {
     });
 
     return { data: formattedData, pageCount };
+  } catch (err) {
+    console.error(err);
+    return { data: [], pageCount: 0 };
+  }
+}
+
+export async function getDepartmentVenueRequests(input: GetRequestsSchema) {
+  await checkAuth();
+  const { page, per_page, sort, from, title, status, to, departmentId } = input;
+
+  try {
+    const skip = (page - 1) * per_page;
+
+    const [column, order] = (sort?.split(".") ?? ["createdAt", "desc"]) as [
+      keyof Request | undefined,
+      "asc" | "desc" | undefined,
+    ];
+
+    const where: any = {
+      request: {
+        departmentId: departmentId,
+      },
+    };
+
+    if (title) {
+      where.title = { contains: title, mode: "insensitive" };
+    }
+
+    if (status) {
+      where.status = status;
+    }
+
+    if (from && to) {
+      where.createdAt = {
+        gte: new Date(from),
+        lte: new Date(to),
+      };
+    }
+
+    const [data, total, department, allRequest] = await db.$transaction([
+      db.venueRequest.findMany({
+        where,
+        take: per_page,
+        skip,
+        orderBy: {
+          [column || "createdAt"]: order || "desc",
+        },
+        include: {
+          request: {
+            include: {
+              user: true,
+              reviewer: true,
+            },
+          },
+          venue: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      }),
+      db.venueRequest.count({ where }),
+      db.department.findUnique({
+        where: {
+          id: departmentId,
+        },
+        select: {
+          name: true,
+        },
+      }),
+      db.venueRequest.findMany({
+        where,
+        orderBy: {
+          [column || "createdAt"]: order || "desc",
+        },
+        select: {
+          actualStart: true,
+          startTime: true,
+          endTime: true,
+          request: {
+            select: {
+              id: true,
+              title: true,
+              status: true,
+              createdAt: true,
+              completedAt: true,
+            },
+          },
+        },
+      }),
+    ]);
+    const pageCount = Math.ceil(total / per_page);
+
+    const formattedData = data.map((data) => {
+      const { request, id, createdAt, updatedAt, venue, ...rest } = data;
+      return {
+        ...rest,
+        id: request.id,
+        completedAt: request.completedAt,
+        title: request.title,
+        requester: formatFullName(
+          request.user.firstName,
+          request.user.middleName,
+          request.user.lastName
+        ),
+        reviewer: request.reviewer
+          ? formatFullName(
+              request.reviewer.firstName,
+              request.reviewer.middleName,
+              request.reviewer.lastName
+            )
+          : undefined,
+        status: request.status,
+        createdAt: request.createdAt,
+        updatedAt: request.updatedAt,
+        venueName: venue.name,
+      };
+    });
+
+    return { data: formattedData, pageCount, department, allRequest };
+  } catch (err) {
+    console.error(err);
+    return { data: [], pageCount: 0 };
+  }
+}
+
+export async function getRequestByVenueId(
+  input: GetVenuesSchema & { venueId: string }
+) {
+  await checkAuth();
+  const { page, per_page, sort, name, from, title, to, venueId } = input;
+
+  try {
+    const skip = (page - 1) * per_page;
+
+    const [column, order] = (sort?.split(".") ?? ["createdAt", "desc"]) as [
+      keyof Venue | undefined,
+      "asc" | "desc" | undefined,
+    ];
+
+    const where: any = {
+      venueId: venueId,
+    };
+
+    if (title) {
+      where.title = { contains: title, mode: "insensitive" };
+    }
+
+    if (from && to) {
+      where.createdAt = {
+        gte: new Date(from),
+        lte: new Date(to),
+      };
+    }
+
+    const [data, total, venue] = await db.$transaction([
+      db.venueRequest.findMany({
+        where,
+        take: per_page,
+        skip,
+        orderBy: {
+          [column || "createdAt"]: order || "desc",
+        },
+        include: {
+          request: {
+            include: {
+              user: true,
+              reviewer: true,
+            },
+          },
+          venue: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      }),
+      db.venueRequest.count({ where }),
+      db.venue.findUnique({
+        where: {
+          id: venueId,
+        },
+        select: {
+          name: true,
+        },
+      }),
+    ]);
+    const pageCount = Math.ceil(total / per_page);
+
+    const formattedData = data.map((data) => {
+      const { request, id, createdAt, updatedAt, venue, ...rest } = data;
+      return {
+        ...rest,
+        id: request.id,
+        completedAt: request.completedAt,
+        title: request.title,
+        requester: formatFullName(
+          request.user.firstName,
+          request.user.middleName,
+          request.user.lastName
+        ),
+        reviewer: request.reviewer
+          ? formatFullName(
+              request.reviewer.firstName,
+              request.reviewer.middleName,
+              request.reviewer.lastName
+            )
+          : undefined,
+        status: request.status,
+        createdAt: request.createdAt,
+        updatedAt: request.updatedAt,
+        venueName: venue.name,
+      };
+    });
+
+    return { data: formattedData, pageCount, venue };
   } catch (err) {
     console.error(err);
     return { data: [], pageCount: 0 };

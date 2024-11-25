@@ -55,6 +55,10 @@ export function exportTableToCSV<TData>(
             return `"${format(cellValue, "PP p")}"`; // Format as 'Nov 11, 2024 4:00 PM'
           }
 
+          if (typeof cellValue === "boolean") {
+            return cellValue ? "Yes" : "No"; // Handle boolean values
+          }
+
           // Handle array values
           if (Array.isArray(cellValue)) {
             return `"${cellValue.join(", ")}"`; // Join array values with commas
@@ -120,6 +124,8 @@ export function exportTableToXLSX<TData>(
         const cellValue = row.getValue(header);
         if (cellValue instanceof Date) {
           return `${format(cellValue, "PP p")}`;
+        } else if (typeof cellValue === "boolean") {
+          return cellValue ? "Yes" : "No";
         } else if (Array.isArray(cellValue)) {
           return cellValue.join(", ");
         } else if (typeof cellValue === "object" && cellValue !== null) {

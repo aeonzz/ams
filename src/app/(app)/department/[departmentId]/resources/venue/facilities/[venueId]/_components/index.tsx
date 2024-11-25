@@ -86,15 +86,6 @@ export default function ManageVenueScreen({ params }: ManageVenueScreenProps) {
 
   return (
     <div className="flex h-full w-full flex-col">
-      <div className="flex h-[50px] items-center justify-between border-b px-3">
-        <div className="flex items-center gap-1">
-          <Button variant="ghost2" size="icon" onClick={() => router.back()}>
-            <ChevronLeft className="size-4" />
-          </Button>
-          <H5 className="truncate font-semibold">{data.name}</H5>
-        </div>
-        <SearchInput />
-      </div>
       <div className="scroll-bar container flex h-full overflow-y-auto p-0">
         <div className="flex flex-col gap-3 p-6 pr-0">
           <PhotoProvider
@@ -215,7 +206,10 @@ export default function ManageVenueScreen({ params }: ManageVenueScreenProps) {
         </div>
         <Separator orientation="vertical" className="mx-6 h-full" />
         <div className="flex-1">
-          <VenueRequestsTable requests={formattedRequests} />
+          <VenueRequestsTable
+            requests={formattedRequests}
+            logsUrl={`/department/${departmentId}/resources/venue/facilities/${venueId}/logs?page=1&per_page=10&sort=createdAt.desc`}
+          />
         </div>
       </div>
     </div>

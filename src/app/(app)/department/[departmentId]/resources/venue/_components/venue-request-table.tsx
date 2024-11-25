@@ -8,33 +8,32 @@ import { DataTableToolbar } from "@/components/data-table/data-table-toolbar";
 
 import { useDataTable } from "@/lib/hooks/use-data-table";
 import { type DataTableFilterField } from "@/lib/types";
-import { getDepartmentTransportRequests } from "@/lib/actions/vehicle";
-import { TransportRequest } from "./types";
-import { TransportRequestTableFloatingBar } from "./transport-request-table-floating-bar";
-import { TransportRequestTableToolbarActions } from "./transport-request-table-toolbar-actions";
-import { getTransportRequestColumns } from "./transport-request-table-columns";
-import TranpsortRequestCalendar from "./transport-request-calendar";
+import VenueRequestCalendar from "./venue-request-calendar";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import { P } from "@/components/typography/text";
+import { getDepartmentVenueRequests } from "@/lib/actions/venue";
+import { getVenueRequestColumns } from "./venue-request-table-columns";
+import { DepartmentVenueRequest } from "./types";
+import { VenueRequestTableFloatingBar } from "./venue-request-table-floating-bar";
+import { VenueRequestTableToolbarActions } from "./venue-request-table-toolbar-actions";
 
-interface TransportRequestTableProps {
-  transportRequestPromise: ReturnType<typeof getDepartmentTransportRequests>;
+interface VenueRequestTableProps {
+  venueRequestPromise: ReturnType<typeof getDepartmentVenueRequests>;
   departmentId: string;
 }
 
-export function TransportRequestTable({
-  transportRequestPromise,
+export function VenueRequestTable({
+  venueRequestPromise,
   departmentId,
-}: TransportRequestTableProps) {
-  const { data, pageCount, department, allRequest } = React.use(
-    transportRequestPromise
-  );
+}: VenueRequestTableProps) {
+  const { data, pageCount, department, allRequest } =
+    React.use(venueRequestPromise);
 
-  const columns = React.useMemo(() => getTransportRequestColumns(), []);
+  const columns = React.useMemo(() => getVenueRequestColumns(), []);
 
-  const filterFields: DataTableFilterField<TransportRequest>[] = [
+  const filterFields: DataTableFilterField<DepartmentVenueRequest>[] = [
     {
       label: "Title",
       value: "title",
@@ -59,19 +58,20 @@ export function TransportRequestTable({
     title: request.request.title,
     status: request.request.status,
     createdAt: request.request.createdAt,
+    startTime: request.startTime,
+    endTime: request.endTime,
     actualStart: request.actualStart,
     completedAt: request.request.completedAt,
-    dateAndTimeNeeded: request.dateAndTimeNeeded,
   }));
 
   return (
     <div className="space-y-2">
-      <TranpsortRequestCalendar data={formattedData} />
+      <VenueRequestCalendar data={formattedData} />
       <div className="grid min-h-[calc(100vh_-_100px)] place-items-center items-center py-3">
         <DataTable
           table={table}
           floatingBar={
-            <TransportRequestTableFloatingBar
+            <VenueRequestTableFloatingBar
               table={table}
               fileName={`${department?.name} Transport Requests`}
             />
@@ -79,7 +79,7 @@ export function TransportRequestTable({
           className="rounded-md border py-2"
         >
           <DataTableToolbar table={table} filterFields={filterFields}>
-            <TransportRequestTableToolbarActions
+            <VenueRequestTableToolbarActions
               table={table}
               fileName={`${department?.name} Transport Requests`}
             >
@@ -88,11 +88,11 @@ export function TransportRequestTable({
                 className={cn(
                   buttonVariants({ variant: "secondary", size: "sm" })
                 )}
-                href={`/department/${departmentId}/resources/transport/vehicles`}
+                href={`/department/${departmentId}/resources/venue/facilities`}
               >
-                <P>Vehicles</P>
+                <P>Facilities</P>
               </Link>
-            </TransportRequestTableToolbarActions>
+            </VenueRequestTableToolbarActions>
           </DataTableToolbar>
         </DataTable>
       </div>

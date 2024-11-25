@@ -50,6 +50,7 @@ interface RequestReviewerActionsProps {
   allowedApproverRoles: string[];
   actionNeeded?: boolean;
   children?: React.ReactNode;
+  inProgress?: boolean;
 }
 
 export default function RequestReviewerActions({
@@ -59,6 +60,7 @@ export default function RequestReviewerActions({
   allowedApproverRoles,
   actionNeeded = false,
   children,
+  inProgress,
 }: RequestReviewerActionsProps) {
   const currentUser = useSession();
   const pathname = usePathname();
@@ -172,7 +174,8 @@ export default function RequestReviewerActions({
   if (
     request.status === "COMPLETED" ||
     request.status === "CANCELLED" ||
-    request.status === "REJECTED"
+    request.status === "REJECTED" ||
+    inProgress
   ) {
     return null;
   }
@@ -366,7 +369,7 @@ export default function RequestReviewerActions({
               )}
               {children}
             </div>
-            {request.status === "APPROVED" && (
+            {request.status === "APPROVED" && !inProgress && (
               <AlertDialog
                 open={isOnHoldAlertOpen}
                 onOpenChange={setIsOnHoldAlertOpen}

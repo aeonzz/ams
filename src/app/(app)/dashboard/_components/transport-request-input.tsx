@@ -48,6 +48,7 @@ import {
 import { cn } from "@/lib/utils";
 import ScheduledEventCardSkeleton from "./scheduled-event-card-skeleton";
 import VehicleScheduleCard from "./vehicle-schedule-card";
+import { Switch } from "@/components/ui/switch";
 
 interface VenueRequestInputProps {
   mutateAsync: UseMutateAsyncFunction<
@@ -114,6 +115,30 @@ export default function TransportRequestInput({
   }, [data]);
 
   async function onSubmit(values: TransportRequestSchema) {
+    const now = new Date();
+    const minDate = new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000);
+    const { dateAndTimeNeeded, isUrgent } = values;
+
+    if (dateAndTimeNeeded.getTime() < Date.now()) {
+      toast.error("Date and time needed cannot be in the past.");
+      return;
+    }
+
+    if (!isUrgent && dateAndTimeNeeded < minDate) {
+      toast.error(
+        "Request should be submitted not later than 2 days prior to the requested date."
+      );
+      return;
+    }
+
+    if (
+      dateAndTimeNeeded.getHours() === 0 &&
+      dateAndTimeNeeded.getMinutes() === 0
+    ) {
+      toast.error("Time cannot be exactly midnight (00:00).");
+      return;
+    }
+
     const selectedVehicle = vehicleData?.find(
       (vehicle) => vehicle.id === values.vehicleId
     );
@@ -249,7 +274,38 @@ export default function TransportRequestInput({
                   isLoading={isLoading}
                   disabled={isPending || !vehicleId}
                   disabledDates={disabledDates}
-                />
+                >
+                  <Popover modal>
+                    <PopoverTrigger className="text-primary hover:underline">
+                      Urgent request
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[360px] p-0">
+                      <FormField
+                        control={form.control}
+                        name="isUrgent"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-center justify-between rounded-lg p-4">
+                            <div className="space-y-0.5">
+                              <FormLabel className="text-base">
+                                Mark as Urgent
+                              </FormLabel>
+                              <FormDescription>
+                                Enable this option to prioritize the request as
+                                urgent.
+                              </FormDescription>
+                            </div>
+                            <FormControl>
+                              <Switch
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                              />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </DateTimePicker>
                 <FormField
                   control={form.control}
                   name="destination"
@@ -314,7 +370,7 @@ export default function TransportRequestInput({
                           rows={1}
                           maxRows={5}
                           placeholder="Purpose..."
-                          className="min-h-[200px] flex-grow resize-none bg-transparent shadow-none text-sm"
+                          className="min-h-[200px] flex-grow resize-none bg-transparent text-sm shadow-none"
                           disabled={isPending}
                           {...field}
                         />

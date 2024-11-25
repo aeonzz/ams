@@ -1,7 +1,7 @@
-import type { TransportRequest as VehicleRequest } from "prisma/generated/zod";
+import type { VenueRequest } from "prisma/generated/zod";
 import type { RequestStatusTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestStatusTypeSchema";
 
-export type TransportRequest = VehicleRequest & {
+export type DepartmentVenueRequest = VenueRequest & {
   id: string;
   completedAt: Date | null;
   title: string;
@@ -11,15 +11,17 @@ export type TransportRequest = VehicleRequest & {
   status: RequestStatusTypeType;
   createdAt: Date;
   updatedAt: Date;
-  vehicleName: string;
+  venueName: string;
 };
 
-export type TransportRequestCalendar = {
+
+export type VenueRequestCalendarType = {
   title: string;
   requestId: string;
   status: RequestStatusTypeType;
   createdAt: Date;
-  dateAndTimeNeeded: Date;
+  startTime: Date;
+  endTime: Date;
   actualStart: Date | null;
   completedAt: Date | null;
 };
