@@ -9,6 +9,7 @@ import { H4, H5, P } from "@/components/typography/text";
 import {
   Book,
   Calendar,
+  CalendarCheck,
   Dot,
   Download,
   Ellipsis,
@@ -76,6 +77,7 @@ interface TransportRequestDetailsProps {
   onHoldReason: string | null;
   requestStatus: RequestStatusTypeType;
   isCurrentUser: boolean;
+  completedAt: Date | null;
 }
 
 export default function TransportRequestDetails({
@@ -86,6 +88,7 @@ export default function TransportRequestDetails({
   isCurrentUser,
   cancellationReason,
   onHoldReason,
+  completedAt,
 }: TransportRequestDetailsProps) {
   const [editField, setEditField] = React.useState<string | null>(null);
   const pathname = usePathname();
@@ -157,8 +160,8 @@ export default function TransportRequestDetails({
       try {
         const pdfBlob = await fillTransportRequestFormPDF({
           createdAt: data.createdAt,
-          id: data.id,
           requestedBy: requestedBy,
+          requestedByCopy: requestedBy,
           office: data.department,
           destination: data.destination,
           numberOfPassengers: data.passengersName.length,
@@ -270,7 +273,7 @@ export default function TransportRequestDetails({
             <H4 className="font-semibold text-muted-foreground">
               Transport Request Details
             </H4>
-            {existingFormFile && (
+            {existingFormFile && requestStatus === "COMPLETED" && (
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
@@ -286,11 +289,7 @@ export default function TransportRequestDetails({
                   className="flex items-center gap-3"
                   side="bottom"
                 >
-                  <CommandTooltip text="Download transport request form">
-                    <CommandShortcut>Ctrl</CommandShortcut>
-                    <CommandShortcut>Shift</CommandShortcut>
-                    <CommandShortcut>D</CommandShortcut>
-                  </CommandTooltip>
+                  <P>Download transport request form</P>
                 </TooltipContent>
               </Tooltip>
             )}
@@ -336,6 +335,19 @@ export default function TransportRequestDetails({
         </div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            {completedAt && (
+              <div className="group flex items-center justify-between">
+                <div className="flex w-full flex-col items-start">
+                  <div className="flex space-x-1 text-muted-foreground">
+                    <CalendarCheck className="h-5 w-5" />
+                    <P className="font-semibold tracking-tight">Completed:</P>
+                  </div>
+                  <div className="w-full pl-5 pt-1">
+                    <P>{format(new Date(completedAt), "PPP p")}</P>
+                  </div>
+                </div>
+              </div>
+            )}
             {editField === "destination" ? (
               <EditInput
                 isPending={isPending}

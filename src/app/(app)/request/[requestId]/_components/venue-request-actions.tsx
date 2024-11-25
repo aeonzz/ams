@@ -2,7 +2,10 @@
 
 import React from "react";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
-import { updateTransportRequest } from "@/lib/actions/requests";
+import {
+  udpateVenueRequest,
+  updateTransportRequest,
+} from "@/lib/actions/requests";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,23 +20,22 @@ import {
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
-import { TransportRequestWithRelations } from "prisma/generated/zod";
+import type { VenueRequestWithRelations } from "prisma/generated/zod";
 import { usePathname } from "next/navigation";
 import { P } from "@/components/typography/text";
 
-interface TransportRequestActionsProps {
-  data: TransportRequestWithRelations;
+interface VenueRequestActionsProps {
+  data: VenueRequestWithRelations;
 }
 
-export default function TransportRequestActions({
+export default function VenueRequestActions({
   data,
-}: TransportRequestActionsProps) {
+}: VenueRequestActionsProps) {
   const pathname = usePathname();
   const queryClient = useQueryClient();
   const [isAlertOpen, setIsAlertOpen] = React.useState(false);
-  const { mutateAsync, isPending } = useServerActionMutation(
-    updateTransportRequest
-  );
+  const { mutateAsync, isPending } =
+    useServerActionMutation(udpateVenueRequest);
 
   async function handleUpdate() {
     toast.promise(
@@ -41,15 +43,14 @@ export default function TransportRequestActions({
         id: data.requestId,
         path: pathname,
         inProgress: true,
-        odometerStart: data.vehicle.odometer,
         actualStart: new Date(),
-        vehicleStatus: "IN_USE",
+        venueStatus: "IN_USE",
       }),
       {
         loading: "Loading...",
         success: () => {
           queryClient.invalidateQueries({ queryKey: [data.requestId] });
-          return "The transport request has been started successfully.";
+          return "The venue request has been started successfully.";
         },
         error: (err) => {
           console.log(err);
@@ -61,12 +62,6 @@ export default function TransportRequestActions({
 
   return (
     <>
-      <div>
-        <P className="text-xs text-muted-foreground">Current odometer value:</P>
-        <div className="flex w-full items-center p-2">
-          <P className="font-medium">{data.vehicle.odometer}</P>
-        </div>
-      </div>
       <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
         <AlertDialogTrigger asChild>
           <Button disabled={isPending} onClick={() => setIsAlertOpen(true)}>
@@ -75,11 +70,10 @@ export default function TransportRequestActions({
         </AlertDialogTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirm Start Request</AlertDialogTitle>
+            <AlertDialogTitle>Confirm Start Venue Request</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to start this transport request? This action
-              will update the status to &quot;In Progress&quot; and cannot be
-              undone.
+              Are you sure you want to start this venue request? This action
+              will update the status to &quot;In Use&quot; and cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

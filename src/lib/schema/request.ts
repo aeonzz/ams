@@ -6,6 +6,7 @@ import {
   RequestStatusTypeSchema,
   RequestTypeSchema,
   VehicleStatusSchema,
+  VenueStatusSchema,
 } from "prisma/generated/zod";
 
 export const requestSchemaBase = z.object({
@@ -52,25 +53,29 @@ export const venueRequestSchemaBase = z.object({
       required_error: "Start time is required",
     })
     .min(new Date(), {
-      message: "Date needed must be in the future",
+      message: "Start time must be in the future",
     })
     .refine((date) => date.getHours() !== 0 || date.getMinutes() !== 0, {
-      message: "Time cannot be exactly midnight (00:00)",
+      message: "Start time cannot be exactly midnight (00:00)",
     }),
+
   endTime: z
     .date({
       required_error: "End time is required",
     })
     .min(new Date(), {
-      message: "Date needed must be in the future",
+      message: "End time must be in the future",
     })
     .refine((date) => date.getHours() !== 0 || date.getMinutes() !== 0, {
-      message: "Time cannot be exactly midnight (00:00)",
+      message: "End time cannot be exactly midnight (00:00)",
     }),
   notes: z
     .string()
     .max(700, { message: "Cannot be more than 600 characters long" })
     .optional(),
+  inProgress: z.boolean().optional(),
+  actualStart: z.date().optional(),
+  venueStatus: VenueStatusSchema.optional(),
 });
 
 export const venueRequestSchema = venueRequestSchemaBase.refine(
@@ -134,22 +139,15 @@ export const transportRequestSchema = z.object({
   passengersName: z
     .array(z.string().max(50, "Passenger name cannot exceed 50 characters"))
     .min(1, "At least one passenger name is required"),
-  dateAndTimeNeeded: z
-    .date({
-      required_error: "Date time is required",
-    })
-    .min(new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), {
-      message:
-        "Request should be submitted not later than 2 days prior to the requested date.",
-    })
-    .refine((date) => date.getHours() !== 0 || date.getMinutes() !== 0, {
-      message: "Time cannot be exactly midnight (00:00)",
-    }),
+  dateAndTimeNeeded: z.date({
+    required_error: "Date time is required",
+  }),
   inProgress: z.boolean().optional(),
   actualStart: z.date().optional(),
   odometerStart: z.number().optional(),
   odometerEnd: z.number().optional(),
   vehicleStatus: VehicleStatusSchema.optional(),
+  isUrgent: z.boolean().default(false),
 });
 
 export type TransportRequestSchema = z.infer<typeof transportRequestSchema>;

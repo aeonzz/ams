@@ -1,25 +1,25 @@
 import ContentLayout from "@/components/layouts/content-layout";
 import DepartmentLayout from "../../_components/department-layout";
-import DepartmentTransportScreen from "./_components";
+import DepartmentVenueScreen from "./_components";
 import { SearchParams } from "@/lib/types";
 import { requestSearchParamsSchema } from "@/lib/schema";
 
-export interface DepartmentTransportPage {
+export interface DepartmentVenuePagePage {
   params: {
     departmentId: string;
   };
   searchParams: SearchParams;
 }
 
-export default function DepartmentTransportPage({
+export default function DepartmentVenuePagePage({
   params,
   searchParams,
-}: DepartmentTransportPage) {
+}: DepartmentVenuePagePage) {
   const search = requestSearchParamsSchema.parse(searchParams);
   return (
-    <ContentLayout title="Transport Management">
-      <DepartmentLayout departmentId={params.departmentId} name="Transport Management" withBackButton>
-        <DepartmentTransportScreen departmentId={params.departmentId} searchParams={search} />
+    <ContentLayout title="Venue Management">
+      <DepartmentLayout departmentId={params.departmentId} name="Venue Management" withBackButton>
+        <DepartmentVenueScreen departmentId={params.departmentId} searchParams={search} />
       </DepartmentLayout>
     </ContentLayout>
   );

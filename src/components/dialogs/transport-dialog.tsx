@@ -53,6 +53,7 @@ export default function TransportDialog() {
       description: "",
       destination: "",
       dateAndTimeNeeded: undefined,
+      isUrgent: false,
     },
   });
 

@@ -11,8 +11,8 @@ import { type DataTableFilterField } from "@/lib/types";
 import { getRequestByVehicleId } from "@/lib/actions/vehicle";
 import { getVehicleLogsColumns } from "./vehicle-logs-table-columns";
 import { TransportRequest } from "../../../../_components/types";
-import { VehicleLogsTableFloatingBar } from "./vehicle-logs-table-floating-bar";
-import { VehicleLogsTableToolbarActions } from "./vehicle-logs-table-toolbar-actions";
+import { TransportRequestTableFloatingBar } from "../../../../_components/transport-request-table-floating-bar";
+import { TransportRequestTableToolbarActions } from "../../../../_components/transport-request-table-toolbar-actions";
 
 interface VehicleLogsTableProps {
   vehicleRequestsPromise: ReturnType<typeof getRequestByVehicleId>;
@@ -49,14 +49,14 @@ export function VehicleLogsTable({
     <DataTable
       table={table}
       floatingBar={
-        <VehicleLogsTableFloatingBar
+        <TransportRequestTableFloatingBar
           table={table}
           fileName={`${vehicle?.name} - Requests`}
         />
       }
     >
       <DataTableToolbar table={table} filterFields={filterFields}>
-        <VehicleLogsTableToolbarActions
+        <TransportRequestTableToolbarActions
           table={table}
           fileName={`${vehicle?.name} - Requests`}
         />

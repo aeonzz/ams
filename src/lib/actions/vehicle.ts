@@ -248,6 +248,7 @@ export async function getDepartmentTransportRequests(input: GetRequestsSchema) {
         },
         select: {
           actualStart: true,
+          dateAndTimeNeeded: true,
           request: {
             select: {
               id: true,

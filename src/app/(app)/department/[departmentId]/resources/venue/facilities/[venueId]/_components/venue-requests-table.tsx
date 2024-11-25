@@ -31,10 +31,12 @@ import { Badge } from "@/components/ui/badge";
 
 interface VenueRequestsTableProps {
   requests: VenueRequestsTableType[];
+  logsUrl: string;
 }
 
 export default function VenueRequestsTable({
   requests,
+  logsUrl,
 }: VenueRequestsTableProps) {
   const [globalFilter, setGlobalFilter] = React.useState("");
 
@@ -116,7 +118,7 @@ export default function VenueRequestsTable({
   });
 
   return (
-    <div className="space-y-3 m-6 ml-0">
+    <div className="m-6 ml-0 space-y-3">
       <div className="flex items-center justify-between">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 transform text-muted-foreground" />
@@ -127,6 +129,13 @@ export default function VenueRequestsTable({
             className="max-w-sm pl-8"
           />
         </div>
+        <Link
+          href={logsUrl}
+          prefetch
+          className={cn("text-sm", buttonVariants({ variant: "link" }))}
+        >
+          See all
+        </Link>
       </div>
       <div className="scroll-bar h-[72vh] overflow-y-auto">
         <Table className="border-none">
@@ -134,7 +143,7 @@ export default function VenueRequestsTable({
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className="px-5 bg-transparent">
+                  <TableHead key={header.id} className="bg-transparent px-5">
                     {header.isPlaceholder
                       ? null
                       : flexRender(

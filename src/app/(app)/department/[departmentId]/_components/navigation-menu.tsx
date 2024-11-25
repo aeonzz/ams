@@ -29,42 +29,36 @@ const management: {
   {
     title: "User Management",
     href: "users?page=1&per_page=10&sort=createdAt.desc",
-    description:
-      "Manage department users. Control roles and permissions tailored to departmental needs.",
+    description: "Manage department users and their roles.",
   },
   {
     title: "Supply Management",
     href: "resources/supply-items?page=1&per_page=10&sort=createdAt.desc",
-    description:
-      "Oversee the department’s supply inventory. Track stock levels, manage supply requests, and ensure timely replenishment of critical items.",
+    description: "Track and manage the department's supply inventory.",
     condition: true,
   },
   {
     title: "Managing Job Requests",
     href: "job-requests",
-    description:
-      "Manage all job requests submitted by the department. Track progress, assign tasks, and ensure job completion.",
+    description: "Oversee job requests and ensure their completion.",
     condition: true,
   },
   {
     title: "Manage Borrowable Items",
     href: "resources/borrowable-items",
-    description:
-      "Manage the list of items available for borrowing within your department. Add, update, or remove items to ensure accurate inventory for borrowing requests.",
+    description: "Maintain the list of items available for borrowing.",
     condition: true,
   },
   {
-    title: "Facilities Management",
-    href: "resources/facilities",
-    description:
-      "Manage department facilities, ensuring that resources are available and properly maintained for effective operations.",
+    title: "Venue Request and Management",
+    href: "resources/venue?page=1&per_page=10&sort=createdAt.desc",
+    description: "Manage venue requests and scheduling.",
     condition: true,
   },
   {
-    title: "Transport Services",
+    title: "Transport Request and Vehicle Management",
     href: "resources/transport?page=1&per_page=10&sort=createdAt.desc",
-    description:
-      "Coordinate transport services for the department, managing vehicle assignments, schedules, and user requests.",
+    description: "Handle transport requests and manage vehicles.",
     condition: true,
   },
 ];
@@ -95,27 +89,30 @@ export default function OverviewNavigationMenu({
     managesSupplyRequest,
   } = data;
 
-  const managementWithConditions = management.map((item) => {
-    if (item.title === "Transport Services") {
-      return { ...item, condition: managesTransport };
-    }
-    if (item.title === "Facilities Management") {
-      return { ...item, condition: managesFacility };
-    }
-    if (item.title === "Managing Job Requests") {
-      return { ...item, condition: acceptsJobs };
-    }
-    if (item.title === "Manage Borrowable Items") {
-      return { ...item, condition: managesBorrowRequest };
-    }
-    if (item.title === "Supply Management") {
-      return { ...item, condition: managesSupplyRequest };
-    }
-    if (item.title === "User Management") {
-      return { ...item, condition: true };
-    }
-    return item;
-  });
+  const managementWithConditions = management
+    .filter((item) => item.condition !== false)
+    .map((item) => {
+      if (item.title === "Transport Services") {
+        return { ...item, condition: managesTransport };
+      }
+      if (item.title === "Facilities Management") {
+        return { ...item, condition: managesFacility };
+      }
+      if (item.title === "Managing Job Requests") {
+        return { ...item, condition: acceptsJobs };
+      }
+      if (item.title === "Manage Borrowable Items") {
+        return { ...item, condition: managesBorrowRequest };
+      }
+      if (item.title === "Supply Management") {
+        return { ...item, condition: managesSupplyRequest };
+      }
+      if (item.title === "User Management") {
+        return { ...item, condition: true };
+      }
+      return item;
+    })
+    .filter((item) => item.condition);
 
   return (
     <NavigationMenu>

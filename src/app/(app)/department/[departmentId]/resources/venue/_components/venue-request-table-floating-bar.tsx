@@ -28,17 +28,17 @@ import { CommandShortcut } from "@/components/ui/command";
 import { P } from "@/components/typography/text";
 import { usePathname } from "next/navigation";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
-import { TransportRequest } from "../../../../_components/types";
+import { DepartmentVenueRequest } from "./types";
 
-interface VehicleLogsTableFloatingBarProps {
-  table: Table<TransportRequest>;
+interface VenueRequestTableFloatingBarProps {
+  table: Table<DepartmentVenueRequest>;
   fileName: string;
 }
 
-export function VehicleLogsTableFloatingBar({
+export function VenueRequestTableFloatingBar({
   table,
   fileName,
-}: VehicleLogsTableFloatingBarProps) {
+}: VenueRequestTableFloatingBarProps) {
   const rows = table.getFilteredSelectedRowModel().rows;
   const pathname = usePathname();
 
@@ -137,7 +137,7 @@ export function VehicleLogsTableFloatingBar({
                 </DropdownMenuContent>
               </DropdownMenu>
               <TooltipContent className="border bg-accent font-semibold text-foreground dark:bg-zinc-900">
-                <P>Export inventory</P>
+                <P>Export {fileName}</P>
               </TooltipContent>
             </Tooltip>
           </div>

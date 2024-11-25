@@ -6,6 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
 import {
   Book,
+  CalendarCheck,
   CalendarIcon,
   Clock,
   Dot,
@@ -67,15 +68,21 @@ interface VenueRequestDetailsProps {
   requestId: string;
   rejectionReason: string | null;
   requestStatus: RequestStatusTypeType;
+  cancellationReason: string | null;
+  onHoldReason: string | null;
   isCurrentUser: boolean;
+  completedAt: Date | null;
 }
 
 export default function VenueRequestDetails({
   data,
   requestId,
   rejectionReason,
+  cancellationReason,
+  onHoldReason,
   requestStatus,
   isCurrentUser,
+  completedAt,
 }: VenueRequestDetailsProps) {
   const pathname = usePathname();
   const { variant, color, stroke } = getVenueStatusColor(data.venue.status);
@@ -230,17 +237,27 @@ export default function VenueRequestDetails({
     form.reset();
   }, [editField]);
 
-  const canEdit = requestStatus === "PENDING" && isCurrentUser;
+  const canEdit =
+    (requestStatus === "PENDING" || requestStatus === "ON_HOLD") &&
+    isCurrentUser;
 
   return (
     <>
       <div className="space-y-4 pb-10">
         <div className="space-y-1">
-          {data.inProgress && (
+          {data.inProgress && requestStatus === "APPROVED" && (
             <AlertCard
               variant="info"
               title="Ongoing Venue Reservation"
               description="This venue reservation is currently active. Please ensure that all necessary preparations and arrangements are in place."
+              className="mb-6"
+            />
+          )}
+          {requestStatus === "CANCELLED" && cancellationReason && (
+            <AlertCard
+              variant="destructive"
+              title="Request Cancelled"
+              description={cancellationReason}
               className="mb-6"
             />
           )}
@@ -251,6 +268,22 @@ export default function VenueRequestDetails({
               description={rejectionReason}
               className="mb-6"
             />
+          )}
+          {requestStatus === "ON_HOLD" && onHoldReason && (
+            <div>
+              <AlertCard
+                variant="warning"
+                title="Request On Hold"
+                description={onHoldReason}
+                className="mb-6"
+              />
+              <AlertCard
+                variant="info"
+                title="Next Steps"
+                description="You can update your request to address the issue, cancel it if no longer needed, or contact support for assistance."
+                className="mb-6"
+              />
+            </div>
           )}
           <div className="flex h-7 items-center justify-between">
             <H4 className="font-semibold text-muted-foreground">
@@ -329,6 +362,19 @@ export default function VenueRequestDetails({
         </div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            {completedAt && (
+              <div className="group flex items-center justify-between">
+                <div className="flex w-full flex-col items-start">
+                  <div className="flex space-x-1 text-muted-foreground">
+                    <CalendarCheck className="h-5 w-5" />
+                    <P className="font-semibold tracking-tight">Completed:</P>
+                  </div>
+                  <div className="w-full pl-5 pt-1">
+                    <P>{format(new Date(completedAt), "PPP p")}</P>
+                  </div>
+                </div>
+              </div>
+            )}
             {editField === "startTime" ? (
               <EditInput
                 isPending={isPending}
@@ -405,21 +451,6 @@ export default function VenueRequestDetails({
                     Edit
                   </Button>
                 )}
-              </div>
-            )}
-            {data.actualEndtime && (
-              <div className="group flex items-center justify-between">
-                <div className="flex w-full flex-col items-start">
-                  <div className="flex space-x-1 text-muted-foreground">
-                    <CalendarIcon className="h-5 w-5" />
-                    <P className="font-semibold tracking-tight">
-                      Actual End Time:
-                    </P>
-                  </div>
-                  <div className="w-full pl-5 pt-1">
-                    <P>{format(new Date(data.actualEndtime), "PPP p")}</P>
-                  </div>
-                </div>
               </div>
             )}
             {editField === "setupRequirements" ? (

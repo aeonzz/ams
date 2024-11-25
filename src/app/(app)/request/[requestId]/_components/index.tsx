@@ -49,6 +49,7 @@ import SupplyResourceDetails from "./supply-resource-details";
 import SupplyRequestActions from "./supply-request-actions";
 import TransportRequestActions from "./transport-request-actions";
 import CancelRequest from "./cancel-request";
+import VenueRequestActions from "./venue-request-actions";
 
 interface RequestDetailsProps {
   params: string;
@@ -135,8 +136,11 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                 data={data.venueRequest}
                 requestId={data.id}
                 rejectionReason={data.rejectionReason}
+                cancellationReason={data.cancellationReason}
+                onHoldReason={data.onHoldReason}
                 requestStatus={data.status}
                 isCurrentUser={currentUser.id === data.userId}
+                completedAt={data.completedAt}
               />
             )}
             {data.type === "BORROW" && data.returnableRequest && (
@@ -167,6 +171,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                 onHoldReason={data.onHoldReason}
                 requestStatus={data.status}
                 isCurrentUser={currentUser.id === data.userId}
+                completedAt={data.completedAt}
               />
             )}
           </div>
@@ -291,7 +296,14 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
         <Separator className="my-6" />
         <div className="flex flex-col gap-3">
           {currentUser.id === data.userId && (
-            <CancelRequest requestId={data.id} requestStatus={data.status} />
+            <CancelRequest
+              requestId={data.id}
+              requestStatus={data.status}
+              inProgress={
+                data.transportRequest?.inProgress ||
+                data.venueRequest?.inProgress
+              }
+            />
           )}
           {data.type === "JOB" &&
             data.jobRequest &&
@@ -358,6 +370,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                 !data.transportRequest.inProgress &&
                 data.status === "APPROVED"
               }
+              inProgress={data.transportRequest.inProgress}
             >
               {data.status === "APPROVED" ||
                 (data.status === "ON_HOLD" && (
@@ -380,7 +393,26 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
               allowedRoles={["OPERATIONS_MANAGER", "DEPARTMENT_HEAD"]}
               allowedDepartment={data.departmentId}
               allowedApproverRoles={["DEPARTMENT_HEAD"]}
-            />
+              inProgress={data.venueRequest.inProgress}
+              actionNeeded={
+                new Date(data.venueRequest.startTime) <= new Date() &&
+                !data.venueRequest.inProgress &&
+                data.status === "APPROVED"
+              }
+            >
+              {data.status === "APPROVED" ||
+                (data.status === "ON_HOLD" && (
+                  <CancelRequest
+                    requestId={data.id}
+                    requestStatus={data.status}
+                  />
+                ))}
+              {new Date(data.venueRequest.startTime) <= new Date() &&
+                !data.venueRequest.inProgress &&
+                data.status === "APPROVED" && (
+                  <VenueRequestActions data={data.venueRequest} />
+                )}
+            </RequestReviewerActions>
           )}
           {data.type === "VENUE" &&
             data.venueRequest &&

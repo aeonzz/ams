@@ -11,7 +11,7 @@ import NotFound from "@/app/not-found";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Facilities",
+  title: "Venue Management",
 };
 
 export interface Props {

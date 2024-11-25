@@ -146,6 +146,16 @@ export default function VenueRequestInput({
     const startDate = new Date(startTime);
     const endDate = new Date(endTime);
 
+    if (startDate.getTime() < Date.now()) {
+      toast.error("Start time cannot be in the past.");
+      return;
+    }
+
+    if (endDate.getTime() < Date.now()) {
+      toast.error("End time cannot be in the past.");
+      return;
+    }
+
     if (
       startDate.getTime() === endDate.getTime() &&
       startDate.toDateString() === endDate.toDateString()

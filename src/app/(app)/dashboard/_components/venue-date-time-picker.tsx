@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { FieldValues, Path, UseFormReturn } from "react-hook-form";
+import { FieldValues, Path, PathValue, UseFormReturn } from "react-hook-form";
 import {
   Form,
   FormControl,
@@ -29,6 +29,7 @@ import { TimePicker } from "@/components/ui/time-picker";
 import {
   addMonths,
   format,
+  isAfter,
   isSameDay,
   isWithinInterval,
   setHours,
@@ -129,12 +130,52 @@ export default function VenueDateTimePicker<T extends FieldValues>({
     if (!selectedDate) return false;
     const time = new Date(selectedDate);
     time.setHours(hours, minutes, 0, 0);
+
+    if (time < new Date()) return true;
+
     return disabledTimeRanges.some((range) =>
       isWithinInterval(time, {
         start: range.start,
         end: range.end,
       })
     );
+  };
+
+  const getNextAvailableTimePreset = (startTime: Date) => {
+    for (const preset of timePresets) {
+      const presetTime = setMinutes(
+        setHours(startTime, preset.hours),
+        preset.minutes
+      );
+      if (
+        !isTimeDisabled(preset.hours, preset.minutes) &&
+        isAfter(presetTime, new Date())
+      ) {
+        return preset.label;
+      }
+    }
+    return null;
+  };
+
+  const resetTimePreset = (date: Date) => {
+    // Automatically select the next available time preset for the selected date
+    const nextAvailableTime = getNextAvailableTimePreset(date);
+    if (nextAvailableTime) {
+      setSelectedTime(nextAvailableTime);
+
+      const [hours, minutes] = nextAvailableTime
+        .split(":")
+        .map((str) => parseInt(str.split(" ")[0], 10));
+
+      const adjustedHours = hours === 12 ? 12 : hours + 12;
+
+      const updatedDate = setHours(
+        setMinutes(new Date(date), minutes),
+        adjustedHours
+      );
+
+      form.setValue(name, updatedDate as PathValue<T, Path<T>>);
+    }
   };
 
   const reservationsForSelectedDate = React.useMemo(() => {
@@ -154,7 +195,7 @@ export default function VenueDateTimePicker<T extends FieldValues>({
         control={form.control}
         name={name}
         render={({ field }) => (
-          <FormItem className="flex flex-col flex-1">
+          <FormItem className="flex flex-1 flex-col">
             <FormLabel className="text-left">{label}</FormLabel>
             <Popover modal>
               <FormControl>
@@ -193,7 +234,6 @@ export default function VenueDateTimePicker<T extends FieldValues>({
                     selected={field.value}
                     onSelect={(date) => {
                       setSelectedDate(date || null);
-                      setSelectedTime(timePresets[0].label);
                       if (date) {
                         const newDate = field.value
                           ? new Date(field.value)
@@ -204,6 +244,7 @@ export default function VenueDateTimePicker<T extends FieldValues>({
                           date.getDate()
                         );
                         field.onChange(newDate);
+                        resetTimePreset(newDate);
                       } else {
                         field.onChange(date);
                       }
@@ -228,7 +269,11 @@ export default function VenueDateTimePicker<T extends FieldValues>({
                         </SelectTrigger>
                         <SelectContent className="max-h-60">
                           {monthNames.map((month, index) => (
-                            <SelectItem key={index} value={index.toString()}>
+                            <SelectItem
+                              key={index}
+                              value={index.toString()}
+                              disabled={index < new Date().getMonth()}
+                            >
                               {month}
                             </SelectItem>
                           ))}

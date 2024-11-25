@@ -6,8 +6,8 @@ import type { RequestStatusTypeType } from "prisma/generated/zod/inputTypeSchema
 
 type Data = {
   createdAt: Date;
-  id: string;
   requestedBy: string;
+  requestedByCopy: string;
   office: string;
   destination: string;
   numberOfPassengers: number;
@@ -73,7 +73,7 @@ export async function fillTransportRequestFormPDF(
   const pdfDoc = await PDFDocument.load(pdfBytes);
   pdfDoc.registerFontkit(fontkit);
 
-  const font = await pdfDoc.embedFont(StandardFonts.CourierBoldOblique);
+  const font = await pdfDoc.embedFont(StandardFonts.CourierOblique);
   const pages = pdfDoc.getPages();
   const firstPage = pages[0];
   const { width, height } = firstPage.getSize();
@@ -82,17 +82,17 @@ export async function fillTransportRequestFormPDF(
   console.log(data.numberOfPassengers);
 
   const fieldPositions: FieldPositions = {
-    createdAt: { x: 100, y: height - 125, size: 10, maxWidth: 200 },
-    id: { x: 130, y: height - 138, size: 10, maxWidth: 200 },
-    requestedBy: { x: 155, y: height - 150, size: 10, maxWidth: 200 },
-    office: { x: 375, y: height - 150, size: 10, maxWidth: 100 },
-    destination: { x: 130, y: height - 163, size: 10, maxWidth: 150 },
-    numberOfPassengers: { x: 420, y: height - 160, size: 10, maxWidth: 50 },
-    passengersName: { x: 70, y: height - 194, size: 10, maxWidth: 420 },
-    vehicle: { x: 110, y: height - 218, size: 10, maxWidth: 200 },
-    dateOfTravel: { x: 140, y: height - 232, size: 10, maxWidth: 200 },
-    description: { x: 70, y: height - 258, size: 9, maxWidth: 420 },
-    status: { x: 120, y: height - 285, size: 10, maxWidth: 150 },
+    createdAt: { x: 100, y: height - 125, size: 9, maxWidth: 200 },
+    requestedBy: { x: 155, y: height - 138, size: 9, maxWidth: 200 },
+    office: { x: 375, y: height - 138, size: 9, maxWidth: 100 },
+    destination: { x: 130, y: height - 150, size: 9, maxWidth: 150 },
+    numberOfPassengers: { x: 410, y: height - 150, size: 9, maxWidth: 50 },
+    passengersName: { x: 160, y: height - 165, size: 8, maxWidth: 420 },
+    vehicle: { x: 110, y: height - 178, size: 9, maxWidth: 200 },
+    dateOfTravel: { x: 140, y: height - 190, size: 9, maxWidth: 200 },
+    description: { x: 70, y: height - 215, size: 9, maxWidth: 420 },
+    status: { x: 120, y: height - 245, size: 9, maxWidth: 150 },
+    requestedByCopy: { x: 70, y: height - 310, size: 9, maxWidth: 150 },
   };
 
   // function drawDebugRectangle(

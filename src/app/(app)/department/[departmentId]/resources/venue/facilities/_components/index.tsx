@@ -40,7 +40,7 @@ import Link from "next/link";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import NotFound from "@/app/not-found";
 
-interface DepartmentVenuesScreenProps {
+interface DepartmentFacilitiesScreenProps {
   departmentId: string;
 }
 
@@ -51,9 +51,9 @@ const NoDataMessage = ({ message }: { message: string }) => (
   </div>
 );
 
-export default function DepartmentVenuesScreen({
+export default function DepartmentFacilitiesScreen({
   departmentId,
-}: DepartmentVenuesScreenProps) {
+}: DepartmentFacilitiesScreenProps) {
   const router = useRouter();
   const dialogManager = useDialogManager();
   const [searchTerm, setSearchTerm] = useState("");
@@ -121,7 +121,7 @@ export default function DepartmentVenuesScreen({
                 return (
                   <Link
                     key={venue.id}
-                    href={`/department/${departmentId}/resources/facilities/${venue.id}`}
+                    href={`/department/${departmentId}/resources/venue/facilities/${venue.id}`}
                     prefetch
                   >
                     <Card className="relative cursor-pointer overflow-hidden shadow-md transition-all hover:border-primary">
@@ -148,7 +148,7 @@ export default function DepartmentVenuesScreen({
                             {textTransform(venue.status)}
                           </Badge>
                           <Link
-                            href={`/department/${departmentId}/facilities/${venue.id}`}
+                            href={`/department/${departmentId}/resources/venue/facilities/${venue.id}`}
                             className={cn(
                               buttonVariants({
                                 variant: "ghost2",
