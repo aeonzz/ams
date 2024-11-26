@@ -9,6 +9,7 @@ import {
   CalendarCheck,
   CalendarIcon,
   Clock,
+  Clock1,
   Dot,
   Download,
   Info,
@@ -289,7 +290,7 @@ export default function VenueRequestDetails({
             <H4 className="font-semibold text-muted-foreground">
               Venue Request Details
             </H4>
-            {existingFormFile && (
+            {existingFormFile && requestStatus === "COMPLETED" && (
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
@@ -305,11 +306,7 @@ export default function VenueRequestDetails({
                   className="flex items-center gap-3"
                   side="bottom"
                 >
-                  <CommandTooltip text="Download venue request form">
-                    <CommandShortcut>Ctrl</CommandShortcut>
-                    <CommandShortcut>Shift</CommandShortcut>
-                    <CommandShortcut>D</CommandShortcut>
-                  </CommandTooltip>
+                  <P>Download venue request form</P>
                 </TooltipContent>
               </Tooltip>
             )}
@@ -371,6 +368,21 @@ export default function VenueRequestDetails({
                   </div>
                   <div className="w-full pl-5 pt-1">
                     <P>{format(new Date(completedAt), "PPP p")}</P>
+                  </div>
+                </div>
+              </div>
+            )}
+            {data.actualStart && (
+              <div className="group flex items-center justify-between">
+                <div className="flex w-full flex-col items-start">
+                  <div className="flex space-x-1 text-muted-foreground">
+                    <Clock1 className="h-5 w-5" />
+                    <P className="font-semibold tracking-tight">
+                      Actual Start:
+                    </P>
+                  </div>
+                  <div className="w-full pl-5 pt-1">
+                    <P>{format(new Date(data.actualStart), "PPP p")}</P>
                   </div>
                 </div>
               </div>

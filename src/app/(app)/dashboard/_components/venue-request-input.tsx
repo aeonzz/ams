@@ -49,6 +49,8 @@ import VenueRequestInputSkeleton from "./venue-request-input-skeleton";
 import { VenueFeaturesType } from "@/lib/types/venue";
 import ScheduledEventCardSkeleton from "./scheduled-event-card-skeleton";
 import MultiSelect from "@/components/multi-select";
+import { PhotoProvider, PhotoView } from "react-photo-view";
+import { CircleMinus, CirclePlus, RotateCw } from "lucide-react";
 
 interface VenueRequestInputProps {
   mutateAsync: UseMutateAsyncFunction<
@@ -224,12 +226,45 @@ export default function VenueRequestInput({
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="scroll-bar flex max-h-[60vh] gap-6 overflow-y-auto px-4 py-1">
             <div className="flex flex-1 scroll-m-10 scroll-p-10 flex-col space-y-2">
-              <VenueField
-                form={form}
-                name="venueId"
-                isPending={isPending}
-                data={venueData}
-              />
+              <div className="flex items-end gap-1">
+                <VenueField
+                  form={form}
+                  name="venueId"
+                  isPending={isPending}
+                  data={venueData}
+                />
+                {selectedVenue?.rulesAndRegulations && (
+                  <PhotoProvider
+                    speed={() => 300}
+                    maskOpacity={0.8}
+                    loadingElement={<LoadingSpinner />}
+                    toolbarRender={({ onScale, scale, rotate, onRotate }) => {
+                      return (
+                        <>
+                          <div className="flex gap-3">
+                            <CirclePlus
+                              className="size-5 cursor-pointer opacity-75 transition-opacity ease-linear hover:opacity-100"
+                              onClick={() => onScale(scale + 1)}
+                            />
+                            <CircleMinus
+                              className="size-5 cursor-pointer opacity-75 transition-opacity ease-linear hover:opacity-100"
+                              onClick={() => onScale(scale - 1)}
+                            />
+                            <RotateCw
+                              className="size-5 cursor-pointer opacity-75 transition-opacity ease-linear hover:opacity-100"
+                              onClick={() => onRotate(rotate + 90)}
+                            />
+                          </div>
+                        </>
+                      );
+                    }}
+                  >
+                    <PhotoView src={selectedVenue.rulesAndRegulations}>
+                      <Button variant="ghost2">Policy</Button>
+                    </PhotoView>
+                  </PhotoProvider>
+                )}
+              </div>
               <MultiSelect
                 form={form}
                 name="setupRequirements"
