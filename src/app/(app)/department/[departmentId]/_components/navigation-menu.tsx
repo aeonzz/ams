@@ -39,7 +39,7 @@ const management: {
   },
   {
     title: "Managing Job Requests",
-    href: "job-requests",
+    href: "job-request/?page=1&per_page=10&sort=createdAt.desc",
     description: "Oversee job requests and ensure their completion.",
     condition: true,
   },

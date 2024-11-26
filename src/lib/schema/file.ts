@@ -21,19 +21,19 @@ export type UploadFileSchemaServerWithPath = z.infer<
   typeof uploadFileSchemaServerWithPath
 >;
 
-export const uploadVenueRulesFile = z.object({
-  url: z.array(
-    z.string({
-      required_error: "Image is required",
-    })
-  ),
+export const updateVenueRulesSchema = z.object({
+  text: z.string({
+    required_error: "Content is required",
+  }),
 });
 
-export type UploadVenueRulesFile = z.infer<typeof uploadVenueRulesFile>;
+export type UpdateVenueRulesSchema = z.infer<typeof updateVenueRulesSchema>;
 
-export const uploadVenueRulesFileWithPath = uploadVenueRulesFile.extend({
+export const updateVenueRulesSchemaWithPath = updateVenueRulesSchema.extend({
   path: z.string(),
   venueId: z.string(),
 });
 
-export type UploadVenueRulesFileWithPath = z.infer<typeof uploadVenueRulesFileWithPath>;
+export type UpdateVenueRulesSchemaWithPath = z.infer<
+  typeof updateVenueRulesSchemaWithPath
+>;

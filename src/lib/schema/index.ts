@@ -152,3 +152,17 @@ export const vehicleMaintenanceHistoryParamsSchema = z.object({
 export type GetVehicleMaintenanceHistory = z.infer<
   typeof vehicleMaintenanceHistoryParamsSchema
 >;
+
+export const JobEvaluationParamsSchema = z.object({
+  page: z.coerce.number().default(1),
+  per_page: z.coerce.number().default(10),
+  sort: z.string().optional(),
+  description: z.string().optional(),
+  from: z.string().optional(),
+  to: z.string().optional(),
+});
+
+export type GetJobEvaluation = z.infer<
+  typeof JobEvaluationParamsSchema
+>;
+

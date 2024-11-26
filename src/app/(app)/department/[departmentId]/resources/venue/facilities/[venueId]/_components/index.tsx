@@ -46,6 +46,7 @@ import ManageVenueActions from "./manage-venue-actions";
 import { PhotoProvider, PhotoView } from "react-photo-view";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
 import SetupRequirements from "./setup-requirements";
+import NumberFlow from "@number-flow/react";
 
 interface ManageVenueScreenProps {
   params: {
@@ -172,7 +173,15 @@ export default function ManageVenueScreen({ params }: ManageVenueScreenProps) {
               <Separator className="my-2" />
               <div className="flex items-center justify-between">
                 <P className="font-semibold text-muted-foreground">Capacity</P>
-                <P>{data.capacity}</P>
+                <P>
+                  <NumberFlow
+                    willChange
+                    continuous
+                    value={data.capacity}
+                    format={{ useGrouping: false }}
+                    aria-hidden
+                  />
+                </P>
               </div>
               <Separator className="my-2" />
               <div className="flex items-center justify-between">

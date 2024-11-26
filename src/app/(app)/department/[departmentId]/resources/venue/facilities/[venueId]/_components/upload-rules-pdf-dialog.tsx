@@ -24,7 +24,7 @@ import { useForm, useFormState } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
-import { File, X } from "lucide-react";
+import { CircleMinus, CirclePlus, File, RotateCw, X } from "lucide-react";
 import { type UploadFileSchema, uploadFileSchema } from "@/lib/db/schema/file";
 import {
   Form,
@@ -51,6 +51,11 @@ import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { type DepartmentWithRelations } from "prisma/generated/zod";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQueryClient } from "@tanstack/react-query";
+import Image from "next/image";
+import placeholder from "public/placeholder.svg";
+import { P } from "@/components/typography/text";
+import { PhotoProvider, PhotoView } from "react-photo-view";
+import LoadingSpinner from "@/components/loaders/loading-spinner";
 
 interface UploadRulesPdfDialogProps {
   file: string | null;
@@ -81,7 +86,7 @@ export default function UploadRulesPdfDialog({
   const isFieldsDirty = Object.keys(dirtyFields).length > 0;
 
   const { onUpload, progresses, uploadedFiles, isUploading } = useUploadFile(
-    "documentUploader",
+    "imageUploader",
     { defaultUploadedFiles: [] }
   );
 
@@ -147,8 +152,8 @@ export default function UploadRulesPdfDialog({
           setAlertOpen(true);
         }
       }}
-      className="flex max-h-[90vh] max-w-4xl flex-col"
       isLoading={isPending}
+      className="max-w-sm"
     >
       <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
         {isFieldsDirty && !isPending && (
@@ -183,27 +188,112 @@ export default function UploadRulesPdfDialog({
       <DialogHeader>
         <DialogTitle>Rules and Regulation</DialogTitle>
       </DialogHeader>
-      <Tabs
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          <div className="flex flex-col rounded-md p-3">
+            <div className="flex flex-1 gap-1">
+              {file ? (
+                <PhotoProvider
+                  speed={() => 300}
+                  maskOpacity={0.8}
+                  loadingElement={<LoadingSpinner />}
+                  toolbarRender={({ onScale, scale, rotate, onRotate }) => {
+                    return (
+                      <>
+                        <div className="flex gap-3">
+                          <CirclePlus
+                            className="size-5 cursor-pointer opacity-75 transition-opacity ease-linear hover:opacity-100"
+                            onClick={() => onScale(scale + 1)}
+                          />
+                          <CircleMinus
+                            className="size-5 cursor-pointer opacity-75 transition-opacity ease-linear hover:opacity-100"
+                            onClick={() => onScale(scale - 1)}
+                          />
+                          <RotateCw
+                            className="size-5 cursor-pointer opacity-75 transition-opacity ease-linear hover:opacity-100"
+                            onClick={() => onRotate(rotate + 90)}
+                          />
+                        </div>
+                      </>
+                    );
+                  }}
+                >
+                  <PhotoView src={file}>
+                    <div className="relative aspect-square h-16 cursor-pointer transition-colors hover:brightness-75">
+                      <Image
+                        src={file ?? placeholder}
+                        alt={`Image of ${file}`}
+                        fill
+                        className="rounded-md border object-cover"
+                      />
+                    </div>
+                  </PhotoView>
+                </PhotoProvider>
+              ) : (
+                <div className="relative aspect-square h-16 cursor-pointer transition-colors hover:brightness-75">
+                  <Image
+                    src={file ?? placeholder}
+                    alt={`Image of ${file}`}
+                    fill
+                    className="rounded-md border object-cover"
+                  />
+                </div>
+              )}
+              <P className="font-medium">Venue Rules and Regulations</P>
+            </div>
+            <FormField
+              control={form.control}
+              name="file"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <FileUploader
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      maxFiles={1}
+                      maxSize={4 * 1024 * 1024}
+                      progresses={progresses}
+                      disabled={isPending || isUploading}
+                      drop={false}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <Separator className="my-4" />
+          <DialogFooter>
+            <div></div>
+            <SubmitButton disabled={isUploading || isPending} className="w-28">
+              Save
+            </SubmitButton>
+          </DialogFooter>
+        </form>
+      </Form>
+      {/* <Tabs
         value={activeTab}
         onValueChange={(value) => setActiveTab(value as "view" | "upload")}
         className="h-full px-3"
       >
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="view">View File</TabsTrigger>
-          <TabsTrigger value="upload">Upload New File</TabsTrigger>
+          <TabsTrigger value="upload">Upload New Image</TabsTrigger>
         </TabsList>
         <TabsContent value="view">
           {file ? (
-            <div className="px-1 py-1">
-              {/* <h3 className="mb-2 text-lg font-semibold">
-                Current {capability.name} Form
-              </h3> */}
-              <iframe src={file} className="h-[65vh] w-full border" />
+            <div className="relative aspect-video px-1 py-1">
+              <Image
+                fill
+                src={file}
+                alt="Facility rules and regulations image"
+                objectFit="cover"
+              />
             </div>
           ) : (
             <div className="flex min-h-[55vh] items-center justify-center">
               <p className="text-center text-muted-foreground">
-                No form uploaded yet.
+                No image uploaded yet.
               </p>
             </div>
           )}
@@ -221,10 +311,9 @@ export default function UploadRulesPdfDialog({
                       <FormControl>
                         <FileUploader
                           value={field.value}
-                          accept={{ "application/pdf": [] }}
                           onValueChange={field.onChange}
                           maxFiles={1}
-                          maxSize={12 * 1024 * 1024}
+                          maxSize={4 * 1024 * 1024}
                           progresses={progresses}
                           disabled={isPending || isUploading}
                         />
@@ -247,7 +336,7 @@ export default function UploadRulesPdfDialog({
             </form>
           </Form>
         </TabsContent>
-      </Tabs>
+      </Tabs> */}
     </DialogContent>
   );
 }

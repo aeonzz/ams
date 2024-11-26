@@ -49,8 +49,9 @@ import VenueRequestInputSkeleton from "./venue-request-input-skeleton";
 import { VenueFeaturesType } from "@/lib/types/venue";
 import ScheduledEventCardSkeleton from "./scheduled-event-card-skeleton";
 import MultiSelect from "@/components/multi-select";
-import { PhotoProvider, PhotoView } from "react-photo-view";
-import { CircleMinus, CirclePlus, RotateCw } from "lucide-react";
+import { EditorContent, Extension, useEditor } from "@tiptap/react";
+import { extensions } from "@/components/tiptap/editor";
+import { ChevronLeft } from "lucide-react";
 
 interface VenueRequestInputProps {
   mutateAsync: UseMutateAsyncFunction<
@@ -76,6 +77,7 @@ export default function VenueRequestInput({
 }: VenueRequestInputProps) {
   const pathname = usePathname();
   const queryClient = useQueryClient();
+  const [isOpenRules, setIsOpenRules] = React.useState(false);
   const venueId = form.watch("venueId");
 
   const { data: venueData, isLoading: isLoadingVenueData } = useQuery<
@@ -218,6 +220,18 @@ export default function VenueRequestInput({
   const filteredVenueSetupRequirements =
     selectedVenue?.venueSetupRequirement.filter((v) => v.available);
 
+  const editor = useEditor({
+    extensions: extensions as Extension[],
+    content: selectedVenue?.rulesAndRegulations,
+    editable: false,
+  });
+
+  React.useEffect(() => {
+    if (editor && selectedVenue?.rulesAndRegulations) {
+      editor.commands.setContent(selectedVenue.rulesAndRegulations);
+    }
+  }, [editor, selectedVenue?.rulesAndRegulations]);
+
   if (isLoadingVenueData) return <VenueRequestInputSkeleton />;
 
   return (
@@ -226,45 +240,12 @@ export default function VenueRequestInput({
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="scroll-bar flex max-h-[60vh] gap-6 overflow-y-auto px-4 py-1">
             <div className="flex flex-1 scroll-m-10 scroll-p-10 flex-col space-y-2">
-              <div className="flex items-end gap-1">
-                <VenueField
-                  form={form}
-                  name="venueId"
-                  isPending={isPending}
-                  data={venueData}
-                />
-                {selectedVenue?.rulesAndRegulations && (
-                  <PhotoProvider
-                    speed={() => 300}
-                    maskOpacity={0.8}
-                    loadingElement={<LoadingSpinner />}
-                    toolbarRender={({ onScale, scale, rotate, onRotate }) => {
-                      return (
-                        <>
-                          <div className="flex gap-3">
-                            <CirclePlus
-                              className="size-5 cursor-pointer opacity-75 transition-opacity ease-linear hover:opacity-100"
-                              onClick={() => onScale(scale + 1)}
-                            />
-                            <CircleMinus
-                              className="size-5 cursor-pointer opacity-75 transition-opacity ease-linear hover:opacity-100"
-                              onClick={() => onScale(scale - 1)}
-                            />
-                            <RotateCw
-                              className="size-5 cursor-pointer opacity-75 transition-opacity ease-linear hover:opacity-100"
-                              onClick={() => onRotate(rotate + 90)}
-                            />
-                          </div>
-                        </>
-                      );
-                    }}
-                  >
-                    <PhotoView src={selectedVenue.rulesAndRegulations}>
-                      <Button variant="ghost2">Policy</Button>
-                    </PhotoView>
-                  </PhotoProvider>
-                )}
-              </div>
+              <VenueField
+                form={form}
+                name="venueId"
+                isPending={isPending}
+                data={venueData}
+              />
               <MultiSelect
                 form={form}
                 name="setupRequirements"
@@ -332,53 +313,96 @@ export default function VenueRequestInput({
               />
             </div>
             {venueId && (
-              <div
-                className={cn("scroll-bar max-h-[60vh] flex-1 overflow-y-auto")}
-              >
-                <P className="mb-2 font-semibold">Schedules</P>
-                {isLoading || isRefetching ? (
-                  <ScheduledEventCardSkeleton />
-                ) : !data || data.length === 0 ? (
-                  <div className="grid h-32 w-full place-items-center">
-                    <P>No reserved schedules</P>
+              <div className="flex-1">
+                {isOpenRules && editor ? (
+                  <div className="scroll-bar max-h-[60vh] space-y-3 overflow-y-auto">
+                    <div className="flex items-center gap-1">
+                      <Button
+                        size="icon"
+                        className="size-7"
+                        variant="ghost2"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setIsOpenRules(false);
+                        }}
+                      >
+                        <ChevronLeft className="size-4" />
+                      </Button>
+                      <H3 className="font-semibold">
+                        Venue Rules and Regulation
+                      </H3>
+                    </div>
+                    <div className="scroll-bar h-full overflow-y-auto">
+                      <EditorContent className="outline-none" editor={editor} />
+                    </div>
                   </div>
                 ) : (
-                  <>
-                    {(() => {
-                      const filteredData = data.filter(
-                        (item) => item.request.venueRequest.venue.id === venueId
-                      );
-                      return filteredData.length === 0 ? (
-                        <div className="grid h-32 w-full place-items-center">
-                          <P>No reserved schedules</P>
-                        </div>
-                      ) : (
-                        filteredData.map((item, index) => (
-                          <ScheduledEventCard key={index} data={item} />
-                        ))
-                      );
-                    })()}
-                  </>
+                  <div
+                    className={cn("scroll-bar max-h-[60vh] overflow-y-auto")}
+                  >
+                    <P className="mb-2 font-semibold">Schedules</P>
+                    {isLoading || isRefetching ? (
+                      <ScheduledEventCardSkeleton />
+                    ) : !data || data.length === 0 ? (
+                      <div className="grid h-32 w-full place-items-center">
+                        <P>No reserved schedules</P>
+                      </div>
+                    ) : (
+                      <>
+                        {(() => {
+                          const filteredData = data.filter(
+                            (item) =>
+                              item.request.venueRequest.venue.id === venueId
+                          );
+                          return filteredData.length === 0 ? (
+                            <div className="grid h-32 w-full place-items-center">
+                              <P>No reserved schedules</P>
+                            </div>
+                          ) : (
+                            filteredData.map((item, index) => (
+                              <ScheduledEventCard key={index} data={item} />
+                            ))
+                          );
+                        })()}
+                      </>
+                    )}
+                  </div>
                 )}
               </div>
             )}
           </div>
           <Separator className="my-4" />
           <DialogFooter>
-            {isFieldsDirty ? (
-              <Button
-                onClick={(e) => {
-                  e.preventDefault();
-                  form.reset();
-                }}
-                variant="destructive"
-                disabled={isPending}
-              >
-                Reset form
-              </Button>
-            ) : (
-              <div></div>
-            )}
+            <div className="flex gap-2">
+              {isFieldsDirty && (
+                <Button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    form.reset();
+                  }}
+                  variant="destructive"
+                  disabled={isPending}
+                >
+                  Reset form
+                </Button>
+              )}
+              {selectedVenue?.rulesAndRegulations && (
+                <span className="text-sm text-muted-foreground">
+                  By proceeding, you confirm that you have read and accept the{" "}
+                  <Button
+                    variant="link"
+                    className="h-fit p-0"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setIsOpenRules(true);
+                    }}
+                  >
+                    rules and regulations
+                  </Button>{" "}
+                  of the venue.
+                </span>
+              )}
+            </div>
             <SubmitButton disabled={isPending} type="submit" className="w-28">
               Submit
             </SubmitButton>

@@ -45,9 +45,7 @@ export const venueRequestSchemaBase = z.object({
     .string()
     .min(10, { message: "Must be at least 10 characters long" })
     .max(700, { message: "Cannot be more than 600 characters long" }),
-  setupRequirements: z
-    .array(z.string().max(50, "Passenger name cannot exceed 50 characters"))
-    .min(1, "At least one passenger name is required"),
+  setupRequirements: z.array(z.string()).optional(),
   startTime: z
     .date({
       required_error: "Start time is required",

@@ -13,7 +13,7 @@ export default function DepartmentFacilitiesPage({
 }: DepartmentFacilitiesPage) {
   return (
     <ContentLayout title="Facilities">
-      <DepartmentLayout departmentId={params.departmentId} name="Facilitiess" withBackButton>
+      <DepartmentLayout departmentId={params.departmentId} name="Facilities" withBackButton>
         <DepartmentFacilitiesScreen departmentId={params.departmentId} />
       </DepartmentLayout>
     </ContentLayout>
