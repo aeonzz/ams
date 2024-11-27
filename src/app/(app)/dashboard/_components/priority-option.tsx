@@ -32,7 +32,7 @@ import {
 interface PriorityOptionProps {
   prio: Priority;
   setPrio: React.Dispatch<React.SetStateAction<Priority>>;
-  isLoading: boolean;
+  isLoading?: boolean;
 }
 
 export type Priority = {
@@ -41,7 +41,7 @@ export type Priority = {
   icon: LucideIcon;
 };
 
-const priorities = [
+export const priorities = [
   {
     value: "NO_PRIORITY",
     label: "No priority",
@@ -72,7 +72,7 @@ const priorities = [
 export default function PriorityOption({
   prio,
   setPrio,
-  isLoading,
+  isLoading = false,
 }: PriorityOptionProps) {
   const [open, setOpen] = React.useState(false);
   return (
@@ -80,7 +80,7 @@ export default function PriorityOption({
       <Popover open={open} onOpenChange={setOpen} modal>
         <PopoverTrigger asChild>
           <Button
-            variant="secondary"
+            variant="ghost2"
             size="sm"
             role="combobox"
             aria-expanded={open}

@@ -7,8 +7,7 @@ export const createJobRequestSchemaServer = z.object({
   images: z.array(z.string()).optional(),
   departmentId: z.string(),
   location: z.string(),
-  dueDate: z.date(),
-  jobType: JobTypeSchema,
+  jobType: z.string(),
 });
 
 export const createJobRequestSchemaServerWithPath =

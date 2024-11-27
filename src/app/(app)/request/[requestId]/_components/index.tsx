@@ -50,6 +50,8 @@ import SupplyRequestActions from "./supply-request-actions";
 import TransportRequestActions from "./transport-request-actions";
 import CancelRequest from "./cancel-request";
 import VenueRequestActions from "./venue-request-actions";
+import PriorityOption from "@/app/(app)/dashboard/_components/priority-option";
+import SetPriority from "./set-priority";
 
 interface RequestDetailsProps {
   params: string;
@@ -290,6 +292,9 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                   </P>
                 </div>
               </div>
+            )}
+            {data.type === "JOB" && data.jobRequest && (
+              <SetPriority prio={data.priority} />
             )}
           </div>
         </div>

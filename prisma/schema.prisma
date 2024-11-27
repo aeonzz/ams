@@ -180,13 +180,11 @@ model JobRequest {
   id                   String                @id
   description          String
   location             String
-  dueDate              DateTime
-  estimatedTime        Int?
   startDate            DateTime?
   endDate              DateTime?
   costEstimate         Float?
   actualCost           Float?
-  jobType              JobType
+  jobType              String
   images               String[]
   reworkAttempts       Rework[]
   rejectionCount       Int                   @default(0)
@@ -232,20 +230,20 @@ model JobRequestEvaluation {
 }
 
 model VenueRequest {
-  id                String   @id
+  id                String    @id
   notes             String?
   purpose           String
   setupRequirements String[]
   startTime         DateTime
   endTime           DateTime
   actualStart       DateTime?
-  inProgress        Boolean  @default(false)
-  requestId         String   @unique
-  request           Request  @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  inProgress        Boolean   @default(false)
+  requestId         String    @unique
+  request           Request   @relation(fields: [requestId], references: [id], onDelete: Cascade)
   venueId           String
-  venue             Venue    @relation(fields: [venueId], references: [id])
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  venue             Venue     @relation(fields: [venueId], references: [id])
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 }
 
 model Venue {
@@ -271,7 +269,7 @@ model VenueSetupRequirement {
   venueId   String
   available Boolean  @default(true)
   venue     Venue    @relation(fields: [venueId], references: [id], onDelete: Cascade)
-  name      String
+  name      String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -454,20 +452,6 @@ enum EntityType {
   USER
   DEPARTMENT
   OTHER
-}
-
-enum JobType {
-  REPAIRS
-  INSTALLATION
-  INSPECTION
-  UPGRADES_RENOVATIONS
-  PREVENTIVE_MAINTENANCE
-  CALIBRATION_TESTING
-  CLEANING_JANITORIAL
-  PAINTING_SURFACE_TREATMENT
-  LANDSCAPING_GROUNDS_MAINTENANCE
-  TROUBLESHOOTING
-  TRANSPORT_VEHICLE_MAINTENANCE
 }
 
 enum NotificationType {

@@ -7,7 +7,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { CalendarIcon, Camera, Check, ChevronsUpDown } from "lucide-react";
+import {
+  CalendarIcon,
+  Camera,
+  Check,
+  ChevronsUpDown,
+  Plus,
+} from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
 import {
   Form,
@@ -60,12 +66,25 @@ import { createJobRequest } from "@/lib/actions/job";
 import { ExtendedJobRequestSchemaServer } from "@/lib/db/schema/job";
 import JobSectionField from "./job-section-field";
 import { type CreateJobRequestSchema } from "./schema";
-import { type Department, JobTypeSchema } from "prisma/generated/zod";
+import { type Department } from "prisma/generated/zod";
 import axios from "axios";
 import JobRequestInputSkeleton from "./job-request-input-skeleton";
 import { ComboboxInput } from "@/components/ui/combobox-input";
 import { Input } from "@/components/ui/input";
 import { useMediaQuery } from "usehooks-ts";
+
+export const jobType = [
+  "REPAIRS",
+  "INSTALLATION",
+  "INSPECTION",
+  "UPGRADES_RENOVATIONS",
+  "PREVENTIVE_MAINTENANCE",
+  "CALIBRATION_TESTING",
+  "CLEANING_JANITORIAL",
+  "PAINTING_SURFACE_TREATMENT",
+  "LANDSCAPING_GROUNDS_MAINTENANCE",
+  "TROUBLESHOOTING",
+] as const;
 
 interface JobRequestInputProps {
   mutateAsync: UseMutateAsyncFunction<
@@ -90,6 +109,9 @@ export default function JobRequestInput({
   isFieldsDirty,
 }: JobRequestInputProps) {
   const pathname = usePathname();
+  const customInputRef = React.useRef<HTMLInputElement>(null);
+  const [customJob, setCustomJob] = React.useState("");
+  const [showCustomInput, setShowCustomInput] = React.useState(false);
   const isDesktop = useMediaQuery("(min-width: 769px)");
 
   const { data, isLoading } = useQuery<Department[]>({
@@ -118,11 +140,10 @@ export default function JobRequestInput({
           description: values.description,
           type: type,
           departmentId: values.departmentId,
-          dueDate: values.dueDate,
-          jobType: values.jobtype,
+          jobType: values.jobType,
           location: values.location,
           path: pathname,
-          priority: "LOW",
+          priority: "NO_PRIORITY",
           ...(currentFiles.length > 0 && {
             images: currentFiles.map((result) => result.url),
           }),
@@ -156,44 +177,37 @@ export default function JobRequestInput({
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="scroll-bar flex max-h-[60vh] gap-6 overflow-y-auto px-4 py-1">
             <div className="flex flex-1 flex-col space-y-2">
-              <div
-                className={cn(
-                  "flex w-full gap-2 py-1",
-                  isDesktop ? "flex-row items-center" : "flex-col"
+              <JobSectionField
+                form={form}
+                name="departmentId"
+                isPending={isPending || isUploading}
+                data={data}
+              />
+              <FormField
+                control={form.control}
+                name="location"
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormLabel>Location</FormLabel>
+                    <FormControl>
+                      <Input
+                        autoComplete="off"
+                        placeholder="Quadrangle"
+                        disabled={isPending || isUploading}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )}
-              >
-                <JobSectionField
-                  form={form}
-                  name="departmentId"
-                  isPending={isPending || isUploading}
-                  data={data}
-                />
-                <FormField
-                  control={form.control}
-                  name="location"
-                  render={({ field }) => (
-                    <FormItem className="flex-1">
-                      <FormLabel>Location</FormLabel>
-                      <FormControl>
-                        <Input
-                          autoComplete="off"
-                          placeholder="Quadrangle"
-                          disabled={isPending || isUploading}
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+              />
               <div
                 className={cn(
                   "flex gap-2 py-1",
                   isDesktop ? "flex-row items-center" : "flex-col"
                 )}
               >
-                <FormField
+                {/* <FormField
                   control={form.control}
                   name="dueDate"
                   render={({ field }) => (
@@ -250,10 +264,10 @@ export default function JobRequestInput({
                       <FormMessage />
                     </FormItem>
                   )}
-                />
+                /> */}
                 <FormField
                   control={form.control}
-                  name="jobtype"
+                  name="jobType"
                   render={({ field }) => (
                     <FormItem className="flex flex-1 flex-col">
                       <FormLabel>Job type</FormLabel>
@@ -279,17 +293,33 @@ export default function JobRequestInput({
                           </FormControl>
                         </PopoverTrigger>
                         <PopoverContent className="w-[230px] p-0" align="start">
-                          <Command className="max-h-72">
+                          <Command className="max-h-64">
                             <CommandInput placeholder="Search job..." />
                             <CommandList>
                               <CommandEmpty>No job found.</CommandEmpty>
                               <CommandGroup>
-                                {JobTypeSchema.options.map((job, index) => (
+                                <CommandItem
+                                  onSelect={() => {
+                                    setShowCustomInput(!showCustomInput);
+                                    if (!showCustomInput) {
+                                      setTimeout(
+                                        () => customInputRef.current?.focus(),
+                                        0
+                                      );
+                                    }
+                                  }}
+                                >
+                                  <Plus className="mr-2 size-4" />
+                                  Other
+                                </CommandItem>
+                                {jobType.map((job, index) => (
                                   <CommandItem
                                     value={job}
                                     key={index}
                                     onSelect={() => {
                                       field.onChange(job);
+                                      setCustomJob("");
+                                      setShowCustomInput(false);
                                     }}
                                   >
                                     {textTransform(job)}
@@ -306,6 +336,26 @@ export default function JobRequestInput({
                               </CommandGroup>
                             </CommandList>
                           </Command>
+                          {showCustomInput && (
+                            <>
+                              <Separator />
+                              <div className="flex flex-col items-center gap-1 p-2">
+                                <Input
+                                  type="text"
+                                  autoFocus
+                                  placeholder="Enter custom job type"
+                                  ref={customInputRef}
+                                  className="w-full"
+                                  value={customJob}
+                                  onChange={(e) => {
+                                    const value = e.target.value;
+                                    setCustomJob(value);
+                                    field.onChange(value);
+                                  }}
+                                />
+                              </div>
+                            </>
+                          )}
                         </PopoverContent>
                       </Popover>
                       <FormMessage />
@@ -314,7 +364,6 @@ export default function JobRequestInput({
                 />
               </div>
               <div className="rounded-md border p-3">
-                {/* <GenerateDescription form={form} /> */}
                 <FormField
                   control={form.control}
                   name="description"

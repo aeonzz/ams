@@ -32,7 +32,6 @@ export { NullsOrderSchema } from './NullsOrderSchema';
 export { JsonNullValueFilterSchema } from './JsonNullValueFilterSchema';
 export { JobStatusSchema } from './JobStatusSchema';
 export { EntityTypeSchema } from './EntityTypeSchema';
-export { JobTypeSchema } from './JobTypeSchema';
 export { NotificationTypeSchema } from './NotificationTypeSchema';
 export { FilePurposeSchema } from './FilePurposeSchema';
 export { ResourceTypeSchema } from './ResourceTypeSchema';

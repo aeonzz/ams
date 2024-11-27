@@ -1,7 +1,6 @@
 import { z } from "zod";
 import {
   JobStatusSchema,
-  JobTypeSchema,
   PriorityTypeSchema,
   RequestStatusTypeSchema,
   RequestTypeSchema,
@@ -187,7 +186,7 @@ export const createJobRequestServer = z.object({
     .string()
     .min(10, { message: "Must be at least 10 characters long" })
     .max(600, { message: "Cannot be more than 600 characters long" }),
-  jobType: JobTypeSchema.refine((val) => val !== undefined, {
+  jobType: z.string({
     message: "Job type is required.",
   }),
   location: z

@@ -1,7 +1,7 @@
 import {
   EntityTypeSchema,
   JobStatusSchema,
-  JobTypeSchema,
+  PriorityTypeSchema,
   RequestStatusTypeSchema,
 } from "prisma/generated/zod";
 import { z } from "zod";
@@ -44,13 +44,11 @@ export type UpdateRequestStatusSchemaWithPath = z.infer<
 
 export const updateJobRequestSchema = z.object({
   description: z.string().optional(),
-  dueDate: z.date().optional(),
-  estimatedTime: z.number().optional(),
   status: JobStatusSchema.optional(),
   startDate: z.date().optional(),
   endDate: z.date().optional(),
-  jobType: JobTypeSchema.optional(),
-  progressNotes: z.string().optional(),
+  jobType: z.string().optional(),
+  priority: PriorityTypeSchema.optional(),
 });
 
 export type UpdateJobRequestSchema = z.infer<typeof updateJobRequestSchema>;

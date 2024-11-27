@@ -47,16 +47,14 @@ import {
   FileCheck,
   FileText,
   MapPin,
+  Plus,
   RotateCw,
   Timer,
   User,
 } from "lucide-react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import {
-  JobTypeSchema,
-  type JobRequestWithRelations,
-} from "prisma/generated/zod";
+import { type JobRequestWithRelations } from "prisma/generated/zod";
 import type { RequestStatusTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestStatusTypeSchema";
 import React from "react";
 import { useForm, useFormState } from "react-hook-form";
@@ -100,6 +98,7 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { Textarea } from "@/components/ui/text-area";
 import { AlertCard } from "@/components/ui/alert-card";
+import { jobType } from "@/app/(app)/dashboard/_components/job-request-input";
 
 interface JobRequestDetailsProps {
   data: JobRequestWithRelations;
@@ -116,6 +115,9 @@ export default function JobRequestDetails({
   requestStatus,
   isCurrentUser,
 }: JobRequestDetailsProps) {
+  const customInputRef = React.useRef<HTMLInputElement>(null);
+  const [customJob, setCustomJob] = React.useState("");
+  const [showCustomInput, setShowCustomInput] = React.useState(false);
   const [editField, setEditField] = React.useState<string | null>(null);
   const pathname = usePathname();
   const queryClient = useQueryClient();
@@ -125,7 +127,6 @@ export default function JobRequestDetails({
       jobType: data.jobType,
       location: data.location,
       description: data.description,
-      dueDate: data.dueDate ? new Date(data.dueDate) : undefined,
     },
   });
 
@@ -424,7 +425,21 @@ export default function JobRequestDetails({
                               <CommandList>
                                 <CommandEmpty>No job found.</CommandEmpty>
                                 <CommandGroup>
-                                  {JobTypeSchema.options.map((job, index) => (
+                                  <CommandItem
+                                    onSelect={() => {
+                                      setShowCustomInput(!showCustomInput);
+                                      if (!showCustomInput) {
+                                        setTimeout(
+                                          () => customInputRef.current?.focus(),
+                                          0
+                                        );
+                                      }
+                                    }}
+                                  >
+                                    <Plus className="mr-2 size-4" />
+                                    Other
+                                  </CommandItem>
+                                  {jobType.map((job, index) => (
                                     <CommandItem
                                       value={job}
                                       key={index}
@@ -446,6 +461,26 @@ export default function JobRequestDetails({
                                 </CommandGroup>
                               </CommandList>
                             </Command>
+                            {showCustomInput && (
+                              <>
+                                <Separator />
+                                <div className="flex flex-col items-center gap-1 p-2">
+                                  <Input
+                                    type="text"
+                                    autoFocus
+                                    placeholder="Enter custom job type"
+                                    ref={customInputRef}
+                                    className="w-full"
+                                    value={customJob}
+                                    onChange={(e) => {
+                                      const value = e.target.value;
+                                      setCustomJob(value);
+                                      field.onChange(value);
+                                    }}
+                                  />
+                                </div>
+                              </>
+                            )}
                           </PopoverContent>
                         </Popover>
                       </FormControl>
@@ -530,7 +565,7 @@ export default function JobRequestDetails({
                 )}
               </div>
             )}
-            {editField === "dueDate" ? (
+            {/* {editField === "dueDate" ? (
               <EditInput
                 isPending={isPending}
                 isFieldsDirty={isFieldsDirty}
@@ -622,8 +657,8 @@ export default function JobRequestDetails({
                   </Button>
                 )}
               </div>
-            )}
-            {data.estimatedTime && (
+            )} */}
+            {/* {data.estimatedTime && (
               <div className="group flex items-center justify-between">
                 <div className="flex w-full flex-col items-start">
                   <div className="flex space-x-1 text-muted-foreground">
@@ -637,7 +672,7 @@ export default function JobRequestDetails({
                   </div>
                 </div>
               </div>
-            )}
+            )} */}
             {requestStatus === "APPROVED" && (
               <>
                 <div className="group flex items-center justify-between">

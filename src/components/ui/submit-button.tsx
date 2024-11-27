@@ -42,52 +42,50 @@ const SubmitButton = forwardRef<HTMLButtonElement, SubmitButtonProps>(
       "text-base"
     );
     return (
-      <motion.div layout transition={{ duration: 0.3, ease: outExpo }}>
-        <Comp
-          className={cn(
-            "relative overflow-hidden",
-            fontSizeClass,
-            buttonVariants({ variant, size, className })
+      <Comp
+        className={cn(
+          "relative overflow-hidden",
+          fontSizeClass,
+          buttonVariants({ variant, size, className })
+        )}
+        disabled={disabled}
+        ref={ref}
+        {...props}
+      >
+        {Icon && iconPlacement === "left" && (
+          <div className="group-hover:translate-x-100 w-0 translate-x-[0%] pr-0 opacity-0 transition-all duration-200 group-hover:w-5 group-hover:pr-2 group-hover:opacity-100">
+            <Icon size={16} className="stroke-primary" />
+          </div>
+        )}
+        <AnimatePresence mode="wait" initial={false}>
+          {disabled ? (
+            <motion.div
+              key="loading"
+              initial={{ y: -10 }}
+              animate={{ y: 0 }}
+              exit={{ y: 30, opacity: 0 }}
+              transition={{ duration: 0.3, type: "spring" }}
+            >
+              <LoadingSpinner />
+            </motion.div>
+          ) : (
+            <motion.div
+              key="standby"
+              initial={{ y: -10 }}
+              animate={{ y: 0 }}
+              exit={{ y: 30 }}
+              transition={{ duration: 0.2, type: "spring" }}
+            >
+              <Slottable>{props.children}</Slottable>
+            </motion.div>
           )}
-          disabled={disabled}
-          ref={ref}
-          {...props}
-        >
-          {Icon && iconPlacement === "left" && (
-            <div className="group-hover:translate-x-100 w-0 translate-x-[0%] pr-0 opacity-0 transition-all duration-200 group-hover:w-5 group-hover:pr-2 group-hover:opacity-100">
-              <Icon size={16} className="stroke-primary" />
-            </div>
-          )}
-          <AnimatePresence mode="wait" initial={false}>
-            {disabled ? (
-              <motion.div
-                key="loading"
-                initial={{ y: -10 }}
-                animate={{ y: 0 }}
-                exit={{ y: 30, opacity: 0 }}
-                transition={{ duration: 0.3, type: "spring" }}
-              >
-                <LoadingSpinner />
-              </motion.div>
-            ) : (
-              <motion.div
-                key="standby"
-                initial={{ y: -10 }}
-                animate={{ y: 0 }}
-                exit={{ y: 30 }}
-                transition={{ duration: 0.2, type: "spring" }}
-              >
-                <Slottable>{props.children}</Slottable>
-              </motion.div>
-            )}
-          </AnimatePresence>
-          {Icon && iconPlacement === "right" && (
-            <div className="w-0 translate-x-[100%] pl-0 opacity-0 transition-all duration-200 group-hover:w-5 group-hover:translate-x-0 group-hover:pl-2 group-hover:opacity-100">
-              <Icon size={16} className="stroke-primary" />
-            </div>
-          )}
-        </Comp>
-      </motion.div>
+        </AnimatePresence>
+        {Icon && iconPlacement === "right" && (
+          <div className="w-0 translate-x-[100%] pl-0 opacity-0 transition-all duration-200 group-hover:w-5 group-hover:translate-x-0 group-hover:pl-2 group-hover:opacity-100">
+            <Icon size={16} className="stroke-primary" />
+          </div>
+        )}
+      </Comp>
     );
   }
 );

@@ -82,7 +82,6 @@ export const createJobRequest = authedProcedure
             create: {
               id: `JRQ-${generateId(3)}`,
               description: rest.description,
-              dueDate: rest.dueDate,
               location: rest.location,
               jobType: rest.jobType,
               images: rest.images,
@@ -650,8 +649,7 @@ export async function getDepartmentJobRequests(input: GetRequestsSchema) {
     const pageCount = Math.ceil(total / per_page);
 
     const formattedData = data.map((data) => {
-      const { request, id, createdAt, updatedAt, ...rest } =
-        data;
+      const { request, id, createdAt, updatedAt, ...rest } = data;
       return {
         ...rest,
         id: request.id,
