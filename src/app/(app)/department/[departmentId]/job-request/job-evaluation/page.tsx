@@ -1,31 +1,35 @@
 "use memo";
 
 import ContentLayout from "@/components/layouts/content-layout";
-import { vehicleSearchParamsSchema } from "@/lib/schema";
+import { JobEvaluationParamsSchema } from "@/lib/schema";
 import { SearchParams } from "@/lib/types";
 import JobEvaluationScreen from "./_components";
 import DepartmentLayout from "@/app/(app)/department/[departmentId]/_components/department-layout";
 
-export interface VenueLogsPageProps {
+export interface JobEvaluationPageProps {
   params: {
     departmentId: string;
   };
   searchParams: SearchParams;
 }
 
-export default function VenueLogsPage({
+export default function JobEvaluationPage({
   params,
   searchParams,
-}: VenueLogsPageProps) {
-  const search = vehicleSearchParamsSchema.parse(searchParams);
+}: JobEvaluationPageProps) {
+  const search = JobEvaluationParamsSchema.parse(searchParams);
   return (
     <ContentLayout title="Job Evaluation">
       <DepartmentLayout
         departmentId={params.departmentId}
         name="Job Evaluation"
         withBackButton
+        container={false}
       >
-        <JobEvaluationScreen departmentId={params.departmentId} searchParams={search} />
+        <JobEvaluationScreen
+          departmentId={params.departmentId}
+          searchParams={search}
+        />
       </DepartmentLayout>
     </ContentLayout>
   );

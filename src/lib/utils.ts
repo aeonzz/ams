@@ -547,13 +547,13 @@ export const isDateInPast = (date: Date) => {
 
 export const textTransform = (text: string) => {
   const transform = text
+    .replace(/([a-z])([A-Z])/g, "$1 $2") 
     .toLowerCase()
-    .split("_")
-    .map((word) => `${word.charAt(0).toUpperCase()}${word.slice(1)}`)
+    .split(/[_\s]/) 
+    .map((word) => `${word.charAt(0).toUpperCase()}${word.slice(1)}`) 
     .join(" ");
   return transform;
 };
-
 /**
  * regular expression to check for valid hour format (01-23)
  */

@@ -186,6 +186,8 @@ model JobRequest {
   actualCost           Float?
   jobType              String
   images               String[]
+  verifiedByReviewer   Boolean               @default(false)
+  verifiedByRequester  Boolean               @default(false)
   reworkAttempts       Rework[]
   rejectionCount       Int                   @default(0)
   priority             PriorityType          @default(NO_PRIORITY)
@@ -194,6 +196,7 @@ model JobRequest {
   status               JobStatus             @default(PENDING)
   assignedTo           String?
   assignedUser         User?                 @relation(fields: [assignedTo], references: [id])
+  isReassigned         Boolean               @default(false)
   createdAt            DateTime              @default(now())
   updatedAt            DateTime              @updatedAt
   jobRequestEvaluation JobRequestEvaluation?
@@ -433,10 +436,6 @@ enum JobStatus {
   PENDING
   IN_PROGRESS
   COMPLETED
-  ON_HOLD
-  CANCELLED
-  REJECTED
-  REWORK_IN_PROGRESS
   VERIFIED
 }
 

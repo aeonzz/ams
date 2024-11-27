@@ -76,11 +76,9 @@ export default function JobSectionField({
                   )}
                 >
                   {field.value ? (
-                    <span className="max-w-44 truncate">
-                      {selectedDepartment?.name}
-                    </span>
+                    <span>{selectedDepartment?.name}</span>
                   ) : (
-                    <span className="max-w-44 truncate">Select department</span>
+                    <span>Select department</span>
                   )}
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
@@ -98,7 +96,7 @@ export default function JobSectionField({
                           <CommandItem
                             value={department.id}
                             onSelect={() => {
-                              form.setValue(name, department.id);
+                              field.onChange(department.id);
                               setOpen(false);
                             }}
                             className="flex items-center"

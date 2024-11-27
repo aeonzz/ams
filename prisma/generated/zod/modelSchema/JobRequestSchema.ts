@@ -26,9 +26,12 @@ export const JobRequestSchema = z.object({
   actualCost: z.number().nullable(),
   jobType: z.string(),
   images: z.string().array(),
+  verifiedByReviewer: z.boolean(),
+  verifiedByRequester: z.boolean(),
   rejectionCount: z.number().int(),
   requestId: z.string(),
   assignedTo: z.string().nullable(),
+  isReassigned: z.boolean(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })

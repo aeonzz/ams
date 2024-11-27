@@ -27,8 +27,7 @@ export function JobRequestTable({
   jobRequestPromise,
   departmentId,
 }: JobRequestTableProps) {
-  const { data, pageCount, department } =
-    React.use(jobRequestPromise);
+  const { data, pageCount, department } = React.use(jobRequestPromise);
 
   const columns = React.useMemo(() => getJobRequestColumns(), []);
 
@@ -37,6 +36,11 @@ export function JobRequestTable({
       label: "Title",
       value: "title",
       placeholder: "Filter title...",
+    },
+    {
+      label: "ID",
+      value: "id",
+      placeholder: "Search id...",
     },
   ];
 
@@ -84,7 +88,7 @@ export function JobRequestTable({
               <Link
                 prefetch
                 className={cn(
-                  buttonVariants({ variant: "secondary", size: "sm" })
+                  buttonVariants({ variant: "ghost2", size: "sm" })
                 )}
                 href={`/department/${departmentId}/job-request/job-evaluation`}
               >

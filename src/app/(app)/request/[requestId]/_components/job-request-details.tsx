@@ -88,22 +88,18 @@ import {
   UpdateJobRequestSchemaServerWithPath,
 } from "@/lib/schema/request";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { Textarea } from "@/components/ui/text-area";
 import { AlertCard } from "@/components/ui/alert-card";
 import { jobType } from "@/app/(app)/dashboard/_components/job-request-input";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface JobRequestDetailsProps {
   data: JobRequestWithRelations;
   requestId: string;
   rejectionReason: string | null;
+  cancellationReason: string | null;
+  onHoldReason: string | null;
   requestStatus: RequestStatusTypeType;
   isCurrentUser: boolean;
 }
@@ -112,6 +108,8 @@ export default function JobRequestDetails({
   data,
   requestId,
   rejectionReason,
+  cancellationReason,
+  onHoldReason,
   requestStatus,
   isCurrentUser,
 }: JobRequestDetailsProps) {
@@ -156,7 +154,6 @@ export default function JobRequestDetails({
             jobType: data.jobType,
             location: data.location,
             description: data.description,
-            dueDate: data.dueDate,
           });
           setEditField(null);
           return "Request updated successfully";
@@ -257,15 +254,6 @@ export default function JobRequestDetails({
   };
 
   useHotkeys(
-    "mod+shift+e",
-    (event) => {
-      event.preventDefault();
-      handleDownloadEvaluation();
-    },
-    { enableOnFormTags: false, enabled: data.jobRequestEvaluation !== null }
-  );
-
-  useHotkeys(
     "shift+enter",
     (event) => {
       event.preventDefault();
@@ -295,7 +283,23 @@ export default function JobRequestDetails({
   return (
     <div className="pb-10">
       <div className="space-y-4">
-        <div className="">
+        <div className="space-y-1">
+          {data.status === "IN_PROGRESS" && requestStatus === "APPROVED" && (
+            <AlertCard
+              variant="info"
+              title="Transport Request in Progress"
+              description="This transport request is currently underway."
+              className="mb-6"
+            />
+          )}
+          {requestStatus === "CANCELLED" && cancellationReason && (
+            <AlertCard
+              variant="destructive"
+              title="Request Cancelled"
+              description={cancellationReason}
+              className="mb-6"
+            />
+          )}
           {requestStatus === "REJECTED" && rejectionReason && (
             <AlertCard
               variant="destructive"
@@ -303,6 +307,22 @@ export default function JobRequestDetails({
               description={rejectionReason}
               className="mb-6"
             />
+          )}
+          {requestStatus === "ON_HOLD" && onHoldReason && (
+            <div>
+              <AlertCard
+                variant="warning"
+                title="Request On Hold"
+                description={onHoldReason}
+                className="mb-6"
+              />
+              <AlertCard
+                variant="info"
+                title="Next Steps"
+                description="You can update your request to address the issue, cancel it if no longer needed, or contact support for assistance."
+                className="mb-6"
+              />
+            </div>
           )}
           <div className="flex h-7 items-center justify-between">
             <H4 className="font-semibold text-muted-foreground">
@@ -325,11 +345,7 @@ export default function JobRequestDetails({
                     className="flex items-center gap-3"
                     side="bottom"
                   >
-                    <CommandTooltip text="Download job request form">
-                      <CommandShortcut>Ctrl</CommandShortcut>
-                      <CommandShortcut>Shift</CommandShortcut>
-                      <CommandShortcut>D</CommandShortcut>
-                    </CommandTooltip>
+                    Download job request form
                   </TooltipContent>
                 </Tooltip>
               )}
@@ -349,11 +365,7 @@ export default function JobRequestDetails({
                     className="flex items-center gap-3"
                     side="bottom"
                   >
-                    <CommandTooltip text="Download evaluation form">
-                      <CommandShortcut>Ctrl</CommandShortcut>
-                      <CommandShortcut>Shift</CommandShortcut>
-                      <CommandShortcut>E</CommandShortcut>
-                    </CommandTooltip>
+                    Download evaluation form
                   </TooltipContent>
                 </Tooltip>
               )}
@@ -367,7 +379,14 @@ export default function JobRequestDetails({
                 <div className="flex w-full flex-col items-start">
                   <div className="flex space-x-1 text-muted-foreground">
                     <User className="h-5 w-5" />
-                    <P className="font-semibold tracking-tight">Assigned To:</P>
+                    <P className="font-semibold tracking-tight">
+                      Assigned To:{" "}
+                      {data.isReassigned && (
+                        <span className="text-sm text-foreground">
+                          (reassigned)
+                        </span>
+                      )}
+                    </P>
                   </div>
                   <div className="w-full pl-5 pt-1">
                     <P>
@@ -841,7 +860,7 @@ export default function JobRequestDetails({
         </PhotoProvider>
       </div>
       <Separator className="my-6" />
-      {data.reworkAttempts.length > 0 && (
+      {/* {data.reworkAttempts.length > 0 && (
         <div className="space-y-2 pb-20">
           <P className="font-semibold text-muted-foreground">
             Rework Information
@@ -859,6 +878,7 @@ export default function JobRequestDetails({
                   <P className="break-all text-muted-foreground">
                     {rework.rejectionReason}
                   </P>
+                  <P>Assignee: {rework.jobRequest.assignedUser?.email}</P>
                 </div>
                 <div className="flex w-full items-center justify-between">
                   <div className="group flex items-center justify-between">
@@ -900,7 +920,7 @@ export default function JobRequestDetails({
             ))}
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 }

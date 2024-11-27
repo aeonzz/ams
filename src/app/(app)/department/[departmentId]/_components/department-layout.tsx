@@ -5,12 +5,14 @@ import React from "react";
 import OverviewNavigationMenu from "./navigation-menu";
 import SearchInput from "@/app/(app)/_components/search-input";
 import BackButton from "@/components/back-button";
+import { cn } from "@/lib/utils";
 
 interface DepartmentLayoutProps {
   departmentId: string;
   children: React.ReactNode;
   name: string;
   withBackButton?: boolean;
+  container?: boolean;
 }
 
 export default function DepartmentLayout({
@@ -18,6 +20,7 @@ export default function DepartmentLayout({
   name,
   children,
   withBackButton = false,
+  container = true,
 }: DepartmentLayoutProps) {
   return (
     <div className="flex h-full w-full flex-col">
@@ -31,7 +34,12 @@ export default function DepartmentLayout({
           <SearchInput />
         </div>
       </div>
-      <div className="scroll-bar container flex flex-1 justify-center overflow-y-auto p-3">
+      <div
+        className={cn(
+          "scroll-bar flex flex-1 justify-center overflow-y-auto",
+          container && "container p-3"
+        )}
+      >
         {children}
       </div>
     </div>

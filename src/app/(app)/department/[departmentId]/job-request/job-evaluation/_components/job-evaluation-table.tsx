@@ -8,10 +8,11 @@ import { DataTableToolbar } from "@/components/data-table/data-table-toolbar";
 
 import { useDataTable } from "@/lib/hooks/use-data-table";
 import { type DataTableFilterField } from "@/lib/types";
-import { getRequestByVenueId } from "@/lib/actions/venue";
 import { getDepartmentJobEvaluation } from "@/lib/actions/job-evaluation";
 import { getJobEvaluationColumns } from "./job-evaluation-table-columns";
 import type { DepartmentJobEvaluation } from "./types";
+import { JobEvaluationTableFloatingBar } from "./job-evaluation-table-floating-bar";
+import { JobEvaluationTableToolbarActions } from "./job-evaluation-table-toolbar-actions";
 
 interface JobEvaluationTableProps {
   jobEvaluationPromise: ReturnType<typeof getDepartmentJobEvaluation>;
@@ -20,15 +21,15 @@ interface JobEvaluationTableProps {
 export function JobEvaluationTable({
   jobEvaluationPromise,
 }: JobEvaluationTableProps) {
-  const { data, pageCount } = React.use(jobEvaluationPromise);
+  const { data, pageCount, department } = React.use(jobEvaluationPromise);
 
   const columns = React.useMemo(() => getJobEvaluationColumns(), []);
 
   const filterFields: DataTableFilterField<DepartmentJobEvaluation>[] = [
     {
-      label: "Title",
-      value: "title",
-      placeholder: "Filter title...",
+      label: "Request ID",
+      value: "requestId",
+      placeholder: "Filter request id...",
     },
   ];
 
@@ -48,16 +49,16 @@ export function JobEvaluationTable({
     <DataTable
       table={table}
       floatingBar={
-        <VenueRequestTableFloatingBar
+        <JobEvaluationTableFloatingBar
           table={table}
-          fileName={`${venue?.name} - Requests`}
+          fileName={`${department?.name} - Job Evaluation`}
         />
       }
     >
       <DataTableToolbar table={table} filterFields={filterFields}>
-        <VenueRequestTableToolbarActions
+        <JobEvaluationTableToolbarActions
           table={table}
-          fileName={`${venue?.name} - Requests`}
+          fileName={`${department?.name} - Job Evaluation`}
         />
       </DataTableToolbar>
     </DataTable>

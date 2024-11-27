@@ -19,8 +19,31 @@ import { Dot } from "lucide-react";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { DepartmentJobEvaluation } from "./types";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { DotsHorizontalIcon } from "@radix-ui/react-icons";
+import { fillJobRequestEvaluationPDF } from "@/lib/fill-pdf/job-evaluation";
+import { toast } from "sonner";
 
 export function getJobEvaluationColumns(): ColumnDef<DepartmentJobEvaluation>[] {
+  const surveyColumns = Array.from({ length: 9 }, (_, i) => ({
+    accessorKey: `surveyResponses.SQ${i}`,
+    header: ({ column }: { column: any }) => (
+      <DataTableColumnHeader column={column} title={`SQ${i}`} />
+    ),
+    cell: ({ row }: { row: any }) => {
+      const response = (row.original.surveyResponses as any)?.[`SQ${i}`];
+      return (
+        <div className="flex space-x-2">
+          <P className="truncate font-medium">{textTransform(response)}</P>
+        </div>
+      );
+    },
+  }));
   return [
     {
       id: "select",
@@ -65,6 +88,19 @@ export function getJobEvaluationColumns(): ColumnDef<DepartmentJobEvaluation>[] 
       },
     },
     {
+      accessorKey: "requestId",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Request ID" />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="flex space-x-2">
+            <P className="truncate font-medium">{row.original.requestId}</P>
+          </div>
+        );
+      },
+    },
+    {
       accessorKey: "requestTitle",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Request Title" />
@@ -80,154 +116,141 @@ export function getJobEvaluationColumns(): ColumnDef<DepartmentJobEvaluation>[] 
               )}
               prefetch
             >
-              <P className="truncate font-medium">{row.original.requestTitle}</P>
+              <P className="truncate font-medium">
+                {row.original.requestTitle}
+              </P>
             </Link>
           </div>
         );
       },
     },
     {
-      accessorKey: "description",
+      accessorKey: "clientType",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Description" />
+        <DataTableColumnHeader column={column} title="Client Type" />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="flex space-x-2">
+            <P className="truncate font-medium">
+              {textTransform(row.original.clientType)}
+            </P>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "position",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Position" />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="flex space-x-2">
+            <P className="truncate font-medium">{row.original.position}</P>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "sex",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Sex" />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="flex space-x-2">
+            <P className="truncate font-medium">{row.original.sex}</P>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "age",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Age" />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="flex space-x-2">
+            <P className="truncate font-medium">{row.original.age}</P>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "regionOfResidence",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Region of Residence" />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="flex space-x-2">
+            <P className="truncate font-medium">
+              {row.original.regionOfResidence}
+            </P>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "awarenessLevel",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Awareness Level" />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="flex space-x-2">
+            <P className="truncate font-medium">
+              {textTransform(row.original.awarenessLevel)}
+            </P>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "visibility",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Visibility" />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="flex space-x-2">
+            <P className="truncate font-medium">
+              {textTransform(row.original.visibility)}
+            </P>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "helpfulness",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Helpfulness" />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="flex space-x-2">
+            <P className="truncate font-medium">
+              {textTransform(row.original.helpfulness)}
+            </P>
+          </div>
+        );
+      },
+    },
+    ...surveyColumns,
+    {
+      accessorKey: "suggestions",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Suggestions" />
       ),
       cell: ({ row }) => {
         return (
           <div className="flex w-[30vw] space-x-2">
-            <P className="truncate font-medium">{row.original.description}</P>
+            <P className="truncate font-medium">{row.original.suggestions}</P>
           </div>
         );
       },
-    },
-    {
-      accessorKey: "requestStatus",
-      header: ({ column }) => (
-        <div className="flex justify-center px-2">
-          <DataTableColumnHeader column={column} title="Status" />
-        </div>
-      ),
-      cell: ({ row }) => {
-        const { color, stroke, variant } = getStatusColor(row.original.requestStatus);
-        return (
-          <div className="flex items-center justify-center">
-            <Badge variant={variant} className="pr-3.5">
-              <Dot className="mr-1 size-3" strokeWidth={stroke} color={color} />
-              {textTransform(row.original.status)}
-            </Badge>
-          </div>
-        );
-      },
-      size: 0,
-      filterFn: (row, id, value) => {
-        return Array.isArray(value) && value.includes(row.getValue(id));
-      },
-    },
-    {
-      accessorKey: "requester",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Requester" />
-      ),
-      cell: ({ row }) => {
-        return (
-          <div className="flex space-x-2">
-            <P className="truncate font-medium">{row.original.requester}</P>
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: "reviewer",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Reviewed By" />
-      ),
-      cell: ({ row }) => {
-        return (
-          <div className="flex space-x-2">
-            <P className="truncate font-medium">{row.original.reviewer}</P>
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: "location",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Location" />
-      ),
-      cell: ({ row }) => {
-        return (
-          <div className="flex space-x-2">
-            <P className="truncate font-medium">{row.original.location}</P>
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: "costEstimate",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Estimated Cost" />
-      ),
-      cell: ({ row }) => {
-        return (
-          <div className="flex space-x-2">
-            <P className="truncate font-medium">{row.original.costEstimate}</P>
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: "actualCost",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Actual Cost" />
-      ),
-      cell: ({ row }) => {
-        return (
-          <div className="flex space-x-2">
-            <P className="truncate font-medium">{row.original.actualCost}</P>
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: "startDate",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="startDate" />
-      ),
-      cell: ({ cell }) => {
-        return (
-          <P className="text-muted-foreground">
-            {cell.getValue() ? format(cell.getValue() as Date, "PP p") : "-"}
-          </P>
-        );
-      },
-      size: 0,
-    },
-    {
-      accessorKey: "endDate",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="endDate" />
-      ),
-      cell: ({ cell }) => {
-        return (
-          <P className="text-muted-foreground">
-            {cell.getValue() ? format(cell.getValue() as Date, "PP p") : "-"}
-          </P>
-        );
-      },
-      size: 0,
-    },
-    {
-      accessorKey: "completedAt",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Completed At" />
-      ),
-      cell: ({ cell }) => {
-        return (
-          <P className="text-muted-foreground">
-            {cell.getValue() ? format(cell.getValue() as Date, "PP p") : "-"}
-          </P>
-        );
-      },
-      size: 0,
     },
     {
       accessorKey: "createdAt",
@@ -242,6 +265,61 @@ export function getJobEvaluationColumns(): ColumnDef<DepartmentJobEvaluation>[] 
         );
       },
       size: 0,
+    },
+    {
+      id: "actions",
+      cell: function Cell({ row }) {
+        const { requestTitle, requestId, ...rest } = row.original;
+        const handleDownloadEvaluation = async () => {
+          const generateAndDownloadPDF = async () => {
+            if (rest) {
+              try {
+                const pdfBlob = await fillJobRequestEvaluationPDF(rest);
+                const url = URL.createObjectURL(pdfBlob);
+                const link = document.createElement("a");
+                link.href = url;
+                link.download = `job_request_evaluation_${requestId}.pdf`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                return "PDF downloaded successfully";
+              } catch (error) {
+                console.error("Error generating PDF:", error);
+                throw new Error("Failed to generate PDF");
+              }
+            }
+          };
+
+          toast.promise(generateAndDownloadPDF(), {
+            loading: "Generating PDF...",
+            success: (message) => message,
+            error: (err) => `Error: ${err.message}`,
+          });
+        };
+
+        return (
+          <div className="grid place-items-center">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  aria-label="Open menu"
+                  variant="ghost"
+                  className="flex size-8 p-0 data-[state=open]:bg-muted"
+                >
+                  <DotsHorizontalIcon className="size-4" aria-hidden="true" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-40">
+                <DropdownMenuItem onSelect={handleDownloadEvaluation}>
+                  Download Form
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        );
+      },
+      size: 40,
     },
   ];
 }

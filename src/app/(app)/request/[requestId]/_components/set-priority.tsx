@@ -9,33 +9,38 @@ import { Minus } from "lucide-react";
 import React from "react";
 import { P } from "@/components/typography/text";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
-import { updateJobRequest } from "@/lib/actions/job";
 import { toast } from "sonner";
 import type { UpdateJobRequestSchemaServerWithPath } from "@/lib/schema/request";
 import { usePathname } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
+import { updateJobRequest } from "@/lib/actions/requests";
 
 interface SetPriorityProps {
   prio: PriorityTypeType;
-	requestId: string;
+  requestId: string;
+  disabled: boolean;
 }
 
-export default function SetPriority({ prio, requestId }: SetPriorityProps) {
-	const pathname = usePathname()
+export default function SetPriority({
+  prio,
+  requestId,
+  disabled,
+}: SetPriorityProps) {
+  const queryClient = useQueryClient();
+  const pathname = usePathname();
   const initialPriority =
     priorities.find((priority) => priority.value === prio) || priorities[0];
 
   const [priority, setPriority] = React.useState<Priority>(initialPriority);
 
-	
   const { mutateAsync, isPending } = useServerActionMutation(updateJobRequest);
 
-	
-  async function onSubmit() {
+  async function onSubmit(updatedPriority: Priority) {
     try {
       const data: UpdateJobRequestSchemaServerWithPath = {
         path: pathname,
         id: requestId,
-        ...values,
+        priority: updatedPriority.value,
       };
 
       toast.promise(mutateAsync(data), {
@@ -44,14 +49,7 @@ export default function SetPriority({ prio, requestId }: SetPriorityProps) {
           queryClient.invalidateQueries({
             queryKey: [requestId],
           });
-          form.reset({
-            jobType: data.jobType,
-            location: data.location,
-            description: data.description,
-            dueDate: data.dueDate,
-          });
-          setEditField(null);
-          return "Request updated successfully";
+          return "Saved";
         },
         error: (err) => {
           console.log(err);
@@ -64,10 +62,19 @@ export default function SetPriority({ prio, requestId }: SetPriorityProps) {
     }
   }
 
+  function handlePriorityChange(newPriority: Priority) {
+    setPriority(newPriority);
+    onSubmit(newPriority);
+  }
+
   return (
     <div>
       <P className="mb-1 text-sm">Priority</P>
-      <PriorityOption prio={priority} setPrio={setPriority} isLoading={false} />
+      <PriorityOption
+        prio={priority}
+        setPrio={handlePriorityChange}
+        isLoading={isPending || disabled}
+      />
     </div>
   );
 }

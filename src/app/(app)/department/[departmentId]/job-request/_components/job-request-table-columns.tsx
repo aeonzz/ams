@@ -19,6 +19,7 @@ import { Dot } from "lucide-react";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { DepartmentJobRequest } from "./types";
+import { PriorityTypeType } from "prisma/generated/zod/inputTypeSchemas/PriorityTypeSchema";
 
 export function getJobRequestColumns(): ColumnDef<DepartmentJobRequest>[] {
   return [
@@ -60,6 +61,19 @@ export function getJobRequestColumns(): ColumnDef<DepartmentJobRequest>[] {
         return (
           <div className="flex space-x-2">
             <P className="truncate font-medium">{row.original.id}</P>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "requester",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Requester" />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="flex space-x-2">
+            <P className="truncate font-medium">{row.original.requester}</P>
           </div>
         );
       },
@@ -107,7 +121,9 @@ export function getJobRequestColumns(): ColumnDef<DepartmentJobRequest>[] {
         </div>
       ),
       cell: ({ row }) => {
-        const { color, stroke, variant } = getStatusColor(row.original.requestStatus);
+        const { color, stroke, variant } = getStatusColor(
+          row.original.requestStatus
+        );
         return (
           <div className="flex items-center justify-center">
             <Badge variant={variant} className="pr-3.5">
@@ -123,14 +139,22 @@ export function getJobRequestColumns(): ColumnDef<DepartmentJobRequest>[] {
       },
     },
     {
-      accessorKey: "requester",
+      accessorKey: "priority",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Requester" />
+        <DataTableColumnHeader column={column} title="Priority" />
       ),
       cell: ({ row }) => {
         return (
           <div className="flex space-x-2">
-            <P className="truncate font-medium">{row.original.requester}</P>
+            <P
+              className={cn(
+                (row.original.priority as PriorityTypeType) === "NO_PRIORITY" &&
+                  "text-muted-foreground",
+                "truncate font-medium"
+              )}
+            >
+              {textTransform(row.original.priority)}
+            </P>
           </div>
         );
       },
@@ -161,32 +185,32 @@ export function getJobRequestColumns(): ColumnDef<DepartmentJobRequest>[] {
         );
       },
     },
-    {
-      accessorKey: "costEstimate",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Estimated Cost" />
-      ),
-      cell: ({ row }) => {
-        return (
-          <div className="flex space-x-2">
-            <P className="truncate font-medium">{row.original.costEstimate}</P>
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: "actualCost",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Actual Cost" />
-      ),
-      cell: ({ row }) => {
-        return (
-          <div className="flex space-x-2">
-            <P className="truncate font-medium">{row.original.actualCost}</P>
-          </div>
-        );
-      },
-    },
+    // {
+    //   accessorKey: "costEstimate",
+    //   header: ({ column }) => (
+    //     <DataTableColumnHeader column={column} title="Estimated Cost" />
+    //   ),
+    //   cell: ({ row }) => {
+    //     return (
+    //       <div className="flex space-x-2">
+    //         <P className="truncate font-medium">{row.original.costEstimate}</P>
+    //       </div>
+    //     );
+    //   },
+    // },
+    // {
+    //   accessorKey: "actualCost",
+    //   header: ({ column }) => (
+    //     <DataTableColumnHeader column={column} title="Actual Cost" />
+    //   ),
+    //   cell: ({ row }) => {
+    //     return (
+    //       <div className="flex space-x-2">
+    //         <P className="truncate font-medium">{row.original.actualCost}</P>
+    //       </div>
+    //     );
+    //   },
+    // },
     {
       accessorKey: "startDate",
       header: ({ column }) => (

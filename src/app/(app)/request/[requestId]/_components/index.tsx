@@ -11,6 +11,7 @@ import {
   Link as LinkIcon,
   Dot,
   Link,
+  Briefcase,
 } from "lucide-react";
 import NotFound from "@/app/not-found";
 import FetchDataError from "@/components/card/fetch-data-error";
@@ -122,6 +123,10 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                 <Calendar className="h-5 w-5" />
                 <P>Created: {format(new Date(data.createdAt), "PPP p")}</P>
               </div>
+              <div className="flex items-center space-x-2">
+                <Briefcase className="h-5 w-5" />
+                <P>Department: {data.department.name}</P>
+              </div>
             </div>
             <Separator className="my-6" />
             {data.type === "JOB" && data.jobRequest && (
@@ -129,6 +134,8 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                 data={data.jobRequest}
                 requestId={data.id}
                 rejectionReason={data.rejectionReason}
+                cancellationReason={data.cancellationReason}
+                onHoldReason={data.onHoldReason}
                 requestStatus={data.status}
                 isCurrentUser={currentUser.id === data.userId}
               />
@@ -204,7 +211,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
             </div>
             {data.type === "JOB" &&
               data.jobRequest &&
-              (data.status === "APPROVED" || data.status === "COMPLETED") && (
+              data.status !== "PENDING" && (
                 <div>
                   <P className="mb-1 text-sm">Job Status</P>
                   {(() => {
@@ -294,7 +301,11 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
               </div>
             )}
             {data.type === "JOB" && data.jobRequest && (
-              <SetPriority prio={data.priority} />
+              <SetPriority
+                prio={data.priority}
+                requestId={data.id}
+                disabled={data.status === "COMPLETED"}
+              />
             )}
           </div>
         </div>
@@ -306,7 +317,8 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
               requestStatus={data.status}
               inProgress={
                 data.transportRequest?.inProgress ||
-                data.venueRequest?.inProgress
+                data.venueRequest?.inProgress ||
+                data.jobRequest?.status !== "PENDING"
               }
             />
           )}
@@ -334,7 +346,16 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
               allowedDepartment={data.departmentId}
               allowedRoles={["OPERATIONS_MANAGER", "DEPARTMENT_HEAD"]}
               allowedApproverRoles={["DEPARTMENT_HEAD"]}
-            />
+              jobRequestId={data.jobRequest.id}
+            >
+              {data.status === "APPROVED" ||
+                (data.status === "ON_HOLD" && (
+                  <CancelRequest
+                    requestId={data.id}
+                    requestStatus={data.status}
+                  />
+                ))}
+            </JobRequestReviewerActions>
           )}
           {data.type === "JOB" &&
             data.jobRequest &&

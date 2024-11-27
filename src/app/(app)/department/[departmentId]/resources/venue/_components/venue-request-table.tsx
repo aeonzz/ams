@@ -86,7 +86,7 @@ export function VenueRequestTable({
               <Link
                 prefetch
                 className={cn(
-                  buttonVariants({ variant: "secondary", size: "sm" })
+                  buttonVariants({ variant: "ghost2", size: "sm" })
                 )}
                 href={`/department/${departmentId}/resources/venue/facilities`}
               >

@@ -196,15 +196,9 @@ export const createJobRequestServer = z.object({
   departmentId: z.string({
     required_error: "Job section is required.",
   }),
-  dueDate: z
-    .date({
-      required_error: "Due date is required.",
-    })
-    .min(new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), {
-      message: "Due date must be at least 3 days in the future",
-    }),
   images: z.array(z.string()).optional(),
   status: JobStatusSchema.optional(),
+  priority: PriorityTypeSchema.optional(),
 });
 
 export type CreateJobRequestSchemaServer = z.infer<

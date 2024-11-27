@@ -50,7 +50,7 @@ export default function CancelRequest({
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [cancellationReason, setCancellationReason] = useState("");
 
-  function handleCancellation() {
+  async function handleCancellation() {
     if (
       (requestStatus === "APPROVED" || requestStatus === "REVIEWED") &&
       !cancellationReason.trim()

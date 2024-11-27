@@ -1,6 +1,7 @@
 import { type Table } from "@tanstack/react-table";
 import { format } from "date-fns";
 import * as XLSX from "xlsx";
+import { textTransform } from "./utils";
 
 export function exportTableToCSV<TData>(
   /**
@@ -41,9 +42,11 @@ export function exportTableToCSV<TData>(
     .map((column) => column.id)
     .filter((id) => !excludeColumns.includes(id as any));
 
+  const transformedHeaders = headers.map((header) => textTransform(header));
+
   // Build CSV content
   const csvContent = [
-    headers.join(","),
+    transformedHeaders.join(),
     ...(onlySelected
       ? table.getFilteredSelectedRowModel().rows
       : table.getRowModel().rows
@@ -114,8 +117,10 @@ export function exportTableToXLSX<TData>(
     .map((column) => column.id)
     .filter((id) => !excludeColumns.includes(id as any));
 
+  const transformedHeaders = headers.map((header) => textTransform(header));
+
   const data = [
-    headers,
+    transformedHeaders,
     ...(onlySelected
       ? table.getFilteredSelectedRowModel().rows
       : table.getRowModel().rows
@@ -127,9 +132,13 @@ export function exportTableToXLSX<TData>(
         } else if (typeof cellValue === "boolean") {
           return cellValue ? "Yes" : "No";
         } else if (Array.isArray(cellValue)) {
-          return cellValue.join(", ");
+          return cellValue
+            .map((item) => textTransform(String(item)))
+            .join(", ");
         } else if (typeof cellValue === "object" && cellValue !== null) {
-          return JSON.stringify(cellValue);
+          return textTransform(JSON.stringify(cellValue));
+        } else if (typeof cellValue === "string") {
+          return textTransform(cellValue);
         } else {
           return cellValue;
         }
