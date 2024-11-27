@@ -19,7 +19,7 @@ export default function ManageRequestScreen({
   const requestPromise = getManageRequests({ ...search, departmentId });
 
   return (
-    <div className="w-full">
+    <div className="w-full py-2">
       <React.Suspense
         fallback={
           <DataTableSkeleton

@@ -12,22 +12,30 @@ import {
 import { Menu } from "lucide-react";
 import MainMenu from "../../_components/main-menu";
 
-export default function MenuSheet() {
+interface MenuSheetProps {
+  className?: string;
+}
+
+export default function MenuSheet({ className }: MenuSheetProps) {
   const [open, setOpen] = React.useState(false);
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button variant="outline" size="icon" className="mr-1 size-8">
+        <Button
+          variant="outline"
+          size="icon"
+          className={cn("mr-1 size-8", className)}
+        >
           <Menu className="size-5" />
         </Button>
       </SheetTrigger>
       <SheetContent
-        className="h-[85%] overflow-hidden rounded-t-[10px] px-1"
-        side="bottom"
+        className="h-full overflow-hidden rounded-r-[10px] px-1"
+        side="left"
         hideClose
       >
-        <SheetHeader></SheetHeader>
+        <SheetHeader className="pt-0"></SheetHeader>
         <div className="scroll-bar overflow-y-auto">
           <MainMenu isOpen />
         </div>

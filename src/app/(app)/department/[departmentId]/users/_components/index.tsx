@@ -1,15 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 
-import { H1, H2, H3, P } from "@/components/typography/text";
 import { GetUsersSchema } from "@/lib/schema";
-import { DateRangePicker } from "@/components/date-range-picker";
-import { Skeleton } from "@/components/ui/skeleton";
-import { DataTableSkeleton } from "@/components/data-table/data-table-skeleton";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
 import { getDepartmentUsers } from "@/lib/actions/department";
 import { DepartmentUsersTable } from "./department-users-table";
-import SearchInput from "@/app/(app)/_components/search-input";
-import OverviewNavigationMenu from "../../_components/navigation-menu";
+import { DataTableSkeleton } from "@/components/data-table/data-table-skeleton";
 
 interface DepartmentUsersScreenProps {
   departmentId: string;
@@ -24,7 +19,17 @@ export default function DepartmentUsersScreen({
 
   return (
     <div className="w-full">
-      <React.Suspense fallback={<LoadingSpinner />}>
+      <React.Suspense
+        fallback={
+          <DataTableSkeleton
+            columnCount={7}
+            searchableColumnCount={1}
+            filterableColumnCount={0}
+            cellWidths={["10rem", "30rem", "12rem", "12rem", "8rem"]}
+            shrinkZero
+          />
+        }
+      >
         <DepartmentUsersTable
           usersPromise={usersPromise}
           departmentId={departmentId}

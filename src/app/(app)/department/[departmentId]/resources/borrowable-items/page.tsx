@@ -8,10 +8,16 @@ export interface DepartmentBorrowableItems {
   };
 }
 
-export default function DepartmentBorrowableItems({ params }: DepartmentBorrowableItems) {
+export default function DepartmentBorrowableItems({
+  params,
+}: DepartmentBorrowableItems) {
   return (
     <ContentLayout title="Venues">
-      <DepartmentLayout departmentId={params.departmentId} name="Borrowable Items">
+      <DepartmentLayout
+        departmentId={params.departmentId}
+        name="Borrowable Items"
+        withBackButton
+      >
         <DepartmentBorrowableItemsScreen departmentId={params.departmentId} />
       </DepartmentLayout>
     </ContentLayout>

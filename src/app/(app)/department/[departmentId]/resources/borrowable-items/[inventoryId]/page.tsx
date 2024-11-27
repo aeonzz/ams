@@ -22,6 +22,8 @@ export default function InventorySubitemsPage({
       <DepartmentLayout
         departmentId={params.departmentId}
         name="Borrowable Items"
+        withBackButton
+        container={false}
       >
         <InventorySubItemsScreen params={params} searchParams={search} />
       </DepartmentLayout>

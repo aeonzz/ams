@@ -6,6 +6,8 @@ import OverviewNavigationMenu from "./navigation-menu";
 import SearchInput from "@/app/(app)/_components/search-input";
 import BackButton from "@/components/back-button";
 import { cn } from "@/lib/utils";
+import { useMediaQuery } from "usehooks-ts";
+import MenuSheet from "@/app/(app)/dashboard/_components/menu-sheet";
 
 interface DepartmentLayoutProps {
   departmentId: string;
@@ -22,10 +24,12 @@ export default function DepartmentLayout({
   withBackButton = false,
   container = true,
 }: DepartmentLayoutProps) {
+  const isDesktop = useMediaQuery("(min-width: 769px)");
   return (
     <div className="flex h-full w-full flex-col">
       <div className="flex h-[50px] items-center justify-between border-b px-3">
         <div className="flex items-center gap-1">
+          {!isDesktop && <MenuSheet />}
           {withBackButton && <BackButton />}
           <P className="font-medium">{name}</P>
         </div>

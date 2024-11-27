@@ -47,6 +47,7 @@ import { RolesDialog } from "./roles-dialog";
 import { useQuery } from "@tanstack/react-query";
 import { Role } from "prisma/generated/zod";
 import axios from "axios";
+import { format } from "date-fns";
 
 export function getDepartmentUsersColumns({
   departmentId,
@@ -194,6 +195,20 @@ export function getDepartmentUsersColumns({
         return Array.isArray(value) && value.includes(row.getValue(id));
       },
     },
+    // {
+    //   accessorKey: "joined",
+    //   header: ({ column }) => (
+    //     <DataTableColumnHeader column={column} title="Date Joined" />
+    //   ),
+    //   cell: ({ cell }) => {
+    //     return (
+    //       <P className="text-muted-foreground">
+    //         {format(cell.getValue() as Date, "PP")}
+    //       </P>
+    //     );
+    //   },
+    //   size: 0,
+    // },
     {
       id: "actions",
       cell: function Cell({ row }) {

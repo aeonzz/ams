@@ -119,12 +119,12 @@ export function getMenuList({
             {
               href: "/request/my-requests?page=1&per_page=10&sort=createdAt.desc",
               label: "Requests",
-              active: pathname === "/requests/my-requests",
+              active: pathname.includes(`/request/my-requests`),
             },
             {
               href: "/request/cancelled?page=1&per_page=10&sort=createdAt.desc",
               label: "Cancelled Requests",
-              active: pathname === "/requests/cancelled",
+              active: pathname.includes(`/request/cancelled`),
             },
           ],
         },

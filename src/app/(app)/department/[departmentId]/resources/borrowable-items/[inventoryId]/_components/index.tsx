@@ -27,7 +27,7 @@ export default function InventorySubItemsScreen({
   });
 
   return (
-    <div className="w-full">
+    <div className="w-full py-2">
       <React.Suspense
         fallback={
           <DataTableSkeleton
