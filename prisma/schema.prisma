@@ -234,6 +234,7 @@ model JobRequestEvaluation {
 
 model VenueRequest {
   id                String    @id
+  department        String
   notes             String?
   purpose           String
   setupRequirements String[]
@@ -272,7 +273,7 @@ model VenueSetupRequirement {
   venueId   String
   available Boolean  @default(true)
   venue     Venue    @relation(fields: [venueId], references: [id], onDelete: Cascade)
-  name      String   @unique
+  name      String   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

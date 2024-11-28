@@ -318,9 +318,17 @@ export const createVenue = authedProcedure
         });
 
         if (setupRequirements && setupRequirements.length > 0) {
+          const duplicates = setupRequirements.filter(
+            (item, index, array) => array.indexOf(item) !== index
+          );
+
+          if (duplicates.length > 0) {
+            throw `Duplicate setup requirement names found: ${duplicates.join(", ")}`;
+          }
+
           const setupRequirementsData = setupRequirements.map(
             (requirement) => ({
-              id: generateId(3),
+              id: generateId(5),
               venueId: createVenue.id,
               name: requirement,
             })
@@ -368,6 +376,14 @@ export const updateVenue = authedProcedure
           const existingRequirementNames = new Set(
             existingRequirements.map((req) => req.name)
           );
+
+          const duplicateInputNames = setupRequirements.filter(
+            (name, index, arr) => arr.indexOf(name) !== index
+          );
+
+          if (duplicateInputNames.length > 0) {
+            throw `Duplicate setup requirement names in input: ${duplicateInputNames.join(", ")}`;
+          }
 
           // Identify requirements to add, update, and delete
           const requirementsToAdd = setupRequirements.filter(

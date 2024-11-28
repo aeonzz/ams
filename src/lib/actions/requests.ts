@@ -218,6 +218,7 @@ export const createVenueRequest = authedProcedure
               setupRequirements: rest.setupRequirements,
               notes: rest.notes,
               venueId: rest.venueId,
+              department: rest.department,
             },
           },
         },

@@ -44,6 +44,9 @@ export const venueRequestSchemaBase = z.object({
     .string()
     .min(10, { message: "Must be at least 10 characters long" })
     .max(700, { message: "Cannot be more than 600 characters long" }),
+  department: z.string({
+    required_error: "Department is required",
+  }),
   setupRequirements: z.array(z.string()).optional(),
   startTime: z
     .date({
@@ -55,7 +58,6 @@ export const venueRequestSchemaBase = z.object({
     .refine((date) => date.getHours() !== 0 || date.getMinutes() !== 0, {
       message: "Start time cannot be exactly midnight (00:00)",
     }),
-
   endTime: z
     .date({
       required_error: "End time is required",
@@ -78,8 +80,7 @@ export const venueRequestSchemaBase = z.object({
 export const venueRequestSchema = venueRequestSchemaBase.refine(
   (data) => data.startTime <= data.endTime,
   {
-    message:
-      "Date and time needed must not be later than the end date and time",
+    message: "Start time must not be later than the end time",
     path: ["startTime"],
   }
 );

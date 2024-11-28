@@ -10,6 +10,7 @@ import { VenueWithRelationsSchema } from './VenueSchema'
 
 export const VenueRequestSchema = z.object({
   id: z.string(),
+  department: z.string(),
   notes: z.string().nullable(),
   purpose: z.string(),
   setupRequirements: z.string().array(),

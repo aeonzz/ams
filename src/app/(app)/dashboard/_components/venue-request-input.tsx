@@ -52,6 +52,8 @@ import MultiSelect from "@/components/multi-select";
 import { EditorContent, Extension, useEditor } from "@tiptap/react";
 import { extensions } from "@/components/tiptap/editor";
 import { ChevronLeft } from "lucide-react";
+import { currentUser } from "@/lib/actions/users";
+import DepartmentInput from "./department-input";
 
 interface VenueRequestInputProps {
   mutateAsync: UseMutateAsyncFunction<
@@ -76,7 +78,9 @@ export default function VenueRequestInput({
   isFieldsDirty,
 }: VenueRequestInputProps) {
   const pathname = usePathname();
+  const currentUser = useSession();
   const queryClient = useQueryClient();
+  console.log(currentUser);
   const [isOpenRules, setIsOpenRules] = React.useState(false);
   const venueId = form.watch("venueId");
 
@@ -226,6 +230,11 @@ export default function VenueRequestInput({
     editable: false,
   });
 
+  const departmentItems = currentUser.userDepartments.map((ud) => ({
+    id: ud.department.id,
+    name: ud.department.name,
+  }));
+
   React.useEffect(() => {
     if (editor && selectedVenue?.rulesAndRegulations) {
       editor.commands.setContent(selectedVenue.rulesAndRegulations);
@@ -245,6 +254,15 @@ export default function VenueRequestInput({
                 name="venueId"
                 isPending={isPending}
                 data={venueData}
+              />
+              <DepartmentInput
+                form={form}
+                name="department"
+                label="Department"
+                items={departmentItems}
+                isPending={isPending}
+                placeholder="Select a department"
+                emptyMessage="No departments found"
               />
               <MultiSelect
                 form={form}
