@@ -83,6 +83,7 @@ export default function ReworkJobActions({
       mutateAsync({
         status,
         reworkId: latestRework.id,
+        //@ts-ignore
         reworkStartDate: status === "REWORK_IN_PROGRESS" ? now : undefined,
         reworkEndDate: status === "COMPLETED" ? now : undefined,
       }),
@@ -102,6 +103,7 @@ export default function ReworkJobActions({
 
   const getButtonConfig = () => {
     switch (data.status) {
+      //@ts-ignore
       case "REJECTED":
         return {
           buttonText: "Restart Job",
@@ -111,6 +113,7 @@ export default function ReworkJobActions({
           dialogDescription:
             "Are you sure you want to restart this job for rework? This will change the status to 'Rework in Progress'.",
         };
+        //@ts-ignore
       case "REWORK_IN_PROGRESS":
         return {
           buttonText: "Mark as Done",

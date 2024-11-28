@@ -69,9 +69,7 @@ import type { EntityTypeType } from "prisma/generated/zod/inputTypeSchemas/Entit
 import IsError from "@/components/is-error";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useHotkeys } from "react-hotkeys-hook";
-import AddEstimatedTime from "./add-estimated-time";
 import { Textarea } from "@/components/ui/text-area";
-import RejectJob from "./reject-job";
 import { Label } from "@/components/ui/label";
 import VerifyJob from "./verify-job";
 

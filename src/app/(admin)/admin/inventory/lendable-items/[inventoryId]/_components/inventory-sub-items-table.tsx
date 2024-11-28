@@ -21,7 +21,7 @@ interface InventorySubItemsTableProps {
 export function InventorySubItemsTable({
   inventorySubItemsPromise,
 }: InventorySubItemsTableProps) {
-  const { data, pageCount } = React.use(inventorySubItemsPromise);
+  const { data, pageCount, item } = React.use(inventorySubItemsPromise);
 
   const columns = React.useMemo(() => getInventorySubItemsColumns(), []);
 
@@ -48,7 +48,12 @@ export function InventorySubItemsTable({
   return (
     <DataTable
       table={table}
-      floatingBar={<InventorySubItemsTableFloatingBar table={table} />}
+      floatingBar={
+        <InventorySubItemsTableFloatingBar
+          fileName={`${item?.name}-Sub-Items`}
+          table={table}
+        />
+      }
     >
       <DataTableToolbar table={table} filterFields={filterFields}>
         <InventorySubItemsTableToolbarActions table={table} />

@@ -57,9 +57,9 @@ const management: {
     condition: true,
   },
   {
-    title: "Manage Borrowable Items",
-    href: "resources/borrowable-items",
-    description: "Maintain the list of items available for borrowing.",
+    title: "Borrow Request Management",
+    href: "resources/borrow-request-management?page=1&per_page=10&sort=createdAt.desc",
+    description: "Oversee and manage borrowable items and requests.",
     condition: true,
   },
   {

@@ -87,7 +87,7 @@ export function DepartmentSupplyItemsTable({
   return (
     <DataTable
       table={table}
-      floatingBar={<SupplyitemsTableFloatingBar table={table} />}
+      floatingBar={<SupplyitemsTableFloatingBar fileName="Supply-Items" table={table} />}
     >
       {hasLowOrNoStock && (
         <AlertCard

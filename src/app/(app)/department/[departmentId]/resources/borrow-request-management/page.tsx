@@ -1,31 +1,33 @@
-"use memo";
-
 import React, { useState } from "react";
 import ContentLayout from "@/components/layouts/content-layout";
 import { requestSearchParamsSchema } from "@/lib/schema";
 import { SearchParams } from "@/lib/types";
-import ManageRequestScreen from "./_components";
+import DepartmentBorrowableItemsRequestsScreen from "./_components";
 import DepartmentLayout from "../../_components/department-layout";
 
-export interface ManageRequestPageProps {
+export interface DepartmentBorrowableItemsRequestsPageProps {
   params: { departmentId: string };
   searchParams: SearchParams;
 }
 
-export default async function ManageRequestPage({
+export default async function DepartmentBorrowableItemsRequestsPage({
   params,
   searchParams,
-}: ManageRequestPageProps) {
+}: DepartmentBorrowableItemsRequestsPageProps) {
   const search = requestSearchParamsSchema.parse(searchParams);
   const { departmentId } = params;
   return (
     <ContentLayout title="Requests">
       <DepartmentLayout
         departmentId={params.departmentId}
-        name="Pending Requests"
+        name="Borrow Requests Management"
         container={false}
+        withBackButton
       >
-        <ManageRequestScreen search={search} departmentId={departmentId} />
+        <DepartmentBorrowableItemsRequestsScreen
+          searchParams={search}
+          departmentId={departmentId}
+        />
       </DepartmentLayout>
     </ContentLayout>
   );

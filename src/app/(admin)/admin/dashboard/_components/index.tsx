@@ -208,6 +208,7 @@ export default function AdminDashboardScreen() {
             </Card>
             <RequestsTable
               data={filteredData.requests}
+              dateRange={date}
               className="col-span-3"
             />
             <Card className="col-span-3 bg-secondary">

@@ -9,7 +9,7 @@ import {
 } from "@radix-ui/react-icons";
 import { type Table } from "@tanstack/react-table";
 
-import { exportTableToCSV } from "@/lib/export";
+import { exportTableToCSV, exportTableToXLSX } from "@/lib/export";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -23,13 +23,21 @@ import { P } from "@/components/typography/text";
 import { usePathname } from "next/navigation";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
 import type { RequestsTableType } from "./types";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface RequestsTableFloatingBarProps {
   table: Table<RequestsTableType>;
+  fileName: string;
 }
 
 export function RequestsTableFloatingBar({
   table,
+  fileName,
 }: RequestsTableFloatingBarProps) {
   const rows = table.getFilteredSelectedRowModel().rows;
   const pathname = usePathname();
@@ -80,31 +88,56 @@ export function RequestsTableFloatingBar({
           <Separator orientation="vertical" className="hidden h-5 sm:block" />
           <div className="flex items-center gap-1.5">
             <Tooltip delayDuration={250}>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="secondary"
-                  size="icon"
-                  className="size-10 border"
-                  onClick={() => {
-                    setMethod("export");
-                    startTransition(() => {
-                      exportTableToCSV(table, {
-                        excludeColumns: ["select", "actions"],
-                        onlySelected: true,
+              <DropdownMenu>
+                <TooltipTrigger asChild>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="secondary"
+                      size="icon"
+                      className="size-10 border"
+                      disabled={isLoading}
+                    >
+                      {isLoading && method === "export" ? (
+                        <LoadingSpinner />
+                      ) : (
+                        <DownloadIcon className="size-5" aria-hidden="true" />
+                      )}
+                    </Button>
+                  </DropdownMenuTrigger>
+                </TooltipTrigger>
+                <DropdownMenuContent align="center">
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setMethod("export");
+                      startTransition(() => {
+                        exportTableToCSV(table, {
+                          filename: fileName,
+                          excludeColumns: ["select", "actions"],
+                          onlySelected: true,
+                        });
                       });
-                    });
-                  }}
-                  disabled={isLoading}
-                >
-                  {isLoading && method === "export" ? (
-                    <LoadingSpinner />
-                  ) : (
-                    <DownloadIcon className="size-5" aria-hidden="true" />
-                  )}
-                </Button>
-              </TooltipTrigger>
+                    }}
+                  >
+                    Export to CSV
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setMethod("export");
+                      startTransition(() => {
+                        exportTableToXLSX(table, {
+                          filename: fileName,
+                          excludeColumns: ["select", "actions"],
+                          onlySelected: true,
+                        });
+                      });
+                    }}
+                  >
+                    Export to Excel
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
               <TooltipContent className="border bg-accent font-semibold text-foreground dark:bg-zinc-900">
-                <P>Export inventory</P>
+                <P>Export {fileName}</P>
               </TooltipContent>
             </Tooltip>
           </div>

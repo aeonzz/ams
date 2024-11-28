@@ -278,7 +278,9 @@ export default function JobRequestDetails({
     form.reset();
   }, [editField]);
 
-  const canEdit = requestStatus === "PENDING" && isCurrentUser;
+  const canEdit =
+    (requestStatus === "PENDING" || requestStatus === "ON_HOLD") &&
+    isCurrentUser;
 
   return (
     <div className="pb-10">

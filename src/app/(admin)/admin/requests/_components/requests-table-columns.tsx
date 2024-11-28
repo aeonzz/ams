@@ -87,6 +87,32 @@ export function getRequestsColumns(): ColumnDef<RequestsTableType>[] {
       },
     },
     {
+      accessorKey: "requester",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Requester" />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="flex space-x-2">
+            <P className="truncate font-medium">{row.original.requester}</P>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "reviewer",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Reviewed By" />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="flex space-x-2">
+            <P className="truncate font-medium">{row.original.reviewer}</P>
+          </div>
+        );
+      },
+    },
+    {
       accessorKey: "type",
       header: ({ column }) => (
         <div className="flex justify-center px-2">

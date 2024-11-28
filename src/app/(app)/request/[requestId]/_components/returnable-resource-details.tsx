@@ -53,6 +53,8 @@ interface ReturnableResourceDetailsProps {
   data: ReturnableRequestWithRelations;
   requestId: string;
   rejectionReason: string | null;
+  cancellationReason: string | null;
+  onHoldReason: string | null;
   requestStatus: RequestStatusTypeType;
   isCurrentUser: boolean;
 }
@@ -61,6 +63,8 @@ export default function ReturnableResourceDetails({
   data,
   requestId,
   rejectionReason,
+  cancellationReason,
+  onHoldReason,
   requestStatus,
   isCurrentUser,
 }: ReturnableResourceDetailsProps) {
@@ -166,17 +170,35 @@ export default function ReturnableResourceDetails({
     }
   }
 
-  const canEdit = requestStatus === "PENDING" && isCurrentUser;
+  const canEdit =
+    (requestStatus === "PENDING" || requestStatus === "ON_HOLD") &&
+    isCurrentUser;
 
   return (
     <>
       <div className="space-y-4 pb-10">
         <div className="space-y-1">
-          {data.inProgress && data.item.status !== "IN_USE" && (
+          {data.inProgress && requestStatus === "APPROVED" && (
             <AlertCard
-              variant="success"
-              title="Ready for Pickup"
-              description="The item is now ready to be picked up."
+              variant="info"
+              title="Request In Progress"
+              description="The request is being processed, or the item is currently being borrowed."
+              className="mb-6"
+            />
+          )}
+          {requestStatus === "CANCELLED" && cancellationReason && (
+            <AlertCard
+              variant="destructive"
+              title="Request Cancelled"
+              description={cancellationReason}
+              className="mb-6"
+            />
+          )}
+          {requestStatus === "REJECTED" && rejectionReason && (
+            <AlertCard
+              variant="destructive"
+              title="Request Rejected"
+              description={rejectionReason}
               className="mb-6"
             />
           )}
@@ -196,13 +218,29 @@ export default function ReturnableResourceDetails({
               className="mb-6"
             />
           )}
-          {requestStatus === "REJECTED" && rejectionReason && (
+          {data.isLost && data.lostReason && (
             <AlertCard
               variant="destructive"
-              title="Request Rejected"
-              description={rejectionReason}
+              title="Item Lost"
+              description={`Reason: ${data.lostReason}`}
               className="mb-6"
             />
+          )}
+          {requestStatus === "ON_HOLD" && onHoldReason && (
+            <div>
+              <AlertCard
+                variant="warning"
+                title="Request On Hold"
+                description={onHoldReason}
+                className="mb-6"
+              />
+              <AlertCard
+                variant="info"
+                title="Next Steps"
+                description="You can update your request to address the issue, cancel it if no longer needed, or contact support for assistance."
+                className="mb-6"
+              />
+            </div>
           )}
           <H4 className="font-semibold text-muted-foreground">
             Borrow Request Details
@@ -496,37 +534,41 @@ export default function ReturnableResourceDetails({
         {requestStatus === "COMPLETED" && (
           <>
             {data.isOverdue && <Badge variant="destructive">Overdue</Badge>}
-            <div className="group flex items-center justify-between">
-              <div className="flex w-full flex-col items-start">
-                <div className="flex space-x-1 text-muted-foreground">
-                  <CalendarIcon className="h-5 w-5" />
-                  <P className="font-semibold tracking-tight">
-                    Actual Return Time:
-                  </P>
+            {!data.isLost && (
+              <>
+                <div className="group flex items-center justify-between">
+                  <div className="flex w-full flex-col items-start">
+                    <div className="flex space-x-1 text-muted-foreground">
+                      <CalendarIcon className="h-5 w-5" />
+                      <P className="font-semibold tracking-tight">
+                        Actual Return Time:
+                      </P>
+                    </div>
+                    <div className="w-full pl-5 pt-1">
+                      <P>
+                        {data.actualReturnDate
+                          ? format(new Date(data.actualReturnDate), "PPP p")
+                          : "-"}
+                      </P>
+                    </div>
+                  </div>
                 </div>
-                <div className="w-full pl-5 pt-1">
-                  <P>
-                    {data.actualReturnDate
-                      ? format(new Date(data.actualReturnDate), "PPP p")
-                      : "-"}
-                  </P>
+                <div className="group flex items-center justify-between">
+                  <div className="flex w-full flex-col items-start">
+                    <div className="flex space-x-1 text-muted-foreground">
+                      <ClipboardCheck className="h-5 w-5" />
+                      <P className="font-semibold tracking-tight">
+                        Return Condition:
+                      </P>
+                    </div>
+                    <div className="w-full pl-5 pt-1">
+                      <P>{data.returnCondition}</P>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-            <div className="group flex items-center justify-between">
-              <div className="flex w-full flex-col items-start">
-                <div className="flex space-x-1 text-muted-foreground">
-                  <ClipboardCheck className="h-5 w-5" />
-                  <P className="font-semibold tracking-tight">
-                    Return Condition:
-                  </P>
-                </div>
-                <div className="w-full pl-5 pt-1">
-                  <P>{data.returnCondition}</P>
-                </div>
-              </div>
-            </div>
-            <Separator className="my-6" />
+                <Separator className="my-6" />
+              </>
+            )}
           </>
         )}
       </div>

@@ -180,6 +180,9 @@ export default function VenueRequestDetails({
           createdAt: data.createdAt,
           venue: data.venue.name,
           dateReserved: data.startTime,
+          actualStart: data.actualStart
+            ? format(new Date(data.actualStart), "PP p")
+            : null,
           purpose: data.purpose,
           equipmentNeeded: data.setupRequirements.join(", "),
           status: requestStatus,

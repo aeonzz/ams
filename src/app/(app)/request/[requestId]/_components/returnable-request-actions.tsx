@@ -43,6 +43,7 @@ export default function ReturnableRequestActions({
   const pathname = usePathname();
   const queryClient = useQueryClient();
   const currentUser = useSession();
+  const [lostReason, setLostReason] = React.useState("");
   const { mutateAsync, isPending } = useServerActionMutation(
     returnableResourceActions
   );
@@ -52,6 +53,9 @@ export default function ReturnableRequestActions({
     itemStatus: ItemStatusType;
     isReturned?: boolean;
     returnCondition?: string;
+    inProgress: boolean;
+    isLost?: boolean;
+    lostReason?: string;
   }) {
     const data: UpdateReturnableResourceRequestSchemaWithPath = {
       path: pathname,
@@ -59,12 +63,18 @@ export default function ReturnableRequestActions({
       itemStatus: values.itemStatus,
       returnCondition: values.returnCondition,
       isReturned: values.isReturned,
+      inProgress: values.inProgress,
+      isLost: values.isLost,
+      lostReason: values.lostReason,
     };
 
     toast.promise(mutateAsync(data), {
       loading: "Loading...",
       success: () => {
         queryClient.invalidateQueries({ queryKey: [requestId] });
+        if (values.isLost) {
+          return "The item has been marked as lost.";
+        }
         return values.itemStatus === "IN_USE"
           ? "The item has been successfully marked as picked up."
           : "The item has been successfully marked as returned.";
@@ -82,7 +92,7 @@ export default function ReturnableRequestActions({
       allowedDepartment={allowedDepartment}
       currentUser={currentUser}
     >
-      {request.inProgress && request.item.status !== "IN_USE" && (
+      {request.item.status !== "IN_USE" && (
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button disabled={isPending}>Mark as Picked Up</Button>
@@ -97,7 +107,13 @@ export default function ReturnableRequestActions({
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
               <AlertDialogAction
-                onClick={() => handleUpdate({ itemStatus: "IN_USE" })}
+                onClick={() =>
+                  handleUpdate({
+                    itemStatus: "IN_USE",
+                    inProgress: true,
+                    isLost: false,
+                  })
+                }
                 disabled={isPending}
               >
                 Confirm
@@ -107,48 +123,99 @@ export default function ReturnableRequestActions({
         </AlertDialog>
       )}
       {request.inProgress && request.item.status === "IN_USE" && (
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button disabled={isPending}>Mark as Returned</Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Mark Item as Returned</AlertDialogTitle>
-              <AlertDialogDescription>
-                Please provide the return condition of the item.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <div>
-              <Label htmlFor="returnCondition" className="text-right">
-                Return Condition
-              </Label>
-              <Textarea
-                id="returnCondition"
-                maxRows={6}
-                minRows={3}
-                value={returnCondition}
-                onChange={(e) => setReturnCondition(e.target.value)}
-                placeholder="Describe the condition of the returned item..."
-                className="text-sm placeholder:text-sm"
-              />
-            </div>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={() =>
-                  handleUpdate({
-                    itemStatus: "AVAILABLE",
-                    isReturned: true,
-                    returnCondition,
-                  })
-                }
-                disabled={isPending || !returnCondition.trim()}
-              >
-                Confirm Return
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        <>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button disabled={isPending}>Mark as Returned</Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Mark Item as Returned</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Please provide the return condition of the item.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <div>
+                <Label htmlFor="returnCondition" className="text-right">
+                  Return Condition
+                </Label>
+                <Textarea
+                  id="returnCondition"
+                  maxRows={6}
+                  minRows={3}
+                  value={returnCondition}
+                  onChange={(e) => setReturnCondition(e.target.value)}
+                  placeholder="Describe the condition of the returned item..."
+                  className="text-sm placeholder:text-sm"
+                />
+              </div>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() =>
+                    handleUpdate({
+                      itemStatus: "AVAILABLE",
+                      isReturned: true,
+                      returnCondition,
+                      inProgress: false,
+                      isLost: false,
+                    })
+                  }
+                  disabled={isPending || !returnCondition.trim()}
+                >
+                  Confirm Return
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive" disabled={isPending}>
+                Mark as Lost
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Mark Item as Lost</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Please provide details about how the item was lost.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <div>
+                <Label htmlFor="lostReason" className="text-right">
+                  Lost Details
+                </Label>
+                <Textarea
+                  id="lostReason"
+                  maxRows={6}
+                  minRows={3}
+                  value={lostReason}
+                  onChange={(e) => setLostReason(e.target.value)}
+                  placeholder="Describe how the item was lost..."
+                  className="text-sm placeholder:text-sm"
+                />
+              </div>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() =>
+                    handleUpdate({
+                      itemStatus: "LOST",
+                      isReturned: false,
+                      inProgress: false,
+                      lostReason,
+                      isLost: true,
+                    })
+                  }
+                  disabled={isPending || !lostReason.trim()}
+                >
+                  Confirm Lost
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </>
       )}
     </PermissionGuard>
   );

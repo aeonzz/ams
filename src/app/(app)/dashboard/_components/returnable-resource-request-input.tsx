@@ -26,7 +26,6 @@ import { Separator } from "@/components/ui/separator";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { usePathname } from "next/navigation";
 import { toast } from "sonner";
-import { useSession } from "@/lib/hooks/use-session";
 import { type RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTypeSchema";
 import axios from "axios";
 import { type ReservedReturnableItemDateAndTime } from "@/lib/schema/utils";

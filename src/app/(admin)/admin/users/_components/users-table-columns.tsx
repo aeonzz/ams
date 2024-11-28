@@ -304,7 +304,7 @@ export function getUsersColumns(): ColumnDef<UserType>[] {
       },
     },
     {
-      id: "userRoles",
+      id: "userRole",
       header: () => <P>User Roles</P>,
       cell: ({ row }) => <DataTableExpand<UserType> row={row} />,
       size: 0,

@@ -12,7 +12,7 @@ import CreateInventoryDialog from "@/app/(admin)/admin/inventory/lendable-items/
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Borrowable items",
+  title: "Borrow Request Management",
 };
 
 interface Props {

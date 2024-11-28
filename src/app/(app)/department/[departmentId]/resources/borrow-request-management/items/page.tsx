@@ -1,16 +1,16 @@
 import ContentLayout from "@/components/layouts/content-layout";
-import DepartmentLayout from "../../_components/department-layout";
 import DepartmentBorrowableItemsScreen from "./_components";
+import DepartmentLayout from "../../../_components/department-layout";
 
-export interface DepartmentBorrowableItems {
+export interface DepartmentBorrowableItemsPageProps {
   params: {
     departmentId: string;
   };
 }
 
-export default function DepartmentBorrowableItems({
+export default function DepartmentBorrowableItemsPage({
   params,
-}: DepartmentBorrowableItems) {
+}: DepartmentBorrowableItemsPageProps) {
   return (
     <ContentLayout title="Venues">
       <DepartmentLayout

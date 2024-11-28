@@ -8,9 +8,14 @@ import {
   TrashIcon,
 } from "@radix-ui/react-icons";
 import { type Table } from "@tanstack/react-table";
-import { toast } from "sonner";
 
 import { exportTableToCSV, exportTableToXLSX } from "@/lib/export";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -21,45 +26,24 @@ import {
 import CommandTooltip from "@/components/ui/command-tooltip";
 import { CommandShortcut } from "@/components/ui/command";
 import { P } from "@/components/typography/text";
-import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
 import { usePathname } from "next/navigation";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { deleteDepartments } from "@/lib/actions/department";
-import type { DepartmentsTableType } from "./types";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { DepartmentBorrowableRequest } from "./types";
 
-interface DepartmentsTableFloatingBarProps {
-  table: Table<DepartmentsTableType>;
+interface BorrowableRequestTableFloatingBarProps {
+  table: Table<DepartmentBorrowableRequest>;
   fileName: string;
 }
 
-export function DepartmentsTableFloatingBar({
+export function BorrowableRequestTableFloatingBar({
   table,
   fileName,
-}: DepartmentsTableFloatingBarProps) {
+}: BorrowableRequestTableFloatingBarProps) {
   const rows = table.getFilteredSelectedRowModel().rows;
   const pathname = usePathname();
 
   const [isLoading, startTransition] = React.useTransition();
-  const [method, setMethod] = React.useState<"export" | "delete">();
-
-  const { isPending, mutateAsync } = useServerActionMutation(deleteDepartments);
+  const [method, setMethod] = React.useState<"export">();
 
   // Clear selection on Escape key press
   React.useEffect(() => {
@@ -154,70 +138,6 @@ export function DepartmentsTableFloatingBar({
               </DropdownMenu>
               <TooltipContent className="border bg-accent font-semibold text-foreground dark:bg-zinc-900">
                 <P>Export {fileName}</P>
-              </TooltipContent>
-            </Tooltip>
-            <Tooltip delayDuration={250}>
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="secondary"
-                      size="icon"
-                      className="size-10 border"
-                      disabled={isPending}
-                    >
-                      {isPending && method === "delete" ? (
-                        <LoadingSpinner />
-                      ) : (
-                        <TrashIcon className="size-5" aria-hidden="true" />
-                      )}
-                    </Button>
-                  </TooltipTrigger>
-                </AlertDialogTrigger>
-                <AlertDialogContent bgOpacity="bg-black/50">
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>
-                      Are you absolutely sure?
-                    </AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This action cannot be undone. This will permanently delete
-                      the selected department/s and all related records from our
-                      servers.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={() => {
-                        setMethod("delete");
-                        toast.promise(
-                          mutateAsync({
-                            ids: rows.map((row) => row.original.id),
-                            path: pathname,
-                          }),
-                          {
-                            loading: "Deleting...",
-                            success: () => {
-                              table.toggleAllRowsSelected(false);
-                              return "user/s deleted successfully";
-                            },
-                            error: (err) => {
-                              console.log(err);
-                              return err.message;
-                            },
-                          }
-                        );
-                      }}
-                      className="bg-destructive hover:bg-destructive/90"
-                      disabled={isPending}
-                    >
-                      Delete
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-              <TooltipContent className="border bg-accent font-semibold text-foreground dark:bg-zinc-900">
-                <P>Delete departments</P>
               </TooltipContent>
             </Tooltip>
           </div>

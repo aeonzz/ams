@@ -302,26 +302,6 @@ export function getJobStatusColor(status: JobStatusType): JobStatusColorConfig {
       variant: "green",
       stroke: 10,
     },
-    CANCELLED: {
-      color: "#6b7280",
-      variant: "gray",
-      stroke: 10,
-    },
-    ON_HOLD: {
-      color: "#a855f7",
-      variant: "purple",
-      stroke: 10,
-    },
-    REJECTED: {
-      color: "#ef4444",
-      variant: "red",
-      stroke: 10,
-    },
-    REWORK_IN_PROGRESS: {
-      color: "#f59e0b",
-      variant: "orange",
-      stroke: 10,
-    },
     VERIFIED: {
       color: "#3b82f6",
       variant: "blue",
@@ -495,14 +475,6 @@ export function getReturnableItemStatusIcon(
     LOST: {
       icon: Search,
       variant: "red",
-    },
-    RETURNED: {
-      icon: RotateCcw,
-      variant: "gray",
-    },
-    PENDING_RETURN: {
-      icon: Clock,
-      variant: "yellow",
     },
   };
 

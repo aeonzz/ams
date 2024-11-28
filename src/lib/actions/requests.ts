@@ -27,6 +27,7 @@ import { updateReturnableResourceRequestSchemaWithPath } from "../schema/resourc
 import { updateRequestStatusSchemaWithPath } from "@/app/(app)/request/[requestId]/_components/schema";
 import { pusher } from "../pusher";
 import { transportRequestActions } from "../schema/request/transport";
+import { formatFullName } from "../utils";
 
 const cohere = createCohere({
   apiKey: process.env.COHERE_API_KEY,
@@ -105,6 +106,7 @@ export async function getRequests(input: GetRequestsSchema) {
         include: {
           user: true,
           department: true,
+          reviewer: true,
         },
       }),
       db.request.count({ where }),
@@ -117,6 +119,18 @@ export async function getRequests(input: GetRequestsSchema) {
         return {
           ...data,
           departmentName: data.department.name,
+          requester: formatFullName(
+            data.user.firstName,
+            data.user.middleName,
+            data.user.lastName
+          ),
+          reviewer: data.reviewer
+            ? formatFullName(
+                data.reviewer.firstName,
+                data.reviewer.middleName,
+                data.reviewer.lastName
+              )
+            : undefined,
         };
       })
     );

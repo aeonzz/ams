@@ -273,7 +273,7 @@ model VenueSetupRequirement {
   venueId   String
   available Boolean  @default(true)
   venue     Venue    @relation(fields: [venueId], references: [id], onDelete: Cascade)
-  name      String   
+  name      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -292,6 +292,8 @@ model ReturnableRequest {
   purpose           String
   location          String
   notes             String?
+  isLost            Boolean          @default(false)
+  lostReason        String? 
   requestId         String           @unique
   request           Request          @relation(fields: [requestId], references: [id], onDelete: Cascade)
   createdAt         DateTime         @default(now())
@@ -503,8 +505,6 @@ enum ItemStatus {
   IN_USE
   MAINTENANCE
   LOST
-  RETURNED
-  PENDING_RETURN
 }
 
 enum SupplyItemStatus {

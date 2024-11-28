@@ -90,7 +90,7 @@ export function JobRequestTable({
                 className={cn(
                   buttonVariants({ variant: "ghost2", size: "sm" })
                 )}
-                href={`/department/${departmentId}/job-request/job-evaluation`}
+                href={`/department/${departmentId}/job-request/job-evaluation?page=1&per_page=10&sort=createdAt.desc`}
               >
                 <P>Job Evaluations</P>
               </Link>

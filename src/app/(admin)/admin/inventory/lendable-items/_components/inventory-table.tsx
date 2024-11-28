@@ -58,7 +58,7 @@ export function InventoryTable({ inventoryPromise }: InventoryTableProps) {
   return (
     <DataTable
       table={table}
-      floatingBar={<InventoryTableFloatingBar table={table} />}
+      floatingBar={<InventoryTableFloatingBar fileName="Lendable-Items" table={table} />}
       renderSubComponent={({ row }) => (
         <SubItemsTable
           subItems={row.original.inventorySubItems}

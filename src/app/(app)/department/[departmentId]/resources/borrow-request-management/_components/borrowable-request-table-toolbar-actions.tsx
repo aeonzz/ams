@@ -6,10 +6,7 @@ import { type Table } from "@tanstack/react-table";
 
 import { exportTableToCSV, exportTableToXLSX } from "@/lib/export";
 import { Button } from "@/components/ui/button";
-
-import CreateUserDialog from "./create-user-dialog";
-import { DeleteUsersDialog } from "./delete-users-dialog";
-import { type UserType } from "@/lib/types/user";
+import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import { DateRangePicker } from "@/components/date-range-picker";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -18,26 +15,23 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { DepartmentBorrowableRequest } from "./types";
 import { ChevronDownIcon } from "lucide-react";
 
-interface UsersTableToolbarActionsProps {
-  table: Table<UserType>;
+interface BorrowableRequestTableToolbarActionsProps {
+  table: Table<DepartmentBorrowableRequest>;
+  fileName: string;
+  children?: React.ReactNode
 }
 
-export function UsersTableToolbarActions({
+export function BorrowableRequestTableToolbarActions({
   table,
-}: UsersTableToolbarActionsProps) {
+  fileName,
+  children
+}: BorrowableRequestTableToolbarActionsProps) {
   return (
     <div className="flex items-center gap-2">
-      {table.getFilteredSelectedRowModel().rows.length > 0 ? (
-        <DeleteUsersDialog
-          users={table
-            .getFilteredSelectedRowModel()
-            .rows.map((row) => row.original)}
-          onSuccess={() => table.toggleAllRowsSelected(false)}
-        />
-      ) : null}
-      <CreateUserDialog />
+      {children}
       <React.Suspense fallback={<Skeleton className="h-7 w-52" />}>
         <DateRangePicker
           triggerVariant="secondary"
@@ -58,8 +52,8 @@ export function UsersTableToolbarActions({
           <DropdownMenuItem
             onClick={() =>
               exportTableToCSV(table, {
-                filename: "Users",
-                excludeColumns: ["select", "actions", "userRole"],
+                filename: fileName,
+                excludeColumns: ["select", "actions"],
               })
             }
           >
@@ -68,8 +62,8 @@ export function UsersTableToolbarActions({
           <DropdownMenuItem
             onClick={() =>
               exportTableToXLSX(table, {
-                filename: "Requests",
-                excludeColumns: ["select", "actions", "userRole"],
+                filename: fileName,
+                excludeColumns: ["select", "actions"],
               })
             }
           >

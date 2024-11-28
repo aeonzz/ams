@@ -58,6 +58,20 @@ export function exportTableToCSV<TData>(
             return `"${format(cellValue, "PP p")}"`; // Format as 'Nov 11, 2024 4:00 PM'
           }
 
+          if (header === "venueSetupRequirement" && Array.isArray(cellValue)) {
+            const features = cellValue
+              .map((feature) => feature.name)
+              .join(", ");
+            return `"${features}"`;
+          }
+
+          if (header === "userDepartments" && Array.isArray(cellValue)) {
+            const departments = cellValue
+              .map((dept: any) => dept.department.name)
+              .join(", ");
+            return `"${departments}"`;
+          }
+
           if (typeof cellValue === "boolean") {
             return cellValue ? "Yes" : "No"; // Handle boolean values
           }
@@ -129,6 +143,13 @@ export function exportTableToXLSX<TData>(
         const cellValue = row.getValue(header);
         if (cellValue instanceof Date) {
           return `${format(cellValue, "PP p")}`;
+        } else if (
+          header === "venueSetupRequirement" &&
+          Array.isArray(cellValue)
+        ) {
+          return cellValue.map((feature) => feature.name).join(", ");
+        } else if (header === "userDepartments" && Array.isArray(cellValue)) {
+          return cellValue.map((dept: any) => dept.department.name).join(", ");
         } else if (typeof cellValue === "boolean") {
           return cellValue ? "Yes" : "No";
         } else if (Array.isArray(cellValue)) {

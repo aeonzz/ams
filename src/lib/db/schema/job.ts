@@ -1,5 +1,4 @@
 import { requestSchemaBase } from "@/lib/schema/request";
-import { JobTypeSchema } from "prisma/generated/zod";
 import { z } from "zod";
 
 export const createJobRequestSchemaServer = z.object({

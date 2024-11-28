@@ -157,6 +157,8 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                 data={data.returnableRequest}
                 requestId={data.id}
                 rejectionReason={data.rejectionReason}
+                cancellationReason={data.cancellationReason}
+                onHoldReason={data.onHoldReason}
                 requestStatus={data.status}
                 isCurrentUser={currentUser.id === data.userId}
               />
@@ -374,7 +376,16 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
               allowedRoles={["OPERATIONS_MANAGER", "DEPARTMENT_HEAD"]}
               allowedDepartment={data.departmentId}
               allowedApproverRoles={["DEPARTMENT_HEAD"]}
-            />
+              inProgress={data.returnableRequest.inProgress}
+            >
+              {data.status === "APPROVED" ||
+                (data.status === "ON_HOLD" && (
+                  <CancelRequest
+                    requestId={data.id}
+                    requestStatus={data.status}
+                  />
+                ))}
+            </RequestReviewerActions>
           )}
           {data.type === "SUPPLY" && data.supplyRequest && (
             <RequestReviewerActions
@@ -455,7 +466,9 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
             )}
           {data.status === "APPROVED" &&
             data.type === "BORROW" &&
-            data.returnableRequest && (
+            data.returnableRequest &&
+            new Date(data.returnableRequest.dateAndTimeNeeded) <=
+              new Date() && (
               <ReturnableRequestActions
                 allowedRoles={["OPERATIONS_MANAGER"]}
                 allowedDepartment={data.departmentId}

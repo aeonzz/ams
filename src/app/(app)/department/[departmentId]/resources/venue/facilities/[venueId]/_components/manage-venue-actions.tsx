@@ -18,7 +18,6 @@ import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import { VenueWithRelations } from "prisma/generated/zod";
 import { CommandShortcut } from "@/components/ui/command";
 import { Dialog } from "@/components/ui/dialog";
-import UploadRulesPdfDialog from "./upload-rules-pdf-dialog";
 import Link from "next/link";
 
 interface ManageVenueActionsProps {

@@ -64,8 +64,6 @@ export default function DepartmentBorrowableItemsScreen({
     return <NotFound />;
   }
 
-  console.log(filteredItems);
-
   return (
     <div className="container flex-col space-y-2 p-0">
       <div className="flex w-full justify-between pb-0">
@@ -110,7 +108,7 @@ export default function DepartmentBorrowableItemsScreen({
                   return (
                     <Link
                       key={item.id}
-                      href={`/department/${departmentId}/resources/borrowable-items/${item.id}?page=1&per_page=10&sort=createdAt.desc`}
+                      href={`/department/${departmentId}/resources/borrow-request-management/${item.id}?page=1&per_page=10&sort=createdAt.desc`}
                       className="flex h-auto w-full justify-between gap-3 overflow-hidden rounded-md p-3 transition-colors hover:bg-secondary-accent hover:text-secondary-accent-foreground"
                       prefetch
                     >

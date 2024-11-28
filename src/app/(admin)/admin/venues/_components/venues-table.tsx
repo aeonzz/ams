@@ -84,7 +84,7 @@ export function VenuesTable({ venuesPromise }: VenuesTableProps) {
   return (
     <DataTable
       table={table}
-      floatingBar={<VenuesTableFloatingBar table={table} />}
+      floatingBar={<VenuesTableFloatingBar fileName="Venues" table={table} />}
     >
       <DataTableToolbar table={table} filterFields={filterFields}>
         <VenuesTableToolbarActions table={table} />

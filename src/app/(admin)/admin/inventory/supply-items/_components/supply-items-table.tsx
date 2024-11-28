@@ -84,7 +84,7 @@ export function SupplyItemsTable({ supplyPromise }: SupplyItemsTableProps) {
   return (
     <DataTable
       table={table}
-      floatingBar={<SupplyitemsTableFloatingBar table={table} />}
+      floatingBar={<SupplyitemsTableFloatingBar fileName="Supply-Items" table={table} />}
     >
       <DataTableToolbar table={table} filterFields={filterFields}>
         <SupplyItemsTableToolbarActions table={table} />
