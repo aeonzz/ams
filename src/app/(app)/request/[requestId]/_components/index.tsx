@@ -54,6 +54,7 @@ import VenueRequestActions from "./venue-request-actions";
 import PriorityOption from "@/app/(app)/dashboard/_components/priority-option";
 import SetPriority from "./set-priority";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import VerifyJob from "./verify-job";
 
 interface RequestDetailsProps {
   params: string;
@@ -347,21 +348,31 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
               </JobRequestEvaluationDialog>
             )}
           {data.type === "JOB" && data.jobRequest && (
-            <JobRequestReviewerActions
-              request={data}
-              allowedDepartment={data.departmentId}
-              allowedRoles={["OPERATIONS_MANAGER", "DEPARTMENT_HEAD"]}
-              allowedApproverRoles={["DEPARTMENT_HEAD"]}
-              jobRequestId={data.jobRequest.id}
-            >
-              {data.status === "APPROVED" ||
-                (data.status === "ON_HOLD" && (
-                  <CancelRequest
+            <>
+              <JobRequestReviewerActions
+                request={data}
+                allowedDepartment={data.departmentId}
+                allowedRoles={["OPERATIONS_MANAGER", "DEPARTMENT_HEAD"]}
+                allowedApproverRoles={["DEPARTMENT_HEAD"]}
+                jobRequestId={data.jobRequest.id}
+              >
+                {data.status === "APPROVED" ||
+                  (data.status === "ON_HOLD" && (
+                    <CancelRequest
+                      requestId={data.id}
+                      requestStatus={data.status}
+                    />
+                  ))}
+              </JobRequestReviewerActions>
+              {!data.jobRequest.verifiedByRequester &&
+                data.userId === currentUser.id && (
+                  <VerifyJob
+                    jobRequestId={data.jobRequest.id}
+                    role="requester"
                     requestId={data.id}
-                    requestStatus={data.status}
                   />
-                ))}
-            </JobRequestReviewerActions>
+                )}
+            </>
           )}
           {data.type === "JOB" &&
             data.jobRequest &&
