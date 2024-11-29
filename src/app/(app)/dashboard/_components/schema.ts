@@ -15,6 +15,9 @@ export const createjobRequestSchema = z.object({
   departmentId: z.string({
     required_error: "Job section is required.",
   }),
+  department: z.string({
+    required_error: "Job section is required.",
+  }),
   // dueDate: z
   //   .date({
   //     required_error: "Due date is required.",

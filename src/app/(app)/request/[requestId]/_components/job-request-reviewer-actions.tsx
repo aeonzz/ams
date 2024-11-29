@@ -65,7 +65,6 @@ import { formatFullName } from "@/lib/utils";
 import { useSession } from "@/lib/hooks/use-session";
 import RequestApproverActions from "./request-approver-actions";
 import { PermissionGuard } from "@/components/permission-guard";
-import type { EntityTypeType } from "prisma/generated/zod/inputTypeSchemas/EntityTypeSchema";
 import IsError from "@/components/is-error";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -573,7 +572,6 @@ export default function JobRequestReviewerActions({
                 {request.jobRequest?.status === "COMPLETED" &&
                   request.status !== "ON_HOLD" && (
                     <>
-                    
                       {!request.jobRequest.verifiedByReviewer && (
                         <PermissionGuard
                           allowedRoles={["OPERATIONS_MANAGER"]}
@@ -740,7 +738,6 @@ export default function JobRequestReviewerActions({
           </Dialog>
           <TooltipContent className="flex items-center gap-3" side="bottom">
             <P>Manage request</P>
-            <CommandShortcut>M</CommandShortcut>
           </TooltipContent>
         </Tooltip>
       </PermissionGuard>

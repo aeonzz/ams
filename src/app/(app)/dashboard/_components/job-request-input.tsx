@@ -72,6 +72,7 @@ import JobRequestInputSkeleton from "./job-request-input-skeleton";
 import { ComboboxInput } from "@/components/ui/combobox-input";
 import { Input } from "@/components/ui/input";
 import { useMediaQuery } from "usehooks-ts";
+import DepartmentInput from "./department-input";
 
 export const jobType = [
   "REPAIRS",
@@ -109,6 +110,7 @@ export default function JobRequestInput({
   isFieldsDirty,
 }: JobRequestInputProps) {
   const pathname = usePathname();
+  const currentUser = useSession();
   const customInputRef = React.useRef<HTMLInputElement>(null);
   const [customJob, setCustomJob] = React.useState("");
   const [showCustomInput, setShowCustomInput] = React.useState(false);
@@ -139,6 +141,7 @@ export default function JobRequestInput({
         const data: ExtendedJobRequestSchemaServer = {
           description: values.description,
           type: type,
+          department: values.department,
           departmentId: values.departmentId,
           jobType: values.jobType,
           location: values.location,
@@ -168,6 +171,11 @@ export default function JobRequestInput({
       toast.error("An error occurred during submission. Please try again.");
     }
   }
+
+  const departmentItems = currentUser.userDepartments.map((ud) => ({
+    id: ud.department.id,
+    name: ud.department.name,
+  }));
 
   if (isLoading) return <JobRequestInputSkeleton />;
 
@@ -200,6 +208,15 @@ export default function JobRequestInput({
                     <FormMessage />
                   </FormItem>
                 )}
+              />
+              <DepartmentInput
+                form={form}
+                name="department"
+                label="Department"
+                items={departmentItems}
+                isPending={isPending}
+                placeholder="Select a department"
+                emptyMessage="No departments found"
               />
               <div
                 className={cn(

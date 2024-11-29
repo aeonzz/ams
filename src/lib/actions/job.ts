@@ -7,7 +7,10 @@ import { db } from "@/lib/db/index";
 import { revalidatePath } from "next/cache";
 import { generateText } from "ai";
 import { cohere } from "@ai-sdk/cohere";
-import { extendedJobRequestSchemaServer } from "../db/schema/job";
+import {
+  extendedJobRequestSchemaServer,
+  uploadProofImagesSchemaWithPath,
+} from "../db/schema/job";
 import { createNotification } from "./notification";
 import {
   assignPersonnelSchemaWithPath,
@@ -22,6 +25,32 @@ import { pusher } from "../pusher";
 import { checkAuth } from "../auth/utils";
 import { GetRequestsSchema } from "../schema";
 import { formatFullName } from "../utils";
+import { PrismaClient } from "@prisma/client";
+
+const generateDateId = async (db: PrismaClient) => {
+  const currentDate = new Date();
+  const year = currentDate.getFullYear();
+  const month = String(currentDate.getMonth() + 1).padStart(2, "0");
+
+  const latestRequest = await db.request.findFirst({
+    where: {
+      id: {
+        startsWith: `${year}-${month}-`,
+      },
+    },
+    orderBy: {
+      id: "desc",
+    },
+  });
+
+  let sequence = 1;
+  if (latestRequest) {
+    const lastSequence = parseInt(latestRequest.id.split("-")[2]);
+    sequence = lastSequence + 1;
+  }
+
+  return `${year}-${month}-${String(sequence).padStart(3, "0")}`;
+};
 
 export const createJobRequest = authedProcedure
   .createServerAction()
@@ -73,7 +102,7 @@ export const createJobRequest = authedProcedure
 
       const createdRequest = await db.request.create({
         data: {
-          id: `REQ-${generateId(3)}`,
+          id: await generateDateId(db),
           userId: user.id,
           priority: rest.priority,
           type: rest.type,
@@ -81,7 +110,8 @@ export const createJobRequest = authedProcedure
           departmentId: rest.departmentId,
           jobRequest: {
             create: {
-              id: `JRQ-${generateId(3)}`,
+              id: generateId(5),
+              department: rest.department,
               description: rest.description,
               location: rest.location,
               jobType: rest.jobType,
@@ -736,3 +766,34 @@ export async function getDepartmentJobRequests(input: GetRequestsSchema) {
     return { data: [], pageCount: 0 };
   }
 }
+
+export const uploadProofImages = authedProcedure
+  .createServerAction()
+  .input(uploadProofImagesSchemaWithPath)
+  .handler(async ({ input }) => {
+    const { path, proofImages, requestId } = input;
+
+    try {
+      const result = await db.$transaction(async (prisma) => {
+        const updatedData = await db.jobRequest.update({
+          where: {
+            requestId: requestId,
+          },
+          data: {
+            proofImages: proofImages,
+          },
+        });
+
+        return updatedData;
+      });
+
+      await pusher.trigger("request", "request_update", {
+        message: "",
+      });
+
+      return revalidatePath(path);
+    } catch (error) {
+      console.log(error);
+      getErrorMessage(error);
+    }
+  });

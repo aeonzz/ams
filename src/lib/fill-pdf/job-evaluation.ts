@@ -91,11 +91,13 @@ export async function fillJobRequestEvaluationPDF(
     Not_Applicable: { x: 417, y: height - 465, size: 8 },
   };
 
+  const checkSymbol = "x";
+
   if (data.clientType in clientTypeCheckmarks) {
     const checkmark = clientTypeCheckmarks[data.clientType];
     console.log(`Drawing checkmark at: ${checkmark.x}, ${checkmark.y}`);
 
-    firstPage.drawText("X", {
+    firstPage.drawText(checkSymbol, {
       x: checkmark.x,
       y: checkmark.y,
       size: checkmark.size,
@@ -114,7 +116,7 @@ export async function fillJobRequestEvaluationPDF(
       `Drawing position checkmark at: ${checkmark.x}, ${checkmark.y}`
     );
 
-    firstPage.drawText("X", {
+    firstPage.drawText(checkSymbol, {
       x: checkmark.x,
       y: checkmark.y,
       size: checkmark.size,
@@ -136,7 +138,7 @@ export async function fillJobRequestEvaluationPDF(
     const checkmark = sexCheckmarks[data.sex];
     console.log(`Drawing sex checkmark at: ${checkmark.x}, ${checkmark.y}`);
 
-    firstPage.drawText("X", {
+    firstPage.drawText(checkSymbol, {
       x: checkmark.x,
       y: checkmark.y,
       size: checkmark.size,
@@ -159,7 +161,7 @@ export async function fillJobRequestEvaluationPDF(
     const checkmark = awarenessLevelCheckmarks[data.awarenessLevel];
     console.log(`Drawing checkmark at: ${checkmark.x}, ${checkmark.y}`);
 
-    firstPage.drawText("X", {
+    firstPage.drawText(checkSymbol, {
       x: checkmark.x,
       y: checkmark.y,
       size: checkmark.size,
@@ -174,7 +176,7 @@ export async function fillJobRequestEvaluationPDF(
     const checkmark = visibilityCheckmarks[data.visibility];
     console.log(`Drawing checkmark at: ${checkmark.x}, ${checkmark.y}`);
 
-    firstPage.drawText("X", {
+    firstPage.drawText(checkSymbol, {
       x: checkmark.x,
       y: checkmark.y,
       size: checkmark.size,
@@ -189,7 +191,7 @@ export async function fillJobRequestEvaluationPDF(
     const checkmark = helpfulnessCheckmarks[data.helpfulness];
     console.log(`Drawing checkmark at: ${checkmark.x}, ${checkmark.y}`);
 
-    firstPage.drawText("X", {
+    firstPage.drawText(checkSymbol, {
       x: checkmark.x,
       y: checkmark.y,
       size: checkmark.size,
@@ -254,7 +256,7 @@ export async function fillJobRequestEvaluationPDF(
         );
 
         // Draw checkmark for the response
-        firstPage.drawText("X", {
+        firstPage.drawText(checkSymbol, {
           x: checkmark.x,
           y: checkmark.y,
           size: checkmark.size,

@@ -156,7 +156,6 @@ export default function VenueRequestDetails({
   const departmentHead = data.request.department.userRole.find(
     (role) => role.role.name === "DEPARTMENT_HEAD"
   )?.user;
-  console.log(data.request.department.userRole, departmentHead);
 
   const existingFormFile = data.request.department.files.find(
     (file) => file.filePurpose === "VENUE_FORM"

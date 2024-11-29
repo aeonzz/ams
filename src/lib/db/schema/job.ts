@@ -7,6 +7,7 @@ export const createJobRequestSchemaServer = z.object({
   departmentId: z.string(),
   location: z.string(),
   jobType: z.string(),
+  department: z.string(),
 });
 
 export const createJobRequestSchemaServerWithPath =
@@ -25,3 +26,14 @@ export const extendedJobRequestSchemaServer = requestSchemaBase.merge(
 export type ExtendedJobRequestSchemaServer = z.infer<
   typeof extendedJobRequestSchemaServer
 >;
+
+export const uploadProofImagesSchema = z.object({
+  proofImages: z.array(z.string()).optional(),
+});
+
+export const uploadProofImagesSchemaWithPath = uploadProofImagesSchema.extend({
+  requestId: z.string(),
+  path: z.string(),
+});
+
+export type UploadProofImagesSchema = z.infer<typeof uploadProofImagesSchema>;

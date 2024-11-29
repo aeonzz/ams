@@ -35,8 +35,8 @@ export default function RequestApproverActions({
       };
 
       const actionText =
-        action === "APPROVED" ? "Finalizing approval of" : "Rejecting";
-      const successText = action === "APPROVED" ? "finalized" : "rejected";
+        action === "APPROVED" ? "Approving" : "Rejecting";
+      const successText = action === "APPROVED" ? "approved" : "rejected";
 
       toast.promise(updateStatusMutate(data), {
         loading: `${actionText} request...`,

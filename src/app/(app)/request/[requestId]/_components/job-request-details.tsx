@@ -27,6 +27,8 @@ import {
   cn,
   formatFullName,
   getJobStatusColor,
+  getMonthName,
+  getOrdinalDate,
   isDateInPast,
   textTransform,
 } from "@/lib/utils";
@@ -92,7 +94,16 @@ import { Calendar } from "@/components/ui/calendar";
 import { Textarea } from "@/components/ui/text-area";
 import { AlertCard } from "@/components/ui/alert-card";
 import { jobType } from "@/app/(app)/dashboard/_components/job-request-input";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { FileUploader } from "@/components/file-uploader";
+import UploadProofImage from "./upload-proof-image";
+import { PermissionGuard } from "@/components/permission-guard";
+import { useSession } from "@/lib/hooks/use-session";
 
 interface JobRequestDetailsProps {
   data: JobRequestWithRelations;
@@ -102,6 +113,7 @@ interface JobRequestDetailsProps {
   onHoldReason: string | null;
   requestStatus: RequestStatusTypeType;
   isCurrentUser: boolean;
+  allowedDepartment: string;
 }
 
 export default function JobRequestDetails({
@@ -112,9 +124,12 @@ export default function JobRequestDetails({
   onHoldReason,
   requestStatus,
   isCurrentUser,
+  allowedDepartment,
 }: JobRequestDetailsProps) {
+  const currentUser = useSession();
   const customInputRef = React.useRef<HTMLInputElement>(null);
   const [customJob, setCustomJob] = React.useState("");
+  const [isGeneratingPdf, setIsGeneratingPdf] = React.useState(false);
   const [showCustomInput, setShowCustomInput] = React.useState(false);
   const [editField, setEditField] = React.useState<string | null>(null);
   const pathname = usePathname();
@@ -173,6 +188,7 @@ export default function JobRequestDetails({
 
   const handleDownloadEvaluation = async () => {
     const generateAndDownloadPDF = async () => {
+      setIsGeneratingPdf(true);
       if (data.jobRequestEvaluation) {
         try {
           const pdfBlob = await fillJobRequestEvaluationPDF(
@@ -188,6 +204,7 @@ export default function JobRequestDetails({
           URL.revokeObjectURL(url);
           return "PDF downloaded successfully";
         } catch (error) {
+          setIsGeneratingPdf(false);
           console.error("Error generating PDF:", error);
           throw new Error("Failed to generate PDF");
         }
@@ -196,39 +213,76 @@ export default function JobRequestDetails({
 
     toast.promise(generateAndDownloadPDF(), {
       loading: "Generating PDF...",
-      success: (message) => message,
+      success: (message) => {
+        setIsGeneratingPdf(false);
+        return message;
+      },
       error: (err) => `Error: ${err.message}`,
     });
   };
 
-  let personAttended: string;
-  if (data.assignedUser) {
-    personAttended = formatFullName(
-      data.assignedUser.firstName,
-      data.assignedUser.middleName,
-      data.assignedUser.lastName
-    );
-  }
-  const requestedBy = formatFullName(
-    data.request.user.firstName,
-    data.request.user.middleName,
-    data.request.user.lastName
-  );
-
   const handleDownloadJobRequestForm = async () => {
     if (!existingFormFile) return;
+
+    setIsGeneratingPdf(true);
+
+    let personAttended: string;
+    if (data.assignedUser) {
+      personAttended = formatFullName(
+        data.assignedUser.firstName,
+        data.assignedUser.middleName,
+        data.assignedUser.lastName
+      );
+    }
+    const requestedBy = formatFullName(
+      data.request.user.firstName,
+      data.request.user.middleName,
+      data.request.user.lastName
+    );
+
+    const departmentHead = data.request.department.userRole.find(
+      (role) => role.role.name === "DEPARTMENT_HEAD"
+    )?.user;
+
     const generateAndDownloadPDF = async () => {
       try {
         const pdfBlob = await fillJobRequestFormPDF({
           id: data.requestId,
+          idAlt: data.requestId,
           description: data.description,
           location: data.location,
-          createdAt: data.createdAt,
+          createdAt: format(new Date(data.createdAt), "PP p"),
+          numberOfPerson: 1,
+          requestedBy: requestedBy,
+          requestedByAlt: requestedBy,
+          reviewedBy: data.request.reviewer
+            ? formatFullName(
+                data.request.reviewer.firstName,
+                data.request.reviewer.middleName,
+                data.request.reviewer.lastName
+              )
+            : "N/A",
+          reviewedByAlt: data.request.reviewer
+            ? formatFullName(
+                data.request.reviewer.firstName,
+                data.request.reviewer.middleName,
+                data.request.reviewer.lastName
+              )
+            : "N/A",
+          departmentHead: departmentHead
+            ? formatFullName(
+                departmentHead.firstName,
+                departmentHead.middleName,
+                departmentHead.lastName
+              )
+            : "N/A",
           startDate: data.startDate,
+          today: getOrdinalDate(),
+          month: getMonthName(),
           endDate: data.endDate,
           personAttended: personAttended,
           status: requestStatus,
-          requestedBy: requestedBy,
+          images: data.proofImages,
           formUrl: existingFormFile,
         });
         const url = URL.createObjectURL(pdfBlob);
@@ -241,6 +295,7 @@ export default function JobRequestDetails({
         URL.revokeObjectURL(url);
         return "PDF downloaded successfully";
       } catch (error) {
+        setIsGeneratingPdf(false);
         console.error("Error generating PDF:", error);
         throw new Error("Failed to generate PDF");
       }
@@ -248,7 +303,10 @@ export default function JobRequestDetails({
 
     toast.promise(generateAndDownloadPDF(), {
       loading: "Generating PDF...",
-      success: (message) => message,
+      success: (message) => {
+        setIsGeneratingPdf(false);
+        return message;
+      },
       error: (err) => `Error: ${err.message}`,
     });
   };
@@ -289,8 +347,8 @@ export default function JobRequestDetails({
           {data.status === "IN_PROGRESS" && requestStatus === "APPROVED" && (
             <AlertCard
               variant="info"
-              title="Transport Request in Progress"
-              description="This transport request is currently underway."
+              title="Job Request in Progress"
+              description="This job request is currently underway."
               className="mb-6"
             />
           )}
@@ -331,16 +389,21 @@ export default function JobRequestDetails({
               Job Request Details
             </H4>
             <div className="space-x-2">
-              {existingFormFile && (
+              {existingFormFile && requestStatus === "COMPLETED" && (
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
                       variant="ghost2"
                       size="icon"
+                      disabled={isGeneratingPdf}
                       className="size-7"
                       onClick={handleDownloadJobRequestForm}
                     >
-                      <Download className="size-4 text-muted-foreground" />
+                      {isGeneratingPdf ? (
+                        <LoadingSpinner className="size-4 text-muted-foreground" />
+                      ) : (
+                        <Download className="size-4 text-muted-foreground" />
+                      )}
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent
@@ -357,10 +420,15 @@ export default function JobRequestDetails({
                     <Button
                       variant="ghost2"
                       size="icon"
+                      disabled={isGeneratingPdf}
                       className="size-7"
                       onClick={handleDownloadEvaluation}
                     >
-                      <FileCheck className="size-4 text-muted-foreground" />
+                      {isGeneratingPdf ? (
+                        <LoadingSpinner className="size-4 text-muted-foreground" />
+                      ) : (
+                        <FileCheck className="size-4 text-muted-foreground" />
+                      )}
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent
@@ -813,6 +881,74 @@ export default function JobRequestDetails({
             )}
           </form>
         </Form>
+        {requestStatus === "COMPLETED" && (
+          <PermissionGuard
+            allowedRoles={["OPERATIONS_MANAGER", "DEPARTMENT_HEAD"]}
+            allowedDepartment={allowedDepartment}
+            currentUser={currentUser}
+          >
+            <div className="flex w-full items-center justify-between">
+              <Accordion type="single" collapsible className="w-full">
+                <AccordionItem value="item-1" className="border-none">
+                  <AccordionTrigger className="py-0">
+                    Proof images
+                  </AccordionTrigger>
+                  <AccordionContent className="mt-3 p-3">
+                    {data.proofImages.length > 0 ? (
+                      <PhotoProvider
+                        speed={() => 300}
+                        maskOpacity={0.8}
+                        loadingElement={<LoadingSpinner />}
+                        toolbarRender={({
+                          onScale,
+                          scale,
+                          rotate,
+                          onRotate,
+                        }) => {
+                          return (
+                            <>
+                              <div className="flex gap-3">
+                                <CirclePlus
+                                  className="size-5 cursor-pointer opacity-75 transition-opacity ease-linear hover:opacity-100"
+                                  onClick={() => onScale(scale + 1)}
+                                />
+                                <CircleMinus
+                                  className="size-5 cursor-pointer opacity-75 transition-opacity ease-linear hover:opacity-100"
+                                  onClick={() => onScale(scale - 1)}
+                                />
+                                <RotateCw
+                                  className="size-5 cursor-pointer opacity-75 transition-opacity ease-linear hover:opacity-100"
+                                  onClick={() => onRotate(rotate + 90)}
+                                />
+                              </div>
+                            </>
+                          );
+                        }}
+                      >
+                        <div className="flex gap-3">
+                          {data.proofImages.map((image, index) => (
+                            <PhotoView key={index} src={image}>
+                              <div className="relative aspect-square h-20 cursor-pointer transition-colors hover:brightness-75">
+                                <Image
+                                  src={image}
+                                  alt={`Image of ${image}`}
+                                  fill
+                                  className="rounded-md border object-cover"
+                                />
+                              </div>
+                            </PhotoView>
+                          ))}
+                        </div>
+                      </PhotoProvider>
+                    ) : (
+                      <UploadProofImage requestId={requestId} />
+                    )}
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </div>
+          </PermissionGuard>
+        )}
         <PhotoProvider
           speed={() => 300}
           maskOpacity={0.8}
@@ -852,8 +988,9 @@ export default function JobRequestDetails({
                     quality={100}
                     width={0}
                     height={0}
+                    priority
                     sizes="100vw"
-                    className="h-auto w-full rounded-sm border object-contain"
+                    className="max-h-[500px] w-full rounded-sm border object-cover"
                   />
                 </div>
               </PhotoView>

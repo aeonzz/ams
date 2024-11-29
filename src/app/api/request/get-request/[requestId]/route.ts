@@ -58,8 +58,15 @@ async function handler(req: NextRequest, user: any, context: Context) {
                 department: {
                   select: {
                     files: true,
+                    userRole: {
+                      select: {
+                        role: true,
+                        user: true,
+                      },
+                    },
                   },
                 },
+                reviewer: true,
               },
             },
             jobRequestEvaluation: true,
