@@ -40,6 +40,7 @@ interface DepartmentInputProps<T extends Record<string, any>> {
   isPending: boolean;
   placeholder?: string;
   emptyMessage?: string;
+  className?: string;
 }
 
 export default function DepartmentInput<T extends Record<string, any>>({
@@ -50,6 +51,7 @@ export default function DepartmentInput<T extends Record<string, any>>({
   isPending,
   placeholder = "Select an item",
   emptyMessage = "No items found.",
+  className,
 }: DepartmentInputProps<T>) {
   const [open, setOpen] = React.useState(false);
 
@@ -58,7 +60,7 @@ export default function DepartmentInput<T extends Record<string, any>>({
       control={form.control}
       name={name}
       render={({ field }) => (
-        <FormItem className="flex flex-1 flex-col">
+        <FormItem className={cn("flex flex-1 flex-col", className)}>
           <FormLabel>{label}</FormLabel>
           <Popover open={open} onOpenChange={setOpen} modal>
             <PopoverTrigger asChild>
@@ -98,7 +100,9 @@ export default function DepartmentInput<T extends Record<string, any>>({
                         <Check
                           className={cn(
                             "mr-2 h-4 w-4",
-                            field.value === item.name ? "opacity-100" : "opacity-0"
+                            field.value === item.name
+                              ? "opacity-100"
+                              : "opacity-0"
                           )}
                         />
                         <P className="truncate">{item.name}</P>

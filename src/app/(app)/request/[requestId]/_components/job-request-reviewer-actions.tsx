@@ -591,14 +591,6 @@ export default function JobRequestReviewerActions({
                           /> */}
                         </PermissionGuard>
                       )}
-                      {!request.jobRequest.verifiedByRequester &&
-                        request.userId === currentUser.id && (
-                          <VerifyJob
-                            jobRequestId={jobRequestId}
-                            role="requester"
-                            requestId={request.id}
-                          />
-                        )}
                     </>
                   )}
                 {request.status === "ON_HOLD" && (

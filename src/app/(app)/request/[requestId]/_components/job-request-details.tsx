@@ -352,6 +352,14 @@ export default function JobRequestDetails({
               className="mb-6"
             />
           )}
+          {data.status === "COMPLETED" && requestStatus === "APPROVED" && (
+            <AlertCard
+              variant="info"
+              title="Verification Pending"
+              description="This request is awaiting verification by both the reviewer and the requester."
+              className="mb-6"
+            />
+          )}
           {requestStatus === "CANCELLED" && cancellationReason && (
             <AlertCard
               variant="destructive"

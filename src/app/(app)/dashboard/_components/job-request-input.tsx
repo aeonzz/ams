@@ -115,6 +115,7 @@ export default function JobRequestInput({
   const [customJob, setCustomJob] = React.useState("");
   const [showCustomInput, setShowCustomInput] = React.useState(false);
   const isDesktop = useMediaQuery("(min-width: 769px)");
+  const selectedDepartment = form.watch("department");
 
   const { data, isLoading } = useQuery<Department[]>({
     queryFn: async () => {
@@ -184,47 +185,39 @@ export default function JobRequestInput({
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="scroll-bar flex max-h-[60vh] gap-6 overflow-y-auto px-4 py-1">
-            <div className="flex flex-1 flex-col space-y-2">
-              <JobSectionField
-                form={form}
-                name="departmentId"
-                isPending={isPending || isUploading}
-                data={data}
-              />
-              <FormField
-                control={form.control}
-                name="location"
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormLabel>Location</FormLabel>
-                    <FormControl>
-                      <Input
-                        autoComplete="off"
-                        placeholder="Quadrangle"
-                        disabled={isPending || isUploading}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <DepartmentInput
-                form={form}
-                name="department"
-                label="Department"
-                items={departmentItems}
-                isPending={isPending}
-                placeholder="Select a department"
-                emptyMessage="No departments found"
-              />
-              <div
-                className={cn(
-                  "flex gap-2 py-1",
-                  isDesktop ? "flex-row items-center" : "flex-col"
-                )}
-              >
-                {/* <FormField
+            {selectedDepartment ? (
+              <div className="flex flex-1 flex-col space-y-2">
+                <JobSectionField
+                  form={form}
+                  name="departmentId"
+                  isPending={isPending || isUploading}
+                  data={data}
+                />
+                <FormField
+                  control={form.control}
+                  name="location"
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel>Location</FormLabel>
+                      <FormControl>
+                        <Input
+                          autoComplete="off"
+                          placeholder="Quadrangle"
+                          disabled={isPending || isUploading}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div
+                  className={cn(
+                    "flex gap-2 py-1",
+                    isDesktop ? "flex-row items-center" : "flex-col"
+                  )}
+                >
+                  {/* <FormField
                   control={form.control}
                   name="dueDate"
                   render={({ field }) => (
@@ -282,147 +275,163 @@ export default function JobRequestInput({
                     </FormItem>
                   )}
                 /> */}
-                <FormField
-                  control={form.control}
-                  name="jobType"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-1 flex-col">
-                      <FormLabel>Job type</FormLabel>
-                      <Popover modal>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant="outline"
-                              disabled={isUploading || isPending}
-                              role="combobox"
-                              className={cn(
-                                "w-full justify-between",
-                                !field.value && "text-muted-foreground"
-                              )}
-                            >
-                              <span className="truncate">
-                                {field.value
-                                  ? textTransform(field.value)
-                                  : "Select job type"}
-                              </span>
-                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-[230px] p-0" align="start">
-                          <Command className="max-h-64">
-                            <CommandInput placeholder="Search job..." />
-                            <CommandList>
-                              <CommandEmpty>No job found.</CommandEmpty>
-                              <CommandGroup>
-                                <CommandItem
-                                  onSelect={() => {
-                                    setShowCustomInput(!showCustomInput);
-                                    if (!showCustomInput) {
-                                      setTimeout(
-                                        () => customInputRef.current?.focus(),
-                                        0
-                                      );
-                                    }
-                                  }}
-                                >
-                                  <Plus className="mr-2 size-4" />
-                                  Other
-                                </CommandItem>
-                                {jobType.map((job, index) => (
+                  <FormField
+                    control={form.control}
+                    name="jobType"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-1 flex-col">
+                        <FormLabel>Job type</FormLabel>
+                        <Popover modal>
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                variant="outline"
+                                disabled={isUploading || isPending}
+                                role="combobox"
+                                className={cn(
+                                  "w-full justify-between",
+                                  !field.value && "text-muted-foreground"
+                                )}
+                              >
+                                <span className="truncate">
+                                  {field.value
+                                    ? textTransform(field.value)
+                                    : "Select job type"}
+                                </span>
+                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+                          <PopoverContent
+                            className="w-[230px] p-0"
+                            align="start"
+                          >
+                            <Command className="max-h-64">
+                              <CommandInput placeholder="Search job..." />
+                              <CommandList>
+                                <CommandEmpty>No job found.</CommandEmpty>
+                                <CommandGroup>
                                   <CommandItem
-                                    value={job}
-                                    key={index}
                                     onSelect={() => {
-                                      field.onChange(job);
-                                      setCustomJob("");
-                                      setShowCustomInput(false);
+                                      setShowCustomInput(!showCustomInput);
+                                      if (!showCustomInput) {
+                                        setTimeout(
+                                          () => customInputRef.current?.focus(),
+                                          0
+                                        );
+                                      }
                                     }}
                                   >
-                                    {textTransform(job)}
-                                    <Check
-                                      className={cn(
-                                        "ml-auto h-4 w-4",
-                                        job === field.value
-                                          ? "opacity-100"
-                                          : "opacity-0"
-                                      )}
-                                    />
+                                    <Plus className="mr-2 size-4" />
+                                    Other
                                   </CommandItem>
-                                ))}
-                              </CommandGroup>
-                            </CommandList>
-                          </Command>
-                          {showCustomInput && (
-                            <>
-                              <Separator />
-                              <div className="flex flex-col items-center gap-1 p-2">
-                                <Input
-                                  type="text"
-                                  autoFocus
-                                  placeholder="Enter custom job type"
-                                  ref={customInputRef}
-                                  className="w-full"
-                                  value={customJob}
-                                  onChange={(e) => {
-                                    const value = e.target.value;
-                                    setCustomJob(value);
-                                    field.onChange(value);
-                                  }}
-                                />
-                              </div>
-                            </>
-                          )}
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                                  {jobType.map((job, index) => (
+                                    <CommandItem
+                                      value={job}
+                                      key={index}
+                                      onSelect={() => {
+                                        field.onChange(job);
+                                        setCustomJob("");
+                                        setShowCustomInput(false);
+                                      }}
+                                    >
+                                      {textTransform(job)}
+                                      <Check
+                                        className={cn(
+                                          "ml-auto h-4 w-4",
+                                          job === field.value
+                                            ? "opacity-100"
+                                            : "opacity-0"
+                                        )}
+                                      />
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                            {showCustomInput && (
+                              <>
+                                <Separator />
+                                <div className="flex flex-col items-center gap-1 p-2">
+                                  <Input
+                                    type="text"
+                                    autoFocus
+                                    placeholder="Enter custom job type"
+                                    ref={customInputRef}
+                                    className="w-full"
+                                    value={customJob}
+                                    onChange={(e) => {
+                                      const value = e.target.value;
+                                      setCustomJob(value);
+                                      field.onChange(value);
+                                    }}
+                                  />
+                                </div>
+                              </>
+                            )}
+                          </PopoverContent>
+                        </Popover>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="rounded-md border p-3">
+                  <FormField
+                    control={form.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Textarea
+                            rows={1}
+                            maxRows={7}
+                            minRows={3}
+                            placeholder="Job description..."
+                            className="border-none bg-transparent p-0 text-sm shadow-none focus-visible:ring-0"
+                            disabled={isUploading || isPending}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="images"
+                    render={({ field }) => (
+                      <FormItem className="w-full">
+                        <FormControl>
+                          <FileUploader
+                            value={field.value}
+                            onValueChange={field.onChange}
+                            maxFiles={4}
+                            maxSize={4 * 1024 * 1024}
+                            progresses={progresses}
+                            disabled={isUploading || isPending}
+                            drop={false}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="flex w-full items-center justify-center">
+                <DepartmentInput
+                  form={form}
+                  name="department"
+                  label="Select a Department for Your Request"
+                  items={departmentItems}
+                  isPending={isPending}
+                  placeholder="Select a department"
+                  emptyMessage="No departments found"
                 />
               </div>
-              <div className="rounded-md border p-3">
-                <FormField
-                  control={form.control}
-                  name="description"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <Textarea
-                          rows={1}
-                          maxRows={7}
-                          minRows={3}
-                          placeholder="Job description..."
-                          className="border-none bg-transparent p-0 text-sm shadow-none focus-visible:ring-0"
-                          disabled={isUploading || isPending}
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="images"
-                  render={({ field }) => (
-                    <FormItem className="w-full">
-                      <FormControl>
-                        <FileUploader
-                          value={field.value}
-                          onValueChange={field.onChange}
-                          maxFiles={4}
-                          maxSize={4 * 1024 * 1024}
-                          progresses={progresses}
-                          disabled={isUploading || isPending}
-                          drop={false}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </div>
+            )}
           </div>
           <Separator className="my-4" />
           <DialogFooter>
