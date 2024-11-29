@@ -365,6 +365,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                   ))}
               </JobRequestReviewerActions>
               {!data.jobRequest.verifiedByRequester &&
+                data.jobRequest.status === "COMPLETED" &&
                 data.userId === currentUser.id && (
                   <VerifyJob
                     jobRequestId={data.jobRequest.id}
