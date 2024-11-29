@@ -59,6 +59,7 @@ export function DepartmentUsersTable({
           departmentId={departmentId}
         />
       }
+      className="py-2"
     >
       <DataTableToolbar table={table} filterFields={filterFields}>
         <DepartmentUsersTableToolbarActions table={table} />

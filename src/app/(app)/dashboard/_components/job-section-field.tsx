@@ -62,7 +62,7 @@ export default function JobSectionField({
       name={name}
       render={({ field }) => (
         <FormItem className="flex flex-1 flex-col">
-          <FormLabel>Department</FormLabel>
+          <FormLabel>Job Section</FormLabel>
           <Popover open={open} onOpenChange={setOpen} modal>
             <PopoverTrigger asChild>
               <FormControl>
@@ -76,11 +76,9 @@ export default function JobSectionField({
                   )}
                 >
                   {field.value ? (
-                    <span className="max-w-44 truncate">
-                      {selectedDepartment?.name}
-                    </span>
+                    <span>{selectedDepartment?.name}</span>
                   ) : (
-                    <span className="max-w-44 truncate">Select department</span>
+                    <span>Select job section</span>
                   )}
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
@@ -88,9 +86,9 @@ export default function JobSectionField({
             </PopoverTrigger>
             <PopoverContent className="p-0">
               <Command>
-                <CommandInput placeholder="Search departments..." />
+                <CommandInput placeholder="Search job sections..." />
                 <CommandList>
-                  <CommandEmpty>No departments found.</CommandEmpty>
+                  <CommandEmpty>No job sections found.</CommandEmpty>
                   <CommandGroup>
                     {data?.map((department) => (
                       <HoverCard key={department.id} openDelay={300}>
@@ -98,7 +96,7 @@ export default function JobSectionField({
                           <CommandItem
                             value={department.id}
                             onSelect={() => {
-                              form.setValue(name, department.id);
+                              field.onChange(department.id);
                               setOpen(false);
                             }}
                             className="flex items-center"

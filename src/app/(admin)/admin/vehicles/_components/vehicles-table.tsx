@@ -73,7 +73,9 @@ export function VehiclesTable({ vehiclesPromise }: VehiclesTableProps) {
   return (
     <DataTable
       table={table}
-      floatingBar={<VehiclesTableFloatingBar table={table} />}
+      floatingBar={
+        <VehiclesTableFloatingBar fileName="Vehicles" table={table} />
+      }
     >
       <DataTableToolbar table={table} filterFields={filterFields}>
         <VehiclesTableToolbarActions table={table} />

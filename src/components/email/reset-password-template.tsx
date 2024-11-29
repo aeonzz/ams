@@ -13,6 +13,7 @@ import {
   Section,
   Text,
 } from "@react-email/components";
+import { env } from "@/lib/env.mjs";
 
 interface ResetPasswordTemplateProps {
   email: string;
@@ -45,7 +46,7 @@ export const ResetPasswordTemplate = ({
         <Section style={buttonContainer}>
           <Button
             style={button}
-            href={`http://localhost:3000/sign-in/reset-password?token=${resetPasswordToken}`}
+            href={`${env.NEXT_PUBLIC_APP_URL}/sign-in/reset-password?token=${resetPasswordToken}`}
           >
             Reset Password
           </Button>
@@ -58,10 +59,10 @@ export const ResetPasswordTemplate = ({
           If you&apos;re having trouble clicking the &quot;Reset Password&quot; button, copy and paste the following URL into your web browser:
         </Text>
         <Link
-          href={`http://localhost:3000/sign-in/reset-password?token=${resetPasswordToken}`}
+          href={`${env.NEXT_PUBLIC_APP_URL}/sign-in/reset-password?token=${resetPasswordToken}`}
           style={link}
         >
-          {`http://localhost:3000/sign-in/reset-password?token=${resetPasswordToken}`}
+          {`${env.NEXT_PUBLIC_APP_URL}/sign-in/reset-password?token=${resetPasswordToken}`}
         </Link>
         <Text style={footer}>
           If you didn&apos;t request a password reset, please ignore this email or <Link href="mailto:support@sync.com" style={link}>contact support</Link> if you have questions.

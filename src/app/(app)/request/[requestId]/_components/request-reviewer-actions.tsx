@@ -323,15 +323,16 @@ export default function RequestReviewerActions({
                     disabled={isUpdateStatusPending}
                     onClick={() => setIsRejectionAlertOpen(true)}
                   >
-                    Approve Request
+                    Resume
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Approve Request</AlertDialogTitle>
+                    <AlertDialogTitle>Resume Request</AlertDialogTitle>
                     <AlertDialogDescription>
-                      This request is currently on hold. Are you sure you want
-                      to approve it?
+                      This request is currently on hold. Resuming it will mark
+                      it as active and ready for further action. Are you sure
+                      you want to proceed?
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>

@@ -302,26 +302,6 @@ export function getJobStatusColor(status: JobStatusType): JobStatusColorConfig {
       variant: "green",
       stroke: 10,
     },
-    CANCELLED: {
-      color: "#6b7280",
-      variant: "gray",
-      stroke: 10,
-    },
-    ON_HOLD: {
-      color: "#a855f7",
-      variant: "purple",
-      stroke: 10,
-    },
-    REJECTED: {
-      color: "#ef4444",
-      variant: "red",
-      stroke: 10,
-    },
-    REWORK_IN_PROGRESS: {
-      color: "#f59e0b",
-      variant: "orange",
-      stroke: 10,
-    },
     VERIFIED: {
       color: "#3b82f6",
       variant: "blue",
@@ -496,14 +476,6 @@ export function getReturnableItemStatusIcon(
       icon: Search,
       variant: "red",
     },
-    RETURNED: {
-      icon: RotateCcw,
-      variant: "gray",
-    },
-    PENDING_RETURN: {
-      icon: Clock,
-      variant: "yellow",
-    },
   };
 
   return (
@@ -547,13 +519,13 @@ export const isDateInPast = (date: Date) => {
 
 export const textTransform = (text: string) => {
   const transform = text
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
     .toLowerCase()
-    .split("_")
+    .split(/[_\s]/)
     .map((word) => `${word.charAt(0).toUpperCase()}${word.slice(1)}`)
     .join(" ");
   return transform;
 };
-
 /**
  * regular expression to check for valid hour format (01-23)
  */
@@ -775,3 +747,32 @@ export function display12HourValue(hours: number) {
 //   if (score > 4) return 'MEDIUM';
 //   return 'LOW';
 // }
+
+export function getOrdinalDate() {
+  const date = new Date();
+  const day = date.getDate();
+
+  // Determine the appropriate suffix
+  let suffix;
+  if (day % 10 === 1 && day !== 11) {
+    suffix = "st";
+  } else if (day % 10 === 2 && day !== 12) {
+    suffix = "nd";
+  } else if (day % 10 === 3 && day !== 13) {
+    suffix = "rd";
+  } else {
+    suffix = "th";
+  }
+
+  // Return the day with its ordinal suffix
+  return `${day}${suffix}`;
+}
+
+export function getMonthName() {
+  const date = new Date();
+  const monthNames = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+  return monthNames[date.getMonth()]; // Get the current month name
+}

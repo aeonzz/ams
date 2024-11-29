@@ -65,7 +65,7 @@ export default function ItemsField({
   };
 
   const handleSubItemSelect = (subItemId: string) => {
-    form.setValue(name, subItemId);
+    form.setValue(name, subItemId, { shouldDirty: true });
     setOpen(false);
   };
 

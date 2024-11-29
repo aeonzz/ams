@@ -1,6 +1,7 @@
 import { type Table } from "@tanstack/react-table";
 import { format } from "date-fns";
 import * as XLSX from "xlsx";
+import { textTransform } from "./utils";
 
 export function exportTableToCSV<TData>(
   /**
@@ -41,9 +42,11 @@ export function exportTableToCSV<TData>(
     .map((column) => column.id)
     .filter((id) => !excludeColumns.includes(id as any));
 
+  const transformedHeaders = headers.map((header) => textTransform(header));
+
   // Build CSV content
   const csvContent = [
-    headers.join(","),
+    transformedHeaders.join(),
     ...(onlySelected
       ? table.getFilteredSelectedRowModel().rows
       : table.getRowModel().rows
@@ -53,6 +56,20 @@ export function exportTableToCSV<TData>(
           const cellValue = row.getValue(header);
           if (cellValue instanceof Date) {
             return `"${format(cellValue, "PP p")}"`; // Format as 'Nov 11, 2024 4:00 PM'
+          }
+
+          if (header === "venueSetupRequirement" && Array.isArray(cellValue)) {
+            const features = cellValue
+              .map((feature) => feature.name)
+              .join(", ");
+            return `"${features}"`;
+          }
+
+          if (header === "userDepartments" && Array.isArray(cellValue)) {
+            const departments = cellValue
+              .map((dept: any) => dept.department.name)
+              .join(", ");
+            return `"${departments}"`;
           }
 
           if (typeof cellValue === "boolean") {
@@ -114,8 +131,10 @@ export function exportTableToXLSX<TData>(
     .map((column) => column.id)
     .filter((id) => !excludeColumns.includes(id as any));
 
+  const transformedHeaders = headers.map((header) => textTransform(header));
+
   const data = [
-    headers,
+    transformedHeaders,
     ...(onlySelected
       ? table.getFilteredSelectedRowModel().rows
       : table.getRowModel().rows
@@ -124,12 +143,23 @@ export function exportTableToXLSX<TData>(
         const cellValue = row.getValue(header);
         if (cellValue instanceof Date) {
           return `${format(cellValue, "PP p")}`;
+        } else if (
+          header === "venueSetupRequirement" &&
+          Array.isArray(cellValue)
+        ) {
+          return cellValue.map((feature) => feature.name).join(", ");
+        } else if (header === "userDepartments" && Array.isArray(cellValue)) {
+          return cellValue.map((dept: any) => dept.department.name).join(", ");
         } else if (typeof cellValue === "boolean") {
           return cellValue ? "Yes" : "No";
         } else if (Array.isArray(cellValue)) {
-          return cellValue.join(", ");
+          return cellValue
+            .map((item) => textTransform(String(item)))
+            .join(", ");
         } else if (typeof cellValue === "object" && cellValue !== null) {
-          return JSON.stringify(cellValue);
+          return textTransform(JSON.stringify(cellValue));
+        } else if (typeof cellValue === "string") {
+          return textTransform(cellValue);
         } else {
           return cellValue;
         }

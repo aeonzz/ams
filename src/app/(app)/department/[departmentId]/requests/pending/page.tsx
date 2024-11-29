@@ -5,8 +5,6 @@ import ContentLayout from "@/components/layouts/content-layout";
 import { requestSearchParamsSchema } from "@/lib/schema";
 import { SearchParams } from "@/lib/types";
 import ManageRequestScreen from "./_components";
-import { RoleGuard } from "@/components/role-guard";
-import NotFound from "@/app/not-found";
 import DepartmentLayout from "../../_components/department-layout";
 
 export interface ManageRequestPageProps {
@@ -25,6 +23,7 @@ export default async function ManageRequestPage({
       <DepartmentLayout
         departmentId={params.departmentId}
         name="Pending Requests"
+        container={false}
       >
         <ManageRequestScreen search={search} departmentId={departmentId} />
       </DepartmentLayout>

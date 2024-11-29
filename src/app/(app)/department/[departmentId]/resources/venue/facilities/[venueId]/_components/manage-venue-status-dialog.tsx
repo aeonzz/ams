@@ -73,18 +73,6 @@ export function ManageVenueStatusDialog({
     );
     dialogManager.setActiveDialog(null);
   };
-
-  useHotkeys(
-    "s",
-    (event) => {
-      if (!dialogManager.isAnyDialogOpen()) {
-        event.preventDefault();
-        dialogManager.setActiveDialog("updateVenueStatusCommand");
-      }
-    },
-    { enableOnFormTags: false }
-  );
-
   // VenueStatusSchema.options.forEach((status, index) => {
   //   useHotkeys(
   //     `${index + 1}`,
@@ -123,10 +111,7 @@ export function ManageVenueStatusDialog({
                     />
                     <P className="font-semibold">{textTransform(status)}</P>
                   </div>
-                  <div className="ml-auto flex items-center gap-1">
-                    {data?.status === status && <Check />}
-                    <CommandShortcut>{index + 1}</CommandShortcut>
-                  </div>
+                  {data?.status === status && <Check className="ml-auto" />}
                 </CommandItem>
               );
             })}

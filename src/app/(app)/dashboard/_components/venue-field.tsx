@@ -93,7 +93,7 @@ export default function VenueField({
                           disabled={isDisabled}
                           onSelect={() => {
                             if (!isDisabled) {
-                              form.setValue("venueId", venue.id);
+                              field.onChange(venue.id);
                               setOpen(false);
                             }
                           }}

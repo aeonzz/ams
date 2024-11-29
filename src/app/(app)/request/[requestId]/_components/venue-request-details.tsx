@@ -9,6 +9,7 @@ import {
   CalendarCheck,
   CalendarIcon,
   Clock,
+  Clock1,
   Dot,
   Download,
   Info,
@@ -62,6 +63,7 @@ import { AlertCard } from "@/components/ui/alert-card";
 import CommandTooltip from "@/components/ui/command-tooltip";
 import { CommandShortcut } from "@/components/ui/command";
 import { fillVenueRequestFormPDF } from "@/lib/fill-pdf/venue-request-form";
+import LoadingSpinner from "@/components/loaders/loading-spinner";
 
 interface VenueRequestDetailsProps {
   data: VenueRequestWithRelations;
@@ -86,6 +88,7 @@ export default function VenueRequestDetails({
 }: VenueRequestDetailsProps) {
   const pathname = usePathname();
   const { variant, color, stroke } = getVenueStatusColor(data.venue.status);
+  const [isGeneratingPdf, setIsGeneratingPdf] = React.useState(false);
   const [editField, setEditField] = React.useState<string | null>(null);
   const form = useForm<UpdateVenueRequestSchema>({
     resolver: zodResolver(updateVenueRequestSchema),
@@ -153,7 +156,6 @@ export default function VenueRequestDetails({
   const departmentHead = data.request.department.userRole.find(
     (role) => role.role.name === "DEPARTMENT_HEAD"
   )?.user;
-  console.log(data.request.department.userRole, departmentHead);
 
   const existingFormFile = data.request.department.files.find(
     (file) => file.filePurpose === "VENUE_FORM"
@@ -169,6 +171,7 @@ export default function VenueRequestDetails({
     );
 
     const generateAndDownloadPDF = async () => {
+      setIsGeneratingPdf(true);
       try {
         const pdfBlob = await fillVenueRequestFormPDF({
           requestedBy: requestedBy,
@@ -176,6 +179,9 @@ export default function VenueRequestDetails({
           createdAt: data.createdAt,
           venue: data.venue.name,
           dateReserved: data.startTime,
+          actualStart: data.actualStart
+            ? format(new Date(data.actualStart), "PP p")
+            : null,
           purpose: data.purpose,
           equipmentNeeded: data.setupRequirements.join(", "),
           status: requestStatus,
@@ -187,6 +193,7 @@ export default function VenueRequestDetails({
               )
             : "N/A",
           formUrl: existingFormFile,
+          department: data.department,
         });
         const url = URL.createObjectURL(pdfBlob);
         const cleanedFileName = existingFormFile.replace("/resources/", "");
@@ -207,7 +214,10 @@ export default function VenueRequestDetails({
 
     toast.promise(generateAndDownloadPDF(), {
       loading: "Generating PDF...",
-      success: (message) => message,
+      success: (message) => {
+        setIsGeneratingPdf(false);
+        return message;
+      },
       error: (err) => `Error: ${err.message}`,
     });
   };
@@ -289,27 +299,28 @@ export default function VenueRequestDetails({
             <H4 className="font-semibold text-muted-foreground">
               Venue Request Details
             </H4>
-            {existingFormFile && (
+            {existingFormFile && requestStatus === "COMPLETED" && (
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
                     variant="ghost2"
                     size="icon"
+                    disabled={isGeneratingPdf}
                     className="size-7"
                     onClick={handleDownloadVenueRequestForm}
                   >
-                    <Download className="size-4 text-muted-foreground" />
+                    {isGeneratingPdf ? (
+                      <LoadingSpinner className="size-4 text-muted-foreground" />
+                    ) : (
+                      <Download className="size-4 text-muted-foreground" />
+                    )}
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent
                   className="flex items-center gap-3"
                   side="bottom"
                 >
-                  <CommandTooltip text="Download venue request form">
-                    <CommandShortcut>Ctrl</CommandShortcut>
-                    <CommandShortcut>Shift</CommandShortcut>
-                    <CommandShortcut>D</CommandShortcut>
-                  </CommandTooltip>
+                  <P>Download venue request form</P>
                 </TooltipContent>
               </Tooltip>
             )}
@@ -362,6 +373,17 @@ export default function VenueRequestDetails({
         </div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <div className="group flex items-center justify-between">
+              <div className="flex w-full flex-col items-start">
+                <div className="flex space-x-1 text-muted-foreground">
+                  <CalendarCheck className="h-5 w-5" />
+                  <P className="font-semibold tracking-tight">Department:</P>
+                </div>
+                <div className="w-full pl-5 pt-1">
+                  <P>{data.department}</P>
+                </div>
+              </div>
+            </div>
             {completedAt && (
               <div className="group flex items-center justify-between">
                 <div className="flex w-full flex-col items-start">
@@ -371,6 +393,21 @@ export default function VenueRequestDetails({
                   </div>
                   <div className="w-full pl-5 pt-1">
                     <P>{format(new Date(completedAt), "PPP p")}</P>
+                  </div>
+                </div>
+              </div>
+            )}
+            {data.actualStart && (
+              <div className="group flex items-center justify-between">
+                <div className="flex w-full flex-col items-start">
+                  <div className="flex space-x-1 text-muted-foreground">
+                    <Clock1 className="h-5 w-5" />
+                    <P className="font-semibold tracking-tight">
+                      Actual Start:
+                    </P>
+                  </div>
+                  <div className="w-full pl-5 pt-1">
+                    <P>{format(new Date(data.actualStart), "PPP p")}</P>
                   </div>
                 </div>
               </div>
@@ -482,11 +519,13 @@ export default function VenueRequestDetails({
                   </div>
                   <div className="w-full pl-5 pt-1">
                     <ul className="ml-4 mt-2 list-disc">
-                      {data.setupRequirements.map((requirement, index) => (
-                        <li key={index} className="mb-1 text-sm">
-                          {requirement}
-                        </li>
-                      ))}
+                      {data.setupRequirements.length > 0
+                        ? data.setupRequirements.map((requirement, index) => (
+                            <li key={index} className="mb-1 text-sm">
+                              {requirement}
+                            </li>
+                          ))
+                        : "-"}
                     </ul>
                   </div>
                 </div>

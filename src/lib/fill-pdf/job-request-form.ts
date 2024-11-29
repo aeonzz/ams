@@ -4,16 +4,33 @@ import { format } from "date-fns";
 import { formatFullName } from "../utils";
 import type { RequestStatusTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestStatusTypeSchema";
 
+type ImagePosition = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  url: string;
+};
+
 type Data = {
   id: string;
+  idAlt: string;
   requestedBy: string;
+  requestedByAlt: string;
   description: string;
+  numberOfPerson: number;
   location: string;
-  createdAt: Date;
+  createdAt: string;
+  reviewedBy: string | null;
+  reviewedByAlt: string | null;
+  departmentHead: string;
   startDate: Date | null;
+  today: string;
+  month: string;
   endDate: Date | null;
   personAttended: string;
   status: RequestStatusTypeType;
+  images: string[];
 };
 
 type FieldPosition = {
@@ -63,6 +80,17 @@ function wrapText(
   return lines;
 }
 
+async function embedImage(
+  pdfDoc: PDFDocument,
+  imageUrl: string
+): Promise<[Uint8Array, string]> {
+  const response = await fetch(imageUrl);
+  const imageBytes = await response.arrayBuffer();
+  const contentType = response.headers.get("content-type") || "";
+
+  return [new Uint8Array(imageBytes), contentType];
+}
+
 export async function fillJobRequestFormPDF(
   data: Data & { formUrl: string }
 ): Promise<Blob> {
@@ -72,23 +100,32 @@ export async function fillJobRequestFormPDF(
   const pdfDoc = await PDFDocument.load(pdfBytes);
   pdfDoc.registerFontkit(fontkit);
 
-  const font = await pdfDoc.embedFont(StandardFonts.CourierBoldOblique);
+  const font = await pdfDoc.embedFont(StandardFonts.CourierOblique);
   const pages = pdfDoc.getPages();
   const firstPage = pages[0];
+  const secondPage = pages[1];
   const { width, height } = firstPage.getSize();
 
-  console.log(`PDF dimensions: ${width}x${height}`);
+  // console.log(`PDF dimensions: ${width}x${height}`);
 
   const fieldPositions: FieldPositions = {
-    id: { x: 100, y: height - 260, size: 9, maxWidth: 200 },
-    description: { x: 143, y: height - 280, size: 8, maxWidth: 200 },
-    location: { x: 350, y: height - 260, size: 10, maxWidth: 100 },
-    createdAt: { x: 600, y: height - 187, size: 10, maxWidth: 150 },
-    startDate: { x: 456, y: height - 260, size: 10, maxWidth: 50 },
-    endDate: { x: 510, y: height - 260, size: 10, maxWidth: 50 },
-    personAttended: { x: 570, y: height - 260, size: 10, maxWidth: 100 },
-    status: { x: 670, y: height - 260, size: 10, maxWidth: 100 },
-    requestedBy: { x: 150, y: height - 450, size: 10, maxWidth: 150 },
+    createdAt: { x: 407, y: height - 135, size: 10, maxWidth: 150 },
+    id: { x: 423, y: height - 160, size: 10, maxWidth: 150 },
+    description: { x: 105, y: height - 220, size: 10, maxWidth: 180 },
+    location: { x: 287, y: height - 220, size: 10, maxWidth: 80 },
+    numberOfPerson: { x: 400, y: height - 220, size: 10, maxWidth: 80 },
+    requestedBy: { x: 50, y: height - 360, size: 10, maxWidth: 200 },
+    reviewedBy: { x: 300, y: height - 360, size: 10, maxWidth: 200 },
+    idAlt: { x: 315, y: height - 425, size: 10, maxWidth: 100 },
+    requestedByAlt: { x: 55, y: height - 443, size: 10, maxWidth: 200 },
+    endDate: { x: 330, y: height - 445, size: 10, maxWidth: 150 },
+    today: { x: 130, y: height - 505, size: 10, maxWidth: 50 },
+    month: { x: 215, y: height - 505, size: 10, maxWidth: 50 },
+    departmentHead: { x: 80, y: height - 525, size: 10, maxWidth: 200 },
+    reviewedByAlt: { x: 290, y: height - 605, size: 10, maxWidth: 200 },
+    // startDate: { x: 456, y: height - 260, size: 10, maxWidth: 50 },
+    // personAttended: { x: 570, y: height - 260, size: 10, maxWidth: 100 },
+    // status: { x: 670, y: height - 260, size: 10, maxWidth: 100 },
   };
 
   // function drawDebugRectangle(
@@ -143,6 +180,47 @@ export async function fillJobRequestFormPDF(
       }
     }
   });
+
+  if (data.images && data.images.length > 0) {
+    const imagePositions = [
+      { x: 100, y: height - 400, width: 300, height: 300 },
+      { x: 250, y: height - 750, width: 300, height: 300 },
+    ];
+
+    for (let i = 0; i < data.images.length; i++) {
+      try {
+        const [imageBytes, contentType] = await embedImage(
+          pdfDoc,
+          data.images[i]
+        );
+        const position = imagePositions[i];
+
+        if (!position) {
+          console.warn(`No position defined for image ${i + 1}`);
+          continue;
+        }
+
+        let image;
+        if (contentType.includes("jpeg") || contentType.includes("jpg")) {
+          image = await pdfDoc.embedJpg(imageBytes);
+        } else if (contentType.includes("png")) {
+          image = await pdfDoc.embedPng(imageBytes);
+        } else {
+          console.warn(`Unsupported image type: ${contentType}`);
+          continue;
+        }
+
+        secondPage.drawImage(image, {
+          x: position.x,
+          y: position.y,
+          width: position.width,
+          height: position.height,
+        });
+      } catch (error) {
+        console.error(`Error embedding image ${i + 1}: ${error}`);
+      }
+    }
+  }
 
   const pdfBytes2 = await pdfDoc.save();
   return new Blob([pdfBytes2], { type: "application/pdf" });

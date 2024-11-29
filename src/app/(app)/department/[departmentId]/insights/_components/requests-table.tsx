@@ -40,23 +40,41 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTypeSchema";
+import { DateRange } from "react-day-picker";
 
 interface DepartmentRequestsTableProps {
   data: Request[];
   className?: string;
+  dateRange: DateRange | undefined;
   requestType: RequestTypeType | "";
 }
 
 export default function DepartmentRequestsTable({
   data,
   className,
+  dateRange,
   requestType,
 }: DepartmentRequestsTableProps) {
   const [statusFilter, setStatusFilter] = React.useState<string[]>([]);
 
   const filteredData = React.useMemo(() => {
-    return requestType ? data.filter((req) => req.type === requestType) : data;
-  }, [requestType, data]);
+    const filterByDateRange = (data: Request[]) => {
+      if (!dateRange || (!dateRange.from && !dateRange.to)) return data;
+      return data.filter((req) => {
+        const createdAt = new Date(req.createdAt);
+        return (
+          (!dateRange.from || createdAt >= dateRange.from) &&
+          (!dateRange.to || createdAt <= dateRange.to)
+        );
+      });
+    };
+
+    const filteredByType = requestType
+      ? data.filter((req) => req.type === requestType)
+      : data;
+
+    return filterByDateRange(filteredByType);
+  }, [requestType, dateRange, data]);
 
   const columns: ColumnDef<Request>[] = React.useMemo(
     () => [

@@ -21,7 +21,12 @@ export default async function DepartmentUsersPage({
 
   return (
     <ContentLayout title="Users">
-      <DepartmentLayout departmentId={params.departmentId} name="Users">
+      <DepartmentLayout
+        departmentId={params.departmentId}
+        name="Users"
+        withBackButton
+        container={false}
+      >
         <DepartmentUsersScreen search={search} departmentId={departmentId} />
       </DepartmentLayout>
     </ContentLayout>

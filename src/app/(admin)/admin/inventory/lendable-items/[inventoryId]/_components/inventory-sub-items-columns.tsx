@@ -248,7 +248,10 @@ export function getInventorySubItemsColumns(): ColumnDef<InventorySubItemType>[]
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-40">
-                <DropdownMenuItem onSelect={() => setShowUpdateTaskSheet(true)}>
+                <DropdownMenuItem
+                  disabled={row.original.status === "LOST"}
+                  onSelect={() => setShowUpdateTaskSheet(true)}
+                >
                   Edit
                 </DropdownMenuItem>
                 <DropdownMenuSub>

@@ -21,8 +21,13 @@ export default function DepartmentSupplyItems({
       <DepartmentLayout
         departmentId={params.departmentId}
         name="Borrowable Items"
+        withBackButton
+        container={false}
       >
-        <DepartmentSupplyItemsScreen departmentId={params.departmentId} searchParams={search} />
+        <DepartmentSupplyItemsScreen
+          departmentId={params.departmentId}
+          searchParams={search}
+        />
       </DepartmentLayout>
     </ContentLayout>
   );

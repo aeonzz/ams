@@ -25,6 +25,7 @@ export default function VenueLogsPage({
         departmentId={params.departmentId}
         name="Vehicle Request History"
         withBackButton
+        container={false}
       >
         <VenueLogsScreen params={params} searchParams={search} />
       </DepartmentLayout>

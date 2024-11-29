@@ -49,6 +49,11 @@ import VenueRequestInputSkeleton from "./venue-request-input-skeleton";
 import { VenueFeaturesType } from "@/lib/types/venue";
 import ScheduledEventCardSkeleton from "./scheduled-event-card-skeleton";
 import MultiSelect from "@/components/multi-select";
+import { EditorContent, Extension, useEditor } from "@tiptap/react";
+import { extensions } from "@/components/tiptap/editor";
+import { ChevronLeft } from "lucide-react";
+import { currentUser } from "@/lib/actions/users";
+import DepartmentInput from "./department-input";
 
 interface VenueRequestInputProps {
   mutateAsync: UseMutateAsyncFunction<
@@ -73,7 +78,10 @@ export default function VenueRequestInput({
   isFieldsDirty,
 }: VenueRequestInputProps) {
   const pathname = usePathname();
+  const currentUser = useSession();
   const queryClient = useQueryClient();
+  console.log(currentUser);
+  const [isOpenRules, setIsOpenRules] = React.useState(false);
   const venueId = form.watch("venueId");
 
   const { data: venueData, isLoading: isLoadingVenueData } = useQuery<
@@ -216,6 +224,23 @@ export default function VenueRequestInput({
   const filteredVenueSetupRequirements =
     selectedVenue?.venueSetupRequirement.filter((v) => v.available);
 
+  const editor = useEditor({
+    extensions: extensions as Extension[],
+    content: selectedVenue?.rulesAndRegulations,
+    editable: false,
+  });
+
+  const departmentItems = currentUser.userDepartments.map((ud) => ({
+    id: ud.department.id,
+    name: ud.department.name,
+  }));
+
+  React.useEffect(() => {
+    if (editor && selectedVenue?.rulesAndRegulations) {
+      editor.commands.setContent(selectedVenue.rulesAndRegulations);
+    }
+  }, [editor, selectedVenue?.rulesAndRegulations]);
+
   if (isLoadingVenueData) return <VenueRequestInputSkeleton />;
 
   return (
@@ -229,6 +254,15 @@ export default function VenueRequestInput({
                 name="venueId"
                 isPending={isPending}
                 data={venueData}
+              />
+              <DepartmentInput
+                form={form}
+                name="department"
+                label="Department"
+                items={departmentItems}
+                isPending={isPending}
+                placeholder="Select a department"
+                emptyMessage="No departments found"
               />
               <MultiSelect
                 form={form}
@@ -297,53 +331,96 @@ export default function VenueRequestInput({
               />
             </div>
             {venueId && (
-              <div
-                className={cn("scroll-bar max-h-[60vh] flex-1 overflow-y-auto")}
-              >
-                <P className="mb-2 font-semibold">Schedules</P>
-                {isLoading || isRefetching ? (
-                  <ScheduledEventCardSkeleton />
-                ) : !data || data.length === 0 ? (
-                  <div className="grid h-32 w-full place-items-center">
-                    <P>No reserved schedules</P>
+              <div className="flex-1">
+                {isOpenRules && editor ? (
+                  <div className="scroll-bar max-h-[60vh] space-y-3 overflow-y-auto">
+                    <div className="flex items-center gap-1">
+                      <Button
+                        size="icon"
+                        className="size-7"
+                        variant="ghost2"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setIsOpenRules(false);
+                        }}
+                      >
+                        <ChevronLeft className="size-4" />
+                      </Button>
+                      <H3 className="font-semibold">
+                        Venue Rules and Regulation
+                      </H3>
+                    </div>
+                    <div className="scroll-bar h-full overflow-y-auto">
+                      <EditorContent className="outline-none" editor={editor} />
+                    </div>
                   </div>
                 ) : (
-                  <>
-                    {(() => {
-                      const filteredData = data.filter(
-                        (item) => item.request.venueRequest.venue.id === venueId
-                      );
-                      return filteredData.length === 0 ? (
-                        <div className="grid h-32 w-full place-items-center">
-                          <P>No reserved schedules</P>
-                        </div>
-                      ) : (
-                        filteredData.map((item, index) => (
-                          <ScheduledEventCard key={index} data={item} />
-                        ))
-                      );
-                    })()}
-                  </>
+                  <div
+                    className={cn("scroll-bar max-h-[60vh] overflow-y-auto")}
+                  >
+                    <P className="mb-2 font-semibold">Schedules</P>
+                    {isLoading || isRefetching ? (
+                      <ScheduledEventCardSkeleton />
+                    ) : !data || data.length === 0 ? (
+                      <div className="grid h-32 w-full place-items-center">
+                        <P>No reserved schedules</P>
+                      </div>
+                    ) : (
+                      <>
+                        {(() => {
+                          const filteredData = data.filter(
+                            (item) =>
+                              item.request.venueRequest.venue.id === venueId
+                          );
+                          return filteredData.length === 0 ? (
+                            <div className="grid h-32 w-full place-items-center">
+                              <P>No reserved schedules</P>
+                            </div>
+                          ) : (
+                            filteredData.map((item, index) => (
+                              <ScheduledEventCard key={index} data={item} />
+                            ))
+                          );
+                        })()}
+                      </>
+                    )}
+                  </div>
                 )}
               </div>
             )}
           </div>
           <Separator className="my-4" />
           <DialogFooter>
-            {isFieldsDirty ? (
-              <Button
-                onClick={(e) => {
-                  e.preventDefault();
-                  form.reset();
-                }}
-                variant="destructive"
-                disabled={isPending}
-              >
-                Reset form
-              </Button>
-            ) : (
-              <div></div>
-            )}
+            <div className="flex gap-2">
+              {isFieldsDirty && (
+                <Button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    form.reset();
+                  }}
+                  variant="destructive"
+                  disabled={isPending}
+                >
+                  Reset form
+                </Button>
+              )}
+              {selectedVenue?.rulesAndRegulations && (
+                <span className="text-sm text-muted-foreground">
+                  By proceeding, you confirm that you have read and accept the{" "}
+                  <Button
+                    variant="link"
+                    className="h-fit p-0"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setIsOpenRules(true);
+                    }}
+                  >
+                    rules and regulations
+                  </Button>{" "}
+                  of the venue.
+                </span>
+              )}
+            </div>
             <SubmitButton disabled={isPending} type="submit" className="w-28">
               Submit
             </SubmitButton>

@@ -279,6 +279,7 @@ export async function getDepartmentUsers(
                   lastName: true,
                 },
               },
+              createdAt: true,
             },
           },
           userRole: {

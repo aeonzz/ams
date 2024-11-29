@@ -197,7 +197,7 @@ export function getInventoryColumns(): ColumnDef<InventoryItemType>[] {
       size: 0,
     },
     {
-      id: "expander",
+      id: "inventorySubItems",
       header: () => <P>Inventory</P>,
       cell: ({ row }) => <DataTableExpand<InventoryItemType> row={row} />,
       size: 0,

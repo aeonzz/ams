@@ -10,8 +10,10 @@ type Data = {
   createdAt: Date;
   venue: string;
   dateReserved: Date;
+  actualStart: string | null;
   purpose: string;
   equipmentNeeded: string;
+  department: string;
   status: RequestStatusTypeType;
   departmentHead: string;
 };
@@ -71,7 +73,7 @@ export async function fillVenueRequestFormPDF(
   const pdfDoc = await PDFDocument.load(pdfBytes);
   pdfDoc.registerFontkit(fontkit);
 
-  const font = await pdfDoc.embedFont(StandardFonts.CourierBoldOblique);
+  const font = await pdfDoc.embedFont(StandardFonts.CourierOblique);
   const pages = pdfDoc.getPages();
   const firstPage = pages[0];
   const { width, height } = firstPage.getSize();
@@ -79,15 +81,17 @@ export async function fillVenueRequestFormPDF(
   console.log(`PDF dimensions: ${width}x${height}`);
 
   const fieldPositions: FieldPositions = {
-    requestedBy: { x: 155, y: height - 150, size: 10, maxWidth: 200 },
-    createdAt: { x: 100, y: height - 200, size: 10, maxWidth: 200 },
-    venue: { x: 100, y: height - 225, size: 10, maxWidth: 100 },
-    dateReserved: { x: 130, y: height - 245, size: 10, maxWidth: 150 },
-    purpose: { x: 50, y: height - 318, size: 10, maxWidth: 500 },
-    equipmentNeeded: { x: 50, y: height - 415, size: 10, maxWidth: 500 },
-    status: { x: 100, y: height - 480, size: 10, maxWidth: 100 },
-    requestedByAlt: { x: 50, y: height - 535, size: 10, maxWidth: 150 },
-    departmentHead: { x: 300, y: height - 535, size: 10, maxWidth: 150 },
+    requestedBy: { x: 110, y: height - 175, size: 10, maxWidth: 200 },
+    createdAt: { x: 85, y: height - 223, size: 10, maxWidth: 200 },
+    department: { x: 115, y: height - 248, size: 10, maxWidth: 200 },
+    venue: { x: 87, y: height - 270, size: 10, maxWidth: 100 },
+    dateReserved: { x: 130, y: height - 293, size: 10, maxWidth: 150 },
+    actualStart: { x: 132, y: height - 315, size: 10, maxWidth: 150 },
+    purpose: { x: 50, y: height - 359, size: 10, maxWidth: 200 },
+    equipmentNeeded: { x: 300, y: height - 360, size: 10, maxWidth: 200 },
+    status: { x: 100, y: height - 455, size: 10, maxWidth: 100 },
+    requestedByAlt: { x: 50, y: height - 513, size: 10, maxWidth: 150 },
+    departmentHead: { x: 230, y: height - 578, size: 10, maxWidth: 150 },
   };
 
   // function drawDebugRectangle(

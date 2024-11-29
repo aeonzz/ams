@@ -31,8 +31,8 @@ import {
 
 interface PriorityOptionProps {
   prio: Priority;
-  setPrio: React.Dispatch<React.SetStateAction<Priority>>;
-  isLoading: boolean;
+  setPrio: (newPriority: Priority) => void;
+  isLoading?: boolean;
 }
 
 export type Priority = {
@@ -41,7 +41,7 @@ export type Priority = {
   icon: LucideIcon;
 };
 
-const priorities = [
+export const priorities = [
   {
     value: "NO_PRIORITY",
     label: "No priority",
@@ -72,7 +72,7 @@ const priorities = [
 export default function PriorityOption({
   prio,
   setPrio,
-  isLoading,
+  isLoading = false,
 }: PriorityOptionProps) {
   const [open, setOpen] = React.useState(false);
   return (
@@ -80,13 +80,14 @@ export default function PriorityOption({
       <Popover open={open} onOpenChange={setOpen} modal>
         <PopoverTrigger asChild>
           <Button
-            variant="secondary"
+            variant="ghost2"
             size="sm"
             role="combobox"
             aria-expanded={open}
             className={cn(
               prio.value === "NO_PRIORITY" && "text-muted-foreground",
-              "px-2"
+              open && "bg-secondary-accent",
+              "w-48 justify-start px-2"
             )}
             disabled={isLoading}
           >
@@ -105,7 +106,7 @@ export default function PriorityOption({
             )}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[230px] p-0" align="start">
+        <PopoverContent className="w-[230px] p-0" align="start" side="left">
           <Command className="max-h-72">
             <CommandInput placeholder="Change priority..." />
             <CommandList>
@@ -137,7 +138,6 @@ export default function PriorityOption({
           </Command>
         </PopoverContent>
       </Popover>
-      <P className="text-muted-foreground">Priority</P>
     </div>
   );
 }

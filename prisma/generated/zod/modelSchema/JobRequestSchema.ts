@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { JobTypeSchema } from '../inputTypeSchemas/JobTypeSchema'
 import { PriorityTypeSchema } from '../inputTypeSchemas/PriorityTypeSchema'
 import { JobStatusSchema } from '../inputTypeSchemas/JobStatusSchema'
 import type { ReworkWithRelations } from './ReworkSchema'
@@ -16,22 +15,23 @@ import { JobRequestEvaluationWithRelationsSchema } from './JobRequestEvaluationS
 /////////////////////////////////////////
 
 export const JobRequestSchema = z.object({
-  jobType: JobTypeSchema,
   priority: PriorityTypeSchema,
   status: JobStatusSchema,
   id: z.string(),
   description: z.string(),
+  department: z.string(),
   location: z.string(),
-  dueDate: z.coerce.date(),
-  estimatedTime: z.number().int().nullable(),
   startDate: z.coerce.date().nullable(),
   endDate: z.coerce.date().nullable(),
-  costEstimate: z.number().nullable(),
-  actualCost: z.number().nullable(),
+  jobType: z.string(),
+  proofImages: z.string().array(),
   images: z.string().array(),
+  verifiedByReviewer: z.boolean(),
+  verifiedByRequester: z.boolean(),
   rejectionCount: z.number().int(),
   requestId: z.string(),
   assignedTo: z.string().nullable(),
+  isReassigned: z.boolean(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })

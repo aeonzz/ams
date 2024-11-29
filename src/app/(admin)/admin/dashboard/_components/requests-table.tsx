@@ -46,10 +46,27 @@ import { StatusFilter } from "@/app/(app)/department/[departmentId]/insights/_co
 interface RequestsTableProps {
   data: RequestWithRelations[];
   className?: string;
+  dateRange: DateRange | undefined;
 }
 
-export default function RequestsTable({ data, className }: RequestsTableProps) {
+export default function RequestsTable({
+  data,
+  className,
+  dateRange,
+}: RequestsTableProps) {
   const [statusFilter, setStatusFilter] = React.useState<string[]>([]);
+
+  const filteredData = React.useMemo(() => {
+    if (!dateRange || (!dateRange.from && !dateRange.to)) return data;
+
+    return data.filter((request) => {
+      const createdAt = new Date(request.createdAt);
+      return (
+        (!dateRange.from || createdAt >= dateRange.from) &&
+        (!dateRange.to || createdAt <= dateRange.to)
+      );
+    });
+  }, [dateRange, data]);
 
   const columns: ColumnDef<RequestWithRelations>[] = React.useMemo(
     () => [
@@ -92,7 +109,9 @@ export default function RequestsTable({ data, className }: RequestsTableProps) {
       {
         accessorKey: "department",
         header: "Department",
-        cell: ({ row }) => <Badge variant="outline">{row.original.department.name}</Badge>,
+        cell: ({ row }) => (
+          <Badge variant="outline">{row.original.department.name}</Badge>
+        ),
       },
       {
         accessorKey: "status",
@@ -169,7 +188,7 @@ export default function RequestsTable({ data, className }: RequestsTableProps) {
   );
 
   const table = useReactTable({
-    data,
+    data: filteredData,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),

@@ -51,7 +51,7 @@ export default function VenueDialog() {
   const form = useForm<VenueRequestSchema>({
     resolver: zodResolver(venueRequestSchema),
     defaultValues: {
-      venueId: undefined,
+      venueId: "",
       notes: "",
       startTime: undefined,
       endTime: undefined,

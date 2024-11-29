@@ -26,22 +26,20 @@ export default function VehicleLogsScreen({
 
   return (
     <div className="flex h-full w-full">
-      <div className="flex-1">
-        <div className="grid min-h-[calc(100vh_-_100px)] place-items-center items-center py-3">
-          <React.Suspense
-            fallback={
-              <DataTableSkeleton
-                columnCount={4}
-                searchableColumnCount={1}
-                filterableColumnCount={2}
-                cellWidths={["10rem", "30rem", "12rem", "12rem", "8rem"]}
-                shrinkZero
-              />
-            }
-          >
-            <VehicleLogsTable vehicleRequestsPromise={vehicleRequestsPromise} />
-          </React.Suspense>
-        </div>
+      <div className="grid h-auto place-items-center items-center py-3">
+        <React.Suspense
+          fallback={
+            <DataTableSkeleton
+              columnCount={4}
+              searchableColumnCount={1}
+              filterableColumnCount={2}
+              cellWidths={["10rem", "30rem", "12rem", "12rem", "8rem"]}
+              shrinkZero
+            />
+          }
+        >
+          <VehicleLogsTable vehicleRequestsPromise={vehicleRequestsPromise} />
+        </React.Suspense>
       </div>
     </div>
   );

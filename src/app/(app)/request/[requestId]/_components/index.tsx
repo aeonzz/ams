@@ -11,6 +11,7 @@ import {
   Link as LinkIcon,
   Dot,
   Link,
+  Briefcase,
 } from "lucide-react";
 import NotFound from "@/app/not-found";
 import FetchDataError from "@/components/card/fetch-data-error";
@@ -50,6 +51,9 @@ import SupplyRequestActions from "./supply-request-actions";
 import TransportRequestActions from "./transport-request-actions";
 import CancelRequest from "./cancel-request";
 import VenueRequestActions from "./venue-request-actions";
+import PriorityOption from "@/app/(app)/dashboard/_components/priority-option";
+import SetPriority from "./set-priority";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface RequestDetailsProps {
   params: string;
@@ -77,108 +81,119 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
           </H5>
           <SearchInput />
         </div>
-        <div className="scroll-bar flex h-[calc(100vh_-_75px)] justify-center overflow-y-auto px-10 py-10">
-          <div className="h-auto w-[750px]">
-            <div className="mb-6">
-              <H2 className="mb-3 font-semibold">{data.title}</H2>
-              <div className="mb-4 flex items-center space-x-2">
-                <Badge variant={RequestTypeIcon.variant}>
-                  <RequestTypeIcon.icon className="mr-1 h-4 w-4" />
-                  {textTransform(data.type)}
-                </Badge>
-                <Badge variant={statusColor.variant} className="pr-3.5">
-                  <Dot
-                    className="mr-1 size-3"
-                    strokeWidth={statusColor.stroke}
-                    color={statusColor.color}
-                  />
-                  {textTransform(data.status)}
-                </Badge>
-              </div>
-              <P className="mb-2 text-muted-foreground">
-                Request details for {data.type.toLowerCase()} request.
-              </P>
-            </div>
-            <div className="space-y-4">
-              <div className="flex items-center space-x-2">
-                <Avatar className="size-5 rounded-full">
-                  <AvatarImage src={`${data.user.profileUrl}`} />
-                  <AvatarFallback className="rounded-md">
-                    {data.user.firstName.charAt(0).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                <P>
-                  Requested by:{" "}
-                  {formatFullName(
-                    data.user.firstName,
-                    data.user.middleName,
-                    data.user.lastName
-                  )}
+        <ScrollArea className="h-[calc(100vh_-_75px)]">
+          <div className="flex justify-center px-10 py-10">
+            <div className="h-auto w-full max-w-3xl">
+              <div className="mb-6">
+                <H2 className="mb-3 font-semibold">{data.title}</H2>
+                <div className="mb-4 flex items-center space-x-2">
+                  <Badge variant={RequestTypeIcon.variant}>
+                    <RequestTypeIcon.icon className="mr-1 h-4 w-4" />
+                    {textTransform(data.type)}
+                  </Badge>
+                  <Badge variant={statusColor.variant} className="pr-3.5">
+                    <Dot
+                      className="mr-1 size-3"
+                      strokeWidth={statusColor.stroke}
+                      color={statusColor.color}
+                    />
+                    {textTransform(data.status)}
+                  </Badge>
+                </div>
+                <P className="mb-2 text-muted-foreground">
+                  Request details for {data.type.toLowerCase()} request.
                 </P>
               </div>
-              <div className="flex items-center space-x-2">
-                <Calendar className="h-5 w-5" />
-                <P>Created: {format(new Date(data.createdAt), "PPP p")}</P>
+              <div className="space-y-4">
+                <div className="flex items-center space-x-2">
+                  <Avatar className="size-5 rounded-full">
+                    <AvatarImage src={`${data.user.profileUrl}`} />
+                    <AvatarFallback className="rounded-md">
+                      {data.user.firstName.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <P>
+                    Requested by:{" "}
+                    {formatFullName(
+                      data.user.firstName,
+                      data.user.middleName,
+                      data.user.lastName
+                    )}
+                  </P>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Calendar className="h-5 w-5" />
+                  <P>Created: {format(new Date(data.createdAt), "PPP p")}</P>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Briefcase className="h-5 w-5" />
+                  <P>Department: {data.department.name}</P>
+                </div>
               </div>
+              <Separator className="my-6" />
+              {data.type === "JOB" && data.jobRequest && (
+                <JobRequestDetails
+                  data={data.jobRequest}
+                  requestId={data.id}
+                  rejectionReason={data.rejectionReason}
+                  cancellationReason={data.cancellationReason}
+                  onHoldReason={data.onHoldReason}
+                  requestStatus={data.status}
+                  isCurrentUser={currentUser.id === data.userId}
+                  allowedDepartment={data.departmentId}
+                />
+              )}
+              {data.type === "VENUE" && data.venueRequest && (
+                <VenueRequestDetails
+                  data={data.venueRequest}
+                  requestId={data.id}
+                  rejectionReason={data.rejectionReason}
+                  cancellationReason={data.cancellationReason}
+                  onHoldReason={data.onHoldReason}
+                  requestStatus={data.status}
+                  isCurrentUser={currentUser.id === data.userId}
+                  completedAt={data.completedAt}
+                />
+              )}
+              {data.type === "BORROW" && data.returnableRequest && (
+                <ReturnableResourceDetails
+                  data={data.returnableRequest}
+                  requestId={data.id}
+                  rejectionReason={data.rejectionReason}
+                  cancellationReason={data.cancellationReason}
+                  onHoldReason={data.onHoldReason}
+                  requestStatus={data.status}
+                  isCurrentUser={currentUser.id === data.userId}
+                />
+              )}
+              {data.type === "SUPPLY" && data.supplyRequest && (
+                <SupplyResourceDetails
+                  data={data.supplyRequest}
+                  requestId={data.id}
+                  rejectionReason={data.rejectionReason}
+                  requestStatus={data.status}
+                  isCurrentUser={currentUser.id === data.userId}
+                  departmentId={data.departmentId}
+                />
+              )}
+              {data.type === "TRANSPORT" && data.transportRequest && (
+                <TransportRequestDetails
+                  data={data.transportRequest}
+                  requestId={data.id}
+                  rejectionReason={data.rejectionReason}
+                  cancellationReason={data.cancellationReason}
+                  onHoldReason={data.onHoldReason}
+                  requestStatus={data.status}
+                  isCurrentUser={currentUser.id === data.userId}
+                  completedAt={data.completedAt}
+                />
+              )}
             </div>
-            <Separator className="my-6" />
-            {data.type === "JOB" && data.jobRequest && (
-              <JobRequestDetails
-                data={data.jobRequest}
-                requestId={data.id}
-                rejectionReason={data.rejectionReason}
-                requestStatus={data.status}
-                isCurrentUser={currentUser.id === data.userId}
-              />
-            )}
-            {data.type === "VENUE" && data.venueRequest && (
-              <VenueRequestDetails
-                data={data.venueRequest}
-                requestId={data.id}
-                rejectionReason={data.rejectionReason}
-                cancellationReason={data.cancellationReason}
-                onHoldReason={data.onHoldReason}
-                requestStatus={data.status}
-                isCurrentUser={currentUser.id === data.userId}
-                completedAt={data.completedAt}
-              />
-            )}
-            {data.type === "BORROW" && data.returnableRequest && (
-              <ReturnableResourceDetails
-                data={data.returnableRequest}
-                requestId={data.id}
-                rejectionReason={data.rejectionReason}
-                requestStatus={data.status}
-                isCurrentUser={currentUser.id === data.userId}
-              />
-            )}
-            {data.type === "SUPPLY" && data.supplyRequest && (
-              <SupplyResourceDetails
-                data={data.supplyRequest}
-                requestId={data.id}
-                rejectionReason={data.rejectionReason}
-                requestStatus={data.status}
-                isCurrentUser={currentUser.id === data.userId}
-                departmentId={data.departmentId}
-              />
-            )}
-            {data.type === "TRANSPORT" && data.transportRequest && (
-              <TransportRequestDetails
-                data={data.transportRequest}
-                requestId={data.id}
-                rejectionReason={data.rejectionReason}
-                cancellationReason={data.cancellationReason}
-                onHoldReason={data.onHoldReason}
-                requestStatus={data.status}
-                isCurrentUser={currentUser.id === data.userId}
-                completedAt={data.completedAt}
-              />
-            )}
           </div>
-        </div>
+        </ScrollArea>
       </div>
       <Separator orientation="vertical" className="h-full" />
-      <div className="w-[320px] p-6 pt-0">
+      <ScrollArea className="w-[320px] px-6 py-2">
         <RequestSummaryTitle />
         <div>
           <div className="space-y-4">
@@ -202,7 +217,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
             </div>
             {data.type === "JOB" &&
               data.jobRequest &&
-              (data.status === "APPROVED" || data.status === "COMPLETED") && (
+              data.status !== "PENDING" && (
                 <div>
                   <P className="mb-1 text-sm">Job Status</P>
                   {(() => {
@@ -291,6 +306,13 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                 </div>
               </div>
             )}
+            {data.type === "JOB" && data.jobRequest && (
+              <SetPriority
+                prio={data.priority}
+                requestId={data.id}
+                disabled={data.status === "COMPLETED"}
+              />
+            )}
           </div>
         </div>
         <Separator className="my-6" />
@@ -301,7 +323,8 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
               requestStatus={data.status}
               inProgress={
                 data.transportRequest?.inProgress ||
-                data.venueRequest?.inProgress
+                data.venueRequest?.inProgress ||
+                data.jobRequest?.status !== "PENDING"
               }
             />
           )}
@@ -329,7 +352,16 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
               allowedDepartment={data.departmentId}
               allowedRoles={["OPERATIONS_MANAGER", "DEPARTMENT_HEAD"]}
               allowedApproverRoles={["DEPARTMENT_HEAD"]}
-            />
+              jobRequestId={data.jobRequest.id}
+            >
+              {data.status === "APPROVED" ||
+                (data.status === "ON_HOLD" && (
+                  <CancelRequest
+                    requestId={data.id}
+                    requestStatus={data.status}
+                  />
+                ))}
+            </JobRequestReviewerActions>
           )}
           {data.type === "JOB" &&
             data.jobRequest &&
@@ -348,7 +380,16 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
               allowedRoles={["OPERATIONS_MANAGER", "DEPARTMENT_HEAD"]}
               allowedDepartment={data.departmentId}
               allowedApproverRoles={["DEPARTMENT_HEAD"]}
-            />
+              inProgress={data.returnableRequest.inProgress}
+            >
+              {data.status === "APPROVED" ||
+                (data.status === "ON_HOLD" && (
+                  <CancelRequest
+                    requestId={data.id}
+                    requestStatus={data.status}
+                  />
+                ))}
+            </RequestReviewerActions>
           )}
           {data.type === "SUPPLY" && data.supplyRequest && (
             <RequestReviewerActions
@@ -429,7 +470,9 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
             )}
           {data.status === "APPROVED" &&
             data.type === "BORROW" &&
-            data.returnableRequest && (
+            data.returnableRequest &&
+            new Date(data.returnableRequest.dateAndTimeNeeded) <=
+              new Date() && (
               <ReturnableRequestActions
                 allowedRoles={["OPERATIONS_MANAGER"]}
                 allowedDepartment={data.departmentId}
@@ -447,7 +490,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
               />
             )}
         </div>
-      </div>
+      </ScrollArea>
     </div>
   );
 }

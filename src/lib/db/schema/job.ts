@@ -1,5 +1,4 @@
 import { requestSchemaBase } from "@/lib/schema/request";
-import { JobTypeSchema } from "prisma/generated/zod";
 import { z } from "zod";
 
 export const createJobRequestSchemaServer = z.object({
@@ -7,8 +6,8 @@ export const createJobRequestSchemaServer = z.object({
   images: z.array(z.string()).optional(),
   departmentId: z.string(),
   location: z.string(),
-  dueDate: z.date(),
-  jobType: JobTypeSchema,
+  jobType: z.string(),
+  department: z.string(),
 });
 
 export const createJobRequestSchemaServerWithPath =
@@ -27,3 +26,14 @@ export const extendedJobRequestSchemaServer = requestSchemaBase.merge(
 export type ExtendedJobRequestSchemaServer = z.infer<
   typeof extendedJobRequestSchemaServer
 >;
+
+export const uploadProofImagesSchema = z.object({
+  proofImages: z.array(z.string()).optional(),
+});
+
+export const uploadProofImagesSchemaWithPath = uploadProofImagesSchema.extend({
+  requestId: z.string(),
+  path: z.string(),
+});
+
+export type UploadProofImagesSchema = z.infer<typeof uploadProofImagesSchema>;

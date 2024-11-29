@@ -22,7 +22,6 @@ import { CircleMinus, CirclePlus, RotateCw } from "lucide-react";
 
 export default function ProfileScreen() {
   const currentUser = useSession();
-  console.log(currentUser)
   return (
     <ScrollArea className="h-full py-3">
       <div className="flex px-3">

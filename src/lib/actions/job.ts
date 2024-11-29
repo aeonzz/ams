@@ -7,7 +7,10 @@ import { db } from "@/lib/db/index";
 import { revalidatePath } from "next/cache";
 import { generateText } from "ai";
 import { cohere } from "@ai-sdk/cohere";
-import { extendedJobRequestSchemaServer } from "../db/schema/job";
+import {
+  extendedJobRequestSchemaServer,
+  uploadProofImagesSchemaWithPath,
+} from "../db/schema/job";
 import { createNotification } from "./notification";
 import {
   assignPersonnelSchemaWithPath,
@@ -16,8 +19,38 @@ import {
   updateJobRequestSchemaWithPath,
   updateRequestStatusSchemaWithPath,
   updateReworkJobRequestSchema,
+  verifyJobSchema,
 } from "@/app/(app)/request/[requestId]/_components/schema";
 import { pusher } from "../pusher";
+import { checkAuth } from "../auth/utils";
+import { GetRequestsSchema } from "../schema";
+import { formatFullName } from "../utils";
+import { PrismaClient } from "@prisma/client";
+
+const generateDateId = async (db: PrismaClient) => {
+  const currentDate = new Date();
+  const year = currentDate.getFullYear();
+  const month = String(currentDate.getMonth() + 1).padStart(2, "0");
+
+  const latestRequest = await db.request.findFirst({
+    where: {
+      id: {
+        startsWith: `${year}-${month}-`,
+      },
+    },
+    orderBy: {
+      id: "desc",
+    },
+  });
+
+  let sequence = 1;
+  if (latestRequest) {
+    const lastSequence = parseInt(latestRequest.id.split("-")[2]);
+    sequence = lastSequence + 1;
+  }
+
+  return `${year}-${month}-${String(sequence).padStart(3, "0")}`;
+};
 
 export const createJobRequest = authedProcedure
   .createServerAction()
@@ -69,7 +102,7 @@ export const createJobRequest = authedProcedure
 
       const createdRequest = await db.request.create({
         data: {
-          id: `REQ-${generateId(3)}`,
+          id: await generateDateId(db),
           userId: user.id,
           priority: rest.priority,
           type: rest.type,
@@ -77,9 +110,9 @@ export const createJobRequest = authedProcedure
           departmentId: rest.departmentId,
           jobRequest: {
             create: {
-              id: `JRQ-${generateId(3)}`,
+              id: generateId(5),
+              department: rest.department,
               description: rest.description,
-              dueDate: rest.dueDate,
               location: rest.location,
               jobType: rest.jobType,
               images: rest.images,
@@ -118,10 +151,22 @@ export const assignPersonnel = authedProcedure
   .input(assignPersonnelSchemaWithPath)
   .handler(async ({ input, ctx }) => {
     const { user } = ctx;
-    const { path, requestId, ...rest } = input;
-
+    const { path, requestId, status, ...rest } = input;
     try {
       const result = await db.$transaction(async (prisma) => {
+        const existingRequest = await prisma.request.findUnique({
+          where: { id: requestId },
+          include: { jobRequest: true },
+        });
+
+        if (!existingRequest) {
+          return "Job request not found";
+        }
+
+        const isReassigned: boolean =
+          !!existingRequest.jobRequest?.assignedTo &&
+          existingRequest.jobRequest.assignedTo !== rest.personnelId;
+
         const updatedRequest = await prisma.request.update({
           where: {
             id: requestId,
@@ -130,6 +175,7 @@ export const assignPersonnel = authedProcedure
             jobRequest: {
               update: {
                 assignedTo: rest.personnelId,
+                isReassigned,
               },
             },
           },
@@ -138,12 +184,25 @@ export const assignPersonnel = authedProcedure
           },
         });
 
-        await pusher.trigger("request", "request_update", {
-          message: "asdasdas",
-        });
+        if (status === "APPROVED" && isReassigned) {
+          await createNotification({
+            resourceId: `/request/${updatedRequest.id}`,
+            title: `New Job Assignment: ${updatedRequest.title}`,
+            resourceType: "TASK",
+            notificationType: "REMINDER",
+            message: `You have been assigned to a new job: ${updatedRequest.title}. Please review the details and take the necessary actions.`,
+            userId: user.id,
+            recepientIds: [rest.personnelId],
+          });
+        }
 
         return updatedRequest;
       });
+
+      await Promise.all([
+        pusher.trigger("request", "request_update", { message: "" }),
+        pusher.trigger("request", "notifications", { message: "" }),
+      ]);
 
       return revalidatePath(path);
     } catch (error) {
@@ -526,33 +585,6 @@ export const updateReworkJobRequest = authedProcedure
         });
 
         if (
-          status === "REWORK_IN_PROGRESS" &&
-          updateJobRequestStatus.jobRequest.request.reviewedBy
-        ) {
-          await createNotification({
-            resourceId: `/request/${updateJobRequestStatus.jobRequest.request.id}`,
-            title: `Rework In Progress: ${updateJobRequestStatus.jobRequest.request.title}`,
-            resourceType: "TASK",
-            notificationType: "INFO",
-            message: `The rework for "${updateJobRequestStatus.jobRequest.request.title}" job is currently in progress. Please check the request for further details.`,
-            recepientIds: [
-              updateJobRequestStatus.jobRequest.request.reviewedBy,
-            ],
-            userId: user.id,
-          });
-
-          await createNotification({
-            resourceId: `/request/${updateJobRequestStatus.jobRequest.request.id}`,
-            title: `Rework In Progress: ${updateJobRequestStatus.jobRequest.request.title}`,
-            resourceType: "REQUEST",
-            notificationType: "INFO",
-            message: `Your job request for "${updateJobRequestStatus.jobRequest.request.title}" is currently under rework. Please check the request for further details.`,
-            recepientIds: [updateJobRequestStatus.jobRequest.request.userId],
-            userId: user.id,
-          });
-        }
-
-        if (
           status === "COMPLETED" &&
           updateJobRequestStatus.jobRequest.request.reviewedBy
         ) {
@@ -578,6 +610,188 @@ export const updateReworkJobRequest = authedProcedure
       });
 
       return result;
+    } catch (error) {
+      console.log(error);
+      getErrorMessage(error);
+    }
+  });
+
+export const completeJobRequest = authedProcedure
+  .createServerAction()
+  .input(verifyJobSchema)
+  .handler(async ({ ctx, input }) => {
+    const { user } = ctx;
+    const { path, jobRequestId, verify, role } = input;
+
+    try {
+      const result = await db.$transaction(async (prisma) => {
+        const updatedData = await db.jobRequest.update({
+          where: { id: jobRequestId },
+          data:
+            role === "reviewer"
+              ? { verifiedByReviewer: verify }
+              : { verifiedByRequester: verify },
+          select: {
+            id: true,
+            verifiedByReviewer: true,
+            verifiedByRequester: true,
+          },
+        });
+
+        if (updatedData.verifiedByReviewer && updatedData.verifiedByRequester) {
+          await db.jobRequest.update({
+            where: {
+              id: jobRequestId,
+            },
+            data: {
+              request: {
+                update: {
+                  status: "COMPLETED",
+                  completedAt: new Date(),
+                },
+              },
+            },
+          });
+        }
+
+        return updatedData;
+      });
+
+      await pusher.trigger("request", "request_update", {
+        message: "",
+      });
+
+      return revalidatePath(path);
+    } catch (error) {
+      console.log(error);
+      getErrorMessage(error);
+    }
+  });
+
+export async function getDepartmentJobRequests(input: GetRequestsSchema) {
+  await checkAuth();
+  const { page, per_page, sort, from, title, status, to, departmentId, id } =
+    input;
+
+  try {
+    const skip = (page - 1) * per_page;
+
+    const [column, order] = (sort?.split(".") ?? ["createdAt", "desc"]) as [
+      keyof Request | undefined,
+      "asc" | "desc" | undefined,
+    ];
+
+    const where: any = {
+      request: {
+        departmentId: departmentId,
+      },
+    };
+
+    if (title) {
+      where.title = { contains: title, mode: "insensitive" };
+    }
+
+    if (id) {
+      where.requestId = id;
+    }
+
+    if (status) {
+      where.status = status;
+    }
+
+    if (from && to) {
+      where.createdAt = {
+        gte: new Date(from),
+        lte: new Date(to),
+      };
+    }
+
+    const [data, total, department] = await db.$transaction([
+      db.jobRequest.findMany({
+        where,
+        take: per_page,
+        skip,
+        orderBy: {
+          [column || "createdAt"]: order || "desc",
+        },
+        include: {
+          request: {
+            include: {
+              user: true,
+              reviewer: true,
+            },
+          },
+        },
+      }),
+      db.jobRequest.count({ where }),
+      db.department.findUnique({
+        where: {
+          id: departmentId,
+        },
+        select: {
+          name: true,
+        },
+      }),
+    ]);
+    const pageCount = Math.ceil(total / per_page);
+
+    const formattedData = data.map((data) => {
+      const { request, id, createdAt, updatedAt, ...rest } = data;
+      return {
+        ...rest,
+        id: request.id,
+        completedAt: request.completedAt,
+        title: request.title,
+        requester: formatFullName(
+          request.user.firstName,
+          request.user.middleName,
+          request.user.lastName
+        ),
+        reviewer: request.reviewer
+          ? formatFullName(
+              request.reviewer.firstName,
+              request.reviewer.middleName,
+              request.reviewer.lastName
+            )
+          : undefined,
+        requestStatus: request.status,
+        createdAt: request.createdAt,
+        updatedAt: request.updatedAt,
+      };
+    });
+
+    return { data: formattedData, pageCount, department };
+  } catch (err) {
+    console.error(err);
+    return { data: [], pageCount: 0 };
+  }
+}
+
+export const uploadProofImages = authedProcedure
+  .createServerAction()
+  .input(uploadProofImagesSchemaWithPath)
+  .handler(async ({ input }) => {
+    const { path, proofImages, requestId } = input;
+
+    try {
+      const result = await db.$transaction(async (prisma) => {
+        const updatedData = await db.jobRequest.update({
+          where: {
+            requestId: requestId,
+          },
+          data: {
+            proofImages: proofImages,
+          },
+        });
+
+        return updatedData;
+      });
+
+      await pusher.trigger("request", "request_update", {
+        message: "",
+      });
+
+      return revalidatePath(path);
     } catch (error) {
       console.log(error);
       getErrorMessage(error);

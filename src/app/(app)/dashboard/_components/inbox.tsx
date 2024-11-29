@@ -77,7 +77,7 @@ export default function Inbox({
 
   return (
     <div className={className}>
-      <div className={cn("scroll-bar overflow-y-auto p-1", height)}>
+      <div className={cn("scroll-bar overflow-y-auto", height)}>
         {renderNotifications()}
         {isFetchingNextPage && <NotificationSkeleton />}
         <div ref={ref} />
@@ -88,7 +88,7 @@ export default function Inbox({
 
 function NotificationSkeleton() {
   return (
-    <div className="mb-1 flex w-full rounded-md border">
+    <div className="flex w-full">
       <div className="py-5 pl-3">
         <Skeleton className="size-2.5 rounded-full" />
       </div>

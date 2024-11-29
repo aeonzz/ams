@@ -23,6 +23,7 @@ import { toast } from "sonner";
 import { useSession } from "@/lib/hooks/use-session";
 import { generateDepartmentReport } from "@/lib/fill-pdf/department-report";
 import { useDashboardActions } from "@/lib/hooks/use-dashboard-actions";
+import { useMediaQuery } from "usehooks-ts";
 
 interface DepartmentInsightsScreenProps {
   departmentId: string;
@@ -31,6 +32,7 @@ interface DepartmentInsightsScreenProps {
 export default function DepartmentInsightsScreen({
   departmentId,
 }: DepartmentInsightsScreenProps) {
+  const isDesktop = useMediaQuery("(min-width: 769px)");
   const currentUser = useSession();
   const { data, isLoading, isError, refetch } = useDepartmentData(departmentId);
   const { setIsGenerating, timeRange, setTimeRange, requestType, date, reset } =
@@ -102,7 +104,7 @@ export default function DepartmentInsightsScreen({
   };
 
   return (
-    <div className="space-y-3">
+    <div className="w-full space-y-3">
       <div className="flex justify-between">
         <div></div>
         <div className="flex gap-2">
@@ -113,10 +115,10 @@ export default function DepartmentInsightsScreen({
           />
         </div>
       </div>
-      <div className="grid h-fit grid-flow-row grid-cols-3 gap-3 pb-3">
+      <div className="grid h-fit grid-flow-row grid-cols-1 gap-3 pb-3 lg:grid-cols-3">
         <DepartmentKPICards
           data={filteredData}
-          className="col-span-3"
+          className="lg:col-span-3"
           dateRange={date}
           requestType={requestType}
         />
@@ -127,15 +129,16 @@ export default function DepartmentInsightsScreen({
         />
         <RequestChart
           data={filteredData}
-          className="col-span-2 h-[400px]"
+          className="h-[400px] lg:col-span-2"
           requestType={requestType}
           dateRange={date}
           timeRange={timeRange}
           setTimeRange={setTimeRange}
         />
-        {data.managesBorrowRequest &&  requestType === "" || requestType === "BORROW" ? (
+
+        {/* {data.managesBorrowRequest &&  requestType === "" || requestType === "BORROW" ? (
           <>
-            {/* <OverdueItemsChart
+            <OverdueItemsChart
               data={data}
               className="col-span-3 h-[400px]"
               dateRange={
@@ -143,7 +146,7 @@ export default function DepartmentInsightsScreen({
                   ? { from: date.from, to: date.to }
                   : undefined
               }
-            /> */}
+            />
             <ItemRequestsChart
               data={data}
               className="col-span-3 h-[400px]"
@@ -154,9 +157,11 @@ export default function DepartmentInsightsScreen({
               }
             />
           </>
-        ) : null}
+        ) : null} */}
+
         <DepartmentRequestsTable
           data={data.request}
+          dateRange={date}
           requestType={requestType}
           className="col-span-3"
         />

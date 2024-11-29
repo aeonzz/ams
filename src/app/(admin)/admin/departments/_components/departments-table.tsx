@@ -65,7 +65,7 @@ export function DepartmentsTable({
   return (
     <DataTable
       table={table}
-      floatingBar={<DepartmentsTableFloatingBar table={table} />}
+      floatingBar={<DepartmentsTableFloatingBar fileName="Departments" table={table} />}
       renderSubComponent={({ row }) => {
         return <DepartmentUsersTable data={row.original.users} />;
       }}

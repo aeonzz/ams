@@ -10,7 +10,7 @@ import {
 import { type Table } from "@tanstack/react-table";
 import { toast } from "sonner";
 
-import { exportTableToCSV } from "@/lib/export";
+import { exportTableToCSV, exportTableToXLSX } from "@/lib/export";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -37,13 +37,21 @@ import {
 } from "@/components/ui/alert-dialog";
 import { deleteDepartments } from "@/lib/actions/department";
 import type { DepartmentsTableType } from "./types";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface DepartmentsTableFloatingBarProps {
   table: Table<DepartmentsTableType>;
+  fileName: string;
 }
 
 export function DepartmentsTableFloatingBar({
   table,
+  fileName,
 }: DepartmentsTableFloatingBarProps) {
   const rows = table.getFilteredSelectedRowModel().rows;
   const pathname = usePathname();
@@ -96,32 +104,56 @@ export function DepartmentsTableFloatingBar({
           <Separator orientation="vertical" className="hidden h-5 sm:block" />
           <div className="flex items-center gap-1.5">
             <Tooltip delayDuration={250}>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="secondary"
-                  size="icon"
-                  className="size-10 border"
-                  onClick={() => {
-                    setMethod("export");
-                    startTransition(() => {
-                      exportTableToCSV(table, {
-                        filename: "Departments",
-                        excludeColumns: ["select", "actions"],
-                        onlySelected: true,
+              <DropdownMenu>
+                <TooltipTrigger asChild>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="secondary"
+                      size="icon"
+                      className="size-10 border"
+                      disabled={isLoading}
+                    >
+                      {isLoading && method === "export" ? (
+                        <LoadingSpinner />
+                      ) : (
+                        <DownloadIcon className="size-5" aria-hidden="true" />
+                      )}
+                    </Button>
+                  </DropdownMenuTrigger>
+                </TooltipTrigger>
+                <DropdownMenuContent align="center">
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setMethod("export");
+                      startTransition(() => {
+                        exportTableToCSV(table, {
+                          filename: fileName,
+                          excludeColumns: ["select", "actions"],
+                          onlySelected: true,
+                        });
                       });
-                    });
-                  }}
-                  disabled={isPending || isLoading}
-                >
-                  {isLoading && method === "export" ? (
-                    <LoadingSpinner />
-                  ) : (
-                    <DownloadIcon className="size-5" aria-hidden="true" />
-                  )}
-                </Button>
-              </TooltipTrigger>
+                    }}
+                  >
+                    Export to CSV
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setMethod("export");
+                      startTransition(() => {
+                        exportTableToXLSX(table, {
+                          filename: fileName,
+                          excludeColumns: ["select", "actions"],
+                          onlySelected: true,
+                        });
+                      });
+                    }}
+                  >
+                    Export to Excel
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
               <TooltipContent className="border bg-accent font-semibold text-foreground dark:bg-zinc-900">
-                <P>Export departments</P>
+                <P>Export {fileName}</P>
               </TooltipContent>
             </Tooltip>
             <Tooltip delayDuration={250}>

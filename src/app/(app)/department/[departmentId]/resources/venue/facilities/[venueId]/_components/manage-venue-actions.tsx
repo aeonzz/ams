@@ -18,7 +18,7 @@ import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import { VenueWithRelations } from "prisma/generated/zod";
 import { CommandShortcut } from "@/components/ui/command";
 import { Dialog } from "@/components/ui/dialog";
-import UploadRulesPdfDialog from "./upload-rules-pdf-dialog";
+import Link from "next/link";
 
 interface ManageVenueActionsProps {
   venueId: string;
@@ -89,9 +89,6 @@ export default function ManageVenueActions({
         >
           <Pencil className="mr-2 size-4" />
           Edit
-          <DropdownMenuShortcut>
-            <CommandShortcut>E</CommandShortcut>
-          </DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuItem
           onSelect={() =>
@@ -100,19 +97,16 @@ export default function ManageVenueActions({
         >
           <Circle className="mr-2 size-4" />
           Status
-          <DropdownMenuShortcut>
-            <CommandShortcut>S</CommandShortcut>
-          </DropdownMenuShortcut>
         </DropdownMenuItem>
-        <DropdownMenuItem
-          onSelect={() => dialogManager.setActiveDialog("uploadFileDialog")}
+        <Link
+          href={`/department/${departmentId}/resources/venue/facilities/${venueId}/rules-and-regulations`}
+          prefetch
         >
-          <Circle className="mr-2 size-4" />
-          Venue Policies
-          <DropdownMenuShortcut>
-            <CommandShortcut>R</CommandShortcut>
-          </DropdownMenuShortcut>
-        </DropdownMenuItem>
+          <DropdownMenuItem>
+            <Circle className="mr-2 size-4" />
+            Venue Policies
+          </DropdownMenuItem>
+        </Link>
       </DropdownMenuContent>
     ),
     [departmentId, venueId, dialogManager]
@@ -134,12 +128,12 @@ export default function ManageVenueActions({
           </DropdownMenuTrigger>
           {MemoizedDropdownContent}
         </DropdownMenu>
-        <UploadRulesPdfDialog
+        {/* <UploadRulesPdfDialog
           file={data.rulesAndRegulations}
           venueId={venueId}
           open={dialogManager.activeDialog === "uploadFileDialog"}
           setOpen={handleOpenChange}
-        />
+        /> */}
       </Dialog>
     </>
   );

@@ -48,7 +48,7 @@ export async function getInventorySubItems(
       };
     }
 
-    const [data, total] = await db.$transaction([
+    const [data, total, item] = await db.$transaction([
       db.inventorySubItem.findMany({
         where,
         take: per_page,
@@ -61,6 +61,14 @@ export async function getInventorySubItems(
         },
       }),
       db.inventorySubItem.count({ where }),
+      db.inventoryItem.findUnique({
+        where: {
+          id: inventoryId,
+        },
+        select: {
+          name: true,
+        },
+      }),
     ]);
 
     const pageCount = Math.ceil(total / per_page);
@@ -81,7 +89,7 @@ export async function getInventorySubItems(
       })
     );
 
-    return { data: modifiedData, pageCount };
+    return { data: modifiedData, pageCount, item };
   } catch (err) {
     console.error(err);
     return { data: [], pageCount: 0 };
@@ -186,9 +194,12 @@ export const returnableResourceActions = authedProcedure
       itemStatus,
       itemId,
       isReturned,
+      isLost,
       returnCondition,
+      lostReason,
       ...rest
     } = input;
+
     try {
       const result = await db.$transaction(async (prisma) => {
         const updatedRequest = await prisma.returnableRequest.update({
@@ -215,15 +226,20 @@ export const returnableResourceActions = authedProcedure
                   },
                 }
               : {}),
+            ...(isLost
+              ? {
+                  isLost: true,
+                  inProgress: false,
+                  lostReason: lostReason,
+                  request: {
+                    update: {
+                      status: "COMPLETED",
+                      completedAt: new Date(),
+                    },
+                  },
+                }
+              : {}),
             ...rest,
-          },
-          include: {
-            request: {
-              include: {
-                user: true,
-                department: true,
-              },
-            },
           },
         });
 
@@ -231,7 +247,7 @@ export const returnableResourceActions = authedProcedure
           pusher.trigger("request", "request_update", { message: "" }),
           pusher.trigger("request", "notifications", { message: "" }),
         ]);
-        
+
         return updatedRequest;
       });
 

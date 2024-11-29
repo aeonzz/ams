@@ -21,6 +21,8 @@ export const ReturnableRequestSchema = z.object({
   purpose: z.string(),
   location: z.string(),
   notes: z.string().nullable(),
+  isLost: z.boolean(),
+  lostReason: z.string().nullable(),
   requestId: z.string(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),

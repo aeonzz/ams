@@ -39,6 +39,9 @@ export const returnableResourceRequestSchemaBase = z.object({
     .max(700, { message: "Cannot be more than 700 characters long" })
     .optional(),
   inProgress: z.boolean().optional(),
+  isOverDue: z.boolean().optional(),
+  isLost: z.boolean().optional(),
+  lostReason: z.string().optional(),
   isReturned: z.boolean().optional(),
   returnCondition: z.string().optional(),
   itemStatus: ItemStatusSchema.optional(),

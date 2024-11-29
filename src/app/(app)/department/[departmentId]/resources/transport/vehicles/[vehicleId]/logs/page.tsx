@@ -25,6 +25,7 @@ export default function VehicleLogsPage({
         departmentId={params.departmentId}
         name="Vehicle Request History"
         withBackButton
+        container={false}
       >
         <VehicleLogsScreen params={params} searchParams={search} />
       </DepartmentLayout>

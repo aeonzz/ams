@@ -5,12 +5,16 @@ import React from "react";
 import OverviewNavigationMenu from "./navigation-menu";
 import SearchInput from "@/app/(app)/_components/search-input";
 import BackButton from "@/components/back-button";
+import { cn } from "@/lib/utils";
+import { useMediaQuery } from "usehooks-ts";
+import MenuSheet from "@/app/(app)/dashboard/_components/menu-sheet";
 
 interface DepartmentLayoutProps {
   departmentId: string;
   children: React.ReactNode;
   name: string;
   withBackButton?: boolean;
+  container?: boolean;
 }
 
 export default function DepartmentLayout({
@@ -18,11 +22,14 @@ export default function DepartmentLayout({
   name,
   children,
   withBackButton = false,
+  container = true,
 }: DepartmentLayoutProps) {
+  const isDesktop = useMediaQuery("(min-width: 769px)");
   return (
     <div className="flex h-full w-full flex-col">
       <div className="flex h-[50px] items-center justify-between border-b px-3">
         <div className="flex items-center gap-1">
+          {!isDesktop && <MenuSheet />}
           {withBackButton && <BackButton />}
           <P className="font-medium">{name}</P>
         </div>
@@ -31,7 +38,12 @@ export default function DepartmentLayout({
           <SearchInput />
         </div>
       </div>
-      <div className="scroll-bar container flex flex-1 justify-center overflow-y-auto p-3">
+      <div
+        className={cn(
+          "scroll-bar flex flex-1 justify-center overflow-y-auto",
+          container && "container p-3"
+        )}
+      >
         {children}
       </div>
     </div>

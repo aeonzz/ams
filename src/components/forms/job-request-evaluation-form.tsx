@@ -627,7 +627,7 @@ export default function JobRequestEvaluationForm({
                   <FormControl>
                     <Textarea
                       placeholder="Enter your suggestions here"
-                      className="h-24 resize-none"
+                      className="bg-transparent text-sm shadow-none focus-visible:ring-0"
                       {...field}
                     />
                   </FormControl>

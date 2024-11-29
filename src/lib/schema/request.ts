@@ -1,7 +1,6 @@
 import { z } from "zod";
 import {
   JobStatusSchema,
-  JobTypeSchema,
   PriorityTypeSchema,
   RequestStatusTypeSchema,
   RequestTypeSchema,
@@ -45,9 +44,10 @@ export const venueRequestSchemaBase = z.object({
     .string()
     .min(10, { message: "Must be at least 10 characters long" })
     .max(700, { message: "Cannot be more than 600 characters long" }),
-  setupRequirements: z
-    .array(z.string().max(50, "Passenger name cannot exceed 50 characters"))
-    .min(1, "At least one passenger name is required"),
+  department: z.string({
+    required_error: "Department is required",
+  }),
+  setupRequirements: z.array(z.string()).optional(),
   startTime: z
     .date({
       required_error: "Start time is required",
@@ -58,7 +58,6 @@ export const venueRequestSchemaBase = z.object({
     .refine((date) => date.getHours() !== 0 || date.getMinutes() !== 0, {
       message: "Start time cannot be exactly midnight (00:00)",
     }),
-
   endTime: z
     .date({
       required_error: "End time is required",
@@ -81,8 +80,7 @@ export const venueRequestSchemaBase = z.object({
 export const venueRequestSchema = venueRequestSchemaBase.refine(
   (data) => data.startTime <= data.endTime,
   {
-    message:
-      "Date and time needed must not be later than the end date and time",
+    message: "Start time must not be later than the end time",
     path: ["startTime"],
   }
 );
@@ -189,7 +187,7 @@ export const createJobRequestServer = z.object({
     .string()
     .min(10, { message: "Must be at least 10 characters long" })
     .max(600, { message: "Cannot be more than 600 characters long" }),
-  jobType: JobTypeSchema.refine((val) => val !== undefined, {
+  jobType: z.string({
     message: "Job type is required.",
   }),
   location: z
@@ -199,15 +197,9 @@ export const createJobRequestServer = z.object({
   departmentId: z.string({
     required_error: "Job section is required.",
   }),
-  dueDate: z
-    .date({
-      required_error: "Due date is required.",
-    })
-    .min(new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), {
-      message: "Due date must be at least 3 days in the future",
-    }),
   images: z.array(z.string()).optional(),
   status: JobStatusSchema.optional(),
+  priority: PriorityTypeSchema.optional(),
 });
 
 export type CreateJobRequestSchemaServer = z.infer<

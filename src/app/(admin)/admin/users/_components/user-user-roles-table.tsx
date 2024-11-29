@@ -97,7 +97,7 @@ export default function UserUserRolesTable({
           onChange={(e) => setGlobalFilter(e.target.value)}
           className="max-w-sm"
         />
-        <div className="flex items-center space-x-3">
+        {/* <div className="flex items-center space-x-3">
           <P>Total: {filteredRoles.length} Items</P>
           <Link
             href="/admin/role-management?page=1&per_page=10&sort=createdAt.desc"
@@ -106,7 +106,7 @@ export default function UserUserRolesTable({
           >
             See all
           </Link>
-        </div>
+        </div> */}
       </div>
       <div className="scroll-bar max-h-[420px] overflow-y-auto">
         <Table>

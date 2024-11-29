@@ -1,30 +1,14 @@
 "use client";
 
 import React from "react";
-import {
-  useInfiniteQuery,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import type {
-  DepartmentWithRelations,
-  Notification,
-  NotificationWithRelations,
-} from "prisma/generated/zod";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import type { Notification } from "prisma/generated/zod";
 import { Skeleton } from "@/components/ui/skeleton";
 import { H1, H4, P } from "@/components/typography/text";
-import SearchInput from "@/app/(app)/_components/search-input";
 import FetchDataError from "@/components/card/fetch-data-error";
 import { cn, textTransform } from "@/lib/utils";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import Link from "next/link";
 import OpenRequestsTable from "./open-requests-table";
 import TotalOpenRequests from "./total-open-requests";
@@ -34,17 +18,21 @@ import {
   deleteNotification,
   updateNotificationStatus,
 } from "@/lib/actions/notification";
-import LoadingSpinner from "@/components/loaders/loading-spinner";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { InboxIcon, Trash } from "lucide-react";
-import { CommandShortcut } from "@/components/ui/command";
-import { toast } from "sonner";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import DepartmentOverviewSkeleton from "./department-overview-skeleton";
-import OverviewNavigationMenu from "../../_components/navigation-menu";
 import { useDepartmentData } from "@/lib/hooks/use-department-data";
 import { useDepartmentNotifications } from "@/lib/hooks/use-department-notifications";
 import { pusherClient } from "@/lib/pusher-client";
+import { useMediaQuery } from "usehooks-ts";
+import LoadingSpinner from "@/components/loaders/loading-spinner";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -55,6 +43,8 @@ interface DepartmentOverviewScreenProps {
 export default function DepartmentOverviewScreen({
   departmentId,
 }: DepartmentOverviewScreenProps) {
+  const isDesktop = useMediaQuery("(min-width: 769px)");
+  const [isSheetOpen, setIsSheetOpen] = React.useState(false);
   const queryClient = useQueryClient();
   const [selectedNotificationId, setSelectedNotificationId] = React.useState<
     string | null
@@ -102,6 +92,9 @@ export default function DepartmentOverviewScreen({
 
   const handleNotificationSelect = (notificationId: string) => {
     setSelectedNotificationId(notificationId);
+    if (!isDesktop) {
+      setIsSheetOpen(true);
+    }
   };
 
   const selectedNotification: Notification = React.useMemo(() => {
@@ -122,7 +115,17 @@ export default function DepartmentOverviewScreen({
   }, [selectedNotification, updateStatusMutate, queryClient, departmentId]);
 
   if (isLoading) {
-    return <DepartmentOverviewSkeleton />;
+    return (
+      <>
+        {isDesktop ? (
+          <DepartmentOverviewSkeleton />
+        ) : (
+          <div className="h-screen">
+            <LoadingSpinner />
+          </div>
+        )}
+      </>
+    );
   }
 
   if (isError || !data) {
@@ -144,11 +147,47 @@ export default function DepartmentOverviewScreen({
     (request) => request.jobRequest?.status === "PENDING"
   );
 
+  const renderNotificationDetails = () => (
+    <ScrollArea className="h-full p-4">
+      {notificationsStatus === "pending" ? (
+        <div className="space-y-4">
+          <Skeleton className="h-8 w-3/4" />
+          <Skeleton className="h-4 w-1/2" />
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-3/4" />
+        </div>
+      ) : notificationsStatus === "error" ? (
+        <div className="flex h-full items-center justify-center">
+          <div className="flex flex-col items-center space-y-3">
+            <InboxIcon className="size-16" strokeWidth={1} />
+            <P className="text-muted-foreground">Error loading notifications</P>
+          </div>
+        </div>
+      ) : selectedNotification ? (
+        <div>
+          <div className="mb-4">
+            <H1 className="font-bold tracking-tight">
+              {selectedNotification.title}
+            </H1>
+            <Badge variant="outline">
+              {textTransform(selectedNotification.resourceType)}
+            </Badge>
+          </div>
+          <P className="mb-2 text-muted-foreground">
+            {new Date(selectedNotification.createdAt).toLocaleString()}
+          </P>
+          <P>{selectedNotification.message}</P>
+        </div>
+      ) : null}
+    </ScrollArea>
+  );
+
   return (
     <div className="container w-full p-0">
       <div className="grid grid-flow-row grid-cols-2 gap-3">
         <div className="col-span-2 flex h-[450px] rounded-md border">
-          <div className="w-[40%] border-r">
+          <div className="w-full border-r lg:w-[36%]">
             <div className="flex h-[50px] items-center justify-between border-b px-3">
               <P className="font-medium">Inbox</P>
             </div>
@@ -165,17 +204,47 @@ export default function DepartmentOverviewScreen({
               height="h-[400px]"
             />
           </div>
-          <div className="flex-1">
-            <div className="flex h-[50px] items-center justify-between border-b px-3">
-              <P className="font-medium">Details</P>
-              {notificationsStatus === "pending" ? (
-                <div className="flex gap-1">
-                  <Skeleton className="h-8 w-20" />
-                  <Skeleton className="h-8 w-20" />
-                </div>
-              ) : selectedNotification ? (
-                <div className="flex gap-1">
-                  {selectedNotification.resourceId && (
+
+          {isDesktop ? (
+            <div className="flex-1">
+              <div className="flex h-[50px] items-center justify-between border-b px-3">
+                <P className="font-medium">Details</P>
+                {notificationsStatus === "pending" ? (
+                  <div className="flex gap-1">
+                    <Skeleton className="h-8 w-20" />
+                    <Skeleton className="h-8 w-20" />
+                  </div>
+                ) : selectedNotification ? (
+                  <div className="flex gap-1">
+                    {selectedNotification.resourceId && (
+                      <Link
+                        href={selectedNotification.resourceId}
+                        className={cn(
+                          buttonVariants({ size: "sm" }),
+                          "text-sm"
+                        )}
+                        prefetch
+                      >
+                        View
+                      </Link>
+                    )}
+                  </div>
+                ) : null}
+              </div>
+              {renderNotificationDetails()}
+            </div>
+          ) : (
+            <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+              <SheetContent
+                side="bottom"
+                className="h-[85vh] overflow-hidden rounded-t-[10px] px-1"
+              >
+                <SheetHeader>
+                  <SheetTitle>Notification Details</SheetTitle>
+                </SheetHeader>
+                {renderNotificationDetails()}
+                <div className="flex justify-between p-4">
+                  {selectedNotification?.resourceId && (
                     <Link
                       href={selectedNotification.resourceId}
                       className={cn(buttonVariants({ size: "sm" }), "text-sm")}
@@ -185,44 +254,9 @@ export default function DepartmentOverviewScreen({
                     </Link>
                   )}
                 </div>
-              ) : null}
-            </div>
-            <ScrollArea className="h-[calc(100%-50px)] p-4">
-              {notificationsStatus === "pending" ? (
-                <div className="space-y-4">
-                  <Skeleton className="h-8 w-3/4" />
-                  <Skeleton className="h-4 w-1/2" />
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-3/4" />
-                </div>
-              ) : notificationsStatus === "error" ? (
-                <div className="flex h-[calc(100vh_-_80px)] items-center justify-center">
-                  <div className="flex flex-col items-center space-y-3">
-                    <InboxIcon className="size-16" strokeWidth={1} />
-                    <P className="text-muted-foreground">
-                      Error loading notifications
-                    </P>
-                  </div>
-                </div>
-              ) : selectedNotification ? (
-                <div>
-                  <div className="mb-4">
-                    <H1 className="font-bold tracking-tight">
-                      {selectedNotification.title}
-                    </H1>
-                    <Badge variant="outline">
-                      {textTransform(selectedNotification.resourceType)}
-                    </Badge>
-                  </div>
-                  <P className="mb-2 text-muted-foreground">
-                    {new Date(selectedNotification.createdAt).toLocaleString()}
-                  </P>
-                  <P>{selectedNotification.message}</P>
-                </div>
-              ) : null}
-            </ScrollArea>
-          </div>
+              </SheetContent>
+            </Sheet>
+          )}
         </div>
         <div className="col-span-2 flex flex-col gap-3">
           <div className="flex h-fit gap-2">

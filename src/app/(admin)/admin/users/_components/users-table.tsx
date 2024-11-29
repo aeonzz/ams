@@ -21,6 +21,7 @@ interface UsersTableProps {
 
 export function UsersTable({ usersPromise }: UsersTableProps) {
   const { data, pageCount } = React.use(usersPromise);
+  console.log(data);
 
   // Memoize the columns so they don't re-render on every render
   const columns = React.useMemo(() => getUsersColumns(), []);
@@ -78,7 +79,7 @@ export function UsersTable({ usersPromise }: UsersTableProps) {
   return (
     <DataTable
       table={table}
-      floatingBar={<UsersTableFloatingBar table={table} />}
+      floatingBar={<UsersTableFloatingBar fileName="Users" table={table} />}
       renderSubComponent={({ row }) => {
         const formattedUserRoles = row.original.userRole.map((role) => ({
           departmentName: role.department.name,

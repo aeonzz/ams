@@ -6,7 +6,7 @@ import { authedProcedure, convertToBase64, getErrorMessage } from "./utils";
 import { revalidatePath } from "next/cache";
 import {
   uploadFileSchemaServerWithPath,
-  uploadVenueRulesFileWithPath,
+  updateVenueRulesSchemaWithPath,
 } from "../schema/file";
 import { generateId } from "lucia";
 import { pusher } from "../pusher";
@@ -47,9 +47,9 @@ export const updateDepartmentFile = authedProcedure
 
 export const updateVenueRulesFile = authedProcedure
   .createServerAction()
-  .input(uploadVenueRulesFileWithPath)
+  .input(updateVenueRulesSchemaWithPath)
   .handler(async ({ input }) => {
-    const { path, url, venueId } = input;
+    const { path, text, venueId } = input;
 
     try {
       await db.venue.update({
@@ -57,7 +57,7 @@ export const updateVenueRulesFile = authedProcedure
           id: venueId,
         },
         data: {
-          rulesAndRegulations: url[0],
+          rulesAndRegulations: text,
         },
       });
 

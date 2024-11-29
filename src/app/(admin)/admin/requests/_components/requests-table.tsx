@@ -82,7 +82,7 @@ export function RequestsTable({ requestsPromise }: RequestsTableProps) {
   return (
     <DataTable
       table={table}
-      floatingBar={<RequestsTableFloatingBar table={table} />}
+      floatingBar={<RequestsTableFloatingBar table={table} fileName="Requests" />}
     >
       <DataTableToolbar table={table} filterFields={filterFields}>
         <RequestsTableToolbarActions table={table} />
