@@ -889,7 +889,7 @@ export default function JobRequestDetails({
             )}
           </form>
         </Form>
-        {requestStatus === "COMPLETED" && (
+        {data.status === "COMPLETED" && (
           <PermissionGuard
             allowedRoles={["OPERATIONS_MANAGER", "DEPARTMENT_HEAD"]}
             allowedDepartment={allowedDepartment}

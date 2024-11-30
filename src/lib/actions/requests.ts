@@ -770,7 +770,7 @@ export const updateJobRequest = authedProcedure
   .createServerAction()
   .input(updateJobRequestSchemaServerWithPath)
   .handler(async ({ input }) => {
-    const { path, id, ...rest } = input;
+    const { path, id, priority, ...rest } = input;
 
     try {
       const result = await db.jobRequest.update({
@@ -778,13 +778,14 @@ export const updateJobRequest = authedProcedure
           requestId: id,
         },
         data: {
+          priority: priority,
           ...rest,
         },
       });
 
-      await pusher.trigger("request", "request_update", {
-        message: "",
-      });
+      console.log(result);
+
+      await pusher.trigger("request", "request_update", { message: "" });
 
       return revalidatePath(path);
     } catch (error) {

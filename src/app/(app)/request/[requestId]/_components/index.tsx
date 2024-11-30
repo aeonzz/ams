@@ -55,6 +55,7 @@ import PriorityOption from "@/app/(app)/dashboard/_components/priority-option";
 import SetPriority from "./set-priority";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import VerifyJob from "./verify-job";
+import { PermissionGuard } from "@/components/permission-guard";
 
 interface RequestDetailsProps {
   params: string;
@@ -309,9 +310,10 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
             )}
             {data.type === "JOB" && data.jobRequest && (
               <SetPriority
-                prio={data.priority}
+                prio={data.jobRequest.priority}
                 requestId={data.id}
                 disabled={data.status === "COMPLETED"}
+                allowedDepartment={data.departmentId}
               />
             )}
           </div>
@@ -322,7 +324,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
             <CancelRequest
               requestId={data.id}
               requestStatus={data.status}
-              inProgress={
+              disabled={
                 data.transportRequest?.inProgress ||
                 data.venueRequest?.inProgress ||
                 data.jobRequest?.status !== "PENDING"
@@ -353,17 +355,8 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                 request={data}
                 allowedDepartment={data.departmentId}
                 allowedRoles={["OPERATIONS_MANAGER", "DEPARTMENT_HEAD"]}
-                allowedApproverRoles={["DEPARTMENT_HEAD"]}
                 jobRequestId={data.jobRequest.id}
-              >
-                {data.status === "APPROVED" ||
-                  (data.status === "ON_HOLD" && (
-                    <CancelRequest
-                      requestId={data.id}
-                      requestStatus={data.status}
-                    />
-                  ))}
-              </JobRequestReviewerActions>
+              />
               {!data.jobRequest.verifiedByRequester &&
                 data.jobRequest.status === "COMPLETED" &&
                 data.userId === currentUser.id && (

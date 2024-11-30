@@ -439,7 +439,6 @@ enum JobStatus {
   PENDING
   IN_PROGRESS
   COMPLETED
-  VERIFIED
 }
 
 enum EntityType {
@@ -518,7 +517,6 @@ enum SupplyItemStatus {
 enum DepartmentType {
   ACADEMIC
   ADMINISTRATIVE
-  TECHNICAL
 }
 
 enum VenueStatus {

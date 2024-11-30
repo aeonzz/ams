@@ -135,10 +135,14 @@ export const createJobRequest = authedProcedure
         userId: user.id,
       });
 
-      await Promise.all([
-        pusher.trigger("request", "request_update", { message: "" }),
-        pusher.trigger("request", "notifications", { message: "" }),
-      ]);
+      try {
+        await Promise.all([
+          pusher.trigger("request", "request_update", { message: "" }),
+          pusher.trigger("request", "notifications", { message: "" }),
+        ]);
+      } catch (pusherError) {
+        console.error("Failed to send Pusher notifications:", pusherError);
+      }
 
       return revalidatePath(path);
     } catch (error) {
@@ -199,10 +203,14 @@ export const assignPersonnel = authedProcedure
         return updatedRequest;
       });
 
-      await Promise.all([
-        pusher.trigger("request", "request_update", { message: "" }),
-        pusher.trigger("request", "notifications", { message: "" }),
-      ]);
+      try {
+        await Promise.all([
+          pusher.trigger("request", "request_update", { message: "" }),
+          pusher.trigger("request", "notifications", { message: "" }),
+        ]);
+      } catch (pusherError) {
+        console.error("Failed to send Pusher notifications:", pusherError);
+      }
 
       return revalidatePath(path);
     } catch (error) {
@@ -329,10 +337,14 @@ export const updateRequestStatus = authedProcedure
         { timeout: 10000 }
       );
 
-      await Promise.all([
-        pusher.trigger("request", "request_update", { message: "" }),
-        pusher.trigger("request", "notifications", { message: "" }),
-      ]);
+      try {
+        await Promise.all([
+          pusher.trigger("request", "request_update", { message: "" }),
+          pusher.trigger("request", "notifications", { message: "" }),
+        ]);
+      } catch (pusherError) {
+        console.error("Failed to send Pusher notifications:", pusherError);
+      }
 
       return revalidatePath(path);
     } catch (error) {
@@ -369,9 +381,13 @@ export const cancelRequest = authedProcedure
           });
         }
 
-        await pusher.trigger("request", "request_update", {
-          message: "",
-        });
+        try {
+          await pusher.trigger("request", "request_update", {
+            message: "",
+          });
+        } catch (pusherError) {
+          console.error("Failed to send Pusher notifications:", pusherError);
+        }
 
         return updatedRequest;
       });
@@ -403,7 +419,6 @@ export const updateJobRequest = authedProcedure
                 ...rest,
               },
             },
-            completedAt: status === "VERIFIED" ? new Date() : undefined,
           },
           include: {
             jobRequest: true,
@@ -450,32 +465,14 @@ export const updateJobRequest = authedProcedure
           });
         }
 
-        if (status === "VERIFIED" && updatedRequest.jobRequest?.assignedTo) {
-          await createNotification({
-            resourceId: `/request/${updatedRequest.id}`,
-            title: `Job Verified: ${updatedRequest.title}`,
-            resourceType: "TASK",
-            notificationType: "APPROVAL",
-            message: `Your work on the job request "${updatedRequest.title}" has been successfully verified and completed.`,
-            recepientIds: [updatedRequest.jobRequest.assignedTo],
-            userId: user.id,
-          });
-
-          await createNotification({
-            resourceId: `/request/${updatedRequest.id}`,
-            title: `Job Request Completed: ${updatedRequest.title}`,
-            resourceType: "REQUEST",
-            notificationType: "SUCCESS",
-            message: `Your job request for "${updatedRequest.title}" has been successfully completed. Thank you for your patience! Please review the request for any further details.`,
-            userId: user.id,
-            recepientIds: [updatedRequest.userId],
-          });
+        try {
+          await Promise.all([
+            pusher.trigger("request", "request_update", { message: "" }),
+            pusher.trigger("request", "notifications", { message: "" }),
+          ]);
+        } catch (pusherError) {
+          console.error("Failed to send Pusher notifications:", pusherError);
         }
-
-        await Promise.all([
-          pusher.trigger("request", "request_update", { message: "" }),
-          pusher.trigger("request", "notifications", { message: "" }),
-        ]);
 
         return updatedRequest;
       });
@@ -625,7 +622,7 @@ export const completeJobRequest = authedProcedure
 
     try {
       const result = await db.$transaction(async (prisma) => {
-        const updatedData = await db.jobRequest.update({
+        const updatedRequest = await db.jobRequest.update({
           where: { id: jobRequestId },
           data:
             role === "reviewer"
@@ -635,10 +632,15 @@ export const completeJobRequest = authedProcedure
             id: true,
             verifiedByReviewer: true,
             verifiedByRequester: true,
+            request: true,
+            assignedTo: true,
           },
         });
 
-        if (updatedData.verifiedByReviewer && updatedData.verifiedByRequester) {
+        if (
+          updatedRequest.verifiedByReviewer &&
+          updatedRequest.verifiedByRequester
+        ) {
           await db.jobRequest.update({
             where: {
               id: jobRequestId,
@@ -652,14 +654,40 @@ export const completeJobRequest = authedProcedure
               },
             },
           });
+          
+          if (updatedRequest.assignedTo) {
+            await createNotification({
+              resourceId: `/request/${updatedRequest.id}`,
+              title: `Job Verified: ${updatedRequest.request.title}`,
+              resourceType: "TASK",
+              notificationType: "APPROVAL",
+              message: `Your work on the job request "${updatedRequest.request.title}" has been successfully verified and completed.`,
+              recepientIds: [updatedRequest.assignedTo],
+              userId: user.id,
+            });
+
+            await createNotification({
+              resourceId: `/request/${updatedRequest.id}`,
+              title: `Job Request Completed: ${updatedRequest.request.title}`,
+              resourceType: "REQUEST",
+              notificationType: "SUCCESS",
+              message: `Your job request for "${updatedRequest.request.title}" has been successfully completed. Thank you for your patience! Please review the request for any further details.`,
+              userId: user.id,
+              recepientIds: [updatedRequest.request.userId],
+            });
+          }
         }
 
-        return updatedData;
+        return updatedRequest;
       });
 
-      await pusher.trigger("request", "request_update", {
-        message: "",
-      });
+      try {
+        await pusher.trigger("request", "request_update", {
+          message: "",
+        });
+      } catch (pusherError) {
+        console.error("Failed to send Pusher notifications:", pusherError);
+      }
 
       return revalidatePath(path);
     } catch (error) {
@@ -692,7 +720,7 @@ export async function getDepartmentJobRequests(input: GetRequestsSchema) {
     }
 
     if (id) {
-      where.requestId = id;
+      where.requestId = { contains: id, mode: "insensitive" };
     }
 
     if (status) {
@@ -787,9 +815,13 @@ export const uploadProofImages = authedProcedure
         return updatedData;
       });
 
-      await pusher.trigger("request", "request_update", {
-        message: "",
-      });
+      try {
+        await pusher.trigger("request", "request_update", {
+          message: "",
+        });
+      } catch (pusherError) {
+        console.error("Failed to send Pusher notifications:", pusherError);
+      }
 
       return revalidatePath(path);
     } catch (error) {

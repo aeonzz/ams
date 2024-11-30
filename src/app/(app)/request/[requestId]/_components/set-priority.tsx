@@ -14,18 +14,24 @@ import type { UpdateJobRequestSchemaServerWithPath } from "@/lib/schema/request"
 import { usePathname } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { updateJobRequest } from "@/lib/actions/requests";
+import { Button } from "@/components/ui/button";
+import { checkPermission, cn } from "@/lib/utils";
+import { useSession } from "@/lib/hooks/use-session";
 
 interface SetPriorityProps {
   prio: PriorityTypeType;
   requestId: string;
   disabled: boolean;
+  allowedDepartment: string;
 }
 
 export default function SetPriority({
   prio,
   requestId,
   disabled,
+  allowedDepartment,
 }: SetPriorityProps) {
+  const currentUser = useSession();
   const queryClient = useQueryClient();
   const pathname = usePathname();
   const initialPriority =
@@ -62,6 +68,12 @@ export default function SetPriority({
     }
   }
 
+  const hasAccess = checkPermission({
+    currentUser,
+    allowedRoles: ["OPERATIONS_MANAGER"],
+    allowedDepartment: allowedDepartment,
+  });
+
   function handlePriorityChange(newPriority: Priority) {
     setPriority(newPriority);
     onSubmit(newPriority);
@@ -70,11 +82,37 @@ export default function SetPriority({
   return (
     <div>
       <P className="mb-1 text-sm">Priority</P>
-      <PriorityOption
-        prio={priority}
-        setPrio={handlePriorityChange}
-        isLoading={isPending || disabled}
-      />
+      {hasAccess ? (
+        <PriorityOption
+          prio={priority}
+          setPrio={handlePriorityChange}
+          isLoading={isPending || disabled}
+        />
+      ) : (
+        <Button
+          variant="ghost2"
+          size="sm"
+          role="combobox"
+          className={cn(
+            priority.value === "NO_PRIORITY" && "text-muted-foreground",
+            "w-48 justify-start px-2"
+          )}
+        >
+          {prio ? (
+            <>
+              <priority.icon
+                className={cn(
+                  "mr-2 size-4",
+                  priority.value === "URGENT" && "text-amber-500"
+                )}
+              />
+              {priority.label}
+            </>
+          ) : (
+            <>Priority</>
+          )}
+        </Button>
+      )}
     </div>
   );
 }

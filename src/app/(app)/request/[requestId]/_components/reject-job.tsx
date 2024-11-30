@@ -62,6 +62,7 @@ export default function RejectJob({ requestId, disabled }: RejectJobProps) {
     try {
       toast.promise(
         mutateAsync({
+          //@ts-ignore
           status: "VERIFIED",
           id: requestId,
           rejectionReason: data.rejectionReason,

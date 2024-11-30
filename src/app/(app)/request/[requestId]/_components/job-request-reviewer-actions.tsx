@@ -29,11 +29,7 @@ import type {
   UserWithRelations,
 } from "prisma/generated/zod";
 import { useServerActionMutation } from "@/lib/hooks/server-action-hooks";
-import {
-  updateRequestStatus,
-  assignPersonnel,
-  updateJobRequest,
-} from "@/lib/actions/job";
+import { updateRequestStatus, assignPersonnel } from "@/lib/actions/job";
 import {
   UpdateRequestStatusSchemaWithPath,
   AssignPersonnelSchemaWithPath,
@@ -71,21 +67,22 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { Textarea } from "@/components/ui/text-area";
 import { Label } from "@/components/ui/label";
 import VerifyJob from "./verify-job";
+import { ClientRoleGuard } from "@/components/client-role-guard";
+import { AlertCard } from "@/components/ui/alert-card";
+import CancelRequest from "./cancel-request";
 
 interface JobRequestReviewerActionsProps {
   request: RequestWithRelations;
   allowedRoles: string[];
   allowedDepartment?: string;
-  allowedApproverRoles: string[];
   jobRequestId: string;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 export default function JobRequestReviewerActions({
   request,
   allowedRoles,
   allowedDepartment,
-  allowedApproverRoles,
   children,
   jobRequestId,
 }: JobRequestReviewerActionsProps) {
@@ -129,9 +126,6 @@ export default function JobRequestReviewerActions({
     isPending: isAssignPersonnelPending,
   } = useServerActionMutation(assignPersonnel);
 
-  const { isPending: isPendingMutation, mutateAsync } =
-    useServerActionMutation(updateJobRequest);
-
   useHotkeys(
     "m",
     (event) => {
@@ -153,13 +147,7 @@ export default function JobRequestReviewerActions({
 
   const handleReview = React.useCallback(
     async (
-      action:
-        | "REVIEWED"
-        | "REJECTED"
-        | "COMPLETED"
-        | "CANCELLED"
-        | "ON_HOLD"
-        | "APPROVED"
+      action: "REVIEWED" | "REJECTED" | "CANCELLED" | "ON_HOLD" | "APPROVED"
     ) => {
       const data: UpdateRequestStatusSchemaWithPath = {
         path: pathname,
@@ -185,28 +173,24 @@ export default function JobRequestReviewerActions({
       }
       const actionText =
         action === "APPROVED"
-          ? "Approving"
+          ? "Resuming"
           : action === "REVIEWED"
             ? "Reviewing"
             : action === "REJECTED"
               ? "Rejecting"
-              : action === "COMPLETED"
-                ? "Completing"
-                : action === "ON_HOLD"
-                  ? "Putting on hold"
-                  : "Cancelling";
+              : action === "ON_HOLD"
+                ? "Putting on hold"
+                : "Cancelling";
       const successText =
         action === "APPROVED"
-          ? "approved"
+          ? "resumed"
           : action === "REVIEWED"
             ? "reviewed"
             : action === "REJECTED"
               ? "rejected"
-              : action === "COMPLETED"
-                ? "completed"
-                : action === "ON_HOLD"
-                  ? "put on hold"
-                  : "cancelled";
+              : action === "ON_HOLD"
+                ? "put on hold"
+                : "cancelled";
 
       try {
         toast.promise(updateStatusMutate(data), {
@@ -228,14 +212,6 @@ export default function JobRequestReviewerActions({
           },
         });
 
-        if (action === "COMPLETED") {
-          await mutateAsync({
-            path: pathname,
-            status: "VERIFIED",
-            requestId: request.id,
-          });
-        }
-
         queryClient.invalidateQueries({ queryKey: [request.id] });
         setIsRejectionAlertOpen(false);
         setRejectionReason("");
@@ -247,7 +223,6 @@ export default function JobRequestReviewerActions({
       pathname,
       request.id,
       updateStatusMutate,
-      mutateAsync,
       currentUser.id,
       currentUser.userRole,
       rejectionReason,
@@ -404,6 +379,26 @@ export default function JobRequestReviewerActions({
                 </DialogDescription>
               </DialogHeader>
               <div className="scroll-bar max-h-[55vh] gap-3 space-y-1 overflow-y-auto px-4 py-1">
+                {request.status === "PENDING" && (
+                  <ClientRoleGuard allowedRoles={["DEPARTMENT_HEAD"]}>
+                    <AlertCard
+                      variant="info"
+                      title="Waiting for Reviewer"
+                      description="This job request is currently waiting for the reviewer to approve."
+                      className="mb-6"
+                    />
+                  </ClientRoleGuard>
+                )}
+                {request.status === "REVIEWED" && (
+                  <ClientRoleGuard allowedRoles={["OPERATIONS_MANAGER"]}>
+                    <AlertCard
+                      variant="info"
+                      title="Waiting for Approval"
+                      description="This job request is currently waiting for the request head to approve."
+                      className="mb-6"
+                    />
+                  </ClientRoleGuard>
+                )}
                 {request.reviewer && (
                   <div>
                     <P className="text-xs text-muted-foreground">
@@ -441,19 +436,21 @@ export default function JobRequestReviewerActions({
                       <P className="text-xs text-muted-foreground">
                         Assigned Personnel:
                       </P>
-                      {request.status === "APPROVED" &&
-                        request.jobRequest.status === "PENDING" && (
-                          <Button
-                            size="sm"
-                            variant="link"
-                            className="h-fit p-0"
-                            onClick={() =>
-                              setIsAssignPersonnelOpen(!isAssignPersonnelOpen)
-                            }
-                          >
-                            {isAssignPersonnelOpen ? "Close" : "Reassign"}
-                          </Button>
-                        )}
+                      <ClientRoleGuard allowedRoles={["OPERATIONS_MANAGER"]}>
+                        {request.status === "APPROVED" &&
+                          request.jobRequest.status === "PENDING" && (
+                            <Button
+                              size="sm"
+                              variant="link"
+                              className="h-fit p-0"
+                              onClick={() =>
+                                setIsAssignPersonnelOpen(!isAssignPersonnelOpen)
+                              }
+                            >
+                              {isAssignPersonnelOpen ? "Close" : "Reassign"}
+                            </Button>
+                          )}
+                      </ClientRoleGuard>
                     </div>
                     <div className="flex w-full items-center p-2">
                       <Avatar className="mr-2 h-8 w-8">
@@ -483,91 +480,89 @@ export default function JobRequestReviewerActions({
                     </div>
                   </div>
                 )}
-                <PermissionGuard
-                  allowedRoles={["OPERATIONS_MANAGER"]}
-                  allowedDepartment={allowedDepartment}
-                  currentUser={currentUser}
-                >
+                <ClientRoleGuard allowedRoles={["OPERATIONS_MANAGER"]}>
                   {(request.status === "PENDING" || isAssignPersonnelOpen) && (
                     <>{renderPersonnelList()}</>
                   )}
-                </PermissionGuard>
+                </ClientRoleGuard>
                 {request.status === "PENDING" && (
-                  <PermissionGuard
-                    allowedRoles={["OPERATIONS_MANAGER"]}
-                    allowedDepartment={allowedDepartment}
-                    currentUser={currentUser}
-                  >
-                    <div className="flex space-x-2">
-                      <Button
-                        onClick={() => handleReview("REVIEWED")}
-                        disabled={
-                          !selectedPerson ||
-                          isUpdateStatusPending ||
-                          isAssignPersonnelPending
-                        }
-                        className="flex-1"
-                      >
-                        Approve
-                      </Button>
-                    </div>
-                    <AlertDialog
-                      open={isRejectionAlertOpen}
-                      onOpenChange={setIsRejectionAlertOpen}
-                    >
-                      <AlertDialogTrigger asChild>
+                  <>
+                    <ClientRoleGuard allowedRoles={["OPERATIONS_MANAGER"]}>
+                      <div className="flex space-x-2">
                         <Button
-                          className="w-full"
-                          variant="destructive"
+                          onClick={() => handleReview("REVIEWED")}
                           disabled={
-                            isUpdateStatusPending || isAssignPersonnelPending
+                            !selectedPerson ||
+                            isUpdateStatusPending ||
+                            isAssignPersonnelPending
                           }
-                          onClick={() => setIsRejectionAlertOpen(true)}
+                          className="flex-1"
                         >
-                          Reject Request
+                          Approve
                         </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle className="">
-                            Reject Request
-                          </AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Are you sure you want to reject this request? This
-                            action cannot be undone. Please provide a reason for
-                            rejection.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <Textarea
-                          maxRows={6}
-                          minRows={3}
-                          placeholder="Rejection reason..."
-                          value={rejectionReason}
-                          onChange={(e) => setRejectionReason(e.target.value)}
-                          className="text-sm placeholder:text-sm"
-                        />
-                        <AlertDialogFooter>
-                          <AlertDialogCancel
-                            onClick={() => setIsRejectionAlertOpen(false)}
-                          >
-                            Cancel
-                          </AlertDialogCancel>
-                          <AlertDialogAction
-                            className="bg-destructive hover:bg-destructive/90"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              handleReview("REJECTED");
-                            }}
-                            disabled={
-                              !rejectionReason.trim() || isUpdateStatusPending
-                            }
-                          >
-                            Continue
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </PermissionGuard>
+                        <AlertDialog
+                          open={isRejectionAlertOpen}
+                          onOpenChange={setIsRejectionAlertOpen}
+                        >
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              className="flex-1"
+                              variant="destructive"
+                              disabled={
+                                isUpdateStatusPending ||
+                                isAssignPersonnelPending
+                              }
+                              onClick={() => setIsRejectionAlertOpen(true)}
+                            >
+                              Reject Request
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle className="">
+                                Reject Request
+                              </AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Are you sure you want to reject this request?
+                                This action cannot be undone. Please provide a
+                                reason for rejection.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <Textarea
+                              maxRows={6}
+                              minRows={3}
+                              placeholder="Rejection reason..."
+                              value={rejectionReason}
+                              onChange={(e) =>
+                                setRejectionReason(e.target.value)
+                              }
+                              className="text-sm placeholder:text-sm"
+                            />
+                            <AlertDialogFooter>
+                              <AlertDialogCancel
+                                onClick={() => setIsRejectionAlertOpen(false)}
+                              >
+                                Cancel
+                              </AlertDialogCancel>
+                              <AlertDialogAction
+                                className="bg-destructive hover:bg-destructive/90"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  handleReview("REJECTED");
+                                }}
+                                disabled={
+                                  !rejectionReason.trim() ||
+                                  isUpdateStatusPending
+                                }
+                              >
+                                Continue
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
+                    </ClientRoleGuard>
+                  </>
                 )}
                 {request.jobRequest?.status === "COMPLETED" &&
                   request.status !== "ON_HOLD" && (
@@ -594,119 +589,42 @@ export default function JobRequestReviewerActions({
                     </>
                   )}
                 {request.status === "ON_HOLD" && (
-                  <AlertDialog
-                    open={isApproveAlertOpen}
-                    onOpenChange={setIsApproveAlertOpen}
-                  >
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        className="w-full"
-                        variant="default"
-                        disabled={isUpdateStatusPending}
-                        onClick={() => setIsRejectionAlertOpen(true)}
-                      >
-                        Resume
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Resume Request</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          This request is currently on hold. Resuming it will
-                          mark it as active and ready for further action. Are
-                          you sure you want to proceed?
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel
-                          disabled={isUpdateStatusPending}
-                          onClick={() => setIsApproveAlertOpen(false)}
-                        >
-                          Cancel
-                        </AlertDialogCancel>
-                        <AlertDialogAction
-                          disabled={isUpdateStatusPending}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handleReview("APPROVED");
-                          }}
-                        >
-                          Confirm
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                )}
-                {request.status === "REVIEWED" && (
-                  <PermissionGuard
-                    allowedRoles={allowedApproverRoles}
-                    allowedDepartment={allowedDepartment}
-                    currentUser={currentUser}
-                  >
-                    <RequestApproverActions
-                      request={request}
-                      isPending={
-                        isUpdateStatusPending || isAssignPersonnelPending
-                      }
-                    />
-                  </PermissionGuard>
-                )}
-                {children}
-                {request.status === "APPROVED" &&
-                  request.jobRequest?.status !== "COMPLETED" && (
+                  <ClientRoleGuard allowedRoles={["OPERATIONS_MANAGER"]}>
                     <AlertDialog
-                      open={isOnHoldAlertOpen}
-                      onOpenChange={setIsOnHoldAlertOpen}
+                      open={isApproveAlertOpen}
+                      onOpenChange={setIsApproveAlertOpen}
                     >
                       <AlertDialogTrigger asChild>
                         <Button
                           className="w-full"
-                          variant="secondary"
+                          variant="default"
                           disabled={isUpdateStatusPending}
-                          onClick={() => setIsOnHoldAlertOpen(true)}
+                          onClick={() => setIsRejectionAlertOpen(true)}
                         >
-                          Put On Hold
+                          Resume
                         </Button>
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>
-                          <AlertDialogTitle>
-                            Put Request On Hold
-                          </AlertDialogTitle>
+                          <AlertDialogTitle>Resume Request</AlertDialogTitle>
                           <AlertDialogDescription>
-                            Are you sure you want to put this request on hold?
-                            Please provide a reason.
+                            This request is currently on hold. Resuming it will
+                            mark it as active and ready for further action. Are
+                            you sure you want to proceed?
                           </AlertDialogDescription>
                         </AlertDialogHeader>
-                        <div className="mb-4">
-                          <Label htmlFor="onHoldReason" className="mb-2 block">
-                            Hold Reason <span className="text-red-500">*</span>
-                          </Label>
-                          <Textarea
-                            id="onHoldReason"
-                            maxRows={6}
-                            minRows={3}
-                            placeholder="Reason for putting on hold..."
-                            value={onHoldReason}
-                            onChange={(e) => setOnHoldReason(e.target.value)}
-                            required
-                            className="text-sm placeholder:text-sm"
-                          />
-                        </div>
                         <AlertDialogFooter>
                           <AlertDialogCancel
                             disabled={isUpdateStatusPending}
-                            onClick={() => setIsOnHoldAlertOpen(false)}
+                            onClick={() => setIsApproveAlertOpen(false)}
                           >
                             Cancel
                           </AlertDialogCancel>
                           <AlertDialogAction
-                            disabled={
-                              !onHoldReason.trim() || isUpdateStatusPending
-                            }
+                            disabled={isUpdateStatusPending}
                             onClick={(e) => {
                               e.preventDefault();
-                              handleReview("ON_HOLD");
+                              handleReview("APPROVED");
                             }}
                           >
                             Confirm
@@ -714,6 +632,102 @@ export default function JobRequestReviewerActions({
                         </AlertDialogFooter>
                       </AlertDialogContent>
                     </AlertDialog>
+                  </ClientRoleGuard>
+                )}
+                {request.status === "REVIEWED" && (
+                  <>
+                    <ClientRoleGuard allowedRoles={["DEPARTMENT_HEAD"]}>
+                      <RequestApproverActions
+                        request={request}
+                        isPending={
+                          isUpdateStatusPending || isAssignPersonnelPending
+                        }
+                      />
+                    </ClientRoleGuard>
+                  </>
+                )}
+                {request.status === "APPROVED" ||
+                  (request.status === "ON_HOLD" && (
+                    <ClientRoleGuard allowedRoles={["OPERATIONS_MANAGER"]}>
+                      <CancelRequest
+                        requestId={request.id}
+                        disabled={
+                          request.jobRequest?.status === "IN_PROGRESS" ||
+                          request.jobRequest?.status === "COMPLETED"
+                        }
+                        requestStatus={request.status}
+                      />
+                    </ClientRoleGuard>
+                  ))}
+                {children}
+                {request.status === "APPROVED" &&
+                  request.jobRequest?.status !== "COMPLETED" && (
+                    <ClientRoleGuard allowedRoles={["OPERATIONS_MANAGER"]}>
+                      <AlertDialog
+                        open={isOnHoldAlertOpen}
+                        onOpenChange={setIsOnHoldAlertOpen}
+                      >
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            className="w-full"
+                            variant="secondary"
+                            disabled={isUpdateStatusPending}
+                            onClick={() => setIsOnHoldAlertOpen(true)}
+                          >
+                            Put On Hold
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>
+                              Put Request On Hold
+                            </AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to put this request on hold?
+                              Please provide a reason.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <div className="mb-4">
+                            <Label
+                              htmlFor="onHoldReason"
+                              className="mb-2 block"
+                            >
+                              Hold Reason{" "}
+                              <span className="text-red-500">*</span>
+                            </Label>
+                            <Textarea
+                              id="onHoldReason"
+                              maxRows={6}
+                              minRows={3}
+                              placeholder="Reason for putting on hold..."
+                              value={onHoldReason}
+                              onChange={(e) => setOnHoldReason(e.target.value)}
+                              required
+                              className="text-sm placeholder:text-sm"
+                            />
+                          </div>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel
+                              disabled={isUpdateStatusPending}
+                              onClick={() => setIsOnHoldAlertOpen(false)}
+                            >
+                              Cancel
+                            </AlertDialogCancel>
+                            <AlertDialogAction
+                              disabled={
+                                !onHoldReason.trim() || isUpdateStatusPending
+                              }
+                              onClick={(e) => {
+                                e.preventDefault();
+                                handleReview("ON_HOLD");
+                              }}
+                            >
+                              Confirm
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </ClientRoleGuard>
                   )}
               </div>
               <Separator className="my-2" />

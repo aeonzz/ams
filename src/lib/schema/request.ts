@@ -130,10 +130,9 @@ export const transportRequestSchema = z.object({
     .string()
     .min(1, "Destination is required")
     .max(70, "Destination cannot exceed 70 characters"),
-  department: z
-    .string()
-    .min(1, "Office/Dept. is required")
-    .max(50, "Office/Dept. cannot exceed 50 characters"),
+  department: z.string({
+    required_error: "Department is required",
+  }),
   passengersName: z
     .array(z.string().max(50, "Passenger name cannot exceed 50 characters"))
     .min(1, "At least one passenger name is required"),

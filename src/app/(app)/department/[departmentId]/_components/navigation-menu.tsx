@@ -105,27 +105,26 @@ export default function OverviewNavigationMenu({
   } = data;
 
   const managementWithConditions = management
-    .filter((item) => item.condition !== false)
     .map((item) => {
-      if (item.title === "Transport Services") {
+      if (item.title === "Transport Request and Vehicle Management") {
         return { ...item, condition: managesTransport };
       }
-      if (item.title === "Facilities Management") {
+      if (item.title === "Venue Request and Management") {
         return { ...item, condition: managesFacility };
       }
       if (item.title === "Managing Job Requests") {
         return { ...item, condition: acceptsJobs };
       }
-      if (item.title === "Manage Borrowable Items") {
+      if (item.title === "Borrow Request Management") {
         return { ...item, condition: managesBorrowRequest };
       }
       if (item.title === "Supply Management") {
         return { ...item, condition: managesSupplyRequest };
       }
       if (item.title === "User Management") {
-        return { ...item, condition: true };
+        return { ...item, condition: true }; // Always visible
       }
-      return item;
+      return { ...item, condition: false }; // Default condition if not matched
     })
     .filter((item) => item.condition);
 
