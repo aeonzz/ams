@@ -191,12 +191,7 @@ export default function CreateUserForm({
               name="departmentIds"
               render={({ field }) => (
                 <FormItem className="flex-1">
-                  <FormLabel>
-                    Departments{" "}
-                    <span className="text-xs text-muted-foreground">
-                      (optional)
-                    </span>
-                  </FormLabel>
+                  <FormLabel>Departments</FormLabel>
                   <Popover open={open} onOpenChange={setOpen} modal>
                     <PopoverTrigger asChild>
                       <FormControl>

@@ -137,20 +137,24 @@ export function formatDate(
 //   return RoleIcons[role] || { icon: CircleIcon, variant: "default" };
 // }
 
-type PermissionGuard = {
+interface CheckPermissionArgs {
   currentUser: UserWithRelations;
   allowedRoles: string[];
-};
+  allowedDepartment?: string;
+}
 
-export function permissionGuard({
-  allowedRoles,
+export function checkPermission({
   currentUser,
-}: PermissionGuard) {
-  const hasAllowedRole = currentUser.userRole.some((role) =>
-    allowedRoles.includes(role.role.name)
-  );
+  allowedRoles,
+  allowedDepartment,
+}: CheckPermissionArgs): boolean {
+  return currentUser.userRole.some((userRole) => {
+    const isAllowedRole = allowedRoles.includes(userRole.role.name);
+    const isInAllowedDepartment =
+      !allowedDepartment || userRole.departmentId === allowedDepartment;
 
-  return hasAllowedRole;
+    return isAllowedRole && isInAllowedDepartment;
+  });
 }
 
 export function getPriorityIcon(priority: PriorityTypeType) {
@@ -300,11 +304,6 @@ export function getJobStatusColor(status: JobStatusType): JobStatusColorConfig {
     COMPLETED: {
       color: "#22c55e",
       variant: "green",
-      stroke: 10,
-    },
-    VERIFIED: {
-      color: "#3b82f6",
-      variant: "blue",
       stroke: 10,
     },
   };
@@ -771,8 +770,18 @@ export function getOrdinalDate() {
 export function getMonthName() {
   const date = new Date();
   const monthNames = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ];
   return monthNames[date.getMonth()]; // Get the current month name
 }

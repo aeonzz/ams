@@ -100,11 +100,7 @@ export default function SignInForm() {
             </FormItem>
           )}
         />
-        <SubmitButton
-          disabled={isLoading}
-          className="w-full"
-          variant="secondary"
-        >
+        <SubmitButton disabled={isLoading} className="w-full" variant="default">
           Sign in
         </SubmitButton>
       </form>

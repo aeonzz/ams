@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const JobStatusSchema = z.enum(['PENDING','IN_PROGRESS','COMPLETED','VERIFIED']);
+export const JobStatusSchema = z.enum(['PENDING','IN_PROGRESS','COMPLETED']);
 
 export type JobStatusType = `${z.infer<typeof JobStatusSchema>}`
 
