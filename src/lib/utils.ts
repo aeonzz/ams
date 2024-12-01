@@ -491,7 +491,7 @@ export function isOverlapping(
   start2: Date,
   end2: Date
 ): boolean {
-  return start1 < end2 && start2 < end1;
+  return start1 <= end2 && start2 <= end1;
 }
 
 export function formatFullName(

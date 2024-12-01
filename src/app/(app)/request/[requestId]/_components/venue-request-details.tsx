@@ -31,6 +31,7 @@ import { Badge } from "@/components/ui/badge";
 import {
   formatFullName,
   getVenueStatusColor,
+  isOverlapping,
   textTransform,
 } from "@/lib/utils";
 import {
@@ -64,6 +65,10 @@ import CommandTooltip from "@/components/ui/command-tooltip";
 import { CommandShortcut } from "@/components/ui/command";
 import { fillVenueRequestFormPDF } from "@/lib/fill-pdf/venue-request-form";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
+import CalendarSchedulaSheet from "./calendar-schedule-sheet";
+import { useVenueReservedDates } from "@/lib/hooks/use-venue-reservation";
+import { PermissionGuard } from "@/components/permission-guard";
+import { useSession } from "@/lib/hooks/use-session";
 
 interface VenueRequestDetailsProps {
   data: VenueRequestWithRelations;
@@ -74,6 +79,7 @@ interface VenueRequestDetailsProps {
   onHoldReason: string | null;
   isCurrentUser: boolean;
   completedAt: Date | null;
+  departmentId: string;
 }
 
 export default function VenueRequestDetails({
@@ -85,8 +91,11 @@ export default function VenueRequestDetails({
   requestStatus,
   isCurrentUser,
   completedAt,
+  departmentId,
 }: VenueRequestDetailsProps) {
   const pathname = usePathname();
+  const venueId = data.venueId;
+  const currentUser = useSession();
   const { variant, color, stroke } = getVenueStatusColor(data.venue.status);
   const [isGeneratingPdf, setIsGeneratingPdf] = React.useState(false);
   const [editField, setEditField] = React.useState<string | null>(null);
@@ -101,13 +110,23 @@ export default function VenueRequestDetails({
     },
   });
 
+  const { disabledTimeRanges, isLoading, isError } = useVenueReservedDates({
+    venueId,
+  });
+
   const { mutateAsync, isPending } =
     useServerActionMutation(udpateVenueRequest);
+
   const { dirtyFields } = useFormState({ control: form.control });
   const isFieldsDirty = Object.keys(dirtyFields).length > 0;
 
   async function onSubmit(values: UpdateVenueRequestSchema) {
     try {
+      if (isLoading && isError) {
+        return toast.error(
+          "Could not get venue reservation details, Please try again later."
+        );
+      }
       if (
         values.startTime &&
         values.endTime &&
@@ -122,6 +141,24 @@ export default function VenueRequestDetails({
           message: "The end time must be after the start time.",
         });
         return;
+      }
+
+      if (values.startTime && values.endTime) {
+        const hasConflict = disabledTimeRanges.some((range) =>
+          isOverlapping(
+            values.startTime!,
+            values.endTime!,
+            range.start,
+            range.end
+          )
+        );
+
+        if (hasConflict) {
+          toast.error(
+            "The selected time range conflicts with existing reservations."
+          );
+          return;
+        }
       }
 
       const data: UpdateVenueRequestSchemaWithPath = {
@@ -193,7 +230,7 @@ export default function VenueRequestDetails({
               )
             : "N/A",
           formUrl: existingFormFile,
-          department: data.department,
+          department: data.department.name,
         });
         const url = URL.createObjectURL(pdfBlob);
         const cleanedFileName = existingFormFile.replace("/resources/", "");
@@ -255,6 +292,15 @@ export default function VenueRequestDetails({
     <>
       <div className="space-y-4 pb-10">
         <div className="space-y-1">
+          {data.approvedByHead !== null &&
+            data.approvedByHead === false && (
+              <AlertCard
+                variant="warning"
+                title="Venue Reservation Rejected"
+                description="The venue reservation request has been rejected by the department head. Please review the feedback and make any necessary adjustments before resubmitting."
+                className="mb-6"
+              />
+            )}
           {data.inProgress && requestStatus === "APPROVED" && (
             <AlertCard
               variant="info"
@@ -341,8 +387,17 @@ export default function VenueRequestDetails({
           )} */}
           </div>
         </div>
-        <div>
-          <H5 className="mb-2 font-semibold text-muted-foreground">Venue:</H5>
+        <div className="space-y-2">
+          <div className="flex justify-between">
+            <H5 className="mb-2 font-semibold text-muted-foreground">Venue:</H5>
+            <PermissionGuard
+              allowedRoles={["OPERATIONS_MANAGER"]}
+              allowedDepartment={departmentId}
+              currentUser={currentUser}
+            >
+              <CalendarSchedulaSheet venueId={data.venueId} />
+            </PermissionGuard>
+          </div>
           <Card>
             <CardHeader className="p-3">
               <div className="flex w-full space-x-3">
@@ -380,7 +435,7 @@ export default function VenueRequestDetails({
                   <P className="font-semibold tracking-tight">Department:</P>
                 </div>
                 <div className="w-full pl-5 pt-1">
-                  <P>{data.department}</P>
+                  <P>{data.department.name}</P>
                 </div>
               </div>
             </div>
@@ -422,7 +477,9 @@ export default function VenueRequestDetails({
               >
                 <VenueEditTimeInput
                   form={form}
-                  venueId={data.venueId}
+                  venueId={venueId}
+                  label="Start Time"
+                  name="startTime"
                   isPending={isPending}
                 />
               </EditInput>
@@ -461,7 +518,9 @@ export default function VenueRequestDetails({
               >
                 <VenueEditTimeInput
                   form={form}
-                  venueId={data.venueId}
+                  label="End Time"
+                  name="endTime"
+                  venueId={venueId}
                   isPending={isPending}
                 />
               </EditInput>
@@ -634,7 +693,9 @@ export default function VenueRequestDetails({
                     <P className="font-semibold tracking-tight">Other Info:</P>
                   </div>
                   <div className="w-full pl-5 pt-1">
-                    <P className="text-wrap break-all">{data.notes}</P>
+                    <P className="text-wrap break-all">
+                      {data.notes ? data.notes : "-"}
+                    </P>
                   </div>
                 </div>
                 {canEdit && (

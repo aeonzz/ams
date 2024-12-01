@@ -42,6 +42,9 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { Textarea } from "@/components/ui/text-area";
 import { CommandShortcut } from "@/components/ui/command";
 import { Label } from "@/components/ui/label";
+import { ClientRoleGuard } from "@/components/client-role-guard";
+import { AlertCard } from "@/components/ui/alert-card";
+import CancelRequest from "./cancel-request";
 
 interface RequestReviewerActionsProps {
   request: RequestWithRelations;
@@ -212,6 +215,26 @@ export default function RequestReviewerActions({
             </DialogDescription>
           </DialogHeader>
           <div className="scroll-bar flex max-h-[60vh] flex-col gap-3 overflow-y-auto px-4 py-1">
+            {request.status === "PENDING" && (
+              <ClientRoleGuard allowedRoles={["DEPARTMENT_HEAD"]}>
+                <AlertCard
+                  variant="info"
+                  title="Waiting for Reviewer"
+                  description="This job request is currently waiting for the reviewer to approve."
+                  className="mb-6"
+                />
+              </ClientRoleGuard>
+            )}
+            {request.status === "REVIEWED" && (
+              <ClientRoleGuard allowedRoles={["OPERATIONS_MANAGER"]}>
+                <AlertCard
+                  variant="info"
+                  title="Waiting for Approval"
+                  description="This job request is currently waiting for the request head to approve."
+                  className="mb-6"
+                />
+              </ClientRoleGuard>
+            )}
             {request.reviewer && (
               <div>
                 <P className="text-xs text-muted-foreground">Reviewed By:</P>
@@ -242,11 +265,7 @@ export default function RequestReviewerActions({
               </div>
             )}
             {request.status === "PENDING" && (
-              <PermissionGuard
-                allowedRoles={["OPERATIONS_MANAGER"]}
-                allowedDepartment={allowedDepartment}
-                currentUser={currentUser}
-              >
+              <ClientRoleGuard allowedRoles={["OPERATIONS_MANAGER"]}>
                 <Button
                   onClick={() => handleReview("REVIEWED")}
                   disabled={isUpdateStatusPending}
@@ -309,124 +328,122 @@ export default function RequestReviewerActions({
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
-              </PermissionGuard>
+              </ClientRoleGuard>
             )}
             {request.status === "ON_HOLD" && (
-              <AlertDialog
-                open={isApproveAlertOpen}
-                onOpenChange={setIsApproveAlertOpen}
-              >
-                <AlertDialogTrigger asChild>
-                  <Button
-                    className="w-full"
-                    variant="default"
-                    disabled={isUpdateStatusPending}
-                    onClick={() => setIsRejectionAlertOpen(true)}
-                  >
-                    Resume
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Resume Request</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This request is currently on hold. Resuming it will mark
-                      it as active and ready for further action. Are you sure
-                      you want to proceed?
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel
-                      disabled={isUpdateStatusPending}
-                      onClick={() => setIsApproveAlertOpen(false)}
-                    >
-                      Cancel
-                    </AlertDialogCancel>
-                    <AlertDialogAction
-                      disabled={isUpdateStatusPending}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handleReview("APPROVED");
-                      }}
-                    >
-                      Confirm
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            )}
-            <div className="flex flex-col gap-3">
-              {request.status === "REVIEWED" && (
-                <PermissionGuard
-                  allowedRoles={allowedApproverRoles}
-                  allowedDepartment={allowedDepartment}
-                  currentUser={currentUser}
+              <ClientRoleGuard allowedRoles={["OPERATIONS_MANAGER"]}>
+                <AlertDialog
+                  open={isApproveAlertOpen}
+                  onOpenChange={setIsApproveAlertOpen}
                 >
-                  <RequestApproverActions
-                    request={request}
-                    isPending={isUpdateStatusPending}
-                  />
-                </PermissionGuard>
-              )}
-              {children}
-            </div>
-            {request.status === "APPROVED" && !inProgress && (
-              <AlertDialog
-                open={isOnHoldAlertOpen}
-                onOpenChange={setIsOnHoldAlertOpen}
-              >
-                <AlertDialogTrigger asChild>
-                  <Button
-                    className="w-full"
-                    variant="secondary"
-                    disabled={isUpdateStatusPending}
-                    onClick={() => setIsOnHoldAlertOpen(true)}
-                  >
-                    Put On Hold
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Put Request On Hold</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Are you sure you want to put this request on hold? Please
-                      provide a reason.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <div className="mb-4">
-                    <Label htmlFor="onHoldReason" className="mb-2 block">
-                      Hold Reason <span className="text-red-500">*</span>
-                    </Label>
-                    <Textarea
-                      id="onHoldReason"
-                      maxRows={6}
-                      minRows={3}
-                      placeholder="Reason for putting on hold..."
-                      value={onHoldReason}
-                      onChange={(e) => setOnHoldReason(e.target.value)}
-                      required
-                      className="text-sm placeholder:text-sm"
-                    />
-                  </div>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      className="w-full"
+                      variant="default"
                       disabled={isUpdateStatusPending}
-                      onClick={() => setIsOnHoldAlertOpen(false)}
+                      onClick={() => setIsRejectionAlertOpen(true)}
                     >
-                      Cancel
-                    </AlertDialogCancel>
-                    <AlertDialogAction
-                      disabled={!onHoldReason.trim() || isUpdateStatusPending}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handleReview("ON_HOLD");
-                      }}
+                      Resume
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Resume Request</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This request is currently on hold. Resuming it will mark
+                        it as active and ready for further action. Are you sure
+                        you want to proceed?
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel
+                        disabled={isUpdateStatusPending}
+                        onClick={() => setIsApproveAlertOpen(false)}
+                      >
+                        Cancel
+                      </AlertDialogCancel>
+                      <AlertDialogAction
+                        disabled={isUpdateStatusPending}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleReview("APPROVED");
+                        }}
+                      >
+                        Confirm
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </ClientRoleGuard>
+            )}
+            {request.status === "REVIEWED" && (
+              <ClientRoleGuard allowedRoles={["DEPARTMENT_HEAD"]}>
+                <RequestApproverActions
+                  request={request}
+                  isPending={isUpdateStatusPending}
+                />
+              </ClientRoleGuard>
+            )}
+            {children}
+            {request.status === "APPROVED" && !inProgress && (
+              <ClientRoleGuard allowedRoles={["OPERATIONS_MANAGER"]}>
+                <AlertDialog
+                  open={isOnHoldAlertOpen}
+                  onOpenChange={setIsOnHoldAlertOpen}
+                >
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      className="w-full"
+                      variant="secondary"
+                      disabled={isUpdateStatusPending}
+                      onClick={() => setIsOnHoldAlertOpen(true)}
                     >
-                      Confirm
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+                      Put On Hold
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Put Request On Hold</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Are you sure you want to put this request on hold?
+                        Please provide a reason.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <div className="mb-4">
+                      <Label htmlFor="onHoldReason" className="mb-2 block">
+                        Hold Reason <span className="text-red-500">*</span>
+                      </Label>
+                      <Textarea
+                        id="onHoldReason"
+                        maxRows={6}
+                        minRows={3}
+                        placeholder="Reason for putting on hold..."
+                        value={onHoldReason}
+                        onChange={(e) => setOnHoldReason(e.target.value)}
+                        required
+                        className="text-sm placeholder:text-sm"
+                      />
+                    </div>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel
+                        disabled={isUpdateStatusPending}
+                        onClick={() => setIsOnHoldAlertOpen(false)}
+                      >
+                        Cancel
+                      </AlertDialogCancel>
+                      <AlertDialogAction
+                        disabled={!onHoldReason.trim() || isUpdateStatusPending}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleReview("ON_HOLD");
+                        }}
+                      >
+                        Confirm
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </ClientRoleGuard>
             )}
           </div>
           <Separator className="my-2" />

@@ -8,6 +8,7 @@ import type { VenueWithRelations } from './VenueSchema'
 import type { VehicleWithRelations } from './VehicleSchema'
 import type { SupplyItemWithRelations } from './SupplyItemSchema'
 import type { FileWithRelations } from './FileSchema'
+import type { VenueRequestWithRelations } from './VenueRequestSchema'
 import { UserRoleWithRelationsSchema } from './UserRoleSchema'
 import { InventoryItemWithRelationsSchema } from './InventoryItemSchema'
 import { UserDepartmentWithRelationsSchema } from './UserDepartmentSchema'
@@ -16,6 +17,7 @@ import { VenueWithRelationsSchema } from './VenueSchema'
 import { VehicleWithRelationsSchema } from './VehicleSchema'
 import { SupplyItemWithRelationsSchema } from './SupplyItemSchema'
 import { FileWithRelationsSchema } from './FileSchema'
+import { VenueRequestWithRelationsSchema } from './VenueRequestSchema'
 
 /////////////////////////////////////////
 // DEPARTMENT SCHEMA
@@ -52,6 +54,7 @@ export type DepartmentRelations = {
   vehicle: VehicleWithRelations[];
   supplyItem: SupplyItemWithRelations[];
   files: FileWithRelations[];
+  venueRequest: VenueRequestWithRelations[];
 };
 
 export type DepartmentWithRelations = z.infer<typeof DepartmentSchema> & DepartmentRelations
@@ -65,6 +68,7 @@ export const DepartmentWithRelationsSchema: z.ZodType<DepartmentWithRelations> =
   vehicle: z.lazy(() => VehicleWithRelationsSchema).array(),
   supplyItem: z.lazy(() => SupplyItemWithRelationsSchema).array(),
   files: z.lazy(() => FileWithRelationsSchema).array(),
+  venueRequest: z.lazy(() => VenueRequestWithRelationsSchema).array(),
 }))
 
 export default DepartmentSchema;

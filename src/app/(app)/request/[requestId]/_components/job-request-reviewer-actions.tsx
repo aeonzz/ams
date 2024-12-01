@@ -646,19 +646,19 @@ export default function JobRequestReviewerActions({
                     </ClientRoleGuard>
                   </>
                 )}
-                {request.status === "APPROVED" ||
-                  (request.status === "ON_HOLD" && (
-                    <ClientRoleGuard allowedRoles={["OPERATIONS_MANAGER"]}>
-                      <CancelRequest
-                        requestId={request.id}
-                        disabled={
-                          request.jobRequest?.status === "IN_PROGRESS" ||
-                          request.jobRequest?.status === "COMPLETED"
-                        }
-                        requestStatus={request.status}
-                      />
-                    </ClientRoleGuard>
-                  ))}
+                {(request.status === "APPROVED" ||
+                  request.status === "ON_HOLD") && (
+                  <ClientRoleGuard allowedRoles={["OPERATIONS_MANAGER"]}>
+                    <CancelRequest
+                      requestId={request.id}
+                      disabled={
+                        request.jobRequest?.status === "IN_PROGRESS" ||
+                        request.jobRequest?.status === "COMPLETED"
+                      }
+                      requestStatus={request.status}
+                    />
+                  </ClientRoleGuard>
+                )}
                 {children}
                 {request.status === "APPROVED" &&
                   request.jobRequest?.status !== "COMPLETED" && (

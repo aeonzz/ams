@@ -38,7 +38,7 @@ export default function VenueRequestCalendar({
   const handleViewChange = (newView: React.SetStateAction<any>) => {
     setView(newView);
   };
-
+  
   const events = data?.map((item) => ({
     title: item.title,
     start: new Date(item.startTime),

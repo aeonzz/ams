@@ -74,6 +74,7 @@ export const venueRequestSchemaBase = z.object({
     .optional(),
   inProgress: z.boolean().optional(),
   actualStart: z.date().optional(),
+  approvedByHead: z.boolean().optional(),
   venueStatus: VenueStatusSchema.optional(),
 });
 

@@ -168,7 +168,7 @@ export default function AddUserDepartmentsForm({
               type="submit"
               className="flex-1"
             >
-              Assign
+              Add
             </Button>
           </div>
         </DialogFooter>

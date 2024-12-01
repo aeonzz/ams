@@ -18,15 +18,7 @@ export default function ScheduledEventCard({ data }: ScheduledEventCardProps) {
   return (
     <Card className="mb-2 bg-secondary">
       <CardHeader>
-        <div className="relative aspect-video h-20">
-          <Image
-            src={data.request.venueRequest.venue.imageUrl}
-            alt={`Image of ${data.request.venueRequest.venue.name}`}
-            fill
-            className="rounded-md border object-cover"
-          />
-        </div>
-        <CardTitle className="truncate">{data.request.title}</CardTitle>
+        <CardTitle className="truncate max-w-[300px]">{data.request.title}</CardTitle>
         <div className="flex flex-col space-y-2">
           <div className="flex items-center space-x-2 rounded-sm border p-2">
             <Avatar className="size-10 rounded-full">

@@ -86,7 +86,7 @@ export default function DepartmentInput<T extends Record<string, any>>({
                     )}
                   >
                     {field.value
-                      ? items?.find((item) => item.name === field.value)?.name
+                      ? items?.find((item) => item.id === field.value)?.id
                       : placeholder}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
@@ -102,9 +102,9 @@ export default function DepartmentInput<T extends Record<string, any>>({
                     {items?.map((item) => (
                       <CommandItem
                         key={item.id}
-                        value={item.name}
+                        value={item.id}
                         onSelect={() => {
-                          field.onChange(item.name);
+                          field.onChange(item.id);
                           setOpen(false);
                         }}
                         className="flex items-center"
@@ -112,7 +112,7 @@ export default function DepartmentInput<T extends Record<string, any>>({
                         <Check
                           className={cn(
                             "mr-2 h-4 w-4",
-                            field.value === item.name
+                            field.value === item.id
                               ? "opacity-100"
                               : "opacity-0"
                           )}

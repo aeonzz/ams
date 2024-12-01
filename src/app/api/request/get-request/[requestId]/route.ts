@@ -119,6 +119,16 @@ async function handler(req: NextRequest, user: any, context: Context) {
                 venueSetupRequirement: true,
               },
             },
+            department: {
+              include: {
+                userRole: {
+                  include: {
+                    role: true,
+                    user: true,
+                  },
+                },
+              },
+            },
             request: {
               select: {
                 department: {

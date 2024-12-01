@@ -64,3 +64,7 @@ export const updateSetupRequirementSchema = z.object({
 export type UpdateSetupRequirementSchema = z.infer<
   typeof updateSetupRequirementSchema
 >;
+
+export const approveVenueRequestByHeadSchema = z.object({
+
+})

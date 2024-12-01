@@ -35,6 +35,7 @@ export type DialogType =
   | "supplyCategoriesDialog"
   | "uploadFileDialog"
   | "adminCommandDialog"
+  | "scheduleCalendar"
   | null;
 
 export interface DialogState {

@@ -28,6 +28,7 @@ import { cn, getStatusColor, textTransform } from "@/lib/utils";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { format } from "date-fns";
+import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 
 interface VenueRequestCalendarDetailCardProps {
   event: {
@@ -40,6 +41,7 @@ export default function VenueRequestCalendarDetailCard({
   event,
 }: VenueRequestCalendarDetailCardProps) {
   const { resource } = event;
+  const dialogManager = useDialogManager();
   const {
     title,
     requestId,
@@ -77,6 +79,7 @@ export default function VenueRequestCalendarDetailCard({
                     className={cn(
                       buttonVariants({ variant: "ghost2", size: "icon" })
                     )}
+                    onClick={() => dialogManager.setActiveDialog(null)}
                   >
                     <ExternalLink className="size-4" />{" "}
                   </Link>
@@ -102,31 +105,27 @@ export default function VenueRequestCalendarDetailCard({
               </div>
               <P>{format(new Date(endTime), "PP p")}</P>
             </div>
-            {actualStart && (
-              <div className="flex flex-col space-y-0.5 text-sm text-muted-foreground">
-                <div className="flex gap-1">
-                  <AlarmCheck className="size-4" />
-                  <P>Actual Start Time: </P>
-                </div>
-                <P>{format(new Date(actualStart), "PP p")}</P>
-              </div>
-            )}
-            {endTime && (
-              <div className="flex flex-col space-y-0.5 text-sm text-muted-foreground">
-                <div className="flex gap-1">
-                  <AlarmMinus className="size-4" />
-                  <P>Actual End Time: </P>
-                </div>
-                <P>{format(new Date(endTime), "PP p")}</P>
-              </div>
-            )}
             <div className="flex flex-col space-y-0.5 text-sm text-muted-foreground">
+              <div className="flex gap-1">
+                <AlarmCheck className="size-4" />
+                <P>Actual Start Time: </P>
+              </div>
+              <P>{actualStart ? format(new Date(actualStart), "PP p") : "-"}</P>
+            </div>
+            <div className="flex flex-col space-y-0.5 text-sm text-muted-foreground">
+              <div className="flex gap-1">
+                <AlarmMinus className="size-4" />
+                <P>Actual End Time: </P>
+              </div>
+              <P>{completedAt ? format(new Date(completedAt), "PP p") : "-"}</P>
+            </div>
+            {/* <div className="flex flex-col space-y-0.5 text-sm text-muted-foreground">
               <div className="flex gap-1">
                 <Clock className="size-4" />
                 <P>Created:</P>
               </div>
               <P>{format(new Date(createdAt), "PP p")}</P>
-            </div>
+            </div> */}
           </div>
         </div>
       </HoverCardContent>

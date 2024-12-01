@@ -132,6 +132,18 @@ export function UpdateVenueSheet({
 
   async function onSubmit(values: UpdateVenueSchema) {
     try {
+      if (values.setupRequirements) {
+        const duplicates = values.setupRequirements.filter(
+          (item, index, array) => array.indexOf(item) !== index
+        );
+        const uniqueRequirements = new Set(values.setupRequirements);
+        if (uniqueRequirements.size !== values.setupRequirements.length) {
+          toast.error(
+            `Duplicate setup requirement names found: ${duplicates.join(", ")}`
+          );
+          return;
+        }
+      }
       const uploadAndSubmit = async () => {
         let currentFiles = uploadedFiles;
 
