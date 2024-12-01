@@ -258,11 +258,6 @@ export function getVenueStatusColor(
       variant: "red",
       stroke: 10,
     },
-    RESERVED: {
-      color: "#a855f7",
-      variant: "purple",
-      stroke: 10,
-    },
     CLOSED: {
       color: "#6b7280",
       variant: "gray",
@@ -338,11 +333,6 @@ export function getVehicleStatusColor(
     UNDER_MAINTENANCE: {
       color: "#ef4444",
       variant: "red",
-      stroke: 10,
-    },
-    RESERVED: {
-      color: "#a855f7",
-      variant: "purple",
       stroke: 10,
     },
   };
@@ -491,7 +481,7 @@ export function isOverlapping(
   start2: Date,
   end2: Date
 ): boolean {
-  return start1 < end2 && start2 < end1;
+  return start1 <= end2 && start2 <= end1;
 }
 
 export function formatFullName(

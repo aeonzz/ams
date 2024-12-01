@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const VenueStatusSchema = z.enum(['AVAILABLE','IN_USE','UNDER_MAINTENANCE','RESERVED','CLOSED']);
+export const VenueStatusSchema = z.enum(['AVAILABLE','IN_USE','UNDER_MAINTENANCE','CLOSED']);
 
 export type VenueStatusType = `${z.infer<typeof VenueStatusSchema>}`
 

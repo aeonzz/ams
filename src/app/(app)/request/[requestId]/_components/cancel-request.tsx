@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { usePathname } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -18,15 +18,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { Label } from "@/components/ui/label";
-import { CommandShortcut } from "@/components/ui/command";
-import { P } from "@/components/typography/text";
 import { cancelRequest } from "@/lib/actions/job";
 import type { CancelRequestSchema } from "./schema";
 import { Textarea } from "@/components/ui/text-area";
@@ -46,9 +38,8 @@ export default function CancelRequest({
   const pathname = usePathname();
   const queryClient = useQueryClient();
   const { mutateAsync, isPending } = useServerActionMutation(cancelRequest);
-
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [cancellationReason, setCancellationReason] = useState("");
+  const [isDialogOpen, setIsDialogOpen] = React.useState(false);
+  const [cancellationReason, setCancellationReason] = React.useState("");
 
   async function handleCancellation() {
     if (
@@ -93,7 +84,12 @@ export default function CancelRequest({
   return (
     <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <AlertDialogTrigger asChild>
-        <Button variant="destructive" className="w-full">
+        <Button
+          variant="destructive"
+          className="w-full"
+          disabled={isPending}
+          onClick={() => setIsDialogOpen(true)}
+        >
           Cancel Request
         </Button>
       </AlertDialogTrigger>
@@ -106,36 +102,35 @@ export default function CancelRequest({
             tracked or acted upon.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        {(requestStatus === "APPROVED" ||
-          requestStatus === "REVIEWED" ||
-          requestStatus === "ON_HOLD") && (
-          <div className="mb-4">
-            <Label htmlFor="cancellationReason" className="mb-2 block">
-              Cancellation Reason <span className="text-red-500">*</span>
-            </Label>
-            <Textarea
-              id="cancellationReason"
-              maxRows={6}
-              minRows={3}
-              placeholder="Enter reason for cancellation"
-              value={cancellationReason}
-              onChange={(e) => setCancellationReason(e.target.value)}
-              required
-              className="text-sm placeholder:text-sm"
-            />
-          </div>
-        )}
+        <div className="mb-4">
+          <Label htmlFor="cancellationReason" className="mb-2 block">
+            Cancellation Reason <span className="text-red-500">*</span>
+          </Label>
+          <Textarea
+            id="cancellationReason"
+            maxRows={6}
+            minRows={3}
+            placeholder="Enter reason for cancellation"
+            value={cancellationReason}
+            onChange={(e) => setCancellationReason(e.target.value)}
+            required
+            className="text-sm placeholder:text-sm"
+          />
+        </div>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel
+            disabled={isPending}
+            onClick={() => setIsDialogOpen(false)}
+          >
+            Cancel
+          </AlertDialogCancel>
           <AlertDialogAction
-            disabled={
-              (requestStatus === "APPROVED" ||
-                requestStatus === "REVIEWED" ||
-                requestStatus === "ON_HOLD") &&
-              !cancellationReason.trim()
-            }
+            disabled={isPending || !cancellationReason.trim()}
             className="bg-destructive hover:bg-destructive/90"
-            onClick={handleCancellation}
+            onClick={(e) => {
+              e.preventDefault();
+              handleCancellation();
+            }}
           >
             Continue
           </AlertDialogAction>

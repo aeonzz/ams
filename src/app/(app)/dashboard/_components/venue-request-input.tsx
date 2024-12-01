@@ -19,9 +19,7 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  DialogFooter,
-} from "@/components/ui/dialog";
+import { DialogFooter } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/text-area";
 import { Button } from "@/components/ui/button";
 import { cn, isOverlapping } from "@/lib/utils";
@@ -32,7 +30,6 @@ import { toast } from "sonner";
 import { useSession } from "@/lib/hooks/use-session";
 import { type RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTypeSchema";
 import axios from "axios";
-import { type ReservedDatesAndTimes } from "@/lib/schema/utils";
 import { H3, P } from "@/components/typography/text";
 import ScheduledEventCard from "./scheduled-event-card";
 import VenueField from "./venue-field";
@@ -46,6 +43,7 @@ import { ChevronLeft } from "lucide-react";
 import DepartmentInput from "./department-input";
 import { AnimatePresence, motion } from "framer-motion";
 import { outExpo } from "@/lib/easings";
+import { useVenueReservedDates } from "@/lib/hooks/use-venue-reservation";
 
 interface VenueRequestInputProps {
   mutateAsync: UseMutateAsyncFunction<
@@ -87,17 +85,8 @@ export default function VenueRequestInput({
     queryKey: ["get-input-venue"],
   });
 
-  const { data, isLoading, refetch, isRefetching } = useQuery<
-    ReservedDatesAndTimes[]
-  >({
-    queryFn: async () => {
-      if (!venueId) return [];
-      const res = await axios.get(`/api/reserved-dates/venue/${venueId}`);
-      return res.data.data;
-    },
-    queryKey: ["venue-reserved-dates", venueId],
-    enabled: !!venueId,
-    refetchOnWindowFocus: false,
+  const { disabledTimeRanges, data, isLoading, refetch, isRefetching } = useVenueReservedDates({
+    venueId,
   });
 
   const selectedVenue = React.useMemo(() => {
@@ -130,88 +119,83 @@ export default function VenueRequestInput({
   //   });
   // }, [data]);
 
-  const disabledTimeRanges = React.useMemo(() => {
-    return (
-      data
-        ?.filter((item) => item.request.status === "APPROVED")
-        .map(({ startTime, endTime }) => ({
-          start: new Date(startTime),
-          end: new Date(endTime),
-        })) ?? []
-    );
-  }, [data]);
-
   async function onSubmit(values: VenueRequestSchema) {
-    const { startTime, endTime } = values;
+    try {
+      const { startTime, endTime } = values;
 
-    const startDate = new Date(startTime);
-    const endDate = new Date(endTime);
+      const startDate = new Date(startTime);
+      const endDate = new Date(endTime);
 
-    if (startDate.getTime() < Date.now()) {
-      toast.error("Start time cannot be in the past.");
-      return;
-    }
+      if (startDate.getTime() < Date.now()) {
+        toast.error("Start time cannot be in the past.");
+        return;
+      }
 
-    if (endDate.getTime() < Date.now()) {
-      toast.error("End time cannot be in the past.");
-      return;
-    }
+      if (endDate.getTime() < Date.now()) {
+        toast.error("End time cannot be in the past.");
+        return;
+      }
 
-    if (
-      startDate.getTime() === endDate.getTime() &&
-      startDate.toDateString() === endDate.toDateString()
-    ) {
-      toast.error(
-        "Start time and end time cannot be the same on the same time."
+      if (
+        startDate.getTime() === endDate.getTime() &&
+        startDate.toDateString() === endDate.toDateString()
+      ) {
+        form.setError("endTime", {
+          type: "manual",
+          message: "Start time and end time cannot be the same on the same time.",
+        });
+        return;
+      }
+
+      // Check for conflicts
+      const hasConflict = disabledTimeRanges.some((range) =>
+        isOverlapping(
+          new Date(startTime),
+          new Date(endTime),
+          range.start,
+          range.end
+        )
       );
-      return;
-    }
 
-    // Check for conflicts
-    const hasConflict = disabledTimeRanges.some((range) =>
-      isOverlapping(
-        new Date(startTime),
-        new Date(endTime),
-        range.start,
-        range.end
-      )
-    );
+      if (hasConflict) {
+        toast.error(
+          "The selected time range conflicts with existing reservations."
+        );
+        return;
+      }
 
-    if (hasConflict) {
-      toast.error(
-        "The selected time range conflicts with existing reservations."
+      const selectedVenue = venueData?.find(
+        (venue) => venue.id === values.venueId
       );
-      return;
+
+      if (!selectedVenue) {
+        toast.error("Selected venue not found.");
+        return;
+      }
+
+      const data: ExtendedVenueRequestSchema = {
+        ...values,
+        priority: "LOW",
+        type: type,
+        departmentId: selectedVenue.departmentId,
+        path: pathname,
+      };
+
+      toast.promise(mutateAsync(data), {
+        loading: "Submitting...",
+        success: () => {
+          handleOpenChange(false);
+          return "Your request has been submitted and is awaiting approval.";
+        },
+        error: (err) => {
+          console.log(err);
+          return err.message;
+        },
+      });
+    } catch (error) {
+      console.error("Error during submission:", error);
+      toast.error("An error occurred during submission. Please try again.");
     }
-
-    const selectedVenue = venueData?.find(
-      (venue) => venue.id === values.venueId
-    );
-
-    if (!selectedVenue) {
-      toast.error("Selected venue not found.");
-      return;
-    }
-
-    const data: ExtendedVenueRequestSchema = {
-      ...values,
-      priority: "LOW",
-      type: type,
-      departmentId: selectedVenue.departmentId,
-      path: pathname,
-    };
-
-    toast.promise(mutateAsync(data), {
-      loading: "Submitting...",
-      success: () => {
-        handleOpenChange(false);
-        return "Your request has been submitted and is awaiting approval.";
-      },
-      error: (err) => {
-        console.log(err);
-        return err.message;
-      },
-    });
   }
 
   const filteredVenueSetupRequirements =

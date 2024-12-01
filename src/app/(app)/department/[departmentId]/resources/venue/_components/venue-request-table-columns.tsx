@@ -86,19 +86,19 @@ export function getVenueRequestColumns(): ColumnDef<DepartmentVenueRequest>[] {
         );
       },
     },
-    {
-      accessorKey: "department",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Notes" />
-      ),
-      cell: ({ row }) => {
-        return (
-          <div className="flex w-[30vw] space-x-2">
-            <P className="truncate font-medium">{row.original.department}</P>
-          </div>
-        );
-      },
-    },
+    // {
+    //   accessorKey: "department",
+    //   header: ({ column }) => (
+    //     <DataTableColumnHeader column={column} title="Notes" />
+    //   ),
+    //   cell: ({ row }) => {
+    //     return (
+    //       <div className="flex w-[30vw] space-x-2">
+    //         <P className="truncate font-medium">{row.original.department}</P>
+    //       </div>
+    //     );
+    //   },
+    // },
     {
       accessorKey: "purpose",
       header: ({ column }) => (

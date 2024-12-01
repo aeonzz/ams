@@ -90,18 +90,20 @@ export function RolesDialog({
         <CommandList>
           <CommandGroup heading="Roles">
             <CommandEmpty>No results found.</CommandEmpty>
-            {data?.map((role) => (
-              <CommandItem
-                key={role.id}
-                onSelect={() => handleRoleSelect(role.id)}
-                className="justify-between"
-              >
-                <div className="flex items-center gap-2">
-                  <User2Icon className="h-4 w-4" />
-                  <P className="font-semibold">{role.name}</P>
-                </div>
-              </CommandItem>
-            ))}
+            {data
+              ?.filter((role) => role.name !== "DEPARTMENT_HEAD")
+              .map((role) => (
+                <CommandItem
+                  key={role.id}
+                  onSelect={() => handleRoleSelect(role.id)}
+                  className="justify-between"
+                >
+                  <div className="flex items-center gap-2">
+                    <User2Icon className="h-4 w-4" />
+                    <P className="font-semibold">{role.name}</P>
+                  </div>
+                </CommandItem>
+              ))}
           </CommandGroup>
         </CommandList>
       </CommandDialog>

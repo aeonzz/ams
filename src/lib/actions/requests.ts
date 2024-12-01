@@ -28,6 +28,7 @@ import { updateRequestStatusSchemaWithPath } from "@/app/(app)/request/[requestI
 import { pusher } from "../pusher";
 import { transportRequestActions } from "../schema/request/transport";
 import { formatFullName } from "../utils";
+import { RequestStatusTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestStatusTypeSchema";
 
 const cohere = createCohere({
   apiKey: process.env.COHERE_API_KEY,
@@ -232,12 +233,24 @@ export const createVenueRequest = authedProcedure
               setupRequirements: rest.setupRequirements,
               notes: rest.notes,
               venueId: rest.venueId,
-              department: rest.department,
+              departmentId: rest.department,
             },
           },
         },
         include: {
           venueRequest: true,
+        },
+      });
+
+      const departmentHead = await db.userRole.findFirst({
+        where: {
+          departmentId: rest.department,
+          role: {
+            name: "DEPARTMENT_HEAD",
+          },
+        },
+        include: {
+          user: true,
         },
       });
 
@@ -251,10 +264,25 @@ export const createVenueRequest = authedProcedure
         userId: user.id,
       });
 
-      await Promise.all([
-        pusher.trigger("request", "request_update", { message: "" }),
-        pusher.trigger("request", "notifications", { message: "" }),
-      ]);
+      if (departmentHead) {
+        await createNotification({
+          resourceId: `/request/${createdRequest.id}`,
+          title: `New Venue Request Requires Approval: ${createdRequest.title}`,
+          resourceType: "REQUEST",
+          notificationType: "INFO",
+          message: `A new venue request titled "${createdRequest.title}" requires your approval as department head.`,
+          recepientIds: [departmentHead.userId],
+          userId: user.id,
+        });
+      }
+      try {
+        await Promise.all([
+          pusher.trigger("request", "request_update", { message: "" }),
+          pusher.trigger("request", "notifications", { message: "" }),
+        ]);
+      } catch (pusherError) {
+        console.error("Failed to send Pusher notifications:", pusherError);
+      }
 
       return revalidatePath(path);
     } catch (error) {
@@ -692,42 +720,95 @@ export const udpateVenueRequest = authedProcedure
   .input(updateVenueRequestSchemaWithPath)
   .handler(async ({ ctx, input }) => {
     const { user } = ctx;
-    const { path, id, venueStatus, venueId, ...rest } = input;
+    const { path, id, venueStatus, venueId, department, ...rest } = input;
     try {
-      const result = await db.venueRequest.update({
-        where: {
-          requestId: id,
-        },
-        data: {
-          venue: {
-            update: {
-              status: venueStatus,
-            },
+      const result = await db.$transaction(async (prisma) => {
+        let requestStatus: RequestStatusTypeType | undefined = undefined;
+        if (
+          rest.approvedByHead !== undefined &&
+          rest.approvedByHead === false
+        ) {
+          requestStatus = "REJECTED" as RequestStatusTypeType;
+        }
+        const updatedVenueRequest = await prisma.venueRequest.update({
+          where: {
+            requestId: id,
           },
-          ...rest,
-        },
-        select: {
-          request: {
-            select: {
-              userId: true,
-              title: true,
+          data: {
+            venue: {
+              update: {
+                status: venueStatus,
+              },
             },
+            request: {
+              update: {
+                status: requestStatus,
+              },
+            },
+            ...rest,
           },
-          requestId: true,
-        },
-      });
-
-      if (rest.inProgress !== undefined && rest.inProgress) {
-        await createNotification({
-          resourceId: `/request/${result.requestId}`,
-          title: `Venue Booking In Progress: ${result.requestId}`,
-          resourceType: "REQUEST",
-          notificationType: "INFO",
-          message: `Your venue booking for "${result.request.title}" is now in progress. Please ensure you arrive on time and follow the booking guidelines.`,
-          userId: user.id,
-          recepientIds: [result.request.userId],
+          select: {
+            request: {
+              select: {
+                userId: true,
+                title: true,
+                departmentId: true,
+              },
+            },
+            requestId: true,
+          },
         });
-      }
+
+        if (
+          rest.approvedByHead !== undefined &&
+          rest.approvedByHead === false
+        ) {
+          await createNotification({
+            resourceId: `/request/${updatedVenueRequest.requestId}`,
+            title: `Venue Booking Declined: ${updatedVenueRequest.request.title}`,
+            resourceType: "REQUEST",
+            notificationType: "WARNING",
+            message: `Your venue booking for "${updatedVenueRequest.request.title}" has been declined by the department head. Please contact your department for further clarification.`,
+            userId: user.id,
+            recepientIds: [updatedVenueRequest.request.userId],
+          });
+        }
+
+        if (rest.approvedByHead !== undefined && rest.approvedByHead === true) {
+          await createNotification({
+            resourceId: `/request/${updatedVenueRequest.requestId}`,
+            title: `Venue Booking Approved: ${updatedVenueRequest.request.title}`,
+            resourceType: "REQUEST",
+            notificationType: "SUCCESS",
+            message: `Your venue booking for "${updatedVenueRequest.request.title}" has been approved by the department head. You may proceed with the necessary preparations.`,
+            userId: user.id,
+            recepientIds: [updatedVenueRequest.request.userId],
+          });
+
+          await createNotification({
+            resourceId: `/request/${updatedVenueRequest.requestId}`,
+            title: `Venue Booking Approved: ${updatedVenueRequest.request.title}`,
+            resourceType: "REQUEST",
+            notificationType: "SUCCESS",
+            message: `The venue booking request for "${updatedVenueRequest.request.title}" has been approved by the department head. The booking is now ready for your review and further action if necessary.`,
+            userId: user.id,
+            recepientIds: [updatedVenueRequest.request.departmentId],
+          });
+        }
+
+        if (rest.inProgress !== undefined && rest.inProgress) {
+          await createNotification({
+            resourceId: `/request/${updatedVenueRequest.requestId}`,
+            title: `Venue Booking In Progress: ${updatedVenueRequest.requestId}`,
+            resourceType: "REQUEST",
+            notificationType: "INFO",
+            message: `Your venue booking for "${updatedVenueRequest.request.title}" is now in progress. Please ensure you arrive on time and follow the booking guidelines.`,
+            userId: user.id,
+            recepientIds: [updatedVenueRequest.request.userId],
+          });
+        }
+        return updatedVenueRequest;
+      });
 
       await pusher.trigger("request", "request_update", {
         message: "",
@@ -783,8 +864,6 @@ export const updateJobRequest = authedProcedure
         },
       });
 
-      console.log(result);
-
       await pusher.trigger("request", "request_update", { message: "" });
 
       return revalidatePath(path);
@@ -815,6 +894,9 @@ export const completeVenueRequest = authedProcedure
             },
             inProgress: false,
           },
+          include: {
+            request: true,
+          },
         });
 
         await db.venue.update({
@@ -824,6 +906,16 @@ export const completeVenueRequest = authedProcedure
           data: {
             status: "AVAILABLE",
           },
+        });
+
+        await createNotification({
+          resourceId: `/request/${updatedVenueRequest.requestId}`,
+          title: `Request Completed: ${updatedVenueRequest.request.title}`,
+          resourceType: "REQUEST",
+          notificationType: "SUCCESS",
+          message: `Your request titled "${updatedVenueRequest.request.title}" has been successfully completed.`,
+          recepientIds: [updatedVenueRequest.request.userId],
+          userId: user.id,
         });
 
         await Promise.all([

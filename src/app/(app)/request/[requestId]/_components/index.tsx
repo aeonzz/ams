@@ -56,6 +56,8 @@ import SetPriority from "./set-priority";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import VerifyJob from "./verify-job";
 import { PermissionGuard } from "@/components/permission-guard";
+import { ClientRoleGuard } from "@/components/client-role-guard";
+import VenueChairApproval from "./venue-chair-approval";
 
 interface RequestDetailsProps {
   params: string;
@@ -69,8 +71,6 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
   if (isLoading) return <RequestDetailsSkeleton />;
   if (isError) return <FetchDataError refetch={refetch} />;
   if (!data) return <NotFound />;
-
-  console.log(data);
 
   const statusColor = getStatusColor(data.status);
   const RequestTypeIcon = getRequestTypeIcon(data.type);
@@ -125,7 +125,9 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                 </div>
                 <div className="flex items-center space-x-2">
                   <Calendar className="h-5 w-5" />
-                  <P>Created: {format(new Date(data.createdAt), "PPP p")}</P>
+                  <P>
+                    Date requested: {format(new Date(data.createdAt), "PPP p")}
+                  </P>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Briefcase className="h-5 w-5" />
@@ -155,6 +157,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                   requestStatus={data.status}
                   isCurrentUser={currentUser.id === data.userId}
                   completedAt={data.completedAt}
+                  departmentId={data.departmentId}
                 />
               )}
               {data.type === "BORROW" && data.returnableRequest && (
@@ -327,7 +330,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
               disabled={
                 data.transportRequest?.inProgress ||
                 data.venueRequest?.inProgress ||
-                data.jobRequest?.status !== "PENDING"
+                (data.jobRequest ? data.jobRequest.status !== "PENDING" : false)
               }
             />
           )}
@@ -389,10 +392,13 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
             >
               {data.status === "APPROVED" ||
                 (data.status === "ON_HOLD" && (
-                  <CancelRequest
-                    requestId={data.id}
-                    requestStatus={data.status}
-                  />
+                  <ClientRoleGuard allowedRoles={["OPERATIONS_MANAGER"]}>
+                    <CancelRequest
+                      requestId={data.id}
+                      disabled={data.returnableRequest.inProgress}
+                      requestStatus={data.status}
+                    />
+                  </ClientRoleGuard>
                 ))}
             </RequestReviewerActions>
           )}
@@ -420,10 +426,13 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
             >
               {data.status === "APPROVED" ||
                 (data.status === "ON_HOLD" && (
-                  <CancelRequest
-                    requestId={data.id}
-                    requestStatus={data.status}
-                  />
+                  <ClientRoleGuard allowedRoles={["OPERATIONS_MANAGER"]}>
+                    <CancelRequest
+                      requestId={data.id}
+                      disabled={data.transportRequest.inProgress}
+                      requestStatus={data.status}
+                    />
+                  </ClientRoleGuard>
                 ))}
               {new Date(data.transportRequest.dateAndTimeNeeded) <=
                 new Date() &&
@@ -433,38 +442,57 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                 )}
             </RequestReviewerActions>
           )}
-          {data.type === "VENUE" && data.venueRequest && (
-            <RequestReviewerActions
-              request={data}
-              allowedRoles={["OPERATIONS_MANAGER", "DEPARTMENT_HEAD"]}
-              allowedDepartment={data.departmentId}
-              allowedApproverRoles={["DEPARTMENT_HEAD"]}
-              inProgress={data.venueRequest.inProgress}
-              actionNeeded={
-                new Date(data.venueRequest.startTime) <= new Date() &&
-                !data.venueRequest.inProgress &&
-                data.status === "APPROVED"
-              }
-            >
-              {data.status === "APPROVED" ||
-                (data.status === "ON_HOLD" && (
-                  <CancelRequest
-                    requestId={data.id}
-                    requestStatus={data.status}
-                  />
-                ))}
-              {new Date(data.venueRequest.startTime) <= new Date() &&
-                !data.venueRequest.inProgress &&
-                data.status === "APPROVED" && (
-                  <VenueRequestActions data={data.venueRequest} />
-                )}
-            </RequestReviewerActions>
-          )}
           {data.type === "VENUE" &&
             data.venueRequest &&
-            data.venueRequest.inProgress && (
-              <CompleteVenueRequest requestId={data.id} />
+            data.venueRequest.approvedByHead === true && (
+              <RequestReviewerActions
+                request={data}
+                allowedRoles={["OPERATIONS_MANAGER", "DEPARTMENT_HEAD"]}
+                allowedDepartment={data.departmentId}
+                allowedApproverRoles={["DEPARTMENT_HEAD"]}
+                inProgress={data.venueRequest.inProgress}
+                actionNeeded={
+                  new Date(data.venueRequest.startTime) <= new Date() &&
+                  !data.venueRequest.inProgress &&
+                  data.status === "APPROVED"
+                }
+              >
+                {new Date(data.venueRequest.startTime) <= new Date() &&
+                  !data.venueRequest.inProgress &&
+                  data.status === "APPROVED" && (
+                    <VenueRequestActions
+                      requestId={data.id}
+                      departmentId={data.departmentId}
+                    />
+                  )}
+                {(data.status === "APPROVED" || data.status === "ON_HOLD") && (
+                  <ClientRoleGuard allowedRoles={["OPERATIONS_MANAGER"]}>
+                    <CancelRequest
+                      requestId={data.id}
+                      disabled={data.venueRequest.inProgress}
+                      requestStatus={data.status}
+                    />
+                  </ClientRoleGuard>
+                )}
+              </RequestReviewerActions>
             )}
+          {data.type === "VENUE" && data.venueRequest && (
+            <>
+              {data.venueRequest.approvedByHead === null &&
+                data.status === "PENDING" && (
+                  <VenueChairApproval
+                    data={data.venueRequest}
+                    requestId={data.id}
+                  />
+                )}
+              {data.venueRequest.inProgress && (
+                <CompleteVenueRequest
+                  requestId={data.id}
+                  departmentId={data.departmentId}
+                />
+              )}
+            </>
+          )}
           {data.type === "TRANSPORT" &&
             data.transportRequest &&
             data.transportRequest.inProgress && (

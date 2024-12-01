@@ -1,6 +1,8 @@
 import { z } from 'zod';
+import type { DepartmentWithRelations } from './DepartmentSchema'
 import type { RequestWithRelations } from './RequestSchema'
 import type { VenueWithRelations } from './VenueSchema'
+import { DepartmentWithRelationsSchema } from './DepartmentSchema'
 import { RequestWithRelationsSchema } from './RequestSchema'
 import { VenueWithRelationsSchema } from './VenueSchema'
 
@@ -10,7 +12,7 @@ import { VenueWithRelationsSchema } from './VenueSchema'
 
 export const VenueRequestSchema = z.object({
   id: z.string(),
-  department: z.string(),
+  departmentId: z.string(),
   notes: z.string().nullable(),
   purpose: z.string(),
   setupRequirements: z.string().array(),
@@ -20,6 +22,8 @@ export const VenueRequestSchema = z.object({
   inProgress: z.boolean(),
   requestId: z.string(),
   venueId: z.string(),
+  approvedByHead: z.boolean().nullable(),
+  notifyHead: z.boolean(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })
@@ -31,6 +35,7 @@ export type VenueRequest = z.infer<typeof VenueRequestSchema>
 /////////////////////////////////////////
 
 export type VenueRequestRelations = {
+  department: DepartmentWithRelations;
   request: RequestWithRelations;
   venue: VenueWithRelations;
 };
@@ -38,6 +43,7 @@ export type VenueRequestRelations = {
 export type VenueRequestWithRelations = z.infer<typeof VenueRequestSchema> & VenueRequestRelations
 
 export const VenueRequestWithRelationsSchema: z.ZodType<VenueRequestWithRelations> = VenueRequestSchema.merge(z.object({
+  department: z.lazy(() => DepartmentWithRelationsSchema),
   request: z.lazy(() => RequestWithRelationsSchema),
   venue: z.lazy(() => VenueWithRelationsSchema),
 }))

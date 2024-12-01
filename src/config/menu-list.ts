@@ -28,45 +28,45 @@ export function getMenuList({
   roles,
   currentUser,
 }: MenuListProps): Group[] {
-  const { userRole } = currentUser;
-  const hasAllowedRole = userRole.some((role) =>
-    roles.includes(role.role.name)
+  const hasValidDepartmentRole = currentUser.userRole.some((userRole) =>
+    roles.includes(userRole.role.name)
   );
 
-  const departmentLinks = currentUser.userDepartments.map((userDepartment) => {
-    const baseSubmenus = [
-      {
-        href: `/department/${userDepartment.departmentId}/overview`,
-        label: "Overview",
-        active:
-          pathname === `/department/${userDepartment.departmentId}/overview`,
-      },
-      {
-        href: `/department/${userDepartment.departmentId}/requests/pending?page=1&per_page=10&sort=createdAt.desc`,
-        label: "Pending Requests",
-        active:
-          pathname ===
-          `/department/${userDepartment.departmentId}/requests/pending`,
-      },
-    ];
-
-    // if (userDepartment.department.acceptsTransport) {
-    //   baseSubmenus.push({
-    //     href: `/department/${userDepartment.departmentId}/transport`,
-    //     label: "Transport Service",
-    //     active:
-    //       pathname === `/department/${userDepartment.departmentId}/transport`,
-    //   });
-    // }
-
-    return {
-      href: `/department/${userDepartment.departmentId}`,
-      label: userDepartment.department.name,
-      active: pathname.includes(`/department/${userDepartment.departmentId}`),
-      icon: Briefcase,
-      submenus: baseSubmenus,
-    };
-  });
+  const departmentLinks = hasValidDepartmentRole
+    ? currentUser.userDepartments
+        .filter((userDepartment) => {
+          // Check if user has a role in this specific department
+          return currentUser.userRole.some(
+            (role) =>
+              role.departmentId === userDepartment.departmentId &&
+              roles.includes(role.role.name)
+          );
+        })
+        .map((userDepartment) => ({
+          href: `/department/${userDepartment.departmentId}`,
+          label: userDepartment.department.name,
+          active: pathname.includes(
+            `/department/${userDepartment.departmentId}`
+          ),
+          icon: Briefcase,
+          submenus: [
+            {
+              href: `/department/${userDepartment.departmentId}/overview`,
+              label: "Overview",
+              active:
+                pathname ===
+                `/department/${userDepartment.departmentId}/overview`,
+            },
+            {
+              href: `/department/${userDepartment.departmentId}/requests/pending?page=1&per_page=10&sort=createdAt.desc`,
+              label: "Pending Requests",
+              active:
+                pathname ===
+                `/department/${userDepartment.departmentId}/requests/pending`,
+            },
+          ],
+        }))
+    : [];
 
   return [
     {
@@ -99,7 +99,7 @@ export function getMenuList({
         //   : []),
       ],
     },
-    ...(hasAllowedRole
+    ...(departmentLinks.length > 0
       ? [
           {
             groupLabel: "Your Departments",
