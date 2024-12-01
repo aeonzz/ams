@@ -90,9 +90,7 @@ export default function VehicleField({
                   <CommandGroup>
                     {data?.map((vehicle) => {
                       const status = getVehicleStatusColor(vehicle.status);
-                      const isDisabled =
-                        vehicle.status === "RESERVED" ||
-                        vehicle.status === "UNDER_MAINTENANCE";
+                      const isDisabled = vehicle.status === "UNDER_MAINTENANCE";
                       return (
                         <CommandItem
                           value={vehicle.id}

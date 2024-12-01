@@ -292,12 +292,29 @@ export default function VenueRequestDetails({
     <>
       <div className="space-y-4 pb-10">
         <div className="space-y-1">
+          {data.approvedByHead === null && (
+            <AlertCard
+              variant="info"
+              title="Awaiting Department Head Approval"
+              description="The venue reservation request is currently pending approval from the department head. You will be notified once a decision has been made."
+              className="mb-6"
+            />
+          )}
+          {data.approvedByHead !== null && data.approvedByHead === false && (
+            <AlertCard
+              variant="warning"
+              title="Venue Reservation Rejected"
+              description="The venue reservation request has been rejected by the department head. Please review the feedback and make any necessary adjustments before resubmitting."
+              className="mb-6"
+            />
+          )}
           {data.approvedByHead !== null &&
-            data.approvedByHead === false && (
+            data.approvedByHead === true &&
+            requestStatus === "PENDING" && (
               <AlertCard
-                variant="warning"
-                title="Venue Reservation Rejected"
-                description="The venue reservation request has been rejected by the department head. Please review the feedback and make any necessary adjustments before resubmitting."
+                variant="info"
+                title="Venue Reservation Approved by Department Head"
+                description="The venue reservation request has been approved by the department head and is pending further processing. Please wait for the next steps or updates."
                 className="mb-6"
               />
             )}

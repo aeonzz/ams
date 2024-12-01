@@ -45,8 +45,6 @@ export default function VenueChairApproval({
     );
   }, [data.department?.userRole]);
 
-  console.log(departmentHead, 'asdfsdf', currentUser.id);
-
   const { mutateAsync, isPending } =
     useServerActionMutation(udpateVenueRequest);
 
@@ -76,7 +74,7 @@ export default function VenueChairApproval({
     }
   }
 
-  if (departmentHead || departmentHead?.userId !== currentUser.id) return null;
+  if (!departmentHead || departmentHead.userId !== currentUser.id) return null;
 
   return (
     <div className="flex flex-col gap-3">

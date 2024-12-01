@@ -20,17 +20,21 @@ import {
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
-import type { VenueRequestWithRelations } from "prisma/generated/zod";
 import { usePathname } from "next/navigation";
 import { P } from "@/components/typography/text";
+import { PermissionGuard } from "@/components/permission-guard";
+import { useSession } from "@/lib/hooks/use-session";
 
 interface VenueRequestActionsProps {
-  data: VenueRequestWithRelations;
+  requestId: string;
+  departmentId: string;
 }
 
 export default function VenueRequestActions({
-  data,
+  requestId,
+  departmentId,
 }: VenueRequestActionsProps) {
+  const currentUser = useSession();
   const pathname = usePathname();
   const queryClient = useQueryClient();
   const [isAlertOpen, setIsAlertOpen] = React.useState(false);
@@ -40,7 +44,7 @@ export default function VenueRequestActions({
   async function handleUpdate() {
     toast.promise(
       mutateAsync({
-        id: data.requestId,
+        id: requestId,
         path: pathname,
         inProgress: true,
         actualStart: new Date(),
@@ -49,7 +53,7 @@ export default function VenueRequestActions({
       {
         loading: "Loading...",
         success: () => {
-          queryClient.invalidateQueries({ queryKey: [data.requestId] });
+          queryClient.invalidateQueries({ queryKey: [requestId] });
           return "The venue request has been started successfully.";
         },
         error: (err) => {
@@ -61,7 +65,11 @@ export default function VenueRequestActions({
   }
 
   return (
-    <>
+    <PermissionGuard
+      allowedRoles={["OPERATIONS_MANAGER"]}
+      allowedDepartment={departmentId}
+      currentUser={currentUser}
+    >
       <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
         <AlertDialogTrigger asChild>
           <Button disabled={isPending} onClick={() => setIsAlertOpen(true)}>
@@ -95,6 +103,6 @@ export default function VenueRequestActions({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </>
+    </PermissionGuard>
   );
 }

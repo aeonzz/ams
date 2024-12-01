@@ -242,6 +242,18 @@ export const createVenueRequest = authedProcedure
         },
       });
 
+      const departmentHead = await db.userRole.findFirst({
+        where: {
+          departmentId: rest.department,
+          role: {
+            name: "DEPARTMENT_HEAD",
+          },
+        },
+        include: {
+          user: true,
+        },
+      });
+
       await createNotification({
         resourceId: `/request/${createdRequest.id}`,
         title: `New Venue Request: ${createdRequest.title}`,
@@ -252,10 +264,25 @@ export const createVenueRequest = authedProcedure
         userId: user.id,
       });
 
-      await Promise.all([
-        pusher.trigger("request", "request_update", { message: "" }),
-        pusher.trigger("request", "notifications", { message: "" }),
-      ]);
+      if (departmentHead) {
+        await createNotification({
+          resourceId: `/request/${createdRequest.id}`,
+          title: `New Venue Request Requires Approval: ${createdRequest.title}`,
+          resourceType: "REQUEST",
+          notificationType: "INFO",
+          message: `A new venue request titled "${createdRequest.title}" requires your approval as department head.`,
+          recepientIds: [departmentHead.userId],
+          userId: user.id,
+        });
+      }
+      try {
+        await Promise.all([
+          pusher.trigger("request", "request_update", { message: "" }),
+          pusher.trigger("request", "notifications", { message: "" }),
+        ]);
+      } catch (pusherError) {
+        console.error("Failed to send Pusher notifications:", pusherError);
+      }
 
       return revalidatePath(path);
     } catch (error) {
@@ -738,7 +765,7 @@ export const udpateVenueRequest = authedProcedure
         ) {
           await createNotification({
             resourceId: `/request/${updatedVenueRequest.requestId}`,
-            title: `Venue Booking Declined: ${updatedVenueRequest.requestId}`,
+            title: `Venue Booking Declined: ${updatedVenueRequest.request.title}`,
             resourceType: "REQUEST",
             notificationType: "WARNING",
             message: `Your venue booking for "${updatedVenueRequest.request.title}" has been declined by the department head. Please contact your department for further clarification.`,
@@ -750,7 +777,7 @@ export const udpateVenueRequest = authedProcedure
         if (rest.approvedByHead !== undefined && rest.approvedByHead === true) {
           await createNotification({
             resourceId: `/request/${updatedVenueRequest.requestId}`,
-            title: `Venue Booking Approved: ${updatedVenueRequest.requestId}`,
+            title: `Venue Booking Approved: ${updatedVenueRequest.request.title}`,
             resourceType: "REQUEST",
             notificationType: "SUCCESS",
             message: `Your venue booking for "${updatedVenueRequest.request.title}" has been approved by the department head. You may proceed with the necessary preparations.`,
@@ -760,7 +787,7 @@ export const udpateVenueRequest = authedProcedure
 
           await createNotification({
             resourceId: `/request/${updatedVenueRequest.requestId}`,
-            title: `Venue Booking Approved: ${updatedVenueRequest.requestId}`,
+            title: `Venue Booking Approved: ${updatedVenueRequest.request.title}`,
             resourceType: "REQUEST",
             notificationType: "SUCCESS",
             message: `The venue booking request for "${updatedVenueRequest.request.title}" has been approved by the department head. The booking is now ready for your review and further action if necessary.`,
@@ -837,8 +864,6 @@ export const updateJobRequest = authedProcedure
         },
       });
 
-      console.log(result);
-
       await pusher.trigger("request", "request_update", { message: "" });
 
       return revalidatePath(path);
@@ -869,6 +894,9 @@ export const completeVenueRequest = authedProcedure
             },
             inProgress: false,
           },
+          include: {
+            request: true,
+          },
         });
 
         await db.venue.update({
@@ -878,6 +906,16 @@ export const completeVenueRequest = authedProcedure
           data: {
             status: "AVAILABLE",
           },
+        });
+
+        await createNotification({
+          resourceId: `/request/${updatedVenueRequest.requestId}`,
+          title: `Request Completed: ${updatedVenueRequest.request.title}`,
+          resourceType: "REQUEST",
+          notificationType: "SUCCESS",
+          message: `Your request titled "${updatedVenueRequest.request.title}" has been successfully completed.`,
+          recepientIds: [updatedVenueRequest.request.userId],
+          userId: user.id,
         });
 
         await Promise.all([

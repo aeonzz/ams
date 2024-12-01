@@ -460,7 +460,10 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                 {new Date(data.venueRequest.startTime) <= new Date() &&
                   !data.venueRequest.inProgress &&
                   data.status === "APPROVED" && (
-                    <VenueRequestActions data={data.venueRequest} />
+                    <VenueRequestActions
+                      requestId={data.id}
+                      departmentId={data.departmentId}
+                    />
                   )}
                 {(data.status === "APPROVED" || data.status === "ON_HOLD") && (
                   <ClientRoleGuard allowedRoles={["OPERATIONS_MANAGER"]}>

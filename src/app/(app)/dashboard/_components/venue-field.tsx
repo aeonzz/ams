@@ -83,7 +83,6 @@ export default function VenueField({
                       const status = getVenueStatusColor(venue.status);
                       const isDisabled =
                         venue.status === "CLOSED" ||
-                        venue.status === "RESERVED" ||
                         venue.status === "UNDER_MAINTENANCE";
 
                       return (

@@ -23,6 +23,7 @@ export const VenueRequestSchema = z.object({
   requestId: z.string(),
   venueId: z.string(),
   approvedByHead: z.boolean().nullable(),
+  notifyHead: z.boolean(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })
