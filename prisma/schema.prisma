@@ -3,6 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
 generator zod {
@@ -48,28 +49,30 @@ model User {
 }
 
 model Department {
-  id                   String           @id
+  id                   String             @id
   description          String?
   name                 String
-  acceptsJobs          Boolean          @default(false)
-  managesTransport     Boolean          @default(false)
-  managesBorrowRequest Boolean          @default(false)
-  managesSupplyRequest Boolean          @default(false)
-  managesFacility      Boolean          @default(false)
-  createdAt            DateTime         @default(now())
-  updatedAt            DateTime         @updatedAt
+  acceptsJobs          Boolean            @default(false)
+  managesTransport     Boolean            @default(false)
+  managesBorrowRequest Boolean            @default(false)
+  managesSupplyRequest Boolean            @default(false)
+  managesFacility      Boolean            @default(false)
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
   responsibilities     String?
   departmentType       DepartmentType
-  isArchived           Boolean          @default(false)
-  userRole             UserRole[]       @relation("DepartmentToUserRole")
-  inventoryItem        InventoryItem[]  @relation("DepartmentToInventoryItem")
-  userDepartments      UserDepartment[] @relation("DepartmentToUserDepartment")
-  request              Request[]        @relation("DepartmentToRequest")
-  venue                Venue[]          @relation("DepartmentToVenue")
-  vehicle              Vehicle[]        @relation("DepartmentToVehicle")
-  supplyItem           SupplyItem[]     @relation("DepartmentToSupplyItem")
+  isArchived           Boolean            @default(false)
+  userRole             UserRole[]         @relation("DepartmentToUserRole")
+  inventoryItem        InventoryItem[]    @relation("DepartmentToInventoryItem")
+  userDepartments      UserDepartment[]   @relation("DepartmentToUserDepartment")
+  request              Request[]          @relation("DepartmentToRequest")
+  venue                Venue[]            @relation("DepartmentToVenue")
+  vehicle              Vehicle[]          @relation("DepartmentToVehicle")
+  supplyItem           SupplyItem[]       @relation("DepartmentToSupplyItem")
   files                File[]
   venueRequest         VenueRequest[]
+  jobRequest           JobRequest[]
+  transportRequest     TransportRequest[]
 }
 
 model UserDepartment {
@@ -180,7 +183,8 @@ model Request {
 model JobRequest {
   id                   String                @id
   description          String
-  department           String
+  departmentId         String
+  department           Department            @relation(fields: [departmentId], references: [id])
   location             String
   startDate            DateTime?
   endDate              DateTime?
@@ -256,7 +260,7 @@ model VenueRequest {
 
 model Venue {
   id                    String                  @id
-  name                  String
+  name                  String                  @unique
   location              String
   capacity              Int
   imageUrl              String
@@ -389,24 +393,25 @@ model SupplyRequestItem {
 }
 
 model TransportRequest {
-  id                     String    @id
+  id                     String     @id
   description            String
-  department             String
+  departmentId           String
+  department             Department @relation(fields: [departmentId], references: [id])
   numberOfPassengers     Int
   passengersName         String[]
   destination            String
-  inProgress             Boolean   @default(false)
+  inProgress             Boolean    @default(false)
   actualStart            DateTime?
   dateAndTimeNeeded      DateTime
   odometerStart          Float?
   odometerEnd            Float?
   totalDistanceTravelled Float?
-  createdAt              DateTime  @default(now())
-  updatedAt              DateTime  @updatedAt
-  requestId              String    @unique
-  request                Request   @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  createdAt              DateTime   @default(now())
+  updatedAt              DateTime   @updatedAt
+  requestId              String     @unique
+  request                Request    @relation(fields: [requestId], references: [id], onDelete: Cascade)
   vehicleId              String
-  vehicle                Vehicle   @relation(fields: [vehicleId], references: [id])
+  vehicle                Vehicle    @relation(fields: [vehicleId], references: [id])
 }
 
 model Vehicle {

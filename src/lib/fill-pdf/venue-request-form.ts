@@ -16,6 +16,7 @@ type Data = {
   department: string;
   status: RequestStatusTypeType;
   departmentHead: string;
+  notedBy: string;
 };
 
 type FieldPosition = {
@@ -92,6 +93,7 @@ export async function fillVenueRequestFormPDF(
     status: { x: 100, y: height - 455, size: 10, maxWidth: 100 },
     requestedByAlt: { x: 50, y: height - 513, size: 10, maxWidth: 150 },
     departmentHead: { x: 230, y: height - 578, size: 10, maxWidth: 150 },
+    notedBy: { x: 305, y: height - 513, size: 10, maxWidth: 150 },
   };
 
   // function drawDebugRectangle(

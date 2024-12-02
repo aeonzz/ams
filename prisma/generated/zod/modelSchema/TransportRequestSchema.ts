@@ -1,6 +1,8 @@
 import { z } from 'zod';
+import type { DepartmentWithRelations } from './DepartmentSchema'
 import type { RequestWithRelations } from './RequestSchema'
 import type { VehicleWithRelations } from './VehicleSchema'
+import { DepartmentWithRelationsSchema } from './DepartmentSchema'
 import { RequestWithRelationsSchema } from './RequestSchema'
 import { VehicleWithRelationsSchema } from './VehicleSchema'
 
@@ -11,7 +13,7 @@ import { VehicleWithRelationsSchema } from './VehicleSchema'
 export const TransportRequestSchema = z.object({
   id: z.string(),
   description: z.string(),
-  department: z.string(),
+  departmentId: z.string(),
   numberOfPassengers: z.number().int(),
   passengersName: z.string().array(),
   destination: z.string(),
@@ -34,6 +36,7 @@ export type TransportRequest = z.infer<typeof TransportRequestSchema>
 /////////////////////////////////////////
 
 export type TransportRequestRelations = {
+  department: DepartmentWithRelations;
   request: RequestWithRelations;
   vehicle: VehicleWithRelations;
 };
@@ -41,6 +44,7 @@ export type TransportRequestRelations = {
 export type TransportRequestWithRelations = z.infer<typeof TransportRequestSchema> & TransportRequestRelations
 
 export const TransportRequestWithRelationsSchema: z.ZodType<TransportRequestWithRelations> = TransportRequestSchema.merge(z.object({
+  department: z.lazy(() => DepartmentWithRelationsSchema),
   request: z.lazy(() => RequestWithRelationsSchema),
   vehicle: z.lazy(() => VehicleWithRelationsSchema),
 }))

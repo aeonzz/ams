@@ -15,6 +15,7 @@ type Data = {
   vehicle: string;
   dateOfTravel: Date;
   description: string;
+  departmentHead: string;
   status: RequestStatusTypeType;
 };
 
@@ -93,6 +94,7 @@ export async function fillTransportRequestFormPDF(
     description: { x: 70, y: height - 215, size: 9, maxWidth: 420 },
     status: { x: 120, y: height - 245, size: 9, maxWidth: 150 },
     requestedByCopy: { x: 70, y: height - 310, size: 9, maxWidth: 150 },
+    departmentHead: { x: 350, y: height - 315, size: 9, maxWidth: 150 },
   };
 
   // function drawDebugRectangle(

@@ -70,25 +70,23 @@ export default function VenueRequestCalendarDetailCard({
               <Dot className="mr-1 size-3" strokeWidth={stroke} color={color} />
               {textTransform(status)}
             </Badge>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Link
-                    href={`/request/${requestId}`}
-                    prefetch
-                    className={cn(
-                      buttonVariants({ variant: "ghost2", size: "icon" })
-                    )}
-                    onClick={() => dialogManager.setActiveDialog(null)}
-                  >
-                    <ExternalLink className="size-4" />{" "}
-                  </Link>
-                </TooltipTrigger>
-                <TooltipContent side="bottom">
-                  <P>View</P>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link
+                  href={`/request/${requestId}`}
+                  prefetch
+                  className={cn(
+                    buttonVariants({ variant: "ghost2", size: "icon" })
+                  )}
+                  onClick={() => dialogManager.setActiveDialog(null)}
+                >
+                  <ExternalLink className="size-4" />{" "}
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                <P>View</P>
+              </TooltipContent>
+            </Tooltip>
           </div>
           <div className="grid grid-flow-row grid-cols-2 gap-x-6 gap-y-3">
             <div className="flex flex-col space-y-0.5 text-sm text-muted-foreground">

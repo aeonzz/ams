@@ -12,6 +12,7 @@ import {
   Dot,
   Link,
   Briefcase,
+  UsersRound,
 } from "lucide-react";
 import NotFound from "@/app/not-found";
 import FetchDataError from "@/components/card/fetch-data-error";
@@ -130,7 +131,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                   </P>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Briefcase className="h-5 w-5" />
+                  <UsersRound className="h-5 w-5" />
                   <P>Department: {data.department.name}</P>
                 </div>
               </div>
@@ -191,6 +192,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                   requestStatus={data.status}
                   isCurrentUser={currentUser.id === data.userId}
                   completedAt={data.completedAt}
+                  departmentId={data.departmentId}
                 />
               )}
             </div>
@@ -315,7 +317,10 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
               <SetPriority
                 prio={data.jobRequest.priority}
                 requestId={data.id}
-                disabled={data.status === "COMPLETED"}
+                disabled={
+                  data.status === "COMPLETED" ||
+                  data.jobRequest.status !== "PENDING"
+                }
                 allowedDepartment={data.departmentId}
               />
             )}
@@ -329,6 +334,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
               requestStatus={data.status}
               disabled={
                 data.transportRequest?.inProgress ||
+                data.returnableRequest?.inProgress ||
                 data.venueRequest?.inProgress ||
                 (data.jobRequest ? data.jobRequest.status !== "PENDING" : false)
               }
@@ -424,21 +430,22 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
               }
               inProgress={data.transportRequest.inProgress}
             >
-              {data.status === "APPROVED" ||
-                (data.status === "ON_HOLD" && (
-                  <ClientRoleGuard allowedRoles={["OPERATIONS_MANAGER"]}>
-                    <CancelRequest
-                      requestId={data.id}
-                      disabled={data.transportRequest.inProgress}
-                      requestStatus={data.status}
-                    />
-                  </ClientRoleGuard>
-                ))}
               {new Date(data.transportRequest.dateAndTimeNeeded) <=
                 new Date() &&
                 !data.transportRequest.inProgress &&
                 data.status === "APPROVED" && (
-                  <TransportRequestActions data={data.transportRequest} />
+                  <TransportRequestActions data={data.transportRequest}>
+                    {(data.status === "APPROVED" ||
+                      data.status === "ON_HOLD") && (
+                      <ClientRoleGuard allowedRoles={["OPERATIONS_MANAGER"]}>
+                        <CancelRequest
+                          requestId={data.id}
+                          disabled={data.transportRequest.inProgress}
+                          requestStatus={data.status}
+                        />
+                      </ClientRoleGuard>
+                    )}
+                  </TransportRequestActions>
                 )}
             </RequestReviewerActions>
           )}
@@ -451,11 +458,11 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                 allowedDepartment={data.departmentId}
                 allowedApproverRoles={["DEPARTMENT_HEAD"]}
                 inProgress={data.venueRequest.inProgress}
-                actionNeeded={
-                  new Date(data.venueRequest.startTime) <= new Date() &&
-                  !data.venueRequest.inProgress &&
-                  data.status === "APPROVED"
-                }
+                // actionNeeded={
+                //   new Date(data.venueRequest.startTime) <= new Date() &&
+                //   !data.venueRequest.inProgress &&
+                //   data.status === "APPROVED"
+                // }
               >
                 {new Date(data.venueRequest.startTime) <= new Date() &&
                   !data.venueRequest.inProgress &&
@@ -501,9 +508,10 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                 initialOdometer={data.transportRequest.vehicle.odometer}
               />
             )}
-          {data.status === "APPROVED" &&
-            data.type === "BORROW" &&
+
+          {data.type === "BORROW" &&
             data.returnableRequest &&
+            data.status === "APPROVED" &&
             new Date(data.returnableRequest.dateAndTimeNeeded) <=
               new Date() && (
               <ReturnableRequestActions

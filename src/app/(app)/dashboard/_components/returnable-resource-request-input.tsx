@@ -122,6 +122,31 @@ export default function ReturnableResourceRequestInput({
     if (!selectedDepartmentId) return;
     const { dateAndTimeNeeded, returnDateAndTime } = values;
 
+    const startDate = new Date(dateAndTimeNeeded);
+    const endDate = new Date(returnDateAndTime);
+
+    if (startDate.getTime() < Date.now()) {
+      toast.error("Start time cannot be in the past.");
+      return;
+    }
+
+    if (endDate.getTime() < Date.now()) {
+      toast.error("End time cannot be in the past.");
+      return;
+    }
+
+    if (
+      startDate.getTime() === endDate.getTime() &&
+      startDate.toDateString() === endDate.toDateString()
+    ) {
+      form.setError("returnDateAndTime", {
+        type: "manual",
+        message: "Date and time needed and Return data and time cannot be the same on the same time.",
+      });
+      return;
+    }
+
+
     // Check for conflicts
     const hasConflict = disabledTimeRanges.some((range) =>
       isOverlapping(

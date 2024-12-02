@@ -139,37 +139,37 @@ export default function NotificationScreen() {
     }
   };
 
-  const handleNotificationDelete = () => {
-    if (selectedNotification) {
-      toast.promise(
-        deleteNotificationMutate({
-          notificationId: selectedNotification.id,
-        }),
-        {
-          loading: "Deleting...",
-          success: () => {
-            queryClient.invalidateQueries({
-              queryKey: [
-                "get-user-notifications-with-params",
-                currentUser.id,
-                activeTab,
-              ],
-            });
-            setIsAlertOpen(false);
-            setSelectedNotificationId(null);
-            if (!isDesktop) {
-              setIsSheetOpen(false);
-            }
-            return "Notification successfully deleted";
-          },
-          error: (err) => {
-            console.log(err);
-            return err.message;
-          },
-        }
-      );
-    }
-  };
+  // const handleNotificationDelete = () => {
+  //   if (selectedNotification) {
+  //     toast.promise(
+  //       deleteNotificationMutate({
+  //         notificationId: selectedNotification.id,
+  //       }),
+  //       {
+  //         loading: "Deleting...",
+  //         success: () => {
+  //           queryClient.invalidateQueries({
+  //             queryKey: [
+  //               "get-user-notifications-with-params",
+  //               currentUser.id,
+  //               activeTab,
+  //             ],
+  //           });
+  //           setIsAlertOpen(false);
+  //           setSelectedNotificationId(null);
+  //           if (!isDesktop) {
+  //             setIsSheetOpen(false);
+  //           }
+  //           return "Notification successfully deleted";
+  //         },
+  //         error: (err) => {
+  //           console.log(err);
+  //           return err.message;
+  //         },
+  //       }
+  //     );
+  //   }
+  // };
 
   useHotkeys(
     "d",
@@ -285,7 +285,7 @@ export default function NotificationScreen() {
         </div>
         <Inbox
           key={currentUser.id}
-          className="w-full"
+          className="w-full bo"
           notifications={filteredNotifications}
           onNotificationSelect={handleNotificationSelect}
           selectedNotificationId={selectedNotificationId}
@@ -315,7 +315,7 @@ export default function NotificationScreen() {
                     View
                   </Link>
                 )}
-                <Tooltip>
+                {/* <Tooltip>
                   <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
                     <AlertDialogTrigger asChild>
                       <TooltipTrigger asChild>
@@ -362,7 +362,7 @@ export default function NotificationScreen() {
                     <P>Delete notification</P>
                     <CommandShortcut>D</CommandShortcut>
                   </TooltipContent>
-                </Tooltip>
+                </Tooltip> */}
               </div>
             ) : null}
           </div>
@@ -388,7 +388,7 @@ export default function NotificationScreen() {
                   View
                 </Link>
               )}
-              <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
+              {/* <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
                 <AlertDialogTrigger asChild>
                   <Button
                     variant="secondary"
@@ -425,7 +425,7 @@ export default function NotificationScreen() {
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
-              </AlertDialog>
+              </AlertDialog> */}
             </div>
           </SheetContent>
         </Sheet>

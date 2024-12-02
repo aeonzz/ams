@@ -135,9 +135,9 @@ export default function ReturnableRequestActions({
                   Please provide the return condition of the item.
                 </AlertDialogDescription>
               </AlertDialogHeader>
-              <div>
-                <Label htmlFor="returnCondition" className="text-right">
-                  Return Condition
+              <div className="mb-4">
+                <Label htmlFor="returnCondition" className="mb-2 block">
+                  Return Condition <span className="text-red-500">*</span>
                 </Label>
                 <Textarea
                   id="returnCondition"
@@ -182,9 +182,9 @@ export default function ReturnableRequestActions({
                   Please provide details about how the item was lost.
                 </AlertDialogDescription>
               </AlertDialogHeader>
-              <div>
-                <Label htmlFor="lostReason" className="text-right">
-                  Lost Details
+              <div className="mb-4">
+                <Label htmlFor="lostReason" className="mb-2 block">
+                  Lost Detailst <span className="text-red-500">*</span>
                 </Label>
                 <Textarea
                   id="lostReason"

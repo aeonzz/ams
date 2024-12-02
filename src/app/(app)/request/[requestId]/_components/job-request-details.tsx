@@ -53,6 +53,7 @@ import {
   RotateCw,
   Timer,
   User,
+  UsersRound,
 } from "lucide-react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -452,6 +453,17 @@ export default function JobRequestDetails({
         </div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <div className="group flex items-center justify-between">
+              <div className="flex w-full flex-col items-start">
+                <div className="flex space-x-1 text-muted-foreground">
+                  <UsersRound className="h-5 w-5" />
+                  <P className="font-semibold tracking-tight">Department:</P>
+                </div>
+                <div className="w-full pl-5 pt-1">
+                  <P>{data.department.name}</P>
+                </div>
+              </div>
+            </div>
             {data.assignedUser && (
               <div className="group flex items-center justify-between">
                 <div className="flex w-full flex-col items-start">

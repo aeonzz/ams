@@ -24,14 +24,6 @@ export default function VehicleScheduleCard({
   return (
     <Card className={cn("mb-2 bg-secondary", className)}>
       <CardHeader>
-        <div className="relative aspect-video h-20">
-          <Image
-            src={data.request.transportRequest.vehicle.imageUrl}
-            alt={`Image of ${data.request.transportRequest.vehicle.name}`}
-            fill
-            className="rounded-md border object-cover"
-          />
-        </div>
         <CardTitle className="truncate">{data.request.title}</CardTitle>
         <div className="flex flex-col space-y-2">
           <div className="flex items-center space-x-2 rounded-sm border p-2">

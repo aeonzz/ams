@@ -9,6 +9,8 @@ import type { VehicleWithRelations } from './VehicleSchema'
 import type { SupplyItemWithRelations } from './SupplyItemSchema'
 import type { FileWithRelations } from './FileSchema'
 import type { VenueRequestWithRelations } from './VenueRequestSchema'
+import type { JobRequestWithRelations } from './JobRequestSchema'
+import type { TransportRequestWithRelations } from './TransportRequestSchema'
 import { UserRoleWithRelationsSchema } from './UserRoleSchema'
 import { InventoryItemWithRelationsSchema } from './InventoryItemSchema'
 import { UserDepartmentWithRelationsSchema } from './UserDepartmentSchema'
@@ -18,6 +20,8 @@ import { VehicleWithRelationsSchema } from './VehicleSchema'
 import { SupplyItemWithRelationsSchema } from './SupplyItemSchema'
 import { FileWithRelationsSchema } from './FileSchema'
 import { VenueRequestWithRelationsSchema } from './VenueRequestSchema'
+import { JobRequestWithRelationsSchema } from './JobRequestSchema'
+import { TransportRequestWithRelationsSchema } from './TransportRequestSchema'
 
 /////////////////////////////////////////
 // DEPARTMENT SCHEMA
@@ -55,6 +59,8 @@ export type DepartmentRelations = {
   supplyItem: SupplyItemWithRelations[];
   files: FileWithRelations[];
   venueRequest: VenueRequestWithRelations[];
+  jobRequest: JobRequestWithRelations[];
+  transportRequest: TransportRequestWithRelations[];
 };
 
 export type DepartmentWithRelations = z.infer<typeof DepartmentSchema> & DepartmentRelations
@@ -69,6 +75,8 @@ export const DepartmentWithRelationsSchema: z.ZodType<DepartmentWithRelations> =
   supplyItem: z.lazy(() => SupplyItemWithRelationsSchema).array(),
   files: z.lazy(() => FileWithRelationsSchema).array(),
   venueRequest: z.lazy(() => VenueRequestWithRelationsSchema).array(),
+  jobRequest: z.lazy(() => JobRequestWithRelationsSchema).array(),
+  transportRequest: z.lazy(() => TransportRequestWithRelationsSchema).array(),
 }))
 
 export default DepartmentSchema;
