@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { useInView } from "react-intersection-observer";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface InboxProps {
   className?: string;
@@ -77,11 +78,11 @@ export default function Inbox({
 
   return (
     <div className={className}>
-      <div className={cn("scroll-bar overflow-y-auto", height)}>
+      <ScrollArea className={cn(height)}>
         {renderNotifications()}
         {isFetchingNextPage && <NotificationSkeleton />}
         <div ref={ref} />
-      </div>
+      </ScrollArea>
     </div>
   );
 }

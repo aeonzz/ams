@@ -26,6 +26,8 @@ import { checkAuth } from "../auth/utils";
 import { GetRequestsSchema } from "../schema";
 import { formatFullName } from "../utils";
 import { PrismaClient } from "@prisma/client";
+import { togetherai } from "@/components/providers/ai-provider";
+import { generateTitle } from "./ai";
 
 const generateDateId = async (db: PrismaClient) => {
   const currentDate = new Date();
@@ -57,61 +59,35 @@ export const createJobRequest = authedProcedure
   .input(extendedJobRequestSchemaServer)
   .handler(async ({ ctx, input }) => {
     const { user } = ctx;
+    const requestId = await generateDateId(db);
 
     const { path, ...rest } = input;
 
     try {
-      const { text } = await generateText({
-        model: cohere("command-r-plus"),
-        system: `You are an expert at creating concise, informative titles for work requests. 
-               Your task is to generate clear, action-oriented titles that quickly convey 
-               the nature of the request. Always consider the job type, category, and specific 
-               name of the task when crafting the title. Aim for brevity and clarity. And make it unique for every request. Dont add quotes`,
-        prompt: `Create a clear and concise title for a request based on these details:
-               Notes: 
-               ${input.type} request
-               ${input.description}
-               ${input.jobType}
-
-               
-               Guidelines:
-               1. Keep it under 50 characters
-               2. Include the job type, category, and name in the title
-               3. Capture the main purpose of the request
-               4. Use action-oriented language
-               5. Be specific to the request's context
-               6. Make it easy to understand at a glance
-               7. Use title case
-               
-               Example: 
-               If given:
-               Notes: Fix leaking faucet in the main office bathroom
-               Job Type: Maintenance
-               Category: Building
-               Name: Plumbing
-               
-               A good title might be:
-               "Urgent Plumbing Maintenance: Office Bathroom Faucet Repair"
-               
-               Now, create a title for the request using the provided details above.`,
-      });
-
-      if (!text || text.trim().length === 0) {
-        throw "Something went wrong while generating the request title. Please check your internet connection or try again.";
+      let title;
+      try {
+        const text = await generateTitle({
+          type: input.type,
+          inputs: [input.description, input.jobType],
+        });
+        title = text.title || requestId;
+      } catch (error) {
+        console.error("Error in title generation:", error);
+        title = requestId;
       }
 
       const createdRequest = await db.request.create({
         data: {
-          id: await generateDateId(db),
+          id: requestId,
           userId: user.id,
           priority: rest.priority,
           type: rest.type,
-          title: text,
+          title: title,
           departmentId: rest.departmentId,
           jobRequest: {
             create: {
               id: generateId(5),
-              department: rest.department,
+              departmentId: rest.department,
               description: rest.description,
               location: rest.location,
               jobType: rest.jobType,
@@ -654,7 +630,7 @@ export const completeJobRequest = authedProcedure
               },
             },
           });
-          
+
           if (updatedRequest.assignedTo) {
             await createNotification({
               resourceId: `/request/${updatedRequest.id}`,

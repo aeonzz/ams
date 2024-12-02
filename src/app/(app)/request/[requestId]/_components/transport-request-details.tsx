@@ -68,6 +68,10 @@ import type { RequestStatusTypeType } from "prisma/generated/zod/inputTypeSchema
 import CommandTooltip from "@/components/ui/command-tooltip";
 import { fillTransportRequestFormPDF } from "@/lib/fill-pdf/transport-request-form";
 import { AlertCard } from "@/components/ui/alert-card";
+import LoadingSpinner from "@/components/loaders/loading-spinner";
+import { PermissionGuard } from "@/components/permission-guard";
+import CalendarVehicleScheduleSheet from "./calendar-vehicle-schedule-sheet";
+import { useSession } from "@/lib/hooks/use-session";
 
 interface TransportRequestDetailsProps {
   data: TransportRequestWithRelations;
@@ -78,6 +82,7 @@ interface TransportRequestDetailsProps {
   requestStatus: RequestStatusTypeType;
   isCurrentUser: boolean;
   completedAt: Date | null;
+  departmentId: string;
 }
 
 export default function TransportRequestDetails({
@@ -89,14 +94,16 @@ export default function TransportRequestDetails({
   cancellationReason,
   onHoldReason,
   completedAt,
+  departmentId
 }: TransportRequestDetailsProps) {
   const [editField, setEditField] = React.useState<string | null>(null);
+  const [isGeneratingPdf, setIsGeneratingPdf] = React.useState(false);
+  const currentUser = useSession()
   const pathname = usePathname();
   const queryClient = useQueryClient();
   const form = useForm<UpdateTransportRequestSchema>({
     resolver: zodResolver(updateTransportRequestSchema),
     defaultValues: {
-      department: data.department,
       description: data.description,
       destination: data.destination,
       passengersName: data.passengersName,
@@ -124,7 +131,6 @@ export default function TransportRequestDetails({
             queryKey: [requestId],
           });
           form.reset({
-            department: data.department,
             description: data.description,
             destination: data.destination,
             passengersName: data.passengersName,
@@ -156,13 +162,18 @@ export default function TransportRequestDetails({
       data.request.user.lastName
     );
 
+    const departmentHead = data.request.department.userRole.find(
+      (role) => role.role.name === "DEPARTMENT_HEAD"
+    )?.user;
+
     const generateAndDownloadPDF = async () => {
+      setIsGeneratingPdf(true);
       try {
         const pdfBlob = await fillTransportRequestFormPDF({
           createdAt: data.createdAt,
           requestedBy: requestedBy,
           requestedByCopy: requestedBy,
-          office: data.department,
+          office: data.department.name,
           destination: data.destination,
           numberOfPassengers: data.passengersName.length,
           passengersName: data.passengersName,
@@ -171,6 +182,13 @@ export default function TransportRequestDetails({
           description: data.description,
           status: requestStatus,
           formUrl: existingFormFile,
+          departmentHead: departmentHead
+            ? formatFullName(
+                departmentHead.firstName,
+                departmentHead.middleName,
+                departmentHead.lastName
+              )
+            : "N/A",
         });
         const url = URL.createObjectURL(pdfBlob);
         const cleanedFileName = existingFormFile.replace("/resources/", "");
@@ -184,6 +202,7 @@ export default function TransportRequestDetails({
         URL.revokeObjectURL(url);
         return "PDF downloaded successfully";
       } catch (error) {
+        setIsGeneratingPdf(false);
         console.error("Error generating PDF:", error);
         throw new Error("Failed to generate PDF");
       }
@@ -191,7 +210,10 @@ export default function TransportRequestDetails({
 
     toast.promise(generateAndDownloadPDF(), {
       loading: "Generating PDF...",
-      success: (message) => message,
+      success: (message) => {
+        setIsGeneratingPdf(false);
+        return message;
+      },
       error: (err) => `Error: ${err.message}`,
     });
   };
@@ -279,10 +301,15 @@ export default function TransportRequestDetails({
                   <Button
                     variant="ghost2"
                     size="icon"
+                    disabled={isGeneratingPdf}
                     className="size-7"
                     onClick={handleDownloadTransportRequestForm}
                   >
-                    <Download className="size-4 text-muted-foreground" />
+                    {isGeneratingPdf ? (
+                      <LoadingSpinner className="size-4 text-muted-foreground" />
+                    ) : (
+                      <Download className="size-4 text-muted-foreground" />
+                    )}
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent
@@ -295,8 +322,19 @@ export default function TransportRequestDetails({
             )}
           </div>
         </div>
-        <div>
-          <H5 className="mb-2 font-semibold text-muted-foreground">Vehicle:</H5>
+        <div className="space-y-2">
+          <div className="flex justify-between">
+            <H5 className="mb-2 font-semibold text-muted-foreground">
+              Vehicle:
+            </H5>
+            <PermissionGuard
+              allowedRoles={["OPERATIONS_MANAGER"]}
+              allowedDepartment={departmentId}
+              currentUser={currentUser}
+            >
+              <CalendarVehicleScheduleSheet vehicleId={data.vehicleId} />
+            </PermissionGuard>
+          </div>
           <Card>
             <CardHeader className="p-3">
               <div className="flex w-full space-x-3">
@@ -335,6 +373,17 @@ export default function TransportRequestDetails({
         </div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <div className="group flex items-center justify-between">
+              <div className="flex w-full flex-col items-start">
+                <div className="flex space-x-1 text-muted-foreground">
+                  <UsersRound className="h-5 w-5" />
+                  <P className="font-semibold tracking-tight">Department:</P>
+                </div>
+                <div className="w-full pl-5 pt-1">
+                  <P>{data.department.name}</P>
+                </div>
+              </div>
+            </div>
             {completedAt && (
               <div className="group flex items-center justify-between">
                 <div className="flex w-full flex-col items-start">
@@ -401,7 +450,7 @@ export default function TransportRequestDetails({
                 )}
               </div>
             )}
-            {editField === "department" ? (
+            {/* {editField === "department" ? (
               <EditInput
                 isPending={isPending}
                 isFieldsDirty={isFieldsDirty}
@@ -455,7 +504,7 @@ export default function TransportRequestDetails({
                   </Button>
                 )}
               </div>
-            )}
+            )} */}
             {editField === "passengersName" ? (
               <EditInput
                 isPending={isPending}

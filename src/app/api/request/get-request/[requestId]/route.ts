@@ -82,6 +82,7 @@ async function handler(req: NextRequest, user: any, context: Context) {
                 createdAt: "desc",
               },
             },
+            department: true,
           },
         },
         returnableRequest: {
@@ -103,13 +104,20 @@ async function handler(req: NextRequest, user: any, context: Context) {
             request: {
               select: {
                 department: {
-                  select: {
+                  include: {
                     files: true,
+                    userRole: {
+                      include: {
+                        role: true,
+                        user: true,
+                      },
+                    },
                   },
                 },
                 user: true,
               },
             },
+            department: true,
           },
         },
         venueRequest: {

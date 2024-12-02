@@ -32,19 +32,19 @@ export default function EditInput<T extends Record<string, any>>({
 }: EditInputProps<T>) {
   const ref = React.useRef<HTMLDivElement>(null);
 
-  React.useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (ref.current && !ref.current.contains(event.target as Node)) {
-        setEditField(null);
-        reset();
-      }
-    }
+  // React.useEffect(() => {
+  //   function handleClickOutside(event: MouseEvent) {
+  //     if (ref.current && !ref.current.contains(event.target as Node)) {
+  //       setEditField(null);
+  //       reset();
+  //     }
+  //   }
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [setEditField, reset]);
+  //   document.addEventListener("mousedown", handleClickOutside);
+  //   return () => {
+  //     document.removeEventListener("mousedown", handleClickOutside);
+  //   };
+  // }, [setEditField, reset]);
 
   return (
     <div ref={ref} className="space-y-1 rounded-md border p-1">

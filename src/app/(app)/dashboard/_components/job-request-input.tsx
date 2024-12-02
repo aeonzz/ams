@@ -59,12 +59,6 @@ import DepartmentInput from "./department-input";
 import { AnimatePresence, motion } from "framer-motion";
 import { outExpo } from "@/lib/easings";
 
-const fadeScaleVariants = {
-  initial: { opacity: 0, scale: 0.95 },
-  animate: { opacity: 1, scale: 1 },
-  exit: { opacity: 0, scale: 0.95 },
-};
-
 export const jobType = [
   "REPAIRS",
   "INSTALLATION",

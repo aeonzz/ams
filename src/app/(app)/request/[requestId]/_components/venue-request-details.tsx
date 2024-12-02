@@ -15,6 +15,7 @@ import {
   Info,
   MapPin,
   Settings,
+  UsersRound,
 } from "lucide-react";
 import type {
   VenueRequestWithRelations,
@@ -65,7 +66,7 @@ import CommandTooltip from "@/components/ui/command-tooltip";
 import { CommandShortcut } from "@/components/ui/command";
 import { fillVenueRequestFormPDF } from "@/lib/fill-pdf/venue-request-form";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
-import CalendarSchedulaSheet from "./calendar-schedule-sheet";
+import CalendarVenueScheduleSheet from "./calendar-venue-schedule-sheet";
 import { useVenueReservedDates } from "@/lib/hooks/use-venue-reservation";
 import { PermissionGuard } from "@/components/permission-guard";
 import { useSession } from "@/lib/hooks/use-session";
@@ -198,6 +199,13 @@ export default function VenueRequestDetails({
     (file) => file.filePurpose === "VENUE_FORM"
   )?.url;
 
+  const requesterDepartmentHead = React.useMemo(() => {
+    const departmentRoles = data.department?.userRole || [];
+    return departmentRoles.find(
+      (userRole) => userRole.role?.name === "DEPARTMENT_HEAD"
+    );
+  }, [data.department?.userRole]);
+
   const handleDownloadVenueRequestForm = async () => {
     if (!existingFormFile) return;
 
@@ -222,6 +230,13 @@ export default function VenueRequestDetails({
           purpose: data.purpose,
           equipmentNeeded: data.setupRequirements.join(", "),
           status: requestStatus,
+          notedBy: requesterDepartmentHead
+          ? formatFullName(
+              requesterDepartmentHead.user.firstName,
+              requesterDepartmentHead.user.middleName,
+              requesterDepartmentHead.user.lastName
+            )
+          : "N/A",
           departmentHead: departmentHead
             ? formatFullName(
                 departmentHead.firstName,
@@ -244,6 +259,7 @@ export default function VenueRequestDetails({
         URL.revokeObjectURL(url);
         return "PDF downloaded successfully";
       } catch (error) {
+        setIsGeneratingPdf(false);
         console.error("Error generating PDF:", error);
         throw new Error("Failed to generate PDF");
       }
@@ -412,7 +428,7 @@ export default function VenueRequestDetails({
               allowedDepartment={departmentId}
               currentUser={currentUser}
             >
-              <CalendarSchedulaSheet venueId={data.venueId} />
+              <CalendarVenueScheduleSheet venueId={data.venueId} />
             </PermissionGuard>
           </div>
           <Card>
@@ -448,7 +464,7 @@ export default function VenueRequestDetails({
             <div className="group flex items-center justify-between">
               <div className="flex w-full flex-col items-start">
                 <div className="flex space-x-1 text-muted-foreground">
-                  <CalendarCheck className="h-5 w-5" />
+                  <UsersRound className="h-5 w-5" />
                   <P className="font-semibold tracking-tight">Department:</P>
                 </div>
                 <div className="w-full pl-5 pt-1">

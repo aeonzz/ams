@@ -20,28 +20,40 @@ import { useQueryClient } from "@tanstack/react-query";
 import { TransportRequestWithRelations } from "prisma/generated/zod";
 import { usePathname } from "next/navigation";
 import { P } from "@/components/typography/text";
+import { Label } from "@/components/ui/label";
+import NumberInput from "@/components/number-input";
 
 interface TransportRequestActionsProps {
   data: TransportRequestWithRelations;
+  children: React.ReactNode;
 }
 
 export default function TransportRequestActions({
   data,
+  children,
 }: TransportRequestActionsProps) {
   const pathname = usePathname();
   const queryClient = useQueryClient();
   const [isAlertOpen, setIsAlertOpen] = React.useState(false);
+  const [odometer, setOdometer] = React.useState<number>(data.vehicle.odometer);
   const { mutateAsync, isPending } = useServerActionMutation(
     updateTransportRequest
   );
 
   async function handleUpdate() {
+    if (odometer === 0) {
+      toast.error(
+        "Odometer reading is required before starting the transport."
+      );
+      return;
+    }
+
     toast.promise(
       mutateAsync({
         id: data.requestId,
         path: pathname,
         inProgress: true,
-        odometerStart: data.vehicle.odometer,
+        odometerStart: odometer,
         actualStart: new Date(),
         vehicleStatus: "IN_USE",
       }),
@@ -62,7 +74,9 @@ export default function TransportRequestActions({
   return (
     <>
       <div>
-        <P className="text-xs text-muted-foreground">Current odometer value:</P>
+        <P className="text-xs text-muted-foreground">
+          Vehicle odometer reading:
+        </P>
         <div className="flex w-full items-center p-2">
           <P className="font-medium">{data.vehicle.odometer}</P>
         </div>
@@ -82,6 +96,19 @@ export default function TransportRequestActions({
               undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
+          <div className="mb-4">
+            <Label htmlFor="odometer" className="mb-2 block">
+              Actual odometer reading <span className="text-red-500">*</span>
+            </Label>
+            <NumberInput
+              value={odometer}
+              min={0}
+              disabled={isPending}
+              onChange={setOdometer}
+              className="w-full justify-between"
+              isDecimal={true}
+            />
+          </div>
           <AlertDialogFooter>
             <AlertDialogCancel
               disabled={isPending}
@@ -90,17 +117,18 @@ export default function TransportRequestActions({
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
+              disabled={isPending || odometer === 0}
               onClick={(e) => {
                 e.preventDefault();
                 handleUpdate();
               }}
-              disabled={isPending}
             >
               Start Request
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      {children}
     </>
   );
 }

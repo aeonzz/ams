@@ -42,10 +42,7 @@ export default function CancelRequest({
   const [cancellationReason, setCancellationReason] = React.useState("");
 
   async function handleCancellation() {
-    if (
-      (requestStatus === "APPROVED" || requestStatus === "REVIEWED") &&
-      !cancellationReason.trim()
-    ) {
+    if (!cancellationReason.trim()) {
       toast.error(
         "Cancellation reason is required for approved or reviewed requests."
       );

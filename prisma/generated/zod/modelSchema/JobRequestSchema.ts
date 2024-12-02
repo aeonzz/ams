@@ -1,10 +1,12 @@
 import { z } from 'zod';
 import { PriorityTypeSchema } from '../inputTypeSchemas/PriorityTypeSchema'
 import { JobStatusSchema } from '../inputTypeSchemas/JobStatusSchema'
+import type { DepartmentWithRelations } from './DepartmentSchema'
 import type { ReworkWithRelations } from './ReworkSchema'
 import type { RequestWithRelations } from './RequestSchema'
 import type { UserWithRelations } from './UserSchema'
 import type { JobRequestEvaluationWithRelations } from './JobRequestEvaluationSchema'
+import { DepartmentWithRelationsSchema } from './DepartmentSchema'
 import { ReworkWithRelationsSchema } from './ReworkSchema'
 import { RequestWithRelationsSchema } from './RequestSchema'
 import { UserWithRelationsSchema } from './UserSchema'
@@ -19,7 +21,7 @@ export const JobRequestSchema = z.object({
   status: JobStatusSchema,
   id: z.string(),
   description: z.string(),
-  department: z.string(),
+  departmentId: z.string(),
   location: z.string(),
   startDate: z.coerce.date().nullable(),
   endDate: z.coerce.date().nullable(),
@@ -43,6 +45,7 @@ export type JobRequest = z.infer<typeof JobRequestSchema>
 /////////////////////////////////////////
 
 export type JobRequestRelations = {
+  department: DepartmentWithRelations;
   reworkAttempts: ReworkWithRelations[];
   request: RequestWithRelations;
   assignedUser?: UserWithRelations | null;
@@ -52,6 +55,7 @@ export type JobRequestRelations = {
 export type JobRequestWithRelations = z.infer<typeof JobRequestSchema> & JobRequestRelations
 
 export const JobRequestWithRelationsSchema: z.ZodType<JobRequestWithRelations> = JobRequestSchema.merge(z.object({
+  department: z.lazy(() => DepartmentWithRelationsSchema),
   reworkAttempts: z.lazy(() => ReworkWithRelationsSchema).array(),
   request: z.lazy(() => RequestWithRelationsSchema),
   assignedUser: z.lazy(() => UserWithRelationsSchema).nullable(),

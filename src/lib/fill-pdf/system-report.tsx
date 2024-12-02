@@ -6,12 +6,10 @@ import { DateRange } from "react-day-picker";
 import { formatFullName } from "../utils";
 import type { RequestTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestTypeSchema";
 import { RequestWithRelations, UserWithRelations } from "prisma/generated/zod";
-import { generateResponseText } from "../actions/ai";
 import RequestChart, {
   processChartData,
   TimeRange,
 } from "@/app/(admin)/admin/dashboard/_components/requests-chart";
-import ReactDOMServer from "react-dom/server";
 import html2canvas from "html2canvas";
 import SystemKPICards from "@/app/(admin)/admin/dashboard/_components/system-kpi-cards";
 import { createRoot } from "react-dom/client";

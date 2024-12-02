@@ -81,6 +81,7 @@ export default function TransportRequestInput({
   const queryClient = useQueryClient();
   const vehicleId = form.watch("vehicleId");
   const selectedDepartment = form.watch("department");
+  console.log(selectedDepartment)
 
   const { data, isLoading, refetch, isRefetching } = useQuery<
     ReservedTransportDateAndTime[]

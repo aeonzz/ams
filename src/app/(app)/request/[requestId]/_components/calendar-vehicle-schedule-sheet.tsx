@@ -11,29 +11,29 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import type { VenueRequestWithRelations } from "prisma/generated/zod";
+import type { TransportRequestWithRelations } from "prisma/generated/zod";
 import { Button } from "@/components/ui/button";
-import VenueRequestCalendar from "@/app/(app)/department/[departmentId]/resources/venue/_components/venue-request-calendar";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import { CalendarIcon } from "lucide-react";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
+import TranpsortRequestCalendar from "@/app/(app)/department/[departmentId]/resources/transport/_components/transport-request-calendar";
 
-interface CalendarSchedulaSheetProps {
-  venueId: string;
+interface CalendarVehicleScheduleSheetProps {
+  vehicleId: string;
 }
 
-export default function CalendarSchedulaSheet({
-  venueId,
-}: CalendarSchedulaSheetProps) {
+export default function CalendarVehicleScheduleSheet({
+  vehicleId,
+}: CalendarVehicleScheduleSheetProps) {
   const dialogManager = useDialogManager();
-  const { data, isLoading } = useQuery<VenueRequestWithRelations[]>({
+  const { data, isLoading } = useQuery<TransportRequestWithRelations[]>({
     queryFn: async () => {
       const res = await axios.get(
-        `/api/request/venue-request/get-venue-request/${venueId}`
+        `/api/request/transport-request/get-vehicle-request/${vehicleId}`
       );
       return res.data.data;
     },
-    queryKey: ["get-department-venue-schedules"],
+    queryKey: ["get-department-vehicle-schedules", vehicleId],
   });
 
   const formattedData = data?.map((request) => ({
@@ -41,10 +41,9 @@ export default function CalendarSchedulaSheet({
     title: request.request.title,
     status: request.request.status,
     createdAt: request.request.createdAt,
-    startTime: request.startTime,
-    endTime: request.endTime,
     actualStart: request.actualStart,
     completedAt: request.request.completedAt,
+    dateAndTimeNeeded: request.dateAndTimeNeeded,
   }));
 
   const handleOpenChange = (open: boolean) => {
@@ -78,7 +77,7 @@ export default function CalendarSchedulaSheet({
             <SheetDescription></SheetDescription>
           </SheetHeader>
           <div>
-            <VenueRequestCalendar data={formattedData} />
+            <TranpsortRequestCalendar data={formattedData} />
           </div>
         </SheetContent>
       </Sheet>

@@ -37,7 +37,7 @@ import {
   setMonth,
 } from "date-fns";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
-import { CalendarIcon, CircleOff, Dot } from "lucide-react";
+import { CalendarIcon, CircleOff, Dot, Info } from "lucide-react";
 import {
   cn,
   formatFullName,
@@ -48,6 +48,12 @@ import {
 import { type ReservedReturnableItemDateAndTime } from "@/lib/schema/utils";
 import { P } from "@/components/typography/text";
 import { Badge } from "@/components/ui/badge";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface DateTimePickerProps<T extends FieldValues> {
   form: UseFormReturn<T>;
@@ -61,10 +67,12 @@ interface DateTimePickerProps<T extends FieldValues> {
 }
 
 const timePresets = [
-  // { label: "4:30 AM", hours: 4, minutes: 30 },
-  // { label: "5:30 AM", hours: 5, minutes: 30 },
-  // { label: "6:00 AM", hours: 6, minutes: 0 },
-  // { label: "6:30 AM", hours: 6, minutes: 30 },
+  { label: "4:00 AM", hours: 4, minutes: 0 },
+  { label: "4:30 AM", hours: 4, minutes: 30 },
+  { label: "5:00 AM", hours: 4, minutes: 0 },
+  { label: "5:30 AM", hours: 5, minutes: 30 },
+  { label: "6:00 AM", hours: 6, minutes: 0 },
+  { label: "6:30 AM", hours: 6, minutes: 30 },
   { label: "7:00 AM", hours: 7, minutes: 0 },
   { label: "7:30 AM", hours: 7, minutes: 30 },
   { label: "8:00 AM", hours: 8, minutes: 0 },
@@ -116,6 +124,101 @@ const monthNames = [
   "December",
 ] as const;
 
+interface TimePreset {
+  label: string;
+  hours: number;
+  minutes: number;
+}
+
+interface TimePresetButtonProps {
+  preset: TimePreset;
+  selected: boolean;
+  disabled: boolean;
+  onClick: () => void;
+  reservations: ReservedReturnableItemDateAndTime[];
+  selectedDate: Date | null;
+}
+
+const TimePresetButton = ({
+  preset,
+  selected,
+  disabled,
+  onClick,
+  reservations,
+  selectedDate,
+}: TimePresetButtonProps) => {
+  const hasReservation = React.useMemo(() => {
+    if (!selectedDate) return false;
+    const presetTime = new Date(selectedDate);
+    presetTime.setHours(preset.hours, preset.minutes, 0, 0);
+
+    return reservations.some((reservation) => {
+      const start = new Date(reservation.dateAndTimeNeeded);
+      const end = new Date(reservation.returnDateAndTime);
+      return presetTime >= start && presetTime <= end;
+    });
+  }, [selectedDate, preset, reservations]);
+
+  const getReservationDetails = () => {
+    if (!selectedDate || !hasReservation) return null;
+    const presetTime = new Date(selectedDate);
+    presetTime.setHours(preset.hours, preset.minutes, 0, 0);
+
+    return reservations.filter((reservation) => {
+      const start = new Date(reservation.dateAndTimeNeeded);
+      const end = new Date(reservation.returnDateAndTime);
+      return presetTime >= start && presetTime <= end;
+    });
+  };
+
+  const reservationDetails = getReservationDetails();
+
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div className="relative w-full">
+            <Button
+              variant={selected ? "default" : "secondary"}
+              onClick={onClick}
+              disabled={disabled}
+              className="w-full"
+            >
+              <span className="flex-1">{preset.label}</span>
+              {hasReservation && (
+                <Info className="absolute right-3 size-4 text-muted-foreground" />
+              )}
+            </Button>
+          </div>
+        </TooltipTrigger>
+        {hasReservation && reservationDetails && (
+          <TooltipContent className="max-w-[300px]">
+            <div className="space-y-2">
+              {reservationDetails.map((reservation, index) => (
+                <div key={index} className="text-sm">
+                  <p className="font-semibold">{reservation.item.name}</p>
+                  <p>
+                    {format(new Date(reservation.dateAndTimeNeeded), "h:mm a")}{" "}
+                    -{" "}
+                    {format(new Date(reservation.returnDateAndTime), "h:mm a")}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {formatFullName(
+                      reservation.request.user.firstName,
+                      reservation.request.user.middleName,
+                      reservation.request.user.lastName
+                    )}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </TooltipContent>
+        )}
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
+
 export default function ResourceDateTimePicker<T extends FieldValues>({
   form,
   isLoading = false,
@@ -130,7 +233,31 @@ export default function ResourceDateTimePicker<T extends FieldValues>({
     new Date().getMonth()
   );
   const [selectedDate, setSelectedDate] = React.useState<Date | null>(null);
+  const [calendarDate, setCalendarDate] = React.useState(new Date());
   const [selectedTime, setSelectedTime] = React.useState<string | null>(null);
+
+  const handleMonthChange = (date: Date) => {
+    setCalendarDate(date);
+  };
+
+  React.useEffect(() => {
+    const defaultValue = form.getValues(name);
+    if (defaultValue) {
+      const date = new Date(defaultValue);
+      setSelectedDate(date);
+      setSelectedMonth(date.getMonth());
+
+      // Find and set the matching time preset
+      const hours = date.getHours();
+      const minutes = date.getMinutes();
+      const matchingPreset = timePresets.find(
+        (preset) => preset.hours === hours && preset.minutes === minutes
+      );
+      if (matchingPreset) {
+        setSelectedTime(matchingPreset.label);
+      }
+    }
+  }, [form, name]);
 
   const isTimeDisabled = (hours: number, minutes: number) => {
     if (!selectedDate) return false;
@@ -145,43 +272,6 @@ export default function ResourceDateTimePicker<T extends FieldValues>({
         end: range.end,
       })
     );
-  };
-
-  const getNextAvailableTimePreset = (startTime: Date) => {
-    for (const preset of timePresets) {
-      const presetTime = setMinutes(
-        setHours(startTime, preset.hours),
-        preset.minutes
-      );
-      if (
-        !isTimeDisabled(preset.hours, preset.minutes) &&
-        isAfter(presetTime, new Date())
-      ) {
-        return preset.label;
-      }
-    }
-    return null;
-  };
-
-  const resetTimePreset = (date: Date) => {
-    // Automatically select the next available time preset for the selected date
-    const nextAvailableTime = getNextAvailableTimePreset(date);
-    if (nextAvailableTime) {
-      setSelectedTime(nextAvailableTime);
-
-      const [hours, minutes] = nextAvailableTime
-        .split(":")
-        .map((str) => parseInt(str.split(" ")[0], 10));
-
-      const adjustedHours = hours === 12 ? 12 : hours + 12;
-
-      const updatedDate = setHours(
-        setMinutes(new Date(date), minutes),
-        adjustedHours
-      );
-
-      form.setValue(name, updatedDate as PathValue<T, Path<T>>);
-    }
   };
 
   const reservationsForSelectedDate = React.useMemo(() => {
@@ -301,28 +391,22 @@ export default function ResourceDateTimePicker<T extends FieldValues>({
                   <Calendar
                     showOutsideDays={false}
                     mode="single"
-                    month={addMonths(
-                      new Date(),
-                      selectedMonth - new Date().getMonth()
-                    )}
-                    onMonthChange={(date) => setSelectedMonth(date.getMonth())}
+                    month={calendarDate}
+                    onMonthChange={handleMonthChange}
                     selected={field.value}
                     onSelect={(date) => {
                       setSelectedDate(date || null);
-                      setSelectedTime(timePresets[0].label);
                       if (date) {
-                        const newDate = field.value
-                          ? new Date(field.value)
-                          : new Date(new Date().setHours(7, 0, 0, 0));
-                        newDate.setFullYear(
-                          date.getFullYear(),
-                          date.getMonth(),
-                          date.getDate()
-                        );
+                        // Reset time when date changes
+                        setSelectedTime(null);
+
+                        // Create new date with no time
+                        const newDate = new Date(date);
+                        newDate.setHours(0, 0, 0, 0);
+
                         field.onChange(newDate);
-                        resetTimePreset(newDate);
                       } else {
-                        field.onChange(date);
+                        field.onChange(null);
                       }
                     }}
                     disabled={isDateInPast}
@@ -356,13 +440,14 @@ export default function ResourceDateTimePicker<T extends FieldValues>({
                     </Select>
                     <div className="scroll-bar flex h-[250px] flex-col gap-2 overflow-y-auto">
                       {timePresets.map((preset, index) => (
-                        <Button
+                        <TimePresetButton
                           key={index}
-                          variant={
-                            selectedTime === preset.label
-                              ? "default"
-                              : "secondary"
-                          }
+                          preset={preset}
+                          selected={selectedTime === preset.label}
+                          disabled={isTimeDisabled(
+                            preset.hours,
+                            preset.minutes
+                          )}
                           onClick={() => {
                             const newDate = field.value
                               ? new Date(field.value)
@@ -374,13 +459,9 @@ export default function ResourceDateTimePicker<T extends FieldValues>({
                             field.onChange(updatedDate);
                             setSelectedTime(preset.label);
                           }}
-                          disabled={isTimeDisabled(
-                            preset.hours,
-                            preset.minutes
-                          )}
-                        >
-                          {preset.label}
-                        </Button>
+                          reservations={reservationsForSelectedDate}
+                          selectedDate={selectedDate}
+                        />
                       ))}
                     </div>
                   </div>

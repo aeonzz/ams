@@ -308,6 +308,16 @@ export const createVenue = authedProcedure
 
     try {
       const result = await db.$transaction(async (prisma) => {
+        const isVenueExists = await prisma.venue.findUnique({
+          where: {
+            name: rest.name,
+          },
+        });
+
+        if (isVenueExists) {
+          throw "Venue name already exists";
+        }
+
         const createVenue = await prisma.venue.create({
           data: {
             id: generateId(3),
