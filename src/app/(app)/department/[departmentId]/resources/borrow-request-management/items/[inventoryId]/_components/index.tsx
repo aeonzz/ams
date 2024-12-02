@@ -41,6 +41,8 @@ export default function InventorySubItemsScreen({
       >
         <InventorySubItemsTable
           inventorySubItemsPromise={inventorySubItemsPromise}
+          departmentId={departmentId}
+          inventoryId={inventoryId}
         />
       </React.Suspense>
     </div>

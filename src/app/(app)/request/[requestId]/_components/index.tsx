@@ -526,7 +526,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
             data.supplyRequest && (
               <SupplyRequestActions
                 requestId={data.id}
-                allowedRoles={["OPERATIONS_MANAGER", "DEPARTMENT_HEAD"]}
+                allowedRoles={["OPERATIONS_MANAGER"]}
                 allowedDepartment={data.departmentId}
               />
             )}

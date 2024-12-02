@@ -7,7 +7,10 @@ import placeholder from "public/placeholder.svg";
 import { type InventorySubItem } from "prisma/generated/zod";
 import { generateId } from "lucia";
 import { revalidatePath } from "next/cache";
-import { GetInventorySubItemSchema } from "../schema";
+import {
+  GetInventorySubItemSchema,
+  GetItemRequestSearchParams,
+} from "../schema";
 import {
   deleteInventorySubItemsSchema,
   extendCreateInventoryItemSchema,
@@ -17,6 +20,7 @@ import {
   updateReturnableResourceRequestSchemaWithPath,
 } from "../schema/resource/returnable-resource";
 import { pusher } from "../pusher";
+import { formatFullName } from "../utils";
 
 export async function getInventorySubItems(
   input: GetInventorySubItemSchema & { inventoryId: string }
@@ -90,6 +94,104 @@ export async function getInventorySubItems(
     );
 
     return { data: modifiedData, pageCount, item };
+  } catch (err) {
+    console.error(err);
+    return { data: [], pageCount: 0 };
+  }
+}
+
+export async function getRequestByItemId(
+  input: GetItemRequestSearchParams & { itemId: string }
+) {
+  await checkAuth();
+  const { page, per_page, sort, from, title, to, itemId } = input;
+
+  try {
+    const skip = (page - 1) * per_page;
+
+    const [column, order] = (sort?.split(".") ?? ["createdAt", "desc"]) as [
+      keyof Request | undefined,
+      "asc" | "desc" | undefined,
+    ];
+
+    console.log("asdasd", itemId);
+
+    const where: any = {
+      itemId: itemId,
+    };
+
+    if (title) {
+      where.title = { contains: title, mode: "insensitive" };
+    }
+
+    if (from && to) {
+      where.createdAt = {
+        gte: new Date(from),
+        lte: new Date(to),
+      };
+    }
+
+    const [data, total, item] = await db.$transaction([
+      db.returnableRequest.findMany({
+        where,
+        take: per_page,
+        skip,
+        orderBy: {
+          [column || "createdAt"]: order || "desc",
+        },
+        include: {
+          request: {
+            include: {
+              user: true,
+              reviewer: true,
+            },
+          },
+          item: {
+            select: {
+              subName: true,
+            },
+          },
+        },
+      }),
+      db.returnableRequest.count({ where }),
+      db.inventorySubItem.findUnique({
+        where: {
+          id: itemId,
+        },
+        select: {
+          subName: true,
+        },
+      }),
+    ]);
+    const pageCount = Math.ceil(total / per_page);
+
+    const formattedData = data.map((data) => {
+      const { request, id, createdAt, updatedAt, item, ...rest } = data;
+      return {
+        ...rest,
+        id: request.id,
+        completedAt: request.completedAt,
+        title: request.title,
+        requester: formatFullName(
+          request.user.firstName,
+          request.user.middleName,
+          request.user.lastName
+        ),
+        reviewer: request.reviewer
+          ? formatFullName(
+              request.reviewer.firstName,
+              request.reviewer.middleName,
+              request.reviewer.lastName
+            )
+          : undefined,
+        status: request.status,
+        createdAt: request.createdAt,
+        updatedAt: request.updatedAt,
+        itemName: item.subName,
+      };
+    });
+
+    return { data: formattedData, pageCount, item };
   } catch (err) {
     console.error(err);
     return { data: [], pageCount: 0 };

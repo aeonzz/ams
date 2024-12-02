@@ -175,47 +175,20 @@ export const createVenueRequest = authedProcedure
         throw "The venue is already reserved for the selected time.";
       }
 
-      const { text } = await generateText({
-        model: cohere("command-r-plus"),
-        system: `You are an expert at creating concise, informative titles for work requests. 
-                 Your task is to generate clear, action-oriented titles that quickly convey 
-                 the nature of the request. Always consider the job type, category, and specific 
-                 name of the task when crafting the title. Aim for brevity and clarity. And make it unique for every request. Dont add quotes`,
-        prompt: `Create a clear and concise title for a request based on these details:
-                 Notes: 
-                 ${input.type} request
-                 ${input.notes}
-                 ${rest.purpose}
+      const requestId = `REQ-${generateId(5)}`;
+      const venuRequestId = `VRQ-${generateId(5)}`;
 
-                 
-                 Guidelines:
-                 1. Keep it under 50 characters
-                 2. Include the job type, category, and name in the title
-                 3. Capture the main purpose of the request
-                 4. Use action-oriented language
-                 5. Be specific to the request's context
-                 6. Make it easy to understand at a glance
-                 7. Use title case
-                 
-                 Example: 
-                 If given:
-                 Notes: Fix leaking faucet in the main office bathroom
-                 Job Type: Maintenance
-                 Category: Building
-                 Name: Plumbing
-                 
-                 A good title might be:
-                 "Urgent Plumbing Maintenance: Office Bathroom Faucet Repair"
-                 
-                 Now, create a title for the request using the provided details above.`,
-      });
-
-      if (!text || text.trim().length === 0) {
-        throw "Something went wrong while generating the request title. Please check your internet connection or try again.";
+      let title;
+      try {
+        const text = await generateTitle({
+          type: input.type,
+          inputs: [input.notes ?? "", input.purpose],
+        });
+        title = text.title || requestId;
+      } catch (error) {
+        console.error("Error in title generation:", error);
+        title = requestId;
       }
-
-      const requestId = `REQ-${generateId(3)}`;
-      const venuRequestId = `VRQ-${generateId(3)}`;
 
       const createdRequest = await db.request.create({
         data: {
@@ -223,7 +196,7 @@ export const createVenueRequest = authedProcedure
           userId: user.id,
           priority: rest.priority,
           type: rest.type,
-          title: text,
+          title: title,
           departmentId: rest.departmentId,
           venueRequest: {
             create: {
@@ -314,10 +287,9 @@ export const createTransportRequest = authedProcedure
         throw "The vehicle is already booked at the requested date and time.";
       }
 
-      const requestId = `REQ-${generateId(3)}`;
-      const transportRequestId = `TRQ-${generateId(3)}`;
+      const requestId = `REQ-${generateId(5)}`;
+      const transportRequestId = `TRQ-${generateId(5)}`;
 
-      
       let title;
       try {
         const text = await generateTitle({

@@ -1,6 +1,6 @@
 import ContentLayout from "@/components/layouts/content-layout";
 import InventorySubItemsScreen from "./_components";
-import DepartmentLayout from "../../../_components/department-layout";
+import DepartmentLayout from "../../../../_components/department-layout";
 import { SearchParams } from "@/lib/types";
 import { inventorySubItemSearchParamsSchema } from "@/lib/schema";
 

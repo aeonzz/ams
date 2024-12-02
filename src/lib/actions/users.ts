@@ -387,12 +387,27 @@ export const removeUserDepartment = authedProcedure
   .createServerAction()
   .input(removeUserDepartmentSchema)
   .handler(async ({ ctx, input }) => {
-    const { path, ...rest } = input;
+    const { path, id } = input;
     try {
+      const userDepartment = await db.userDepartment.findUnique({
+        where: { id },
+        select: { userId: true },
+      });
+
+      if (!userDepartment) {
+        throw "User department not found";
+      }
+
+      const departmentCount = await db.userDepartment.count({
+        where: { userId: userDepartment.userId },
+      });
+
+      if (departmentCount <= 1) {
+        throw "Cannot remove the last department from a user"
+      }
+
       await db.userDepartment.delete({
-        where: {
-          ...rest,
-        },
+        where: { id },
       });
       return revalidatePath(path);
     } catch (error) {
