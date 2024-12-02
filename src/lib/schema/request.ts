@@ -55,9 +55,17 @@ export const venueRequestSchemaBase = z.object({
     .min(new Date(), {
       message: "Start time must be in the future",
     })
-    .refine((date) => date.getHours() !== 0 || date.getMinutes() !== 0, {
-      message: "Start time cannot be exactly midnight (00:00)",
-    }),
+    .refine(
+      (date) => {
+        const localDate = new Date(
+          date.toLocaleString("en-US", { timeZone: "Asia/Manila" })
+        );
+        return localDate.getHours() !== 0 || localDate.getMinutes() !== 0;
+      },
+      {
+        message: "Start time cannot be exactly midnight (00:00)",
+      }
+    ),
   endTime: z
     .date({
       required_error: "End time is required",
@@ -65,9 +73,17 @@ export const venueRequestSchemaBase = z.object({
     .min(new Date(), {
       message: "End time must be in the future",
     })
-    .refine((date) => date.getHours() !== 0 || date.getMinutes() !== 0, {
-      message: "End time cannot be exactly midnight (00:00)",
-    }),
+    .refine(
+      (date) => {
+        const localDate = new Date(
+          date.toLocaleString("en-US", { timeZone: "Asia/Manila" })
+        );
+        return localDate.getHours() !== 0 || localDate.getMinutes() !== 0;
+      },
+      {
+        message: "End time cannot be exactly midnight (00:00)",
+      }
+    ),
   notes: z
     .string()
     .max(700, { message: "Cannot be more than 600 characters long" })
