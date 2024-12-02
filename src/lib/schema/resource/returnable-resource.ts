@@ -13,9 +13,17 @@ export const returnableResourceRequestSchemaBase = z.object({
     .min(new Date(), {
       message: "Date needed must be in the future",
     })
-    .refine((date) => date.getHours() !== 0 || date.getMinutes() !== 0, {
-      message: "Time cannot be exactly midnight (00:00)",
-    }),
+    .refine(
+      (date) => {
+        const localDate = new Date(
+          date.toLocaleString("en-US", { timeZone: "Asia/Manila" })
+        );
+        return localDate.getHours() !== 0 || localDate.getMinutes() !== 0;
+      },
+      {
+        message: "End time cannot be exactly midnight (00:00)",
+      }
+    ),
   returnDateAndTime: z
     .date({
       required_error: "Return date is required",
@@ -23,9 +31,17 @@ export const returnableResourceRequestSchemaBase = z.object({
     .min(new Date(), {
       message: "Return date must be in the future",
     })
-    .refine((date) => date.getHours() !== 0 || date.getMinutes() !== 0, {
-      message: "Time cannot be exactly midnight (00:00)",
-    }),
+    .refine(
+      (date) => {
+        const localDate = new Date(
+          date.toLocaleString("en-US", { timeZone: "Asia/Manila" })
+        );
+        return localDate.getHours() !== 0 || localDate.getMinutes() !== 0;
+      },
+      {
+        message: "End time cannot be exactly midnight (00:00)",
+      }
+    ),
   purpose: z
     .string()
     .min(1, { message: "Purpose is required" })
