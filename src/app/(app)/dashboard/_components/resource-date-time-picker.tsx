@@ -69,7 +69,7 @@ interface DateTimePickerProps<T extends FieldValues> {
 const timePresets = [
   { label: "4:00 AM", hours: 4, minutes: 0 },
   { label: "4:30 AM", hours: 4, minutes: 30 },
-  { label: "5:00 AM", hours: 4, minutes: 0 },
+  { label: "5:00 AM", hours: 5, minutes: 0 },
   { label: "5:30 AM", hours: 5, minutes: 30 },
   { label: "6:00 AM", hours: 6, minutes: 0 },
   { label: "6:30 AM", hours: 6, minutes: 30 },
