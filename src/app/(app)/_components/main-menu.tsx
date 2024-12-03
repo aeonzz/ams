@@ -89,6 +89,8 @@ export default function MainMenu({ isOpen }: MainMenuProps) {
                         active={active}
                         submenus={submenus}
                         isOpen={isOpen}
+                        departmentId={menus[index].departmentId}
+                        showNotification={menus[index].showNotification}
                       />
                     )
                 )}
