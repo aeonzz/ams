@@ -35,7 +35,6 @@ export function getMenuList({
   const departmentLinks = hasValidDepartmentRole
     ? currentUser.userDepartments
         .filter((userDepartment) => {
-          // Check if user has a role in this specific department
           return currentUser.userRole.some(
             (role) =>
               role.departmentId === userDepartment.departmentId &&
@@ -49,6 +48,8 @@ export function getMenuList({
             `/department/${userDepartment.departmentId}`
           ),
           icon: Briefcase,
+          departmentId: userDepartment.departmentId,
+          showNotification: true, // Add this line
           submenus: [
             {
               href: `/department/${userDepartment.departmentId}/overview`,

@@ -29,7 +29,14 @@ async function handler(req: NextRequest, user: any, context: Context) {
       take: limit,
     });
 
-    return NextResponse.json({ data: result }, { status: 200 });
+    const unreadCount = await db.notification.count({
+      where: {
+        recepientId: context.params.departmentId,
+        isRead: false,
+      },
+    });
+
+    return NextResponse.json({ data: result, unreadCount }, { status: 200 });
   } catch (error) {
     console.log(error);
     return NextResponse.json(

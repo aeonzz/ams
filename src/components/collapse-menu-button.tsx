@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import Link from "next/link";
 import { DropdownMenuArrow } from "@radix-ui/react-dropdown-menu";
@@ -25,6 +23,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useDepartmentNotifications } from "@/lib/hooks/use-department-notifications";
 
 import SubMenuButton from "./sub-menu-button";
 
@@ -40,6 +39,8 @@ interface CollapseMenuButtonProps {
   active: boolean;
   submenus: Submenu[];
   isOpen: boolean | undefined;
+  departmentId?: string;
+  showNotification?: boolean;
 }
 
 export default function CollapseMenuButton({
@@ -48,9 +49,26 @@ export default function CollapseMenuButton({
   active,
   submenus,
   isOpen,
+  departmentId,
+  showNotification = false,
 }: CollapseMenuButtonProps) {
   const isSubmenuActive = submenus.some((submenu) => submenu.active);
   const [isCollapsed, setIsCollapsed] = useState<boolean>(isSubmenuActive);
+
+  // Only fetch notifications if this is a department menu item
+  const { unreadCount } =
+    showNotification && departmentId
+      ? useDepartmentNotifications(departmentId)
+      : { unreadCount: 0 };
+
+  const NotificationBadge = () =>
+    showNotification && unreadCount > 0 ? (
+      <div className="absolute right-2 grid size-4 place-items-center rounded-full bg-red-500">
+        <span className="text-[9px] leading-[1rem] text-white">
+          {unreadCount}
+        </span>
+      </div>
+    ) : null;
 
   return (
     <div className="w-full">
@@ -58,7 +76,7 @@ export default function CollapseMenuButton({
         <Collapsible
           open={isCollapsed}
           onOpenChange={setIsCollapsed}
-          className="w-full"
+          className="relative w-full"
         >
           <CollapsibleTrigger
             className="mb-1 [&[data-state=open]>div>div>svg]:rotate-90"
@@ -66,7 +84,7 @@ export default function CollapseMenuButton({
           >
             <Button
               variant="ghost"
-              className={cn("group h-8 w-full justify-start")}
+              className={cn("group relative h-8 w-full justify-start")}
             >
               <div className="flex w-full items-center gap-1">
                 <div className="flex items-center">
@@ -98,6 +116,7 @@ export default function CollapseMenuButton({
                   />
                 </div>
               </div>
+              <NotificationBadge />
             </Button>
           </CollapsibleTrigger>
           <CollapsibleContent className="overflow-hidden pl-10 data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
@@ -139,11 +158,21 @@ export default function CollapseMenuButton({
                       </p>
                     </div>
                   </div>
+                  <NotificationBadge />
                 </Button>
               </DropdownMenuTrigger>
             </TooltipTrigger>
             <TooltipContent side="right" align="start" alignOffset={2}>
-              {label}
+              <div className="flex items-center gap-2">
+                {label}
+                {unreadCount > 0 && (
+                  <span className="grid size-4 place-items-center rounded-full bg-red-500">
+                    <span className="text-[9px] leading-[1rem] text-white">
+                      {unreadCount}
+                    </span>
+                  </span>
+                )}
+              </div>
             </TooltipContent>
           </Tooltip>
           <DropdownMenuContent

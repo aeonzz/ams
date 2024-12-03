@@ -70,7 +70,7 @@ const timePresets = [
   { label: "7:00 AM", hours: 7, minutes: 0 },
   { label: "7:30 AM", hours: 7, minutes: 30 },
   { label: "8:00 AM", hours: 8, minutes: 0 },
-  { label: "8:30 AM", hours: 8, minutes: 0 },
+  { label: "8:30 AM", hours: 8, minutes: 30 },
   { label: "9:00 AM", hours: 9, minutes: 0 },
   { label: "9:30 AM", hours: 9, minutes: 30 },
   { label: "10:00 AM", hours: 10, minutes: 0 },

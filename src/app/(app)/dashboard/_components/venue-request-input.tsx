@@ -70,7 +70,6 @@ export default function VenueRequestInput({
   const pathname = usePathname();
   const currentUser = useSession();
   const queryClient = useQueryClient();
-  console.log(currentUser);
   const [isOpenRules, setIsOpenRules] = React.useState(false);
   const venueId = form.watch("venueId");
   const selectedDepartment = form.watch("department");

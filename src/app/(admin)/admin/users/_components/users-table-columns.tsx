@@ -214,6 +214,7 @@ export function getUsersColumns(): ColumnDef<UserType>[] {
                       {hoveredDepartment === userDepartment.department.id && (
                         <Button
                           variant="ghost"
+                          disabled={isPending}
                           size="sm"
                           className="absolute -right-1 -top-1 h-4 w-4 rounded-full p-0"
                           onClick={(e) => {

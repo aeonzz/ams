@@ -19,13 +19,16 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { PhotoProvider, PhotoView } from "react-photo-view";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
 import { CircleMinus, CirclePlus, RotateCw } from "lucide-react";
+import { textTransform } from "@/lib/utils";
 
 export default function ProfileScreen() {
   const currentUser = useSession();
+  console.log(currentUser);
+
   return (
-    <ScrollArea className="h-full py-3">
-      <div className="flex px-3">
-        <div className="w-[650px]">
+    <ScrollArea className="h-[calc(100vh_-_100px)] py-3">
+      <div className="flex flex-col px-3">
+        <div className="w-full">
           <H2 className="font-semibold">Account</H2>
           <P className="text-muted-foreground">Update your account settings</P>
           <Separator className="my-6" />
@@ -92,10 +95,35 @@ export default function ProfileScreen() {
               <UploadProfileDialog />
             </CardFooter>
           </Card>
-          {/* <UpdateUserForm
-            email={currentUser.email}
-            username={currentUser.username}
-          /> */}
+        </div>
+
+        <div className="mt-8 w-full">
+          <H2 className="font-semibold">Departments</H2>
+          <P className="text-muted-foreground">Your assigned departments</P>
+          <Separator className="my-6 w-full" />
+          <div className="grid w-[750px] grid-cols-3 gap-3">
+            {currentUser.userDepartments.map((userDepartment) => (
+              <Card key={userDepartment.id} className="w-lg bg-secondary">
+                <CardHeader>
+                  <CardTitle>{userDepartment.department.name}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <P className="font-medium">
+                    Type:{" "}
+                    {textTransform(userDepartment.department.departmentType)}
+                  </P>
+                </CardContent>
+              </Card>
+            ))}
+            <Card className="w-lg bg-secondary">
+              <CardHeader>
+                <CardTitle>asdfasdfsadf</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <P>Tasdfsdf</P>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     </ScrollArea>

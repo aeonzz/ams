@@ -61,7 +61,7 @@
     "@tiptap/pm": "^2.10.2",
     "@tiptap/react": "^2.10.2",
     "@tiptap/starter-kit": "^2.10.2",
-    "@trigger.dev/sdk": "^3.3.1",
+    "@trigger.dev/sdk": "3.3.2",
     "@uploadthing/react": "^7.1.1",
     "ai": "^4.0.9",
     "axios": "^1.3.1",
@@ -119,7 +119,7 @@
   },
   "devDependencies": {
     "@ianvs/prettier-plugin-sort-imports": "^4.3.0",
-    "@trigger.dev/build": "^3.3.1",
+    "@trigger.dev/build": "3.3.2",
     "@types/node": "^20",
     "@types/nodemailer": "^6.4.17",
     "@types/path-browserify": "^1.0.2",

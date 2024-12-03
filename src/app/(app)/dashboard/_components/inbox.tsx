@@ -78,11 +78,11 @@ export default function Inbox({
 
   return (
     <div className={className}>
-      <ScrollArea className={cn(height)}>
+      <div className={cn("scroll-bar overflow-y-auto", height)}>
         {renderNotifications()}
         {isFetchingNextPage && <NotificationSkeleton />}
         <div ref={ref} />
-      </ScrollArea>
+      </div>
     </div>
   );
 }

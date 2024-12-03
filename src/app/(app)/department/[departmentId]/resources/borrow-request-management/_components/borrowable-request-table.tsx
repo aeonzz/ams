@@ -74,7 +74,7 @@ export function BorrowableRequestTable({
       <DataTableToolbar table={table} filterFields={filterFields}>
         <BorrowableRequestTableToolbarActions
           table={table}
-          fileName={`${department?.name} Transport Requests`}
+          fileName={`${department?.name} Borrow Requests`}
         >
           <Link
             prefetch

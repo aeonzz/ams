@@ -458,11 +458,11 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                 allowedDepartment={data.departmentId}
                 allowedApproverRoles={["DEPARTMENT_HEAD"]}
                 inProgress={data.venueRequest.inProgress}
-                // actionNeeded={
-                //   new Date(data.venueRequest.startTime) <= new Date() &&
-                //   !data.venueRequest.inProgress &&
-                //   data.status === "APPROVED"
-                // }
+                actionNeeded={
+                  new Date(data.venueRequest.startTime) <= new Date() &&
+                  !data.venueRequest.inProgress &&
+                  data.status === "APPROVED"
+                }
               >
                 {new Date(data.venueRequest.startTime) <= new Date() &&
                   !data.venueRequest.inProgress &&
@@ -526,7 +526,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
             data.supplyRequest && (
               <SupplyRequestActions
                 requestId={data.id}
-                allowedRoles={["OPERATIONS_MANAGER", "DEPARTMENT_HEAD"]}
+                allowedRoles={["OPERATIONS_MANAGER"]}
                 allowedDepartment={data.departmentId}
               />
             )}

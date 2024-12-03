@@ -1,25 +1,27 @@
 import React from "react";
 
 import { P } from "@/components/typography/text";
-import { GetRequestsSchema, type GetVehicleSchema } from "@/lib/schema";
 import { DataTableSkeleton } from "@/components/data-table/data-table-skeleton";
-import { VenueLogsTable } from "./venue-logs-table";
-import { getRequestByVenueId } from "@/lib/actions/venue";
+import { type GetItemRequestSearchParams } from "@/lib/schema";
+import { getRequestByItemId } from "@/lib/actions/inventoryItem";
+import { InventorySubItemRequestTable } from "./inventory-sub-item-request-table";
 
-interface VenueLogsScreenProps {
+interface InventorySubitemRequestsScreenProps {
   params: {
-    venueId: string;
+    departmentId: string;
+    inventoryId: string;
+    subId: string;
   };
-  searchParams: GetRequestsSchema;
+  searchParams: GetItemRequestSearchParams;
 }
 
-export default function VenueLogsScreen({
+export default function InventorySubitemRequestsScreen({
   params,
   searchParams,
-}: VenueLogsScreenProps) {
-  const venueRequestsPromise = getRequestByVenueId({
+}: InventorySubitemRequestsScreenProps) {
+  const itemRequestPromise = getRequestByItemId({
     ...searchParams,
-    venueId: params.venueId,
+    itemId: params.subId,
   });
 
   return (
@@ -36,7 +38,9 @@ export default function VenueLogsScreen({
             />
           }
         >
-          <VenueLogsTable venueRequestsPromise={venueRequestsPromise} />
+          <InventorySubItemRequestTable
+            itemRequestPromise={itemRequestPromise}
+          />
         </React.Suspense>
       </div>
     </div>

@@ -10,6 +10,8 @@ type Menu = {
   active: boolean;
   icon: any;
   submenus: Submenu[];
+  departmentId?: string;
+  showNotification?: boolean
 };
 
 export type Group = {

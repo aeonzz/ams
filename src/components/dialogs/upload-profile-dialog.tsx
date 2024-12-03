@@ -26,7 +26,7 @@ import {
   FormItem,
   FormMessage,
 } from "../ui/form";
-import { useForm } from "react-hook-form";
+import { useForm, useFormState } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitButton } from "../ui/submit-button";
 import { Separator } from "../ui/separator";
@@ -45,6 +45,9 @@ export default function UploadProfileDialog() {
       imageUrl: [],
     },
   });
+
+  const { dirtyFields } = useFormState({ control: form.control });
+  const isFieldsDirty = Object.keys(dirtyFields).length > 0;
 
   const { onUpload, progresses, uploadedFiles, isUploading } = useUploadFile(
     "imageUploader",
@@ -135,13 +138,13 @@ export default function UploadProfileDialog() {
               <DialogFooter>
                 <div></div>
                 <div className="flex space-x-3">
-                  <SubmitButton
-                    disabled={isPending || isUploading}
+                  <Button
+                    disabled={isPending || isUploading || !isFieldsDirty}
                     type="submit"
                     className="w-20"
                   >
                     Save
-                  </SubmitButton>
+                  </Button>
                 </div>
               </DialogFooter>
             </form>

@@ -12,8 +12,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import UploadProfileDialog from "@/components/dialogs/upload-profile-dialog";
-import UpdateUserForm from "@/components/forms/update-user-form";
 import { H2, P } from "@/components/typography/text";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ResetPasswordForm from "@/components/forms/reset-password-form";

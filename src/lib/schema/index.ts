@@ -165,3 +165,14 @@ export const JobEvaluationParamsSchema = z.object({
 });
 
 export type GetJobEvaluation = z.infer<typeof JobEvaluationParamsSchema>;
+
+export const itemRequestSearchParamsSchema = z.object({
+  page: z.coerce.number().default(1),
+  per_page: z.coerce.number().default(10),
+  sort: z.string().optional(),
+  title: z.string().optional(),
+  from: z.string().optional(),
+  to: z.string().optional(),
+});
+
+export type GetItemRequestSearchParams = z.infer<typeof itemRequestSearchParamsSchema>;
