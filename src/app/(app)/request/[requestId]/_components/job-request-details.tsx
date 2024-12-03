@@ -562,7 +562,7 @@ export default function JobRequestDetails({
                                           "ml-auto h-4 w-4",
                                           job === field.value
                                             ? "opacity-100"
-                                            : "opacity-0"
+                                            : "lg:opacity-0"
                                         )}
                                       />
                                     </CommandItem>
@@ -612,7 +612,7 @@ export default function JobRequestDetails({
                 {canEdit && (
                   <Button
                     variant="link"
-                    className="opacity-0 group-hover:opacity-100"
+                    className="lg:opacity-0 group-hover:opacity-100"
                     onClick={(e) => {
                       e.preventDefault();
                       setEditField("jobType");
@@ -663,7 +663,7 @@ export default function JobRequestDetails({
                 {canEdit && (
                   <Button
                     variant="link"
-                    className="opacity-0 group-hover:opacity-100"
+                    className="lg:opacity-0 group-hover:opacity-100"
                     onClick={(e) => {
                       e.preventDefault();
                       setEditField("location");
@@ -756,7 +756,7 @@ export default function JobRequestDetails({
                 {canEdit && (
                   <Button
                     variant="link"
-                    className="opacity-0 group-hover:opacity-100"
+                    className="lg:opacity-0 group-hover:opacity-100"
                     onClick={(e) => {
                       e.preventDefault();
                       setEditField("dueDate");
@@ -888,7 +888,7 @@ export default function JobRequestDetails({
                 {canEdit && (
                   <Button
                     variant="link"
-                    className="opacity-0 group-hover:opacity-100"
+                    className="lg:opacity-0 group-hover:opacity-100"
                     onClick={(e) => {
                       e.preventDefault();
                       setEditField("description");

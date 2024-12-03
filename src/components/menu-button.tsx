@@ -34,7 +34,7 @@ export default function MenuButton({
       variant="ghost"
       className={cn(
         active && "bg-tertiary hover:bg-tertiary",
-        "group mb-1 h-8 w-full justify-start"
+        "group mb-1 h-8 w-full justify-start hover:bg-tertiary"
       )}
       asChild
     >

@@ -41,7 +41,7 @@ export default function UserNav({ isOpen }: UserNavProps) {
           asChild
         >
           <Button
-            variant="ghost"
+            variant="ghost2"
             className="flex w-full justify-between truncate px-3 py-3"
           >
             <Avatar className="mr-2 size-7 rounded-md">

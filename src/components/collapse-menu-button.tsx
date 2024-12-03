@@ -83,7 +83,7 @@ export default function CollapseMenuButton({
           >
             <Button
               variant="ghost"
-              className={cn("group relative h-8 w-full justify-start")}
+              className={cn("group relative h-8 w-full justify-start hover:bg-tertiary")}
             >
               <div className="flex w-full items-center gap-1">
                 <div className="flex items-center">

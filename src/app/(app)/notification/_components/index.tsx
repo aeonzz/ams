@@ -372,7 +372,7 @@ export default function NotificationScreen() {
         <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
           <SheetContent
             side="bottom"
-            className="h-[85vh] overflow-hidden rounded-t-[10px] px-1 outline"
+            className="h-[70vh] overflow-hidden rounded-t-[10px] px-1 outline"
           >
             <SheetHeader>
               <SheetTitle>Notification Details</SheetTitle>

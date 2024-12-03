@@ -2,18 +2,7 @@
 
 import React from "react";
 import { format } from "date-fns";
-import {
-  Calendar,
-  Clock,
-  MapPin,
-  Truck,
-  AlertTriangle,
-  Link as LinkIcon,
-  Dot,
-  Link,
-  Briefcase,
-  UsersRound,
-} from "lucide-react";
+import { Calendar, Dot, Info, UsersRound } from "lucide-react";
 import NotFound from "@/app/not-found";
 import FetchDataError from "@/components/card/fetch-data-error";
 import { H2, H3, H4, H5, P } from "@/components/typography/text";
@@ -23,7 +12,6 @@ import {
   cn,
   formatFullName,
   getJobStatusColor,
-  getPriorityIcon,
   getRequestTypeIcon,
   getStatusColor,
   textTransform,
@@ -52,13 +40,20 @@ import SupplyRequestActions from "./supply-request-actions";
 import TransportRequestActions from "./transport-request-actions";
 import CancelRequest from "./cancel-request";
 import VenueRequestActions from "./venue-request-actions";
-import PriorityOption from "@/app/(app)/dashboard/_components/priority-option";
 import SetPriority from "./set-priority";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import VerifyJob from "./verify-job";
-import { PermissionGuard } from "@/components/permission-guard";
 import { ClientRoleGuard } from "@/components/client-role-guard";
 import VenueChairApproval from "./venue-chair-approval";
+import { useMediaQuery } from "usehooks-ts";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import MenuSheet from "@/app/(app)/dashboard/_components/menu-sheet";
 
 interface RequestDetailsProps {
   params: string;
@@ -66,7 +61,9 @@ interface RequestDetailsProps {
 
 export default function RequestDetails({ params }: RequestDetailsProps) {
   const currentUser = useSession();
+  const isDesktop = useMediaQuery("(min-width: 769px)");
   const dialogManager = useDialogManager();
+  const [sheetOpen, setSheetOpen] = React.useState(false);
   const { data, isLoading, isError, refetch } = useRequest(params);
 
   if (isLoading) return <RequestDetailsSkeleton />;
@@ -78,14 +75,15 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
   return (
     <div className="flex h-full w-full">
       <div className="flex-1 overflow-hidden">
-        <div className="flex h-[50px] items-center gap-16 border-b px-6">
+        <div className="flex h-[50px] items-center border-b px-3">
+          {!isDesktop && <MenuSheet />}
           <H5 className="truncate font-semibold text-muted-foreground">
             {params}
           </H5>
           <SearchInput />
         </div>
-        <ScrollArea className="h-[calc(100vh_-_75px)]">
-          <div className="flex justify-center px-10 py-10">
+        <ScrollArea className="h-[calc(100vh_-_50px)] lg:h-[calc(100vh_-_75px)]">
+          <div className="flex justify-center p-5 lg:p-10">
             <div className="h-auto w-full max-w-3xl">
               <div className="mb-6">
                 <H2 className="mb-3 font-semibold">{data.title}</H2>
@@ -199,339 +197,710 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
           </div>
         </ScrollArea>
       </div>
-      <Separator orientation="vertical" className="h-full" />
-      <ScrollArea className="w-[320px] px-6 py-2">
-        <RequestSummaryTitle />
-        <div>
-          <div className="space-y-4">
+
+      {isDesktop ? (
+        <>
+          <Separator orientation="vertical" className="h-full" />
+          <ScrollArea className="w-[320px] px-6 py-2">
+            <RequestSummaryTitle />
             <div>
-              <P className="mb-1 text-sm">Request</P>
-              <Badge variant={RequestTypeIcon.variant}>
-                <RequestTypeIcon.icon className="mr-2 h-4 w-4" />
-                {textTransform(data.type)}
-              </Badge>
-            </div>
-            <div>
-              <P className="mb-1 text-sm">Status</P>
-              <Badge variant={statusColor.variant} className="pr-3.5">
-                <Dot
-                  className="mr-1 size-3"
-                  strokeWidth={statusColor.stroke}
-                  color={statusColor.color}
-                />
-                {textTransform(data.status)}
-              </Badge>
-            </div>
-            {data.type === "JOB" &&
-              data.jobRequest &&
-              data.status !== "PENDING" && (
+              <div className="space-y-4">
                 <div>
-                  <P className="mb-1 text-sm">Job Status</P>
-                  {(() => {
-                    const JobStatusColor = getJobStatusColor(
-                      data.jobRequest.status
-                    );
-                    return (
-                      <Badge
-                        variant={JobStatusColor.variant}
-                        className="pr-3.5"
-                      >
-                        <Dot
-                          className="mr-1 size-3"
-                          strokeWidth={JobStatusColor.stroke}
-                          color={JobStatusColor.color}
-                        />
-                        {textTransform(data.jobRequest.status)}
-                      </Badge>
-                    );
-                  })()}
+                  <P className="mb-1 text-sm">Request</P>
+                  <Badge variant={RequestTypeIcon.variant}>
+                    <RequestTypeIcon.icon className="mr-2 h-4 w-4" />
+                    {textTransform(data.type)}
+                  </Badge>
                 </div>
-              )}
-            <div>
-              <P className="mb-1 text-sm">Requested by</P>
-              <div className="flex items-center space-x-2 p-1">
-                <Avatar className="size-5 rounded-full">
-                  <AvatarImage src={`${data.user.profileUrl}`} />
-                  <AvatarFallback className="rounded-md">
-                    {data.user.firstName.charAt(0).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                <P>
-                  {formatFullName(
-                    data.user.firstName,
-                    data.user.middleName,
-                    data.user.lastName
-                  )}
-                </P>
-              </div>
-            </div>
-            {data.reviewer && (
-              <div>
-                <P className="mb-1 text-sm">Reviewed by</P>
-                <div className="flex items-center space-x-2 p-1">
-                  <Avatar className="size-5 rounded-full">
-                    <AvatarImage src={`${data.reviewer.profileUrl}`} />
-                    <AvatarFallback className="rounded-md">
-                      {data.reviewer.firstName.charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <P>
-                    {data.reviewer
-                      ? formatFullName(
-                          data.reviewer.firstName,
-                          data.reviewer.middleName,
-                          data.reviewer.lastName
-                        )
-                      : "N/A"}
-                  </P>
-                </div>
-              </div>
-            )}
-            {data.type === "JOB" && data.jobRequest?.assignedUser && (
-              <div>
-                <P className="mb-1 text-sm">Assigned to</P>
-                <div className="flex items-center space-x-2 p-1">
-                  <Avatar className="size-5 rounded-full">
-                    <AvatarImage
-                      src={`${data.jobRequest.assignedUser.profileUrl}`}
+                <div>
+                  <P className="mb-1 text-sm">Status</P>
+                  <Badge variant={statusColor.variant} className="pr-3.5">
+                    <Dot
+                      className="mr-1 size-3"
+                      strokeWidth={statusColor.stroke}
+                      color={statusColor.color}
                     />
-                    <AvatarFallback className="rounded-md">
-                      {data.jobRequest.assignedUser.firstName
-                        .charAt(0)
-                        .toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <P>
-                    {data.jobRequest.assignedUser
-                      ? formatFullName(
-                          data.jobRequest.assignedUser.firstName,
-                          data.jobRequest.assignedUser.middleName,
-                          data.jobRequest.assignedUser.lastName
-                        )
-                      : "N/A"}
-                  </P>
+                    {textTransform(data.status)}
+                  </Badge>
                 </div>
-              </div>
-            )}
-            {data.type === "JOB" && data.jobRequest && (
-              <SetPriority
-                prio={data.jobRequest.priority}
-                requestId={data.id}
-                disabled={
-                  data.status === "COMPLETED" ||
-                  data.jobRequest.status !== "PENDING"
-                }
-                allowedDepartment={data.departmentId}
-              />
-            )}
-          </div>
-        </div>
-        <Separator className="my-6" />
-        <div className="flex flex-col gap-3">
-          {currentUser.id === data.userId && (
-            <CancelRequest
-              requestId={data.id}
-              requestStatus={data.status}
-              disabled={
-                data.transportRequest?.inProgress ||
-                data.returnableRequest?.inProgress ||
-                data.venueRequest?.inProgress ||
-                (data.jobRequest ? data.jobRequest.status !== "PENDING" : false)
-              }
-            />
-          )}
-          {data.type === "JOB" &&
-            data.jobRequest &&
-            !data.jobRequest.jobRequestEvaluation &&
-            data.status === "COMPLETED" &&
-            currentUser.id === data.userId && (
-              <JobRequestEvaluationDialog
-                jobRequestId={data.jobRequest.id}
-                requestId={data.id}
-              >
-                <Button
-                  onClick={() =>
-                    dialogManager.setActiveDialog("jobRequestEvaluationDialog")
-                  }
-                >
-                  Evaluation
-                </Button>
-              </JobRequestEvaluationDialog>
-            )}
-          {data.type === "JOB" && data.jobRequest && (
-            <>
-              <JobRequestReviewerActions
-                request={data}
-                allowedDepartment={data.departmentId}
-                allowedRoles={["OPERATIONS_MANAGER", "DEPARTMENT_HEAD"]}
-                jobRequestId={data.jobRequest.id}
-              />
-              {!data.jobRequest.verifiedByRequester &&
-                data.jobRequest.status === "COMPLETED" &&
-                data.userId === currentUser.id && (
-                  <VerifyJob
-                    jobRequestId={data.jobRequest.id}
-                    role="requester"
+                {data.type === "JOB" &&
+                  data.jobRequest &&
+                  data.status !== "PENDING" && (
+                    <div>
+                      <P className="mb-1 text-sm">Job Status</P>
+                      {(() => {
+                        const JobStatusColor = getJobStatusColor(
+                          data.jobRequest.status
+                        );
+                        return (
+                          <Badge
+                            variant={JobStatusColor.variant}
+                            className="pr-3.5"
+                          >
+                            <Dot
+                              className="mr-1 size-3"
+                              strokeWidth={JobStatusColor.stroke}
+                              color={JobStatusColor.color}
+                            />
+                            {textTransform(data.jobRequest.status)}
+                          </Badge>
+                        );
+                      })()}
+                    </div>
+                  )}
+                <div>
+                  <P className="mb-1 text-sm">Requested by</P>
+                  <div className="flex items-center space-x-2 p-1">
+                    <Avatar className="size-5 rounded-full">
+                      <AvatarImage src={`${data.user.profileUrl}`} />
+                      <AvatarFallback className="rounded-md">
+                        {data.user.firstName.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <P>
+                      {formatFullName(
+                        data.user.firstName,
+                        data.user.middleName,
+                        data.user.lastName
+                      )}
+                    </P>
+                  </div>
+                </div>
+                {data.reviewer && (
+                  <div>
+                    <P className="mb-1 text-sm">Reviewed by</P>
+                    <div className="flex items-center space-x-2 p-1">
+                      <Avatar className="size-5 rounded-full">
+                        <AvatarImage src={`${data.reviewer.profileUrl}`} />
+                        <AvatarFallback className="rounded-md">
+                          {data.reviewer.firstName.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <P>
+                        {data.reviewer
+                          ? formatFullName(
+                              data.reviewer.firstName,
+                              data.reviewer.middleName,
+                              data.reviewer.lastName
+                            )
+                          : "N/A"}
+                      </P>
+                    </div>
+                  </div>
+                )}
+                {data.type === "JOB" && data.jobRequest?.assignedUser && (
+                  <div>
+                    <P className="mb-1 text-sm">Assigned to</P>
+                    <div className="flex items-center space-x-2 p-1">
+                      <Avatar className="size-5 rounded-full">
+                        <AvatarImage
+                          src={`${data.jobRequest.assignedUser.profileUrl}`}
+                        />
+                        <AvatarFallback className="rounded-md">
+                          {data.jobRequest.assignedUser.firstName
+                            .charAt(0)
+                            .toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <P>
+                        {data.jobRequest.assignedUser
+                          ? formatFullName(
+                              data.jobRequest.assignedUser.firstName,
+                              data.jobRequest.assignedUser.middleName,
+                              data.jobRequest.assignedUser.lastName
+                            )
+                          : "N/A"}
+                      </P>
+                    </div>
+                  </div>
+                )}
+                {data.type === "JOB" && data.jobRequest && (
+                  <SetPriority
+                    prio={data.jobRequest.priority}
                     requestId={data.id}
+                    disabled={
+                      data.status === "COMPLETED" ||
+                      data.jobRequest.status !== "PENDING"
+                    }
+                    allowedDepartment={data.departmentId}
                   />
                 )}
-            </>
-          )}
-          {data.type === "JOB" &&
-            data.jobRequest &&
-            data.jobRequest.assignedTo === currentUser.id &&
-            data.status === "APPROVED" && (
-              <PersonnelActions
-                requestId={data.id}
-                allowedDepartment={data.departmentId}
-                allowedRoles={["PERSONNEL"]}
-                data={data.jobRequest}
-              />
-            )}
-          {data.type === "BORROW" && data.returnableRequest && (
-            <RequestReviewerActions
-              request={data}
-              allowedRoles={["OPERATIONS_MANAGER", "DEPARTMENT_HEAD"]}
-              allowedDepartment={data.departmentId}
-              allowedApproverRoles={["DEPARTMENT_HEAD"]}
-              inProgress={data.returnableRequest.inProgress}
-            >
-              {data.status === "APPROVED" ||
-                (data.status === "ON_HOLD" && (
-                  <ClientRoleGuard allowedRoles={["OPERATIONS_MANAGER"]}>
-                    <CancelRequest
-                      requestId={data.id}
-                      disabled={data.returnableRequest.inProgress}
-                      requestStatus={data.status}
-                    />
-                  </ClientRoleGuard>
-                ))}
-            </RequestReviewerActions>
-          )}
-          {data.type === "SUPPLY" && data.supplyRequest && (
-            <RequestReviewerActions
-              request={data}
-              allowedRoles={["OPERATIONS_MANAGER", "DEPARTMENT_HEAD"]}
-              allowedDepartment={data.departmentId}
-              allowedApproverRoles={["DEPARTMENT_HEAD"]}
-            />
-          )}
-          {data.type === "TRANSPORT" && data.transportRequest && (
-            <RequestReviewerActions
-              request={data}
-              allowedRoles={["OPERATIONS_MANAGER", "DEPARTMENT_HEAD"]}
-              allowedDepartment={data.departmentId}
-              allowedApproverRoles={["DEPARTMENT_HEAD"]}
-              actionNeeded={
-                new Date(data.transportRequest.dateAndTimeNeeded) <=
-                  new Date() &&
-                !data.transportRequest.inProgress &&
-                data.status === "APPROVED"
-              }
-              inProgress={data.transportRequest.inProgress}
-            >
-              {new Date(data.transportRequest.dateAndTimeNeeded) <=
-                new Date() &&
-                !data.transportRequest.inProgress &&
+              </div>
+            </div>
+            <Separator className="my-6" />
+            <div className="flex flex-col gap-3">
+              {currentUser.id === data.userId && (
+                <CancelRequest
+                  requestId={data.id}
+                  requestStatus={data.status}
+                  disabled={
+                    data.transportRequest?.inProgress ||
+                    data.returnableRequest?.inProgress ||
+                    data.venueRequest?.inProgress ||
+                    (data.jobRequest
+                      ? data.jobRequest.status !== "PENDING"
+                      : false)
+                  }
+                />
+              )}
+              {data.type === "JOB" &&
+                data.jobRequest &&
+                !data.jobRequest.jobRequestEvaluation &&
+                data.status === "COMPLETED" &&
+                currentUser.id === data.userId && (
+                  <JobRequestEvaluationDialog
+                    jobRequestId={data.jobRequest.id}
+                    requestId={data.id}
+                  >
+                    <Button
+                      onClick={() =>
+                        dialogManager.setActiveDialog(
+                          "jobRequestEvaluationDialog"
+                        )
+                      }
+                    >
+                      Evaluation
+                    </Button>
+                  </JobRequestEvaluationDialog>
+                )}
+              {data.type === "JOB" && data.jobRequest && (
+                <>
+                  <JobRequestReviewerActions
+                    request={data}
+                    allowedDepartment={data.departmentId}
+                    allowedRoles={["OPERATIONS_MANAGER", "DEPARTMENT_HEAD"]}
+                    jobRequestId={data.jobRequest.id}
+                  />
+                  {!data.jobRequest.verifiedByRequester &&
+                    data.jobRequest.status === "COMPLETED" &&
+                    data.userId === currentUser.id && (
+                      <VerifyJob
+                        jobRequestId={data.jobRequest.id}
+                        role="requester"
+                        requestId={data.id}
+                      />
+                    )}
+                </>
+              )}
+              {data.type === "JOB" &&
+                data.jobRequest &&
+                data.jobRequest.assignedTo === currentUser.id &&
                 data.status === "APPROVED" && (
-                  <TransportRequestActions data={data.transportRequest}>
+                  <PersonnelActions
+                    requestId={data.id}
+                    allowedDepartment={data.departmentId}
+                    allowedRoles={["PERSONNEL"]}
+                    data={data.jobRequest}
+                  />
+                )}
+              {data.type === "BORROW" && data.returnableRequest && (
+                <RequestReviewerActions
+                  request={data}
+                  allowedRoles={["OPERATIONS_MANAGER", "DEPARTMENT_HEAD"]}
+                  allowedDepartment={data.departmentId}
+                  allowedApproverRoles={["DEPARTMENT_HEAD"]}
+                  inProgress={data.returnableRequest.inProgress}
+                >
+                  {data.status === "APPROVED" ||
+                    (data.status === "ON_HOLD" && (
+                      <ClientRoleGuard allowedRoles={["OPERATIONS_MANAGER"]}>
+                        <CancelRequest
+                          requestId={data.id}
+                          disabled={data.returnableRequest.inProgress}
+                          requestStatus={data.status}
+                        />
+                      </ClientRoleGuard>
+                    ))}
+                </RequestReviewerActions>
+              )}
+              {data.type === "SUPPLY" && data.supplyRequest && (
+                <RequestReviewerActions
+                  request={data}
+                  allowedRoles={["OPERATIONS_MANAGER", "DEPARTMENT_HEAD"]}
+                  allowedDepartment={data.departmentId}
+                  allowedApproverRoles={["DEPARTMENT_HEAD"]}
+                />
+              )}
+              {data.type === "TRANSPORT" && data.transportRequest && (
+                <RequestReviewerActions
+                  request={data}
+                  allowedRoles={["OPERATIONS_MANAGER", "DEPARTMENT_HEAD"]}
+                  allowedDepartment={data.departmentId}
+                  allowedApproverRoles={["DEPARTMENT_HEAD"]}
+                  actionNeeded={
+                    new Date(data.transportRequest.dateAndTimeNeeded) <=
+                      new Date() &&
+                    !data.transportRequest.inProgress &&
+                    data.status === "APPROVED"
+                  }
+                  inProgress={data.transportRequest.inProgress}
+                >
+                  {new Date(data.transportRequest.dateAndTimeNeeded) <=
+                    new Date() &&
+                    !data.transportRequest.inProgress &&
+                    data.status === "APPROVED" && (
+                      <TransportRequestActions data={data.transportRequest}>
+                        {(data.status === "APPROVED" ||
+                          data.status === "ON_HOLD") && (
+                          <ClientRoleGuard
+                            allowedRoles={["OPERATIONS_MANAGER"]}
+                          >
+                            <CancelRequest
+                              requestId={data.id}
+                              disabled={data.transportRequest.inProgress}
+                              requestStatus={data.status}
+                            />
+                          </ClientRoleGuard>
+                        )}
+                      </TransportRequestActions>
+                    )}
+                </RequestReviewerActions>
+              )}
+              {data.type === "VENUE" &&
+                data.venueRequest &&
+                data.venueRequest.approvedByHead === true && (
+                  <RequestReviewerActions
+                    request={data}
+                    allowedRoles={["OPERATIONS_MANAGER", "DEPARTMENT_HEAD"]}
+                    allowedDepartment={data.departmentId}
+                    allowedApproverRoles={["DEPARTMENT_HEAD"]}
+                    inProgress={data.venueRequest.inProgress}
+                    actionNeeded={
+                      new Date(data.venueRequest.startTime) <= new Date() &&
+                      !data.venueRequest.inProgress &&
+                      data.status === "APPROVED"
+                    }
+                  >
+                    {new Date(data.venueRequest.startTime) <= new Date() &&
+                      !data.venueRequest.inProgress &&
+                      data.status === "APPROVED" && (
+                        <VenueRequestActions
+                          requestId={data.id}
+                          departmentId={data.departmentId}
+                        />
+                      )}
                     {(data.status === "APPROVED" ||
                       data.status === "ON_HOLD") && (
                       <ClientRoleGuard allowedRoles={["OPERATIONS_MANAGER"]}>
                         <CancelRequest
                           requestId={data.id}
-                          disabled={data.transportRequest.inProgress}
+                          disabled={data.venueRequest.inProgress}
                           requestStatus={data.status}
                         />
                       </ClientRoleGuard>
                     )}
-                  </TransportRequestActions>
+                  </RequestReviewerActions>
                 )}
-            </RequestReviewerActions>
-          )}
-          {data.type === "VENUE" &&
-            data.venueRequest &&
-            data.venueRequest.approvedByHead === true && (
-              <RequestReviewerActions
-                request={data}
-                allowedRoles={["OPERATIONS_MANAGER", "DEPARTMENT_HEAD"]}
-                allowedDepartment={data.departmentId}
-                allowedApproverRoles={["DEPARTMENT_HEAD"]}
-                inProgress={data.venueRequest.inProgress}
-                actionNeeded={
-                  new Date(data.venueRequest.startTime) <= new Date() &&
-                  !data.venueRequest.inProgress &&
-                  data.status === "APPROVED"
-                }
-              >
-                {new Date(data.venueRequest.startTime) <= new Date() &&
-                  !data.venueRequest.inProgress &&
-                  data.status === "APPROVED" && (
-                    <VenueRequestActions
+              {data.type === "VENUE" && data.venueRequest && (
+                <>
+                  {data.venueRequest.approvedByHead === null &&
+                    data.status === "PENDING" && (
+                      <VenueChairApproval
+                        data={data.venueRequest}
+                        requestId={data.id}
+                      />
+                    )}
+                  {data.venueRequest.inProgress && (
+                    <CompleteVenueRequest
                       requestId={data.id}
                       departmentId={data.departmentId}
                     />
                   )}
-                {(data.status === "APPROVED" || data.status === "ON_HOLD") && (
-                  <ClientRoleGuard allowedRoles={["OPERATIONS_MANAGER"]}>
-                    <CancelRequest
-                      requestId={data.id}
-                      disabled={data.venueRequest.inProgress}
-                      requestStatus={data.status}
-                    />
-                  </ClientRoleGuard>
+                </>
+              )}
+              {data.type === "TRANSPORT" &&
+                data.transportRequest &&
+                data.transportRequest.inProgress && (
+                  <CompleteTransportRequest
+                    requestId={data.id}
+                    initialOdometer={data.transportRequest.vehicle.odometer}
+                  />
                 )}
-              </RequestReviewerActions>
-            )}
-          {data.type === "VENUE" && data.venueRequest && (
-            <>
-              {data.venueRequest.approvedByHead === null &&
-                data.status === "PENDING" && (
-                  <VenueChairApproval
-                    data={data.venueRequest}
+
+              {data.type === "BORROW" &&
+                data.returnableRequest &&
+                data.status === "APPROVED" &&
+                new Date(data.returnableRequest.dateAndTimeNeeded) <=
+                  new Date() && (
+                  <ReturnableRequestActions
+                    allowedRoles={["OPERATIONS_MANAGER"]}
+                    allowedDepartment={data.departmentId}
+                    request={data.returnableRequest}
                     requestId={data.id}
                   />
                 )}
-              {data.venueRequest.inProgress && (
-                <CompleteVenueRequest
-                  requestId={data.id}
-                  departmentId={data.departmentId}
-                />
-              )}
-            </>
-          )}
-          {data.type === "TRANSPORT" &&
-            data.transportRequest &&
-            data.transportRequest.inProgress && (
-              <CompleteTransportRequest
-                requestId={data.id}
-                initialOdometer={data.transportRequest.vehicle.odometer}
-              />
-            )}
+              {data.status === "APPROVED" &&
+                data.type === "SUPPLY" &&
+                data.supplyRequest && (
+                  <SupplyRequestActions
+                    requestId={data.id}
+                    allowedRoles={["OPERATIONS_MANAGER"]}
+                    allowedDepartment={data.departmentId}
+                  />
+                )}
+            </div>
+          </ScrollArea>
+        </>
+      ) : (
+        <>
+          <Button
+            className="absolute bottom-5 right-5 size-10 rounded-full p-0"
+            onClick={() => setSheetOpen(true)}
+          >
+            <Info className="size-5" />
+          </Button>
+          <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+            <SheetContent>
+              <SheetHeader>
+                <SheetTitle>Request Summary</SheetTitle>
+              </SheetHeader>
+              <ScrollArea className="h-[calc(100vh_-_120px)] px-4">
+                <RequestSummaryTitle />
+                <div>
+                  <div className="space-y-4">
+                    <div>
+                      <P className="mb-1 text-sm">Request</P>
+                      <Badge variant={RequestTypeIcon.variant}>
+                        <RequestTypeIcon.icon className="mr-2 h-4 w-4" />
+                        {textTransform(data.type)}
+                      </Badge>
+                    </div>
+                    <div>
+                      <P className="mb-1 text-sm">Status</P>
+                      <Badge variant={statusColor.variant} className="pr-3.5">
+                        <Dot
+                          className="mr-1 size-3"
+                          strokeWidth={statusColor.stroke}
+                          color={statusColor.color}
+                        />
+                        {textTransform(data.status)}
+                      </Badge>
+                    </div>
+                    {data.type === "JOB" &&
+                      data.jobRequest &&
+                      data.status !== "PENDING" && (
+                        <div>
+                          <P className="mb-1 text-sm">Job Status</P>
+                          {(() => {
+                            const JobStatusColor = getJobStatusColor(
+                              data.jobRequest.status
+                            );
+                            return (
+                              <Badge
+                                variant={JobStatusColor.variant}
+                                className="pr-3.5"
+                              >
+                                <Dot
+                                  className="mr-1 size-3"
+                                  strokeWidth={JobStatusColor.stroke}
+                                  color={JobStatusColor.color}
+                                />
+                                {textTransform(data.jobRequest.status)}
+                              </Badge>
+                            );
+                          })()}
+                        </div>
+                      )}
+                    <div>
+                      <P className="mb-1 text-sm">Requested by</P>
+                      <div className="flex items-center space-x-2 p-1">
+                        <Avatar className="size-5 rounded-full">
+                          <AvatarImage src={`${data.user.profileUrl}`} />
+                          <AvatarFallback className="rounded-md">
+                            {data.user.firstName.charAt(0).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <P>
+                          {formatFullName(
+                            data.user.firstName,
+                            data.user.middleName,
+                            data.user.lastName
+                          )}
+                        </P>
+                      </div>
+                    </div>
+                    {data.reviewer && (
+                      <div>
+                        <P className="mb-1 text-sm">Reviewed by</P>
+                        <div className="flex items-center space-x-2 p-1">
+                          <Avatar className="size-5 rounded-full">
+                            <AvatarImage src={`${data.reviewer.profileUrl}`} />
+                            <AvatarFallback className="rounded-md">
+                              {data.reviewer.firstName.charAt(0).toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+                          <P>
+                            {data.reviewer
+                              ? formatFullName(
+                                  data.reviewer.firstName,
+                                  data.reviewer.middleName,
+                                  data.reviewer.lastName
+                                )
+                              : "N/A"}
+                          </P>
+                        </div>
+                      </div>
+                    )}
+                    {data.type === "JOB" && data.jobRequest?.assignedUser && (
+                      <div>
+                        <P className="mb-1 text-sm">Assigned to</P>
+                        <div className="flex items-center space-x-2 p-1">
+                          <Avatar className="size-5 rounded-full">
+                            <AvatarImage
+                              src={`${data.jobRequest.assignedUser.profileUrl}`}
+                            />
+                            <AvatarFallback className="rounded-md">
+                              {data.jobRequest.assignedUser.firstName
+                                .charAt(0)
+                                .toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+                          <P>
+                            {data.jobRequest.assignedUser
+                              ? formatFullName(
+                                  data.jobRequest.assignedUser.firstName,
+                                  data.jobRequest.assignedUser.middleName,
+                                  data.jobRequest.assignedUser.lastName
+                                )
+                              : "N/A"}
+                          </P>
+                        </div>
+                      </div>
+                    )}
+                    {data.type === "JOB" && data.jobRequest && (
+                      <SetPriority
+                        prio={data.jobRequest.priority}
+                        requestId={data.id}
+                        disabled={
+                          data.status === "COMPLETED" ||
+                          data.jobRequest.status !== "PENDING"
+                        }
+                        allowedDepartment={data.departmentId}
+                      />
+                    )}
+                  </div>
+                </div>
+                <Separator className="my-6" />
+                <div className="flex flex-col gap-3">
+                  {currentUser.id === data.userId && (
+                    <CancelRequest
+                      requestId={data.id}
+                      requestStatus={data.status}
+                      disabled={
+                        data.transportRequest?.inProgress ||
+                        data.returnableRequest?.inProgress ||
+                        data.venueRequest?.inProgress ||
+                        (data.jobRequest
+                          ? data.jobRequest.status !== "PENDING"
+                          : false)
+                      }
+                    />
+                  )}
+                  {data.type === "JOB" &&
+                    data.jobRequest &&
+                    !data.jobRequest.jobRequestEvaluation &&
+                    data.status === "COMPLETED" &&
+                    currentUser.id === data.userId && (
+                      <JobRequestEvaluationDialog
+                        jobRequestId={data.jobRequest.id}
+                        requestId={data.id}
+                      >
+                        <Button
+                          onClick={() =>
+                            dialogManager.setActiveDialog(
+                              "jobRequestEvaluationDialog"
+                            )
+                          }
+                        >
+                          Evaluation
+                        </Button>
+                      </JobRequestEvaluationDialog>
+                    )}
+                  {data.type === "JOB" && data.jobRequest && (
+                    <>
+                      <JobRequestReviewerActions
+                        request={data}
+                        allowedDepartment={data.departmentId}
+                        allowedRoles={["OPERATIONS_MANAGER", "DEPARTMENT_HEAD"]}
+                        jobRequestId={data.jobRequest.id}
+                      />
+                      {!data.jobRequest.verifiedByRequester &&
+                        data.jobRequest.status === "COMPLETED" &&
+                        data.userId === currentUser.id && (
+                          <VerifyJob
+                            jobRequestId={data.jobRequest.id}
+                            role="requester"
+                            requestId={data.id}
+                          />
+                        )}
+                    </>
+                  )}
+                  {data.type === "JOB" &&
+                    data.jobRequest &&
+                    data.jobRequest.assignedTo === currentUser.id &&
+                    data.status === "APPROVED" && (
+                      <PersonnelActions
+                        requestId={data.id}
+                        allowedDepartment={data.departmentId}
+                        allowedRoles={["PERSONNEL"]}
+                        data={data.jobRequest}
+                      />
+                    )}
+                  {data.type === "BORROW" && data.returnableRequest && (
+                    <RequestReviewerActions
+                      request={data}
+                      allowedRoles={["OPERATIONS_MANAGER", "DEPARTMENT_HEAD"]}
+                      allowedDepartment={data.departmentId}
+                      allowedApproverRoles={["DEPARTMENT_HEAD"]}
+                      inProgress={data.returnableRequest.inProgress}
+                    >
+                      {data.status === "APPROVED" ||
+                        (data.status === "ON_HOLD" && (
+                          <ClientRoleGuard
+                            allowedRoles={["OPERATIONS_MANAGER"]}
+                          >
+                            <CancelRequest
+                              requestId={data.id}
+                              disabled={data.returnableRequest.inProgress}
+                              requestStatus={data.status}
+                            />
+                          </ClientRoleGuard>
+                        ))}
+                    </RequestReviewerActions>
+                  )}
+                  {data.type === "SUPPLY" && data.supplyRequest && (
+                    <RequestReviewerActions
+                      request={data}
+                      allowedRoles={["OPERATIONS_MANAGER", "DEPARTMENT_HEAD"]}
+                      allowedDepartment={data.departmentId}
+                      allowedApproverRoles={["DEPARTMENT_HEAD"]}
+                    />
+                  )}
+                  {data.type === "TRANSPORT" && data.transportRequest && (
+                    <RequestReviewerActions
+                      request={data}
+                      allowedRoles={["OPERATIONS_MANAGER", "DEPARTMENT_HEAD"]}
+                      allowedDepartment={data.departmentId}
+                      allowedApproverRoles={["DEPARTMENT_HEAD"]}
+                      actionNeeded={
+                        new Date(data.transportRequest.dateAndTimeNeeded) <=
+                          new Date() &&
+                        !data.transportRequest.inProgress &&
+                        data.status === "APPROVED"
+                      }
+                      inProgress={data.transportRequest.inProgress}
+                    >
+                      {new Date(data.transportRequest.dateAndTimeNeeded) <=
+                        new Date() &&
+                        !data.transportRequest.inProgress &&
+                        data.status === "APPROVED" && (
+                          <TransportRequestActions data={data.transportRequest}>
+                            {(data.status === "APPROVED" ||
+                              data.status === "ON_HOLD") && (
+                              <ClientRoleGuard
+                                allowedRoles={["OPERATIONS_MANAGER"]}
+                              >
+                                <CancelRequest
+                                  requestId={data.id}
+                                  disabled={data.transportRequest.inProgress}
+                                  requestStatus={data.status}
+                                />
+                              </ClientRoleGuard>
+                            )}
+                          </TransportRequestActions>
+                        )}
+                    </RequestReviewerActions>
+                  )}
+                  {data.type === "VENUE" &&
+                    data.venueRequest &&
+                    data.venueRequest.approvedByHead === true && (
+                      <RequestReviewerActions
+                        request={data}
+                        allowedRoles={["OPERATIONS_MANAGER", "DEPARTMENT_HEAD"]}
+                        allowedDepartment={data.departmentId}
+                        allowedApproverRoles={["DEPARTMENT_HEAD"]}
+                        inProgress={data.venueRequest.inProgress}
+                        actionNeeded={
+                          new Date(data.venueRequest.startTime) <= new Date() &&
+                          !data.venueRequest.inProgress &&
+                          data.status === "APPROVED"
+                        }
+                      >
+                        {new Date(data.venueRequest.startTime) <= new Date() &&
+                          !data.venueRequest.inProgress &&
+                          data.status === "APPROVED" && (
+                            <VenueRequestActions
+                              requestId={data.id}
+                              departmentId={data.departmentId}
+                            />
+                          )}
+                        {(data.status === "APPROVED" ||
+                          data.status === "ON_HOLD") && (
+                          <ClientRoleGuard
+                            allowedRoles={["OPERATIONS_MANAGER"]}
+                          >
+                            <CancelRequest
+                              requestId={data.id}
+                              disabled={data.venueRequest.inProgress}
+                              requestStatus={data.status}
+                            />
+                          </ClientRoleGuard>
+                        )}
+                      </RequestReviewerActions>
+                    )}
+                  {data.type === "VENUE" && data.venueRequest && (
+                    <>
+                      {data.venueRequest.approvedByHead === null &&
+                        data.status === "PENDING" && (
+                          <VenueChairApproval
+                            data={data.venueRequest}
+                            requestId={data.id}
+                          />
+                        )}
+                      {data.venueRequest.inProgress && (
+                        <CompleteVenueRequest
+                          requestId={data.id}
+                          departmentId={data.departmentId}
+                        />
+                      )}
+                    </>
+                  )}
+                  {data.type === "TRANSPORT" &&
+                    data.transportRequest &&
+                    data.transportRequest.inProgress && (
+                      <CompleteTransportRequest
+                        requestId={data.id}
+                        initialOdometer={data.transportRequest.vehicle.odometer}
+                      />
+                    )}
 
-          {data.type === "BORROW" &&
-            data.returnableRequest &&
-            data.status === "APPROVED" &&
-            new Date(data.returnableRequest.dateAndTimeNeeded) <=
-              new Date() && (
-              <ReturnableRequestActions
-                allowedRoles={["OPERATIONS_MANAGER"]}
-                allowedDepartment={data.departmentId}
-                request={data.returnableRequest}
-                requestId={data.id}
-              />
-            )}
-          {data.status === "APPROVED" &&
-            data.type === "SUPPLY" &&
-            data.supplyRequest && (
-              <SupplyRequestActions
-                requestId={data.id}
-                allowedRoles={["OPERATIONS_MANAGER"]}
-                allowedDepartment={data.departmentId}
-              />
-            )}
-        </div>
-      </ScrollArea>
+                  {data.type === "BORROW" &&
+                    data.returnableRequest &&
+                    data.status === "APPROVED" &&
+                    new Date(data.returnableRequest.dateAndTimeNeeded) <=
+                      new Date() && (
+                      <ReturnableRequestActions
+                        allowedRoles={["OPERATIONS_MANAGER"]}
+                        allowedDepartment={data.departmentId}
+                        request={data.returnableRequest}
+                        requestId={data.id}
+                      />
+                    )}
+                  {data.status === "APPROVED" &&
+                    data.type === "SUPPLY" &&
+                    data.supplyRequest && (
+                      <SupplyRequestActions
+                        requestId={data.id}
+                        allowedRoles={["OPERATIONS_MANAGER"]}
+                        allowedDepartment={data.departmentId}
+                      />
+                    )}
+                </div>
+              </ScrollArea>
+            </SheetContent>
+          </Sheet>
+        </>
+      )}
     </div>
   );
 }
