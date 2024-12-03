@@ -56,10 +56,9 @@ export default function CollapseMenuButton({
   const [isCollapsed, setIsCollapsed] = useState<boolean>(isSubmenuActive);
 
   // Only fetch notifications if this is a department menu item
-  const { unreadCount } =
-    showNotification && departmentId
-      ? useDepartmentNotifications(departmentId)
-      : { unreadCount: 0 };
+  const { unreadCount: notificationCount } = useDepartmentNotifications(departmentId || "");
+  // Compute the final unread count based on showNotification prop
+  const unreadCount = showNotification ? notificationCount : 0;
 
   const NotificationBadge = () =>
     showNotification && unreadCount > 0 ? (
