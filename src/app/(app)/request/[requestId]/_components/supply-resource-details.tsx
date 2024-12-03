@@ -275,7 +275,7 @@ export default function SupplyResourceDetails({
                 {canEdit && (
                   <Button
                     variant="link"
-                    className="opacity-0 group-hover:opacity-100"
+                    className="lg:opacity-0 group-hover:opacity-100"
                     onClick={(e) => {
                       e.preventDefault();
                       setEditField("dateAndTimeNeeded");
@@ -329,7 +329,7 @@ export default function SupplyResourceDetails({
                 {canEdit && (
                   <Button
                     variant="link"
-                    className="opacity-0 group-hover:opacity-100"
+                    className="lg:opacity-0 group-hover:opacity-100"
                     onClick={(e) => {
                       e.preventDefault();
                       setEditField("purpose");

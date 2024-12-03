@@ -530,7 +530,7 @@ export default function VenueRequestDetails({
                 {canEdit && (
                   <Button
                     variant="link"
-                    className="opacity-0 group-hover:opacity-100"
+                    className="lg:opacity-0 group-hover:opacity-100"
                     onClick={(e) => {
                       e.preventDefault();
                       setEditField("startTime");
@@ -571,7 +571,7 @@ export default function VenueRequestDetails({
                 {canEdit && (
                   <Button
                     variant="link"
-                    className="opacity-0 group-hover:opacity-100"
+                    className="lg:opacity-0 group-hover:opacity-100"
                     onClick={(e) => {
                       e.preventDefault();
                       setEditField("endTime");
@@ -624,7 +624,7 @@ export default function VenueRequestDetails({
                 {canEdit && (
                   <Button
                     variant="link"
-                    className="opacity-0 group-hover:opacity-100"
+                    className="lg:opacity-0 group-hover:opacity-100"
                     onClick={(e) => {
                       e.preventDefault();
                       setEditField("setupRequirements");
@@ -678,7 +678,7 @@ export default function VenueRequestDetails({
                 {canEdit && (
                   <Button
                     variant="link"
-                    className="opacity-0 group-hover:opacity-100"
+                    className="lg:opacity-0 group-hover:opacity-100"
                     onClick={(e) => {
                       e.preventDefault();
                       setEditField("purpose");
@@ -734,7 +734,7 @@ export default function VenueRequestDetails({
                 {canEdit && (
                   <Button
                     variant="link"
-                    className="opacity-0 group-hover:opacity-100"
+                    className="lg:opacity-0 group-hover:opacity-100"
                     onClick={(e) => {
                       e.preventDefault();
                       setEditField("info");

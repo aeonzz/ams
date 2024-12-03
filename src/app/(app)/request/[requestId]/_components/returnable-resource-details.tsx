@@ -319,7 +319,7 @@ export default function ReturnableResourceDetails({
                 {canEdit && (
                   <Button
                     variant="link"
-                    className="opacity-0 group-hover:opacity-100"
+                    className="lg:opacity-0 group-hover:opacity-100"
                     onClick={(e) => {
                       e.preventDefault();
                       setEditField("location");
@@ -363,7 +363,7 @@ export default function ReturnableResourceDetails({
                 {canEdit && (
                   <Button
                     variant="link"
-                    className="opacity-0 group-hover:opacity-100"
+                    className="lg:opacity-0 group-hover:opacity-100"
                     onClick={(e) => {
                       e.preventDefault();
                       setEditField("dateAndTimeNeeded");
@@ -407,7 +407,7 @@ export default function ReturnableResourceDetails({
                 {canEdit && (
                   <Button
                     variant="link"
-                    className="opacity-0 group-hover:opacity-100"
+                    className="lg:opacity-0 group-hover:opacity-100"
                     onClick={(e) => {
                       e.preventDefault();
                       setEditField("returnDateAndTime");
@@ -461,7 +461,7 @@ export default function ReturnableResourceDetails({
                 {canEdit && (
                   <Button
                     variant="link"
-                    className="opacity-0 group-hover:opacity-100"
+                    className="lg:opacity-0 group-hover:opacity-100"
                     onClick={(e) => {
                       e.preventDefault();
                       setEditField("purpose");
@@ -517,7 +517,7 @@ export default function ReturnableResourceDetails({
                 {canEdit && (
                   <Button
                     variant="link"
-                    className="opacity-0 group-hover:opacity-100"
+                    className="lg:opacity-0 group-hover:opacity-100"
                     onClick={(e) => {
                       e.preventDefault();
                       setEditField("notes");

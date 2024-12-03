@@ -439,7 +439,7 @@ export default function TransportRequestDetails({
                 {canEdit && (
                   <Button
                     variant="link"
-                    className="opacity-0 group-hover:opacity-100"
+                    className="lg:opacity-0 group-hover:opacity-100"
                     onClick={(e) => {
                       e.preventDefault();
                       setEditField("destination");
@@ -494,7 +494,7 @@ export default function TransportRequestDetails({
                 {canEdit && (
                   <Button
                     variant="link"
-                    className="opacity-0 group-hover:opacity-100"
+                    className="lg:opacity-0 group-hover:opacity-100"
                     onClick={(e) => {
                       e.preventDefault();
                       setEditField("department");
@@ -557,7 +557,7 @@ export default function TransportRequestDetails({
                 {canEdit && (
                   <Button
                     variant="link"
-                    className="opacity-0 group-hover:opacity-100"
+                    className="lg:opacity-0 group-hover:opacity-100"
                     onClick={(e) => {
                       e.preventDefault();
                       setEditField("passengersName");
@@ -598,7 +598,7 @@ export default function TransportRequestDetails({
                 {canEdit && (
                   <Button
                     variant="link"
-                    className="opacity-0 group-hover:opacity-100"
+                    className="lg:opacity-0 group-hover:opacity-100"
                     onClick={(e) => {
                       e.preventDefault();
                       setEditField("dateAndTimeNeeded");
@@ -652,7 +652,7 @@ export default function TransportRequestDetails({
                 {canEdit && (
                   <Button
                     variant="link"
-                    className="opacity-0 group-hover:opacity-100"
+                    className="lg:opacity-0 group-hover:opacity-100"
                     onClick={(e) => {
                       e.preventDefault();
                       setEditField("description");

@@ -24,7 +24,7 @@ export default function SubMenuButton({
       variant="ghost"
       className={cn(
         active && "bg-tertiary hover:bg-tertiary",
-        "mb-1 h-8 w-full justify-start"
+        "mb-1 h-8 w-full justify-start hover:bg-tertiary"
       )}
       asChild
     >

@@ -33,15 +33,15 @@ export default async function ResetPasswordPage({
   }
 
   return (
-    <div className="flex flex-col items-center justify-center space-y-2">
-      <h1 className="scroll-m-20 text-xl font-semibold tracking-tight">
+    <div className="flex flex-col items-center justify-center space-y-2 max-w-[340px]">
+      <h1 className="scroll-m-20 text-xl text-center font-semibold tracking-tight">
         Reset Your Password
       </h1>
       <p className="text-center text-sm text-muted-foreground">
         Please enter your new password and confirm it to complete the reset
         process.
       </p>
-      <ResetPasswordForm resetPasswordToken={token} className="sm:w-[330px]" />
+      <ResetPasswordForm resetPasswordToken={token} />
     </div>
   );
 }
