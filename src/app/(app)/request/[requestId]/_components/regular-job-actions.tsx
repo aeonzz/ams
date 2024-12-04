@@ -30,6 +30,8 @@ import type { JobRequestWithRelations } from "prisma/generated/zod";
 import { CommandShortcut } from "@/components/ui/command";
 import { P } from "@/components/typography/text";
 import { type JobStatusType } from "prisma/generated/zod/inputTypeSchemas/JobStatusSchema";
+import { useMediaQuery } from "usehooks-ts";
+import { cn } from "@/lib/utils";
 
 interface RegularJobActionsProps {
   allowedDepartment?: string;
@@ -46,6 +48,7 @@ export default function RegularJobActions({
 }: RegularJobActionsProps) {
   const currentUser = useSession();
   const queryClient = useQueryClient();
+  const isDesktop = useMediaQuery("(min-width: 769px)");
   const pathname = usePathname();
   const [alertOpen, setAlertOpen] = React.useState(false);
 
@@ -131,7 +134,10 @@ export default function RegularJobActions({
               </Button>
             </TooltipTrigger>
           </AlertDialogTrigger>
-          <AlertDialogContent onCloseAutoFocus={(e) => e.preventDefault()}>
+          <AlertDialogContent
+            className={cn(!isDesktop && "max-w-[calc(100vw_-_20px)]")}
+            onCloseAutoFocus={(e) => e.preventDefault()}
+          >
             <AlertDialogHeader>
               <AlertDialogTitle>{config.dialogTitle}</AlertDialogTitle>
               <AlertDialogDescription>

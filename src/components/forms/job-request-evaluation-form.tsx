@@ -46,6 +46,7 @@ import { P } from "../typography/text";
 import { Info } from "lucide-react";
 import { toast } from "sonner";
 import { usePathname } from "next/navigation";
+import { useMediaQuery } from "usehooks-ts";
 
 const surveyQuestions = [
   "SQ0: I am satisfied with the service that I availed.",
@@ -108,7 +109,6 @@ interface JobRequestEvaluationFormProps {
   >;
   isPending: boolean;
   form: UseFormReturn<CreateJobEvaluationSchema>;
-  handleOpenChange: (open: boolean) => void;
   isFieldsDirty: boolean;
   jobRequestId: string;
   requestId: string;
@@ -118,12 +118,12 @@ export default function JobRequestEvaluationForm({
   mutateAsync,
   isPending,
   form,
-  handleOpenChange,
   isFieldsDirty,
   jobRequestId,
   requestId,
 }: JobRequestEvaluationFormProps) {
   const pathname = usePathname();
+  const isDesktop = useMediaQuery("(min-width: 769px)");
   const queryClient = useQueryClient();
   const onSubmit = async (values: CreateJobEvaluationSchema) => {
     try {
@@ -135,7 +135,7 @@ export default function JobRequestEvaluationForm({
       toast.promise(mutateAsync(data), {
         loading: "Submitting your evaluation...",
         success: () => {
-          handleOpenChange(false);
+          queryClient.invalidateQueries({ queryKey: [requestId] });
           return "Thank you! Your evaluation has been successfully submitted.";
         },
         error: (err) => {
@@ -169,8 +169,8 @@ export default function JobRequestEvaluationForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
-        <div className="scroll-bar flex h-[calc(100vh_-_150px)] gap-6 overflow-y-auto py-1">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full pt-4">
+        <div className="flex gap-6 py-1">
           <div className="flex flex-1 flex-col">
             <div className="flex flex-col space-y-6 px-4">
               <div className="flex">
@@ -198,13 +198,13 @@ export default function JobRequestEvaluationForm({
                   name="clientType"
                   render={({ field }) => (
                     <FormItem>
-                      <div className="flex space-x-3">
+                      <div className="lg-flex-row flex flex-col gap-3">
                         <FormLabel className="w-20">Client Type:</FormLabel>
                         <FormControl>
                           <RadioGroup
                             onValueChange={field.onChange}
                             value={field.value || ""}
-                            className="flex space-x-3"
+                            className="flex flex-wrap gap-3"
                           >
                             {(ClientTypeSchema.options as ClientTypeType[]).map(
                               (type) => (
@@ -234,7 +234,7 @@ export default function JobRequestEvaluationForm({
                   name="position"
                   render={({ field }) => (
                     <FormItem>
-                      <div className="flex space-x-3">
+                      <div className="lg-flex-row flex flex-col gap-3">
                         <FormLabel className="w-20">I am a:</FormLabel>
                         <FormControl>
                           <RadioGroup
@@ -290,7 +290,7 @@ export default function JobRequestEvaluationForm({
                   name="sex"
                   render={({ field }) => (
                     <FormItem>
-                      <div className="flex space-x-3">
+                      <div className="lg-flex-row flex flex-col gap-3">
                         <FormLabel className="w-20">Sex:</FormLabel>
                         <FormControl>
                           <RadioGroup
@@ -319,7 +319,7 @@ export default function JobRequestEvaluationForm({
                   )}
                 />
                 <Separator className="my-4" />
-                <div className="flex gap-3">
+                <div className="flex flex-col gap-3 lg:flex-row">
                   <FormField
                     control={form.control}
                     name="age"
@@ -554,44 +554,39 @@ export default function JobRequestEvaluationForm({
               </div>
             </div>
             <Separator className="my-4" />
-            <div className="space-y-6 px-4">
-              <div className="flex">
-                <div className="mr-2 w-fit pt-[2px]">
-                  <Info className="size-4 text-primary" />
+            {isDesktop ? (
+              <div className="grid grid-cols-[1fr,auto] gap-4 px-4">
+                <div className="flex items-center justify-center">
+                  <FormLabel className="text-lg font-semibold">
+                    Service Quality Dimensions
+                  </FormLabel>
                 </div>
-                <P className="text-muted-foreground">
-                  For SQD 0-8, please put a check mark on the column that best
-                  corresponds to your answer
-                </P>
-              </div>
-              <div className="space-y-6">
-                <div className="grid grid-cols-[1fr,auto] gap-4">
-                  <div className="flex items-center justify-center">
-                    <FormLabel className="text-lg font-semibold">
-                      Service Quality Dimensions
-                    </FormLabel>
-                  </div>
-                  <div className="flex justify-between space-x-4">
-                    {emojiRatings.map((emoji, index) => (
-                      <div key={index} className="flex-1 text-center">
-                        <div className="text-2xl">{emoji}</div>
-                        <div className="text-xs">
-                          {emojiMeanings[index].label}
-                        </div>
+                <div className={`flex justify-between space-x-4`}>
+                  {emojiRatings.map((emoji, index) => (
+                    <div key={index} className="flex-1 text-center">
+                      <div className="text-2xl">{emoji}</div>
+                      <div className="text-xs">
+                        {emojiMeanings[index].label}
                       </div>
-                    ))}
-                  </div>
-                  {surveyQuestions.map((question, questionIndex) => (
-                    <React.Fragment key={questionKeys[questionIndex]}>
-                      <P className="flex h-16 items-center">{question}</P>
-                      <div className="flex justify-between space-x-4">
-                        {emojiMeanings.map((meaning, emojiIndex) => (
-                          <FormField
-                            key={emojiIndex}
-                            control={form.control}
-                            name={`surveyResponses.${questionKeys[questionIndex]}`}
-                            render={({ field }) => (
-                              <FormItem className="flex flex-1 items-center justify-center">
+                    </div>
+                  ))}
+                </div>
+                {surveyQuestions.map((question, questionIndex) => (
+                  <React.Fragment key={questionKeys[questionIndex]}>
+                    <P className="flex h-16 items-center font-medium">
+                      {question}
+                    </P>
+                    <FormField
+                      name={`surveyResponses.${questionKeys[questionIndex]}`}
+                      control={form.control}
+                      render={({ field }) => (
+                        <FormItem>
+                          <div className="flex justify-between space-x-4">
+                            {emojiMeanings.map((meaning, emojiIndex) => (
+                              <div
+                                key={emojiIndex}
+                                className="flex flex-1 flex-col items-center justify-center"
+                              >
                                 <FormControl>
                                   <Checkbox
                                     checked={field.value === meaning.value}
@@ -603,17 +598,59 @@ export default function JobRequestEvaluationForm({
                                     className="size-10"
                                   />
                                 </FormControl>
-                              </FormItem>
-                            )}
-                          />
-                        ))}
-                      </div>
-                      <FormMessage />
-                    </React.Fragment>
-                  ))}
-                </div>
+                              </div>
+                            ))}
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </React.Fragment>
+                ))}
               </div>
-            </div>
+            ) : (
+              <div className="flex flex-col gap-4 px-4">
+                {surveyQuestions.map((question, questionIndex) => (
+                  <React.Fragment key={questionKeys[questionIndex]}>
+                    <P className="flex h-auto min-h-[4rem] items-center">
+                      {question}
+                    </P>
+                    <FormField
+                      name={`surveyResponses.${questionKeys[questionIndex]}`}
+                      control={form.control}
+                      render={({ field }) => (
+                        <FormItem>
+                          <div className="flex justify-around">
+                            {emojiMeanings.map((meaning, emojiIndex) => (
+                              <div
+                                key={emojiIndex}
+                                className="flex flex-none flex-col items-center justify-center"
+                              >
+                                <div className="mt-2 text-xl">
+                                  {emojiRatings[emojiIndex]}
+                                </div>
+                                <FormControl>
+                                  <Checkbox
+                                    checked={field.value === meaning.value}
+                                    onCheckedChange={(checked) => {
+                                      field.onChange(
+                                        checked ? meaning.value : ""
+                                      );
+                                    }}
+                                    className="size-8"
+                                  />
+                                </FormControl>
+                              </div>
+                            ))}
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </React.Fragment>
+                ))}
+              </div>
+            )}
             <Separator className="my-4" />
             <FormField
               control={form.control}

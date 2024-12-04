@@ -19,6 +19,8 @@ import type { VerifyJobSchema } from "./schema";
 import { usePathname } from "next/navigation";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
+import { useMediaQuery } from "usehooks-ts";
+import { cn } from "@/lib/utils";
 
 interface VerifyJobProps {
   jobRequestId: string;
@@ -33,6 +35,7 @@ export default function VerifyJob({
 }: VerifyJobProps) {
   const pathname = usePathname();
   const queryClient = useQueryClient();
+  const isDesktop = useMediaQuery("(min-width: 769px)");
   const [isAlertOpen, setIsAlertOpen] = React.useState(false);
 
   const { isPending, mutateAsync } =
@@ -66,7 +69,9 @@ export default function VerifyJob({
           Verify Job
         </Button>
       </AlertDialogTrigger>
-      <AlertDialogContent>
+      <AlertDialogContent
+        className={cn(!isDesktop && "max-w-[calc(100vw_-_20px)]")}
+      >
         <AlertDialogHeader>
           <AlertDialogTitle>Verify job</AlertDialogTitle>
           <AlertDialogDescription>
