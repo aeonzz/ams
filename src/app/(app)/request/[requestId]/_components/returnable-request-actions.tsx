@@ -26,6 +26,8 @@ import { Textarea } from "@/components/ui/text-area";
 import { useQueryClient } from "@tanstack/react-query";
 import { PermissionGuard } from "@/components/permission-guard";
 import { useSession } from "@/lib/hooks/use-session";
+import { cn } from "@/lib/utils";
+import { useMediaQuery } from "usehooks-ts";
 
 interface ReturnableRequestActionsProps {
   requestId: string;
@@ -43,6 +45,7 @@ export default function ReturnableRequestActions({
   const pathname = usePathname();
   const queryClient = useQueryClient();
   const currentUser = useSession();
+  const isDesktop = useMediaQuery("(min-width: 769px)");
   const [lostReason, setLostReason] = React.useState("");
   const { mutateAsync, isPending } = useServerActionMutation(
     returnableResourceActions
@@ -97,7 +100,9 @@ export default function ReturnableRequestActions({
           <AlertDialogTrigger asChild>
             <Button disabled={isPending}>Mark as Picked Up</Button>
           </AlertDialogTrigger>
-          <AlertDialogContent>
+          <AlertDialogContent
+            className={cn(!isDesktop && "max-w-[calc(100vw_-_20px)]")}
+          >
             <AlertDialogHeader>
               <AlertDialogTitle>Confirm Pickup</AlertDialogTitle>
               <AlertDialogDescription>

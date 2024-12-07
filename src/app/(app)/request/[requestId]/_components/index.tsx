@@ -67,7 +67,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
   const [sheetOpen, setSheetOpen] = React.useState(false);
   const { data, isLoading, isError, refetch } = useRequest(params);
 
-  if (isLoading) return <RequestDetailsSkeleton />;
+  if (isLoading) return <RequestDetailsSkeleton isDesktop={isDesktop} />;
   if (isError) return <FetchDataError refetch={refetch} />;
   if (!data) return <NotFound />;
 

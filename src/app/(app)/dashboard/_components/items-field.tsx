@@ -130,7 +130,7 @@ export default function ItemsField({
                   <ChevronsUpDown className="ml-auto h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-[470px] p-0">
+              <PopoverContent className="w-[calc(100vw_-_20px)] p-0 lg:w-[470px]">
                 <Command className="max-h-[300px]">
                   <CommandInput placeholder="Search items..." />
                   <CommandList>

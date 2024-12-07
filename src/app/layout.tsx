@@ -13,7 +13,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 // const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: "ams",
+  title: "ReqQuest",
   description: "USTP Jasaan's Administrative Management System",
 };
 

@@ -24,6 +24,7 @@ export default async function ManageRequestPage({
         departmentId={params.departmentId}
         name="Pending Requests"
         container={false}
+        enableMobile
       >
         <ManageRequestScreen search={search} departmentId={departmentId} />
       </DepartmentLayout>

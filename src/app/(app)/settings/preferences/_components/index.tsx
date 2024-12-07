@@ -8,9 +8,9 @@ import SideBarItem from "./sidebar-item";
 
 export default function PreferencesScreen() {
   return (
-    <ScrollArea className="h-full py-3">
+    <ScrollArea className="h-[calc(100vh_-_130px)] w-full py-3 lg:h-full lg:w-auto">
       <div className="flex px-3">
-        <div className="w-[650px]">
+        <div className="lg:w-[650px]">
           <H2 className="font-semibold">Preferences</H2>
           <P className="text-muted-foreground">
             Customize your settings and personalize your experience.

@@ -307,7 +307,7 @@ export default function VenueDateTimePicker<T extends FieldValues>({
               </FormControl>
               <PopoverContent
                 align="start"
-                className="scroll-bar flex h-[350px] w-auto overflow-y-auto p-0 lg:h-fit"
+                className="scroll-bar flex h-[330px] w-auto overflow-y-auto p-0 lg:h-fit"
               >
                 <div className="flex flex-col lg:flex-row">
                   <Calendar

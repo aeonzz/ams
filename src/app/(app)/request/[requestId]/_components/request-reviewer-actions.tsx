@@ -33,7 +33,7 @@ import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { P } from "@/components/typography/text";
 import { Separator } from "@/components/ui/separator";
-import { formatFullName } from "@/lib/utils";
+import { cn, formatFullName } from "@/lib/utils";
 import { useSession } from "@/lib/hooks/use-session";
 import RequestApproverActions from "./request-approver-actions";
 import { PermissionGuard } from "@/components/permission-guard";
@@ -45,6 +45,7 @@ import { Label } from "@/components/ui/label";
 import { ClientRoleGuard } from "@/components/client-role-guard";
 import { AlertCard } from "@/components/ui/alert-card";
 import CancelRequest from "./cancel-request";
+import { useMediaQuery } from "usehooks-ts";
 
 interface RequestReviewerActionsProps {
   request: RequestWithRelations;
@@ -67,6 +68,7 @@ export default function RequestReviewerActions({
 }: RequestReviewerActionsProps) {
   const currentUser = useSession();
   const pathname = usePathname();
+  const isDesktop = useMediaQuery("(min-width: 769px)");
   const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = React.useState(false);
   const [isRejectionAlertOpen, setIsRejectionAlertOpen] = React.useState(false);
@@ -84,7 +86,7 @@ export default function RequestReviewerActions({
       event.preventDefault();
       setIsOpen(true);
     },
-    { enableOnFormTags: false }
+    { enableOnFormTags: false, enabled: isDesktop }
   );
 
   const handleReview = React.useCallback(
@@ -206,7 +208,10 @@ export default function RequestReviewerActions({
             }
           }}
           onCloseAutoFocus={(e) => e.preventDefault()}
-          className="sm:max-w-[425px]"
+          className={cn(
+            !isDesktop && "max-w-[calc(100vw_-_20px)]",
+            "lg:max-w-[425px]"
+          )}
         >
           <DialogHeader>
             <DialogTitle>Manage Request</DialogTitle>

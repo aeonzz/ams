@@ -8,6 +8,7 @@ import BackButton from "@/components/back-button";
 import { cn } from "@/lib/utils";
 import { useMediaQuery } from "usehooks-ts";
 import MenuSheet from "@/app/(app)/dashboard/_components/menu-sheet";
+import DisableMobile from "@/components/providers/disable-mobile";
 
 interface DepartmentLayoutProps {
   departmentId: string;
@@ -15,6 +16,7 @@ interface DepartmentLayoutProps {
   name: string;
   withBackButton?: boolean;
   container?: boolean;
+  enableMobile?: boolean;
 }
 
 export default function DepartmentLayout({
@@ -23,6 +25,7 @@ export default function DepartmentLayout({
   children,
   withBackButton = false,
   container = true,
+  enableMobile = false,
 }: DepartmentLayoutProps) {
   const isDesktop = useMediaQuery("(min-width: 769px)");
   return (
@@ -44,7 +47,7 @@ export default function DepartmentLayout({
           container && "container p-3"
         )}
       >
-        {children}
+        {enableMobile ? children : <DisableMobile>{children}</DisableMobile>}
       </div>
     </div>
   );

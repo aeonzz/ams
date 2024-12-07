@@ -62,11 +62,11 @@ const SubmitButton = forwardRef<HTMLButtonElement, SubmitButtonProps>(
             <motion.div
               key="loading"
               initial={{ y: -10 }}
-              animate={{ y: 0 }}
+              animate={{ y: 0 }} 
               exit={{ y: 30, opacity: 0 }}
               transition={{ duration: 0.3, type: "spring" }}
             >
-              <LoadingSpinner />
+              <LoadingSpinner className="fill-yellow" />
             </motion.div>
           ) : (
             <motion.div

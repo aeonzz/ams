@@ -21,6 +21,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { useQueryClient } from "@tanstack/react-query";
+import { useMediaQuery } from "usehooks-ts";
+import { cn } from "@/lib/utils";
 
 interface VenueChairApprovalProps {
   data: VenueRequestWithRelations;
@@ -33,6 +35,7 @@ export default function VenueChairApproval({
 }: VenueChairApprovalProps) {
   const currentUser = useSession();
   const queryClient = useQueryClient();
+  const isDesktop = useMediaQuery("(min-width: 769px)");
   const pathname = usePathname();
   const [isApproveDialogOpen, setIsApproveDialogOpen] = React.useState(false);
   const [isDisapproveDialogOpen, setIsDisapproveDialogOpen] =
@@ -90,7 +93,9 @@ export default function VenueChairApproval({
             Approve Request
           </Button>
         </AlertDialogTrigger>
-        <AlertDialogContent>
+        <AlertDialogContent
+          className={cn(!isDesktop && "max-w-[calc(100vw_-_20px)]")}
+        >
           <AlertDialogHeader>
             <AlertDialogTitle>Confirm Approval</AlertDialogTitle>
             <AlertDialogDescription>

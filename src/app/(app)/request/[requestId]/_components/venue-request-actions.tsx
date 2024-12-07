@@ -24,6 +24,8 @@ import { usePathname } from "next/navigation";
 import { P } from "@/components/typography/text";
 import { PermissionGuard } from "@/components/permission-guard";
 import { useSession } from "@/lib/hooks/use-session";
+import { cn } from "@/lib/utils";
+import { useMediaQuery } from "usehooks-ts";
 
 interface VenueRequestActionsProps {
   requestId: string;
@@ -36,6 +38,7 @@ export default function VenueRequestActions({
 }: VenueRequestActionsProps) {
   const currentUser = useSession();
   const pathname = usePathname();
+  const isDesktop = useMediaQuery("(min-width: 769px)");
   const queryClient = useQueryClient();
   const [isAlertOpen, setIsAlertOpen] = React.useState(false);
   const { mutateAsync, isPending } =
@@ -76,7 +79,9 @@ export default function VenueRequestActions({
             Start Request
           </Button>
         </AlertDialogTrigger>
-        <AlertDialogContent>
+        <AlertDialogContent
+          className={cn(!isDesktop && "max-w-[calc(100vw_-_20px)]")}
+        >
           <AlertDialogHeader>
             <AlertDialogTitle>Confirm Start Venue Request</AlertDialogTitle>
             <AlertDialogDescription>

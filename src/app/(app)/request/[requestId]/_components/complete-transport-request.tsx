@@ -23,6 +23,8 @@ import { completeTransportRequest } from "@/lib/actions/requests";
 import { useQueryClient } from "@tanstack/react-query";
 import type { TransportRequestActions } from "@/lib/schema/request/transport";
 import NumberInput from "@/components/number-input";
+import { useMediaQuery } from "usehooks-ts";
+import { cn } from "@/lib/utils";
 
 interface CompleteTransportRequestProps {
   requestId: string;
@@ -34,6 +36,7 @@ export default function CompleteTransportRequest({
   initialOdometer,
 }: CompleteTransportRequestProps) {
   const [open, setOpen] = React.useState(false);
+  const isDesktop = useMediaQuery("(min-width: 769px)");
   const [odometer, setOdometer] = React.useState<number>(initialOdometer);
   const pathname = usePathname();
   const queryClient = useQueryClient();
@@ -79,7 +82,9 @@ export default function CompleteTransportRequest({
       <AlertDialogTrigger asChild>
         <Button disabled={isPending}>Mark as Completed</Button>
       </AlertDialogTrigger>
-      <AlertDialogContent>
+      <AlertDialogContent
+        className={cn(!isDesktop && "max-w-[calc(100vw_-_20px)]")}
+      >
         <AlertDialogHeader>
           <AlertDialogTitle>Confirm Completion</AlertDialogTitle>
           <AlertDialogDescription>

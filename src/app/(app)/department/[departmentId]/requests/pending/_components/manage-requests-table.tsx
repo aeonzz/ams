@@ -8,20 +8,9 @@ import { DataTableToolbar } from "@/components/data-table/data-table-toolbar";
 
 import { useDataTable } from "@/lib/hooks/use-data-table";
 import { type DataTableFilterField } from "@/lib/types";
-import {
-  PriorityTypeSchema,
-  Request,
-  RequestStatusTypeSchema,
-  RequestTypeSchema,
-} from "prisma/generated/zod";
+import { RequestTypeSchema } from "prisma/generated/zod";
 import { getManageRequests } from "@/lib/actions/requests";
-import {
-  getPriorityIcon,
-  getRequestTypeIcon,
-  getStatusColor,
-} from "@/lib/utils";
-import { ModifiedDataTable } from "@/components/data-table/modified-data-table";
-import { Dot } from "lucide-react";
+import { getRequestTypeIcon } from "@/lib/utils";
 import { getManageRequestsColumns } from "./manage-request-table-columns";
 import { ManageRequestsTableToolbarActions } from "./manage-requests-table-toolbar-actions";
 import { ManageRequestsTableFloatingBar } from "./manage-requests-table-floating-bar";
@@ -86,7 +75,7 @@ export function ManageRequestsTable({
   });
 
   return (
-    <ModifiedDataTable
+    <DataTable
       showSelectedRows={false}
       table={table}
       floatingBar={<ManageRequestsTableFloatingBar table={table} />}
@@ -94,6 +83,6 @@ export function ManageRequestsTable({
       <DataTableToolbar table={table} filterFields={filterFields}>
         <ManageRequestsTableToolbarActions table={table} />
       </DataTableToolbar>
-    </ModifiedDataTable>
+    </DataTable>
   );
 }

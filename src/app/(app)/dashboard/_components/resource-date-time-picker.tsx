@@ -317,77 +317,11 @@ export default function ResourceDateTimePicker<T extends FieldValues>({
                   </Button>
                 </PopoverTrigger>
               </FormControl>
-              <PopoverContent className="flex h-fit w-auto p-0">
-                <div className="flex">
-                  {reservationsForSelectedDate.length > 0 ? (
-                    <div className="w-[270px] p-3">
-                      <P className="mb-2 font-medium">
-                        Reservations for{" "}
-                        {selectedDate
-                          ? format(selectedDate, "P")
-                          : "Selected Date"}
-                      </P>
-                      <div className="scroll-bar h-[250px] overflow-y-auto">
-                        {reservationsForSelectedDate.map(
-                          (reservation, index) => {
-                            const statusColor = getStatusColor(
-                              reservation.request.status
-                            );
-
-                            return (
-                              <div
-                                key={index}
-                                className="border-y py-2 text-sm"
-                              >
-                                <p>
-                                  <strong>{reservation.item.name}</strong>
-                                </p>
-                                <p>
-                                  {format(
-                                    new Date(reservation.dateAndTimeNeeded),
-                                    "MMM d, h:mm a"
-                                  )}{" "}
-                                  -{" "}
-                                  {format(
-                                    new Date(reservation.returnDateAndTime),
-                                    "MMM d, h:mm a"
-                                  )}
-                                </p>
-                                <div className="flex flex-col">
-                                  <P className="text-xs text-muted-foreground">
-                                    Requested by:
-                                  </P>
-                                  <P>
-                                    {formatFullName(
-                                      reservation.request.user.firstName,
-                                      reservation.request.user.middleName,
-                                      reservation.request.user.lastName
-                                    )}
-                                  </P>
-                                  <Badge
-                                    variant={statusColor.variant}
-                                    className="mt-1 w-fit pr-3.5"
-                                  >
-                                    <Dot
-                                      className="mr-1 size-3"
-                                      strokeWidth={statusColor.stroke}
-                                      color={statusColor.color}
-                                    />
-                                    {textTransform(reservation.request.status)}
-                                  </Badge>
-                                </div>
-                              </div>
-                            );
-                          }
-                        )}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex h-full w-[270px] flex-col items-center justify-center">
-                      <CircleOff className="mb-2 size-6 text-muted-foreground" />
-                      <P className="text-muted-foreground">No Reservations</P>
-                    </div>
-                  )}
+              <PopoverContent
+                align="start"
+                className="scroll-bar flex h-[330px] w-auto overflow-y-auto p-0 lg:h-fit"
+              >
+                <div className="flex flex-col lg:flex-row">
                   <Calendar
                     showOutsideDays={false}
                     mode="single"
@@ -412,59 +346,130 @@ export default function ResourceDateTimePicker<T extends FieldValues>({
                     disabled={isDateInPast}
                     initialFocus
                   />
-                  <div className="space-y-3 p-3">
-                    <Select
-                      value={selectedMonth.toString()}
-                      onValueChange={(value) => {
-                        const newMonth = parseInt(value);
-                        setSelectedMonth(newMonth);
-                        if (field.value) {
-                          field.onChange(setMonth(field.value, newMonth));
-                        }
-                      }}
-                    >
-                      <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Select month" />
-                      </SelectTrigger>
-                      <SelectContent className="max-h-60">
-                        {monthNames.map((month, index) => (
-                          <SelectItem
-                            key={index}
-                            value={index.toString()}
-                            disabled={index < new Date().getMonth()}
-                          >
-                            {month}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <div className="scroll-bar flex h-[250px] flex-col gap-2 overflow-y-auto">
-                      {timePresets.map((preset, index) => (
-                        <TimePresetButton
-                          key={index}
-                          preset={preset}
-                          selected={selectedTime === preset.label}
-                          disabled={isTimeDisabled(
-                            preset.hours,
-                            preset.minutes
-                          )}
-                          onClick={() => {
-                            const newDate = field.value
-                              ? new Date(field.value)
-                              : new Date();
-                            const updatedDate = setMinutes(
-                              setHours(newDate, preset.hours),
-                              preset.minutes
-                            );
-                            field.onChange(updatedDate);
-                            setSelectedTime(preset.label);
+
+                  {form.getValues(name) && (
+                    <div className="flex flex-col lg:flex-row">
+                      <div className="w-full space-y-3 p-3 lg:w-auto">
+                        <Select
+                          value={selectedMonth.toString()}
+                          onValueChange={(value) => {
+                            const newMonth = parseInt(value);
+                            setSelectedMonth(newMonth);
+                            if (field.value) {
+                              field.onChange(setMonth(field.value, newMonth));
+                            }
                           }}
-                          reservations={reservationsForSelectedDate}
-                          selectedDate={selectedDate}
-                        />
-                      ))}
+                        >
+                          <SelectTrigger className="w-[180px]">
+                            <SelectValue placeholder="Select month" />
+                          </SelectTrigger>
+                          <SelectContent className="max-h-60">
+                            {monthNames.map((month, index) => (
+                              <SelectItem
+                                key={index}
+                                value={index.toString()}
+                                disabled={index < new Date().getMonth()}
+                              >
+                                {month}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <div className="scroll-bar flex h-[250px] flex-col gap-2 overflow-y-auto">
+                          {timePresets.map((preset, index) => (
+                            <TimePresetButton
+                              key={index}
+                              preset={preset}
+                              selected={selectedTime === preset.label}
+                              disabled={isTimeDisabled(
+                                preset.hours,
+                                preset.minutes
+                              )}
+                              onClick={() => {
+                                const newDate = field.value
+                                  ? new Date(field.value)
+                                  : new Date();
+                                const updatedDate = setMinutes(
+                                  setHours(newDate, preset.hours),
+                                  preset.minutes
+                                );
+                                field.onChange(updatedDate);
+                                setSelectedTime(preset.label);
+                              }}
+                              reservations={reservationsForSelectedDate}
+                              selectedDate={selectedDate}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                      {reservationsForSelectedDate.length > 0 && (
+                        <div className="w-[270px] p-3">
+                          <P className="mb-2 font-medium">
+                            Reservations for{" "}
+                            {selectedDate
+                              ? format(selectedDate, "P")
+                              : "Selected Date"}
+                          </P>
+                          <div className="scroll-bar h-[250px] overflow-y-auto">
+                            {reservationsForSelectedDate.map(
+                              (reservation, index) => {
+                                const statusColor = getStatusColor(
+                                  reservation.request.status
+                                );
+
+                                return (
+                                  <div
+                                    key={index}
+                                    className="border-y py-2 text-sm"
+                                  >
+                                    <p>
+                                      <strong>{reservation.item.name}</strong>
+                                    </p>
+                                    <p>
+                                      {format(
+                                        new Date(reservation.dateAndTimeNeeded),
+                                        "MMM d, h:mm a"
+                                      )}{" "}
+                                      -{" "}
+                                      {format(
+                                        new Date(reservation.returnDateAndTime),
+                                        "MMM d, h:mm a"
+                                      )}
+                                    </p>
+                                    <div className="flex flex-col">
+                                      <P className="text-xs text-muted-foreground">
+                                        Requested by:
+                                      </P>
+                                      <P>
+                                        {formatFullName(
+                                          reservation.request.user.firstName,
+                                          reservation.request.user.middleName,
+                                          reservation.request.user.lastName
+                                        )}
+                                      </P>
+                                      <Badge
+                                        variant={statusColor.variant}
+                                        className="mt-1 w-fit pr-3.5"
+                                      >
+                                        <Dot
+                                          className="mr-1 size-3"
+                                          strokeWidth={statusColor.stroke}
+                                          color={statusColor.color}
+                                        />
+                                        {textTransform(
+                                          reservation.request.status
+                                        )}
+                                      </Badge>
+                                    </div>
+                                  </div>
+                                );
+                              }
+                            )}
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  </div>
+                  )}
                 </div>
               </PopoverContent>
             </Popover>
