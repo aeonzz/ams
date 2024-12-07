@@ -19,7 +19,7 @@ export default function DisableMobile({ children }: DisableMobileProps) {
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Device Not Supported</AlertTitle>
           <AlertDescription>
-            We're sorry, but this section is optimized for desktop use only.
+            We&apos;re sorry, but this section is optimized for desktop use only.
             Please access it from a desktop computer for the best experience.
           </AlertDescription>
         </Alert>
