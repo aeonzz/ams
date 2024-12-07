@@ -28,6 +28,7 @@ import {
   SignalMedium,
   TriangleAlert,
 } from "lucide-react";
+import { useMediaQuery } from "usehooks-ts";
 
 interface PriorityOptionProps {
   prio: Priority;
@@ -75,6 +76,7 @@ export default function PriorityOption({
   isLoading = false,
 }: PriorityOptionProps) {
   const [open, setOpen] = React.useState(false);
+  const isDesktop = useMediaQuery("(min-width: 769px)");
   return (
     <div className="space-y-1">
       <Popover open={open} onOpenChange={setOpen} modal>
@@ -106,7 +108,11 @@ export default function PriorityOption({
             )}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[230px] p-0" align="start" side="left">
+        <PopoverContent
+          className="w-[230px] p-0"
+          align="start"
+          side={isDesktop ? "left" : "bottom"}
+        >
           <Command className="max-h-72">
             <CommandInput placeholder="Change priority..." />
             <CommandList>

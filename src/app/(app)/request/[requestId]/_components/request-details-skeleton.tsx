@@ -1,7 +1,13 @@
-import { Skeleton } from "@/components/ui/skeleton"
-import { Separator } from "@/components/ui/separator"
+import { Skeleton } from "@/components/ui/skeleton";
+import { Separator } from "@/components/ui/separator";
 
-export default function RequestDetailsSkeleton() {
+interface RequestDetailsSkeletonProps {
+  isDesktop: boolean;
+}
+
+export default function RequestDetailsSkeleton({
+  isDesktop,
+}: RequestDetailsSkeletonProps) {
   return (
     <div className="flex h-full w-full">
       <div className="flex-1 overflow-hidden">
@@ -48,23 +54,27 @@ export default function RequestDetailsSkeleton() {
           </div>
         </div>
       </div>
-      <Separator orientation="vertical" className="h-full" />
-      <div className="w-[320px] space-y-6 p-6">
-        <div className="space-y-4">
-          <Skeleton className="h-6 w-1/2" />
-          {[...Array(4)].map((_, index) => (
-            <div key={index} className="space-y-2">
-              <Skeleton className="h-4 w-1/3" />
+      {isDesktop && (
+        <>
+          <Separator orientation="vertical" className="h-full" />
+          <div className="w-[320px] space-y-6 p-6">
+            <div className="space-y-4">
               <Skeleton className="h-6 w-1/2" />
+              {[...Array(4)].map((_, index) => (
+                <div key={index} className="space-y-2">
+                  <Skeleton className="h-4 w-1/3" />
+                  <Skeleton className="h-6 w-1/2" />
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-        <Separator />
-        <div className="space-y-4">
-          <Skeleton className="h-10 w-full" />
-          <Skeleton className="h-10 w-full" />
-        </div>
-      </div>
+            <Separator />
+            <div className="space-y-4">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+          </div>
+        </>
+      )}
     </div>
-  )
+  );
 }

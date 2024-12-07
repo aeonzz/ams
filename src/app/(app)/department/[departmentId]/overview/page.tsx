@@ -12,7 +12,7 @@ export interface DepartmentOverview {
 export default function DepartmentOverview({ params }: DepartmentOverview) {
   return (
     <ContentLayout title="Overview">
-      <DepartmentLayout departmentId={params.departmentId} name="Overview">
+      <DepartmentLayout departmentId={params.departmentId} name="Overview" enableMobile>
         <DepartmentOverviewSchreen departmentId={params.departmentId} />
       </DepartmentLayout>
     </ContentLayout>

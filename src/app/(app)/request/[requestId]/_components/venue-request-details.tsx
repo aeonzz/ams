@@ -231,12 +231,12 @@ export default function VenueRequestDetails({
           equipmentNeeded: data.setupRequirements.join(", "),
           status: requestStatus,
           notedBy: requesterDepartmentHead
-          ? formatFullName(
-              requesterDepartmentHead.user.firstName,
-              requesterDepartmentHead.user.middleName,
-              requesterDepartmentHead.user.lastName
-            )
-          : "N/A",
+            ? formatFullName(
+                requesterDepartmentHead.user.firstName,
+                requesterDepartmentHead.user.middleName,
+                requesterDepartmentHead.user.lastName
+              )
+            : "N/A",
           departmentHead: departmentHead
             ? formatFullName(
                 departmentHead.firstName,
@@ -308,7 +308,7 @@ export default function VenueRequestDetails({
     <>
       <div className="space-y-4 pb-10">
         <div className="space-y-1">
-          {data.approvedByHead === null && (
+          {data.approvedByHead === null && requestStatus !== "CANCELLED" && (
             <AlertCard
               variant="info"
               title="Awaiting Department Head Approval"
@@ -316,14 +316,16 @@ export default function VenueRequestDetails({
               className="mb-6"
             />
           )}
-          {data.approvedByHead !== null && data.approvedByHead === false && (
-            <AlertCard
-              variant="warning"
-              title="Venue Reservation Rejected"
-              description="The venue reservation request has been rejected by the department head. Please review the feedback and make any necessary adjustments before resubmitting."
-              className="mb-6"
-            />
-          )}
+          {data.approvedByHead !== null &&
+            data.approvedByHead === false &&
+            requestStatus !== "CANCELLED" && (
+              <AlertCard
+                variant="warning"
+                title="Venue Reservation Rejected"
+                description="The venue reservation request has been rejected by the department head. Please review the feedback and make any necessary adjustments before resubmitting."
+                className="mb-6"
+              />
+            )}
           {data.approvedByHead !== null &&
             data.approvedByHead === true &&
             requestStatus === "PENDING" && (
@@ -530,7 +532,7 @@ export default function VenueRequestDetails({
                 {canEdit && (
                   <Button
                     variant="link"
-                    className="lg:opacity-0 group-hover:opacity-100"
+                    className="group-hover:opacity-100 lg:opacity-0"
                     onClick={(e) => {
                       e.preventDefault();
                       setEditField("startTime");
@@ -571,7 +573,7 @@ export default function VenueRequestDetails({
                 {canEdit && (
                   <Button
                     variant="link"
-                    className="lg:opacity-0 group-hover:opacity-100"
+                    className="group-hover:opacity-100 lg:opacity-0"
                     onClick={(e) => {
                       e.preventDefault();
                       setEditField("endTime");
@@ -624,7 +626,7 @@ export default function VenueRequestDetails({
                 {canEdit && (
                   <Button
                     variant="link"
-                    className="lg:opacity-0 group-hover:opacity-100"
+                    className="group-hover:opacity-100 lg:opacity-0"
                     onClick={(e) => {
                       e.preventDefault();
                       setEditField("setupRequirements");
@@ -678,7 +680,7 @@ export default function VenueRequestDetails({
                 {canEdit && (
                   <Button
                     variant="link"
-                    className="lg:opacity-0 group-hover:opacity-100"
+                    className="group-hover:opacity-100 lg:opacity-0"
                     onClick={(e) => {
                       e.preventDefault();
                       setEditField("purpose");
@@ -734,7 +736,7 @@ export default function VenueRequestDetails({
                 {canEdit && (
                   <Button
                     variant="link"
-                    className="lg:opacity-0 group-hover:opacity-100"
+                    className="group-hover:opacity-100 lg:opacity-0"
                     onClick={(e) => {
                       e.preventDefault();
                       setEditField("info");

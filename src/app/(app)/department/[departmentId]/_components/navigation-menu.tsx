@@ -316,5 +316,5 @@ export default function OverviewNavigationMenu({
     </Sheet>
   );
 
-  return isDesktop ? renderDesktopMenu() : renderMobileMenu();
+  return isDesktop ? renderDesktopMenu() : null;
 }

@@ -23,6 +23,8 @@ import { cancelRequest } from "@/lib/actions/job";
 import type { CancelRequestSchema } from "./schema";
 import { Textarea } from "@/components/ui/text-area";
 import type { RequestStatusTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestStatusTypeSchema";
+import { useMediaQuery } from "usehooks-ts";
+import { cn } from "@/lib/utils";
 
 interface CancelRequestProps {
   requestStatus: RequestStatusTypeType;
@@ -37,6 +39,7 @@ export default function CancelRequest({
 }: CancelRequestProps) {
   const pathname = usePathname();
   const queryClient = useQueryClient();
+  const isDesktop = useMediaQuery("(min-width: 769px)");
   const { mutateAsync, isPending } = useServerActionMutation(cancelRequest);
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [cancellationReason, setCancellationReason] = React.useState("");
@@ -90,7 +93,10 @@ export default function CancelRequest({
           Cancel Request
         </Button>
       </AlertDialogTrigger>
-      <AlertDialogContent onCloseAutoFocus={(e) => e.preventDefault()}>
+      <AlertDialogContent
+        className={cn(!isDesktop && "max-w-[calc(100vw_-_20px)]")}
+        onCloseAutoFocus={(e) => e.preventDefault()}
+      >
         <AlertDialogHeader>
           <AlertDialogTitle>Confirm Request Cancellation</AlertDialogTitle>
           <AlertDialogDescription>
@@ -107,6 +113,7 @@ export default function CancelRequest({
             id="cancellationReason"
             maxRows={6}
             minRows={3}
+            autoFocus
             placeholder="Enter reason for cancellation"
             value={cancellationReason}
             onChange={(e) => setCancellationReason(e.target.value)}

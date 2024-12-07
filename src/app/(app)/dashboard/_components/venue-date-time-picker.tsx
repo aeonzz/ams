@@ -54,6 +54,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useMediaQuery } from "usehooks-ts";
 
 interface DateTimePickerProps<T extends FieldValues> {
   form: UseFormReturn<T>;
@@ -215,6 +216,7 @@ export default function VenueDateTimePicker<T extends FieldValues>({
   disabledTimeRanges = [],
   reservations = [],
 }: DateTimePickerProps<T>) {
+  const isDesktop = useMediaQuery("(min-width: 769px)");
   const [selectedMonth, setSelectedMonth] = React.useState(
     new Date().getMonth()
   );
@@ -303,8 +305,11 @@ export default function VenueDateTimePicker<T extends FieldValues>({
                   </Button>
                 </PopoverTrigger>
               </FormControl>
-              <PopoverContent align="start" className="flex h-fit w-auto p-0">
-                <div className="flex">
+              <PopoverContent
+                align="start"
+                className="scroll-bar flex h-[330px] w-auto overflow-y-auto p-0 lg:h-fit"
+              >
+                <div className="flex flex-col lg:flex-row">
                   <Calendar
                     showOutsideDays={false}
                     mode="single"
@@ -330,8 +335,8 @@ export default function VenueDateTimePicker<T extends FieldValues>({
                     disabled={isDateInPast}
                   />
                   {form.getValues(name) && (
-                    <div className="flex">
-                      <div className="space-y-3 p-3">
+                    <div className="flex flex-col lg:flex-row">
+                      <div className="w-full space-y-3 p-3 lg:w-auto">
                         <Select
                           value={selectedMonth.toString()}
                           onValueChange={(value) => {
@@ -342,7 +347,7 @@ export default function VenueDateTimePicker<T extends FieldValues>({
                             }
                           }}
                         >
-                          <SelectTrigger className="w-[180px]">
+                          <SelectTrigger className="lg:w-[180px]">
                             <SelectValue placeholder="Select month" />
                           </SelectTrigger>
                           <SelectContent className="max-h-60">

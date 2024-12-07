@@ -50,13 +50,11 @@ export function getManageRequestsColumns(): ColumnDef<RequestTableType>[] {
     {
       accessorKey: "title",
       header: ({ column }) => (
-        <div className="px-2">
-          <DataTableColumnHeader column={column} title="Title" />
-        </div>
+        <DataTableColumnHeader column={column} title="Title" />
       ),
       cell: ({ row }) => {
         return (
-          <div className="flex space-x-2">
+          <div className="flex w-[30vw] space-x-2">
             <Link
               href={`/request/${row.original.id}`}
               className={cn(
@@ -70,10 +68,15 @@ export function getManageRequestsColumns(): ColumnDef<RequestTableType>[] {
           </div>
         );
       },
+      size: 100,
     },
     {
       accessorKey: "status",
-      header: ({ column }) => null,
+      header: ({ column }) => (
+        <div className="px-2">
+          <DataTableColumnHeader column={column} title="status" />
+        </div>
+      ),
       cell: ({ row }) => {
         const { color, stroke, variant } = getStatusColor(row.original.status);
         return (
@@ -92,7 +95,11 @@ export function getManageRequestsColumns(): ColumnDef<RequestTableType>[] {
     },
     {
       accessorKey: "createdAt",
-      header: ({ column }) => null,
+      header: ({ column }) => (
+        <div className="px-2">
+          <DataTableColumnHeader column={column} title="Requested" />
+        </div>
+      ),
       cell: ({ cell, row }) => {
         return (
           <div className="flex items-center gap-3">

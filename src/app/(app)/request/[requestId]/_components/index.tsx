@@ -26,7 +26,7 @@ import { useRequest } from "@/lib/hooks/use-request-store";
 import VenueRequestDetails from "./venue-request-details";
 import ReturnableResourceDetails from "./returnable-resource-details";
 import PersonnelActions from "./personnel-actions";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import JobRequestEvaluationDialog from "@/components/dialogs/job-request-evaluation-dialog";
 import RequestSummaryTitle from "./request-summary-title";
@@ -54,6 +54,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import MenuSheet from "@/app/(app)/dashboard/_components/menu-sheet";
+import Link from "next/link";
 
 interface RequestDetailsProps {
   params: string;
@@ -66,14 +67,14 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
   const [sheetOpen, setSheetOpen] = React.useState(false);
   const { data, isLoading, isError, refetch } = useRequest(params);
 
-  if (isLoading) return <RequestDetailsSkeleton />;
+  if (isLoading) return <RequestDetailsSkeleton isDesktop={isDesktop} />;
   if (isError) return <FetchDataError refetch={refetch} />;
   if (!data) return <NotFound />;
 
   const statusColor = getStatusColor(data.status);
   const RequestTypeIcon = getRequestTypeIcon(data.type);
   return (
-    <div className="flex h-full w-full">
+    <div className="relative flex h-full w-full">
       <div className="flex-1 overflow-hidden">
         <div className="flex h-[50px] items-center border-b px-3">
           {!isDesktop && <MenuSheet />}
@@ -343,25 +344,19 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                   }
                 />
               )}
+
               {data.type === "JOB" &&
                 data.jobRequest &&
                 !data.jobRequest.jobRequestEvaluation &&
                 data.status === "COMPLETED" &&
                 currentUser.id === data.userId && (
-                  <JobRequestEvaluationDialog
-                    jobRequestId={data.jobRequest.id}
-                    requestId={data.id}
+                  <Link
+                    href={`/request/${params}/evaluation`}
+                    prefetch
+                    className={cn(buttonVariants({ variant: "default" }))}
                   >
-                    <Button
-                      onClick={() =>
-                        dialogManager.setActiveDialog(
-                          "jobRequestEvaluationDialog"
-                        )
-                      }
-                    >
-                      Evaluation
-                    </Button>
-                  </JobRequestEvaluationDialog>
+                    <P>Evaluation</P>
+                  </Link>
                 )}
               {data.type === "JOB" && data.jobRequest && (
                 <>
@@ -544,18 +539,17 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
       ) : (
         <>
           <Button
-            className="absolute bottom-5 right-5 size-10 rounded-full p-0"
+            className="absolute bottom-3 right-3 size-10 rounded-full p-0"
             onClick={() => setSheetOpen(true)}
           >
             <Info className="size-5" />
           </Button>
           <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-            <SheetContent>
-              <SheetHeader>
-                <SheetTitle>Request Summary</SheetTitle>
-              </SheetHeader>
-              <ScrollArea className="h-[calc(100vh_-_120px)] px-4">
+            <SheetContent className="gap-0 overflow-hidden rounded-l-[10px] px-1">
+              <SheetHeader className="px-4 py-0">
                 <RequestSummaryTitle />
+              </SheetHeader>
+              <ScrollArea className="h-[calc(100vh_-_60px)] px-4">
                 <div>
                   <div className="space-y-4">
                     <div>
@@ -701,20 +695,39 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                     !data.jobRequest.jobRequestEvaluation &&
                     data.status === "COMPLETED" &&
                     currentUser.id === data.userId && (
-                      <JobRequestEvaluationDialog
-                        jobRequestId={data.jobRequest.id}
-                        requestId={data.id}
+                      <Link
+                        href={`/request/${params}/evaluation`}
+                        prefetch
+                        className={cn(buttonVariants({ variant: "default" }))}
                       >
-                        <Button
-                          onClick={() =>
-                            dialogManager.setActiveDialog(
-                              "jobRequestEvaluationDialog"
-                            )
-                          }
-                        >
-                          Evaluation
-                        </Button>
-                      </JobRequestEvaluationDialog>
+                        <P>Evaluation</P>
+                      </Link>
+                      // <JobRequestEvaluationDialog
+                      //   jobRequestId={data.jobRequest.id}
+                      //   requestId={data.id}
+                      // >
+                      //   {isDesktop ? (
+                      //     <Button
+                      //       onClick={() =>
+                      //         dialogManager.setActiveDialog(
+                      //           "jobRequestEvaluationDialog"
+                      //         )
+                      //       }
+                      //     >
+                      //       Evaluation
+                      //     </Button>
+                      //   ) : (
+                      //     <Link
+                      //     href={`/request/${params}/evaluation`}
+                      //       prefetch
+                      //       className={cn(
+                      //         buttonVariants({ variant: "default" })
+                      //       )}
+                      //     >
+                      //       <P>Evaluation</P>
+                      //     </Link>
+                      //   )}
+                      // </JobRequestEvaluationDialog>
                     )}
                   {data.type === "JOB" && data.jobRequest && (
                     <>

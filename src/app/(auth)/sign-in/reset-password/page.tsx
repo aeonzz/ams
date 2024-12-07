@@ -33,8 +33,8 @@ export default async function ResetPasswordPage({
   }
 
   return (
-    <div className="flex flex-col items-center justify-center space-y-2 max-w-[340px]">
-      <h1 className="scroll-m-20 text-xl text-center font-semibold tracking-tight">
+    <div className="flex max-w-[340px] flex-col items-center justify-center space-y-2 rounded-md bg-background p-6">
+      <h1 className="scroll-m-20 text-center text-xl font-semibold tracking-tight">
         Reset Your Password
       </h1>
       <p className="text-center text-sm text-muted-foreground">
@@ -47,7 +47,7 @@ export default async function ResetPasswordPage({
 }
 
 const ErrorMessage = ({ message }: { message: string }) => (
-  <h1 className="scroll-m-20 text-center text-2xl font-semibold tracking-tight">
+  <h1 className="scroll-m-20 rounded-md bg-background p-6 text-center text-2xl font-semibold tracking-tight">
     {message}
   </h1>
 );

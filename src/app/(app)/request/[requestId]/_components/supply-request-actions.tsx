@@ -21,6 +21,8 @@ import { UpdateSupplyResourceRequestSchemaWithPath } from "@/lib/schema/resource
 import { useQueryClient } from "@tanstack/react-query";
 import { PermissionGuard } from "@/components/permission-guard";
 import { useSession } from "@/lib/hooks/use-session";
+import { useMediaQuery } from "usehooks-ts";
+import { cn } from "@/lib/utils";
 
 interface SupplyRequestActionsProps {
   requestId: string;
@@ -36,6 +38,7 @@ export default function SupplyRequestActions({
   const pathname = usePathname();
   const currentUser = useSession();
   const queryClient = useQueryClient();
+  const isDesktop = useMediaQuery("(min-width: 769px)");
   const { mutateAsync, isPending } =
     useServerActionMutation(supplyRequestActions);
 
@@ -68,7 +71,9 @@ export default function SupplyRequestActions({
         <AlertDialogTrigger asChild>
           <Button disabled={isPending}>Mark as Picked Up</Button>
         </AlertDialogTrigger>
-        <AlertDialogContent>
+        <AlertDialogContent
+          className={cn(!isDesktop && "max-w-[calc(100vw_-_20px)]")}
+        >
           <AlertDialogHeader>
             <AlertDialogTitle>Confirm Pickup</AlertDialogTitle>
             <AlertDialogDescription>

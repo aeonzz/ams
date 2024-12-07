@@ -57,7 +57,7 @@ import axios from "axios";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { P } from "@/components/typography/text";
 import { Separator } from "@/components/ui/separator";
-import { formatFullName } from "@/lib/utils";
+import { cn, formatFullName } from "@/lib/utils";
 import { useSession } from "@/lib/hooks/use-session";
 import RequestApproverActions from "./request-approver-actions";
 import { PermissionGuard } from "@/components/permission-guard";
@@ -70,6 +70,7 @@ import VerifyJob from "./verify-job";
 import { ClientRoleGuard } from "@/components/client-role-guard";
 import { AlertCard } from "@/components/ui/alert-card";
 import CancelRequest from "./cancel-request";
+import { useMediaQuery } from "usehooks-ts";
 
 interface JobRequestReviewerActionsProps {
   request: RequestWithRelations;
@@ -93,6 +94,7 @@ export default function JobRequestReviewerActions({
   const [selectedPerson, setSelectedPerson] = React.useState<
     string | undefined | null
   >(request.jobRequest?.assignedTo);
+  const isDesktop = useMediaQuery("(min-width: 769px)");
   const [isAlertOpen, setIsAlertOpen] = React.useState(false);
   const [isRejectionAlertOpen, setIsRejectionAlertOpen] = React.useState(false);
   const [isOnHoldAlertOpen, setIsOnHoldAlertOpen] = React.useState(false);
@@ -132,7 +134,7 @@ export default function JobRequestReviewerActions({
       event.preventDefault();
       setIsOpen(true);
     },
-    { enableOnFormTags: false }
+    { enableOnFormTags: false, enabled: isDesktop }
   );
 
   React.useEffect(() => {
@@ -370,7 +372,10 @@ export default function JobRequestReviewerActions({
                 }
               }}
               onCloseAutoFocus={(e) => e.preventDefault()}
-              className="sm:max-w-[425px]"
+              className={cn(
+                !isDesktop && "max-w-[calc(100vw_-_20px)]",
+                "lg:max-w-[425px]"
+              )}
             >
               <DialogHeader>
                 <DialogTitle>Manage Request</DialogTitle>
@@ -517,7 +522,11 @@ export default function JobRequestReviewerActions({
                               Reject Request
                             </Button>
                           </AlertDialogTrigger>
-                          <AlertDialogContent>
+                          <AlertDialogContent
+                            className={cn(
+                              !isDesktop && "max-w-[calc(100vw_-_20px)]"
+                            )}
+                          >
                             <AlertDialogHeader>
                               <AlertDialogTitle className="">
                                 Reject Request
@@ -604,7 +613,11 @@ export default function JobRequestReviewerActions({
                           Resume
                         </Button>
                       </AlertDialogTrigger>
-                      <AlertDialogContent>
+                      <AlertDialogContent
+                        className={cn(
+                          !isDesktop && "max-w-[calc(100vw_-_20px)]"
+                        )}
+                      >
                         <AlertDialogHeader>
                           <AlertDialogTitle>Resume Request</AlertDialogTitle>
                           <AlertDialogDescription>
@@ -677,7 +690,11 @@ export default function JobRequestReviewerActions({
                             Put On Hold
                           </Button>
                         </AlertDialogTrigger>
-                        <AlertDialogContent>
+                        <AlertDialogContent
+                          className={cn(
+                            !isDesktop && "max-w-[calc(100vw_-_20px)]"
+                          )}
+                        >
                           <AlertDialogHeader>
                             <AlertDialogTitle>
                               Put Request On Hold
@@ -742,9 +759,11 @@ export default function JobRequestReviewerActions({
               </DialogFooter>
             </DialogContent>
           </Dialog>
-          <TooltipContent className="flex items-center gap-3" side="bottom">
-            <P>Manage request</P>
-          </TooltipContent>
+          {isDesktop && (
+            <TooltipContent className="flex items-center gap-3" side="bottom">
+              <P>Manage request</P>
+            </TooltipContent>
+          )}
         </Tooltip>
       </PermissionGuard>
     </>

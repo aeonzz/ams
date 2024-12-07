@@ -63,7 +63,7 @@ export default function ForgotPassword() {
       });
   }
   return (
-    <div className="grid place-items-center">
+    <div className="grid place-items-center rounded-md bg-background p-6">
       {isEmailSent ? (
         <>
           <h1 className="scroll-m-20 text-xl font-semibold tracking-tight">

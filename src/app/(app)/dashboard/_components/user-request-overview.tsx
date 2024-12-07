@@ -120,9 +120,9 @@ export default function UserRequestOverview({
             <Button
               variant="shine"
               onClick={() => dialogManager.setActiveDialog("requestDialog")}
-              className="h-full flex-col truncate text-slate-100 dark:text-foreground"
+              className="h-full flex-col truncate"
             >
-              <CirclePlus className="mb-5 size-7" />
+              <CirclePlus className="text-yellow mb-5 size-7" />
               Create request
             </Button>
           )}

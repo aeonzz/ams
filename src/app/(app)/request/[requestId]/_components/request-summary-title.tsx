@@ -14,16 +14,18 @@ import { usePathname } from "next/navigation";
 import React from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
+import { useMediaQuery } from "usehooks-ts";
 
 export default function RequestSummaryTitle() {
   const pathname = usePathname();
+  const isDesktop = useMediaQuery("(min-width: 769px)");
   const [isCopying, setIsCopying] = React.useState(false);
 
   const getFullUrl = () => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       return `${window.location.origin}${pathname}`;
     }
-    return pathname; 
+    return pathname;
   };
 
   const copyToClipboard = async () => {
@@ -46,32 +48,44 @@ export default function RequestSummaryTitle() {
       event.preventDefault();
       copyToClipboard();
     },
-    { enableOnFormTags: false }
+    { enableOnFormTags: false, enabled: isDesktop }
   );
 
   return (
     <div className="flex items-center justify-between py-2.5">
       <H4 className="font-semibold text-muted-foreground">Request Summary</H4>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            variant="ghost2"
-            size="icon"
-            className="size-7"
-            onClick={copyToClipboard}
-            disabled={isCopying}
-          >
-            <Link className="size-4 text-muted-foreground" />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent className="flex items-center gap-3" side="bottom">
-          <CommandTooltip text="Copy full request URL">
-            <CommandShortcut>Ctrl</CommandShortcut>
-            <CommandShortcut>Shift</CommandShortcut>
-            <CommandShortcut>L</CommandShortcut>
-          </CommandTooltip>
-        </TooltipContent>
-      </Tooltip>
+      {isDesktop ? (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost2"
+              size="icon"
+              className="size-7"
+              onClick={copyToClipboard}
+              disabled={isCopying}
+            >
+              <Link className="size-4 text-muted-foreground" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent className="flex items-center gap-3" side="bottom">
+            <CommandTooltip text="Copy full request URL">
+              <CommandShortcut>Ctrl</CommandShortcut>
+              <CommandShortcut>Shift</CommandShortcut>
+              <CommandShortcut>L</CommandShortcut>
+            </CommandTooltip>
+          </TooltipContent>
+        </Tooltip>
+      ) : (
+        <Button
+          variant="ghost2"
+          size="icon"
+          className="size-7"
+          onClick={copyToClipboard}
+          disabled={isCopying}
+        >
+          <Link className="size-4 text-muted-foreground" />
+        </Button>
+      )}
     </div>
   );
 }

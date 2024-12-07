@@ -17,6 +17,7 @@ import { useDialogManager } from "@/lib/hooks/use-dialog-manager";
 import { CalendarIcon } from "lucide-react";
 import LoadingSpinner from "@/components/loaders/loading-spinner";
 import TranpsortRequestCalendar from "@/app/(app)/department/[departmentId]/resources/transport/_components/transport-request-calendar";
+import { useMediaQuery } from "usehooks-ts";
 
 interface CalendarVehicleScheduleSheetProps {
   vehicleId: string;
@@ -26,6 +27,7 @@ export default function CalendarVehicleScheduleSheet({
   vehicleId,
 }: CalendarVehicleScheduleSheetProps) {
   const dialogManager = useDialogManager();
+  const isDesktop = useMediaQuery("(min-width: 769px)");
   const { data, isLoading } = useQuery<TransportRequestWithRelations[]>({
     queryFn: async () => {
       const res = await axios.get(
@@ -71,7 +73,10 @@ export default function CalendarVehicleScheduleSheet({
         open={dialogManager.activeDialog === "scheduleCalendar"}
         onOpenChange={handleOpenChange}
       >
-        <SheetContent className="!max-w-[50vw]">
+        <SheetContent
+          side={isDesktop ? "right" : "bottom"}
+          className="rounded-t-[10px] lg:!max-w-[50vw] lg:rounded-t-none"
+        >
           <SheetHeader>
             <SheetTitle>Schedules</SheetTitle>
             <SheetDescription></SheetDescription>

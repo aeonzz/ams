@@ -148,7 +148,10 @@ export function DateRangePicker({
         </PopoverTrigger>
         <PopoverContent
           align="start"
-          className={cn("w-auto p-0", className)}
+          className={cn(
+            "scroll-bar flex h-[75vh] w-auto overflow-y-auto p-0 lg:h-auto",
+            className
+          )}
           {...props}
         >
           <Calendar

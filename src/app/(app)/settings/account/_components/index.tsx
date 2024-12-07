@@ -23,10 +23,9 @@ import { textTransform } from "@/lib/utils";
 
 export default function ProfileScreen() {
   const currentUser = useSession();
-  console.log(currentUser);
 
   return (
-    <ScrollArea className="h-[calc(100vh_-_100px)] py-3">
+    <ScrollArea className="h-[calc(100vh_-_130px)] py-3 lg:h-[calc(100vh_-_100px)]">
       <div className="flex flex-col px-3">
         <div className="w-full">
           <H2 className="font-semibold">Account</H2>
@@ -101,7 +100,7 @@ export default function ProfileScreen() {
           <H2 className="font-semibold">Departments</H2>
           <P className="text-muted-foreground">Your assigned departments</P>
           <Separator className="my-6 w-full" />
-          <div className="grid w-[750px] grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 gap-3 lg:w-[750px] lg:grid-cols-3">
             {currentUser.userDepartments.map((userDepartment) => (
               <Card key={userDepartment.id} className="w-lg bg-secondary">
                 <CardHeader>
@@ -115,14 +114,6 @@ export default function ProfileScreen() {
                 </CardContent>
               </Card>
             ))}
-            <Card className="w-lg bg-secondary">
-              <CardHeader>
-                <CardTitle>asdfasdfsadf</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <P>Tasdfsdf</P>
-              </CardContent>
-            </Card>
           </div>
         </div>
       </div>

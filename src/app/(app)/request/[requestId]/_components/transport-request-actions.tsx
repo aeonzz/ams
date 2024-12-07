@@ -22,6 +22,8 @@ import { usePathname } from "next/navigation";
 import { P } from "@/components/typography/text";
 import { Label } from "@/components/ui/label";
 import NumberInput from "@/components/number-input";
+import { useMediaQuery } from "usehooks-ts";
+import { cn } from "@/lib/utils";
 
 interface TransportRequestActionsProps {
   data: TransportRequestWithRelations;
@@ -34,6 +36,7 @@ export default function TransportRequestActions({
 }: TransportRequestActionsProps) {
   const pathname = usePathname();
   const queryClient = useQueryClient();
+  const isDesktop = useMediaQuery("(min-width: 769px)");
   const [isAlertOpen, setIsAlertOpen] = React.useState(false);
   const [odometer, setOdometer] = React.useState<number>(data.vehicle.odometer);
   const { mutateAsync, isPending } = useServerActionMutation(
@@ -87,7 +90,9 @@ export default function TransportRequestActions({
             Start Request
           </Button>
         </AlertDialogTrigger>
-        <AlertDialogContent>
+        <AlertDialogContent
+          className={cn(!isDesktop && "max-w-[calc(100vw_-_20px)]")}
+        >
           <AlertDialogHeader>
             <AlertDialogTitle>Confirm Start Request</AlertDialogTitle>
             <AlertDialogDescription>

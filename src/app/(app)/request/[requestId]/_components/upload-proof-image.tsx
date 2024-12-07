@@ -8,7 +8,7 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { useForm } from "react-hook-form";
+import { useForm, useFormState } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { FileUploader } from "@/components/file-uploader";
@@ -29,6 +29,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { useMediaQuery } from "usehooks-ts";
+import { cn } from "@/lib/utils";
 
 const ImageUpload = z.object({
   proofImages: z.array(z.instanceof(File), {
@@ -42,6 +44,7 @@ interface UploadProofImageProps {
 
 export default function UploadProofImage({ requestId }: UploadProofImageProps) {
   const pathname = usePathname();
+  const isDesktop = useMediaQuery("(min-width: 769px)");
   const [open, setOpen] = React.useState(false);
   const form = useForm<z.infer<typeof ImageUpload>>({
     resolver: zodResolver(ImageUpload),
@@ -49,6 +52,9 @@ export default function UploadProofImage({ requestId }: UploadProofImageProps) {
       proofImages: [],
     },
   });
+
+  const { dirtyFields } = useFormState({ control: form.control });
+  const isFieldsDirty = Object.keys(dirtyFields).length > 0;
 
   const { onUpload, progresses, uploadedFiles, isUploading } = useUploadFile(
     "imageUploader",
@@ -118,18 +124,22 @@ export default function UploadProofImage({ requestId }: UploadProofImageProps) {
         />
         <div className="flex justify-end">
           <AlertDialog open={open} onOpenChange={setOpen}>
-            <AlertDialogTrigger asChild>
-              <SubmitButton
-                disabled={isPending || isUploading}
-                type="button"
-                variant="secondary"
-                size="sm"
-                className="w-20"
-              >
-                Save
-              </SubmitButton>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
+            {isFieldsDirty && (
+              <AlertDialogTrigger asChild>
+                <SubmitButton
+                  disabled={isPending || isUploading}
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  className="w-20"
+                >
+                  Save
+                </SubmitButton>
+              </AlertDialogTrigger>
+            )}
+            <AlertDialogContent
+              className={cn(!isDesktop && "max-w-[calc(100vw_-_20px)]")}
+            >
               <AlertDialogHeader>
                 <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                 <AlertDialogDescription>

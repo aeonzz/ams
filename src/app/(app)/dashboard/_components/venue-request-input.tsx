@@ -44,6 +44,14 @@ import DepartmentInput from "./department-input";
 import { AnimatePresence, motion } from "framer-motion";
 import { outExpo } from "@/lib/easings";
 import { useVenueReservedDates } from "@/lib/hooks/use-venue-reservation";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useMediaQuery } from "usehooks-ts";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 interface VenueRequestInputProps {
   mutateAsync: UseMutateAsyncFunction<
@@ -70,6 +78,7 @@ export default function VenueRequestInput({
   const pathname = usePathname();
   const currentUser = useSession();
   const queryClient = useQueryClient();
+  const isDesktop = useMediaQuery("(min-width: 769px)");
   const [isOpenRules, setIsOpenRules] = React.useState(false);
   const venueId = form.watch("venueId");
   const selectedDepartment = form.watch("department");
@@ -84,9 +93,10 @@ export default function VenueRequestInput({
     queryKey: ["get-input-venue"],
   });
 
-  const { disabledTimeRanges, data, isLoading, refetch, isRefetching } = useVenueReservedDates({
-    venueId,
-  });
+  const { disabledTimeRanges, data, isLoading, refetch, isRefetching } =
+    useVenueReservedDates({
+      venueId,
+    });
 
   const selectedVenue = React.useMemo(() => {
     return venueData?.find((venue) => venue.id === venueId);
@@ -141,7 +151,8 @@ export default function VenueRequestInput({
       ) {
         form.setError("endTime", {
           type: "manual",
-          message: "Start time and end time cannot be the same on the same time.",
+          message:
+            "Start time and end time cannot be the same on the same time.",
         });
         return;
       }
@@ -217,6 +228,38 @@ export default function VenueRequestInput({
     }
   }, [editor, selectedVenue?.rulesAndRegulations]);
 
+  const scheduleSection = (
+    <div className="flex-1">
+      <div className={cn("scroll-bar max-h-[60vh] overflow-y-auto")}>
+        <P className="mb-2 font-semibold">Schedules</P>
+        {isLoading || isRefetching ? (
+          <ScheduledEventCardSkeleton />
+        ) : !data || data.length === 0 ? (
+          <div className="grid h-32 w-full place-items-center">
+            <P>No reserved schedules</P>
+          </div>
+        ) : (
+          <>
+            {(() => {
+              const filteredData = data.filter(
+                (item) => item.request.venueRequest.venue.id === venueId
+              );
+              return filteredData.length === 0 ? (
+                <div className="grid h-32 w-full place-items-center">
+                  <P>No reserved schedules</P>
+                </div>
+              ) : (
+                filteredData.map((item, index) => (
+                  <ScheduledEventCard key={index} data={item} />
+                ))
+              );
+            })()}
+          </>
+        )}
+      </div>
+    </div>
+  );
+
   return (
     <>
       <Form {...form}>
@@ -230,148 +273,125 @@ export default function VenueRequestInput({
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ duration: 0.1, ease: outExpo }}
               >
-                <div className="scroll-bar flex max-h-[60vh] gap-6 overflow-y-auto px-4 py-1">
-                  <div className="flex flex-1 scroll-m-10 scroll-p-10 flex-col space-y-2">
-                    <VenueField
-                      form={form}
-                      name="venueId"
-                      isPending={isPending}
-                      data={venueData}
-                    />
-                    <MultiSelect
-                      form={form}
-                      name="setupRequirements"
-                      label="Venue Setup Requirements"
-                      items={filteredVenueSetupRequirements}
-                      isPending={isPending}
-                      placeholder="Select items"
-                      emptyMessage="No items found."
-                    />
-                    <VenueDateTimePicker
-                      form={form}
-                      name="startTime"
-                      label="Start Time"
-                      isLoading={isLoading}
-                      disabled={isPending || !venueId}
-                      disabledTimeRanges={disabledTimeRanges}
-                      reservations={data}
-                    />
-                    <VenueDateTimePicker
-                      form={form}
-                      name="endTime"
-                      label="End Time"
-                      isLoading={isLoading}
-                      disabled={isPending || !venueId}
-                      disabledTimeRanges={disabledTimeRanges}
-                      reservations={data}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="purpose"
-                      render={({ field }) => (
-                        <FormItem className="flex flex-grow flex-col">
-                          <FormControl>
-                            <Textarea
-                              rows={1}
-                              maxRows={5}
-                              placeholder="Purpose..."
-                              className="min-h-[150px] flex-grow resize-none text-sm"
-                              disabled={isPending}
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="notes"
-                      render={({ field }) => (
-                        <FormItem className="flex flex-grow flex-col">
-                          <FormControl>
-                            <Textarea
-                              rows={1}
-                              maxRows={5}
-                              placeholder="Other info..."
-                              className="min-h-[120px] flex-grow resize-none text-sm"
-                              disabled={isPending}
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  {venueId && (
-                    <div className="flex-1">
-                      {isOpenRules && editor ? (
-                        <div className="scroll-bar max-h-[60vh] space-y-3 overflow-y-auto">
-                          <div className="flex items-center gap-1">
-                            <Button
-                              size="icon"
-                              className="size-7"
-                              variant="ghost2"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                setIsOpenRules(false);
-                              }}
-                            >
-                              <ChevronLeft className="size-4" />
-                            </Button>
-                            <H3 className="font-semibold">
-                              Venue Rules and Regulation
-                            </H3>
-                          </div>
-                          <div className="scroll-bar h-full overflow-y-auto">
-                            <EditorContent
-                              className="outline-none"
-                              editor={editor}
-                            />
-                          </div>
-                        </div>
-                      ) : (
-                        <div
-                          className={cn(
-                            "scroll-bar max-h-[60vh] overflow-y-auto"
-                          )}
-                        >
-                          <P className="mb-2 font-semibold">Schedules</P>
-                          {isLoading || isRefetching ? (
-                            <ScheduledEventCardSkeleton />
-                          ) : !data || data.length === 0 ? (
-                            <div className="grid h-32 w-full place-items-center">
-                              <P>No reserved schedules</P>
-                            </div>
-                          ) : (
-                            <>
-                              {(() => {
-                                const filteredData = data.filter(
-                                  (item) =>
-                                    item.request.venueRequest.venue.id ===
-                                    venueId
-                                );
-                                return filteredData.length === 0 ? (
-                                  <div className="grid h-32 w-full place-items-center">
-                                    <P>No reserved schedules</P>
-                                  </div>
-                                ) : (
-                                  filteredData.map((item, index) => (
-                                    <ScheduledEventCard
-                                      key={index}
-                                      data={item}
-                                    />
-                                  ))
-                                );
-                              })()}
-                            </>
-                          )}
-                        </div>
-                      )}
+                {isOpenRules && editor ? (
+                  <ScrollArea className="h-[60vh] space-y-3 px-4">
+                    <div className="flex items-center gap-1">
+                      <Button
+                        size="icon"
+                        className="size-7"
+                        variant="ghost2"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setIsOpenRules(false);
+                        }}
+                      >
+                        <ChevronLeft className="size-4" />
+                      </Button>
+                      <H3 className="font-semibold text-yellow">
+                        Venue Rules and Regulation
+                      </H3>
                     </div>
-                  )}
-                </div>
+                    <div className="scroll-bar h-full overflow-y-auto">
+                      <EditorContent className="outline-none" editor={editor} />
+                    </div>
+                  </ScrollArea>
+                ) : (
+                  <div
+                    className={cn(
+                      "scroll-bar max-h-[60vh] overflow-y-auto px-4 py-1",
+                      isDesktop ? "flex gap-6" : "flex flex-col"
+                    )}
+                  >
+                    <div className="flex flex-1 scroll-m-10 scroll-p-10 flex-col space-y-2">
+                      {!isDesktop && venueId && (
+                        <Accordion type="single" collapsible className="w-full">
+                          <AccordionItem value="schedules">
+                            <AccordionTrigger className="py-0">
+                              View Schedules
+                            </AccordionTrigger>
+                            <AccordionContent>
+                              {scheduleSection}
+                            </AccordionContent>
+                          </AccordionItem>
+                        </Accordion>
+                      )}
+                      <VenueField
+                        form={form}
+                        name="venueId"
+                        isPending={isPending}
+                        data={venueData}
+                      />
+                      <MultiSelect
+                        form={form}
+                        name="setupRequirements"
+                        label="Venue Setup Requirements"
+                        items={filteredVenueSetupRequirements}
+                        isPending={isPending}
+                        placeholder="Select items"
+                        emptyMessage="No items found."
+                      />
+                      <VenueDateTimePicker
+                        form={form}
+                        name="startTime"
+                        label="Start Time"
+                        isLoading={isLoading}
+                        disabled={isPending || !venueId}
+                        disabledTimeRanges={disabledTimeRanges}
+                        reservations={data}
+                      />
+                      <VenueDateTimePicker
+                        form={form}
+                        name="endTime"
+                        label="End Time"
+                        isLoading={isLoading}
+                        disabled={isPending || !venueId}
+                        disabledTimeRanges={disabledTimeRanges}
+                        reservations={data}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="purpose"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-grow flex-col">
+                            <FormControl>
+                              <Textarea
+                                rows={1}
+                                maxRows={5}
+                                placeholder="Purpose..."
+                                className="min-h-[150px] flex-grow resize-none text-sm"
+                                disabled={isPending}
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="notes"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-grow flex-col">
+                            <FormControl>
+                              <Textarea
+                                rows={1}
+                                maxRows={5}
+                                placeholder="Other info..."
+                                className="min-h-[120px] flex-grow resize-none text-sm"
+                                disabled={isPending}
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    {/* Schedule Section - Only shown in desktop */}
+                    {isDesktop && venueId && scheduleSection}
+                  </div>
+                )}
                 <Separator className="my-4" />
                 <DialogFooter>
                   <div className="flex gap-2">
@@ -379,6 +399,7 @@ export default function VenueRequestInput({
                       <Button
                         onClick={(e) => {
                           e.preventDefault();
+
                           form.reset();
                         }}
                         variant="secondary"
@@ -396,6 +417,7 @@ export default function VenueRequestInput({
                           className="h-fit p-0"
                           onClick={(e) => {
                             e.preventDefault();
+                            setIsOpenRules(false);
                             setIsOpenRules(true);
                           }}
                         >

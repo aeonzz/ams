@@ -52,6 +52,12 @@ import DepartmentInput from "./department-input";
 import { useSession } from "@/lib/hooks/use-session";
 import { AnimatePresence, motion } from "framer-motion";
 import { outExpo } from "@/lib/easings";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 interface VenueRequestInputProps {
   mutateAsync: UseMutateAsyncFunction<
@@ -81,7 +87,7 @@ export default function TransportRequestInput({
   const queryClient = useQueryClient();
   const vehicleId = form.watch("vehicleId");
   const selectedDepartment = form.watch("department");
-  console.log(selectedDepartment)
+  console.log(selectedDepartment);
 
   const { data, isLoading, refetch, isRefetching } = useQuery<
     ReservedTransportDateAndTime[]
@@ -180,6 +186,36 @@ export default function TransportRequestInput({
     name: ud.department.name,
   }));
 
+  const scheduleSection = (
+    <div className={cn("scroll-bar max-h-[60vh] overflow-y-auto")}>
+      <P className="mb-2 font-semibold">Schedules</P>
+      {isLoading || isRefetching ? (
+        <ScheduledEventCardSkeleton />
+      ) : !data || data.length === 0 ? (
+        <div className="grid h-32 w-full place-items-center">
+          <P>No schedules</P>
+        </div>
+      ) : (
+        <>
+          {(() => {
+            const filteredData = data.filter(
+              (item) => item.request.transportRequest.vehicle.id === vehicleId
+            );
+            return filteredData.length === 0 ? (
+              <div className="grid h-32 w-full place-items-center">
+                <P>No reserved schedules</P>
+              </div>
+            ) : (
+              filteredData.map((item, index) => (
+                <VehicleScheduleCard key={index} data={item} />
+              ))
+            );
+          })()}
+        </>
+      )}
+    </div>
+  );
+
   return (
     <>
       <Form {...form}>
@@ -193,229 +229,154 @@ export default function TransportRequestInput({
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ duration: 0.1, ease: outExpo }}
               >
-                <div className="flex gap-2 px-4">
-                  <div className="scroll-bar flex max-h-[60vh] flex-1 overflow-y-auto px-1 py-1">
-                    <div className="flex w-full flex-col space-y-2">
-                      <div>
-                        <div className="flex">
-                          <div className="mr-2 w-fit pt-[2px]">
-                            <Info className="size-4 text-primary" />
-                          </div>
-                          <P className="text-muted-foreground">
-                            Request should be submitted not later than 2 days
-                            prior to the requested date.
-                          </P>
-                        </div>
-                        {!isDesktop && (
-                          <Popover modal>
-                            <PopoverTrigger asChild>
-                              <Button variant="outline" className="w-full">
-                                Schedules
-                              </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-[calc(100vw_-_45px)]">
-                              {vehicleId && (
-                                <div
-                                  className={cn(
-                                    "scroll-bar max-h-[60vh] w-[300px] overflow-y-auto pr-1"
-                                  )}
-                                >
-                                  <P className="mb-2 font-semibold">
-                                    Schedules
-                                  </P>
-                                  {isLoading || isRefetching ? (
-                                    <ScheduledEventCardSkeleton />
-                                  ) : !data || data.length === 0 ? (
-                                    <div className="grid h-32 w-full place-items-center">
-                                      <P>No schedules</P>
-                                    </div>
-                                  ) : (
-                                    <>
-                                      {(() => {
-                                        const filteredData = data.filter(
-                                          (item) =>
-                                            item.request.transportRequest
-                                              .vehicle.id === vehicleId
-                                        );
-                                        return filteredData.length === 0 ? (
-                                          <div className="grid h-32 w-full place-items-center">
-                                            <P>No reserved schedules</P>
-                                          </div>
-                                        ) : (
-                                          filteredData.map((item, index) => (
-                                            <VehicleScheduleCard
-                                              className="w-full"
-                                              key={index}
-                                              data={item}
-                                            />
-                                          ))
-                                        );
-                                      })()}
-                                    </>
-                                  )}
-                                </div>
-                              )}
-                            </PopoverContent>
-                          </Popover>
-                        )}
+                <div
+                  className={cn(
+                    "scroll-bar max-h-[60vh] overflow-y-auto px-4 py-1",
+                    isDesktop ? "flex gap-6" : "flex flex-col"
+                  )}
+                >
+                  <div className="flex flex-1 scroll-m-10 scroll-p-10 flex-col space-y-2">
+                    <div className="flex">
+                      <div className="mr-2 w-fit pt-[2px]">
+                        <Info className="size-4 text-primary" />
                       </div>
-                      <VehicleField
-                        form={form}
-                        name="vehicleId"
-                        isPending={isPending}
-                        data={vehicleData}
-                      />
-                      <DateTimePicker
-                        form={form}
-                        name="dateAndTimeNeeded"
-                        label="Date and Time needed"
-                        isLoading={isLoading}
-                        disabled={isPending || !vehicleId}
-                        disabledDates={disabledDates}
-                      >
-                        <Popover modal>
-                          <PopoverTrigger className="text-primary hover:underline">
-                            Urgent request
-                          </PopoverTrigger>
-                          <PopoverContent className="w-[360px] p-0">
-                            <FormField
-                              control={form.control}
-                              name="isUrgent"
-                              render={({ field }) => (
-                                <FormItem className="flex flex-row items-center justify-between rounded-lg p-4">
-                                  <div className="space-y-0.5">
-                                    <FormLabel className="text-base">
-                                      Mark as Urgent
-                                    </FormLabel>
-                                    <FormDescription>
-                                      Enable this option to prioritize the
-                                      request as urgent.
-                                    </FormDescription>
-                                  </div>
-                                  <FormControl>
-                                    <Switch
-                                      checked={field.value}
-                                      onCheckedChange={field.onChange}
-                                    />
-                                  </FormControl>
-                                </FormItem>
-                              )}
+                      <P className="text-muted-foreground">
+                        Request should be submitted not later than 2 days prior
+                        to the requested date.
+                      </P>
+                    </div>
+                    {!isDesktop && vehicleId && (
+                      <Accordion type="single" collapsible className="w-full">
+                        <AccordionItem value="schedules">
+                          <AccordionTrigger className="py-0">
+                            View Schedules
+                          </AccordionTrigger>
+                          <AccordionContent>{scheduleSection}</AccordionContent>
+                        </AccordionItem>
+                      </Accordion>
+                    )}
+                    <VehicleField
+                      form={form}
+                      name="vehicleId"
+                      isPending={isPending}
+                      data={vehicleData}
+                    />
+                    <DateTimePicker
+                      form={form}
+                      name="dateAndTimeNeeded"
+                      label="Date and Time needed"
+                      isLoading={isLoading}
+                      disabled={isPending || !vehicleId}
+                      disabledDates={disabledDates}
+                    >
+                      <Popover modal>
+                        <PopoverTrigger className="text-primary hover:underline">
+                          Urgent request
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[360px] p-0">
+                          <FormField
+                            control={form.control}
+                            name="isUrgent"
+                            render={({ field }) => (
+                              <FormItem className="flex flex-row items-center justify-between rounded-lg p-4">
+                                <div className="space-y-0.5">
+                                  <FormLabel className="text-base">
+                                    Mark as Urgent
+                                  </FormLabel>
+                                  <FormDescription>
+                                    Enable this option to prioritize the request
+                                    as urgent.
+                                  </FormDescription>
+                                </div>
+                                <FormControl>
+                                  <Switch
+                                    checked={field.value}
+                                    onCheckedChange={field.onChange}
+                                  />
+                                </FormControl>
+                              </FormItem>
+                            )}
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </DateTimePicker>
+                    <FormField
+                      control={form.control}
+                      name="destination"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-grow flex-col">
+                          <FormLabel className="text-left">
+                            Destination
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Destination..."
+                              autoComplete="off"
+                              disabled={isPending}
+                              {...field}
                             />
-                          </PopoverContent>
-                        </Popover>
-                      </DateTimePicker>
-                      <FormField
-                        control={form.control}
-                        name="destination"
-                        render={({ field }) => (
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="passengersName"
+                      render={({ field }) => {
+                        const selectedVehicle = vehicleData?.find(
+                          (vehicle) => vehicle.id === vehicleId
+                        );
+                        const maxCapacity = selectedVehicle?.capacity ?? 0;
+
+                        return (
                           <FormItem className="flex flex-grow flex-col">
                             <FormLabel className="text-left">
-                              Destination
+                              Passenger(s) Name
                             </FormLabel>
                             <FormControl>
-                              <Input
-                                placeholder="Destination..."
-                                autoComplete="off"
-                                disabled={isPending}
-                                {...field}
+                              <TagInput
+                                placeholder={`Enter passenger name (max: ${maxCapacity})`}
+                                disabled={isPending || maxCapacity === 0}
+                                value={field.value || []}
+                                onChange={(value) => {
+                                  if (value.length <= maxCapacity) {
+                                    field.onChange(value);
+                                  } else {
+                                    toast.error(
+                                      `Maximum capacity of ${maxCapacity} passengers reached.`
+                                    );
+                                  }
+                                }}
                               />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="passengersName"
-                        render={({ field }) => {
-                          const selectedVehicle = vehicleData?.find(
-                            (vehicle) => vehicle.id === vehicleId
-                          );
-                          const maxCapacity = selectedVehicle?.capacity ?? 0;
-
-                          return (
-                            <FormItem className="flex flex-grow flex-col">
-                              <FormLabel className="text-left">
-                                Passenger(s) Name
-                              </FormLabel>
-                              <FormControl>
-                                <TagInput
-                                  placeholder={`Enter passenger name (max: ${maxCapacity})`}
-                                  disabled={isPending || maxCapacity === 0}
-                                  value={field.value || []}
-                                  onChange={(value) => {
-                                    if (value.length <= maxCapacity) {
-                                      field.onChange(value);
-                                    } else {
-                                      toast.error(
-                                        `Maximum capacity of ${maxCapacity} passengers reached.`
-                                      );
-                                    }
-                                  }}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          );
-                        }}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="description"
-                        render={({ field }) => (
-                          <FormItem className="flex flex-grow flex-col">
-                            <FormLabel className="text-left">Purpose</FormLabel>
-                            <FormControl>
-                              <Textarea
-                                rows={1}
-                                maxRows={5}
-                                placeholder="Purpose..."
-                                className="min-h-[200px] flex-grow resize-none bg-transparent text-sm shadow-none"
-                                disabled={isPending}
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
+                        );
+                      }}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="description"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-grow flex-col">
+                          <FormLabel className="text-left">Purpose</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              rows={1}
+                              maxRows={5}
+                              placeholder="Purpose..."
+                              className="min-h-[200px] flex-grow resize-none bg-transparent text-sm shadow-none"
+                              disabled={isPending}
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   </div>
-                  {vehicleId && (
-                    <div
-                      className={cn(
-                        "scroll-bar max-h-[60vh] w-[300px] overflow-y-auto pr-1"
-                      )}
-                    >
-                      <P className="mb-2 font-semibold">Schedules</P>
-                      {isLoading || isRefetching ? (
-                        <ScheduledEventCardSkeleton />
-                      ) : !data || data.length === 0 ? (
-                        <div className="grid h-32 w-full place-items-center">
-                          <P>No schedules</P>
-                        </div>
-                      ) : (
-                        <>
-                          {(() => {
-                            const filteredData = data.filter(
-                              (item) =>
-                                item.request.transportRequest.vehicle.id ===
-                                vehicleId
-                            );
-                            return filteredData.length === 0 ? (
-                              <div className="grid h-32 w-full place-items-center">
-                                <P>No reserved schedules</P>
-                              </div>
-                            ) : (
-                              filteredData.map((item, index) => (
-                                <VehicleScheduleCard key={index} data={item} />
-                              ))
-                            );
-                          })()}
-                        </>
-                      )}
-                    </div>
-                  )}
+                  {isDesktop && vehicleId && <div>{scheduleSection}</div>}
                 </div>
                 <Separator className="my-4" />
                 <DialogFooter>

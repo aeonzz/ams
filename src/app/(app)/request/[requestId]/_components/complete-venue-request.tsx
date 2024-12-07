@@ -22,6 +22,8 @@ import { completeVenueRequest } from "@/lib/actions/requests";
 import { useQueryClient } from "@tanstack/react-query";
 import { PermissionGuard } from "@/components/permission-guard";
 import { useSession } from "@/lib/hooks/use-session";
+import { useMediaQuery } from "usehooks-ts";
+import { cn } from "@/lib/utils";
 
 interface CompleteVenueRequestProps {
   requestId: string;
@@ -35,6 +37,7 @@ export default function CompleteVenueRequest({
   const currentUser = useSession();
   const pathname = usePathname();
   const queryClient = useQueryClient();
+  const isDesktop = useMediaQuery("(min-width: 769px)");
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
 
   const { mutateAsync, isPending } =
@@ -72,7 +75,9 @@ export default function CompleteVenueRequest({
             Mark as Completed
           </Button>
         </AlertDialogTrigger>
-        <AlertDialogContent>
+        <AlertDialogContent
+          className={cn(!isDesktop && "max-w-[calc(100vw_-_20px)]")}
+        >
           <AlertDialogHeader>
             <AlertDialogTitle>Confirm Mark as Completed</AlertDialogTitle>
             <AlertDialogDescription>

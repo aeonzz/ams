@@ -54,7 +54,7 @@ export default function ResourceOption() {
         open={dialogManager.activeDialog === "resourceDialog"}
         onOpenChange={handleOpenChange}
       >
-        <DialogContent className="max-w-sm">
+        <DialogContent className="max-w-[calc(100vw_-_20px)] lg:max-w-sm">
           <DialogHeader>
             <DialogTitle>Resource Request</DialogTitle>
             <div className="flex h-full items-center space-x-4 pb-4">

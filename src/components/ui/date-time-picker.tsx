@@ -205,8 +205,11 @@ export default function DateTimePicker<T extends FieldValues>({
                   </Button>
                 </PopoverTrigger>
               </FormControl>
-              <PopoverContent align="start" className="flex h-fit w-auto p-0">
-                <div className="flex">
+              <PopoverContent
+                align="start"
+                className="scroll-bar flex h-[330px] w-auto overflow-y-auto p-0 lg:h-fit"
+              >
+                <div className="flex flex-col lg:flex-row">
                   <Calendar
                     showOutsideDays={false}
                     mode="single"
@@ -232,7 +235,7 @@ export default function DateTimePicker<T extends FieldValues>({
                     disabled={isDateDisabled}
                   />
                   {form.getValues(name) && (
-                    <div className="space-y-3 overflow-y-auto p-3">
+                    <div className="flex min-h-[300px] w-full flex-col gap-3 overflow-y-auto p-3 lg:flex-row">
                       <Select
                         value={selectedMonth.toString()}
                         onValueChange={(value) => {
@@ -243,7 +246,7 @@ export default function DateTimePicker<T extends FieldValues>({
                           }
                         }}
                       >
-                        <SelectTrigger className="w-[180px]">
+                        <SelectTrigger className="lg:w-[180px]">
                           <SelectValue placeholder="Select month" />
                         </SelectTrigger>
                         <SelectContent className="max-h-60">

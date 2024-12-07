@@ -30,6 +30,8 @@ import { useForm, useFormState } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitButton } from "../ui/submit-button";
 import { Separator } from "../ui/separator";
+import { useMediaQuery } from "usehooks-ts";
+import { cn } from "@/lib/utils";
 
 const ImageUpload = z.object({
   imageUrl: z.array(z.instanceof(File), {
@@ -39,6 +41,7 @@ const ImageUpload = z.object({
 
 export default function UploadProfileDialog() {
   const [open, setOpen] = React.useState(false);
+  const isDesktop = useMediaQuery("(min-width: 769px)");
   const form = useForm<z.infer<typeof ImageUpload>>({
     resolver: zodResolver(ImageUpload),
     defaultValues: {
@@ -102,6 +105,7 @@ export default function UploadProfileDialog() {
             e.preventDefault();
           }
         }}
+        className={cn(!isDesktop && "max-w-[calc(100vw_-_20px)]")}
       >
         <DialogHeader>
           <DialogTitle>Upload Avatar</DialogTitle>

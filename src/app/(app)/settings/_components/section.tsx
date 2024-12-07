@@ -28,7 +28,10 @@ const SectionItem = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex h-[75px] border-b pb-6", className)}
+    className={cn(
+      "flex h-auto flex-col border-b pb-6 lg:flex-row",
+      className
+    )}
     {...props}
   />
 ));

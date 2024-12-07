@@ -42,7 +42,7 @@ export default function AdminSettingsDialog() {
 
   return (
     <CommandDialog
-      open={dialogManager.activeDialog === "adminSettingsDialog"}
+      open={dialogManager.activeDialog === "settingsDialog"}
       onOpenChange={handleOpenChange}
     >
       <CommandInput placeholder="Change theme..." />
