@@ -216,10 +216,16 @@ export function getInventorySubItemRequestColumns(): ColumnDef<DepartmentBorrowa
           <div className="flex items-center">
             {row.original.inProgress !== null ? (
               <>
-                {row.original.inProgress ? (
-                  <Badge variant={"cyan"}>Ongoing</Badge>
+                {row.original.status === "COMPLETED" ? (
+                  <>
+                    {row.original.inProgress ? (
+                      <Badge variant={"cyan"}>Ongoing</Badge>
+                    ) : (
+                      <Badge variant={"green"}>Completed</Badge>
+                    )}
+                  </>
                 ) : (
-                  <Badge variant={"green"}>Completed</Badge>
+                  "-"
                 )}
               </>
             ) : (
@@ -305,7 +311,49 @@ export function getInventorySubItemRequestColumns(): ColumnDef<DepartmentBorrowa
         return (
           <div className="flex space-x-2">
             <P className="truncate font-medium">
-              {row.original.returnCondition ? row.original.returnCondition : "-"}
+              {row.original.returnCondition
+                ? row.original.returnCondition
+                : "-"}
+            </P>
+          </div>
+        );
+      },
+      size: 0,
+    },
+    {
+      accessorKey: "isLost",
+      header: ({ column }) => (
+        <div className="flex justify-center px-2">
+          <DataTableColumnHeader column={column} title="Lost" />
+        </div>
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="flex space-x-2">
+            {row.original.isLost !== null ? (
+              <P className="truncate font-medium">
+                {row.original.isLost ? "Yes" : "No"}
+              </P>
+            ) : (
+              "-"
+            )}
+          </div>
+        );
+      },
+      size: 0,
+    },
+    {
+      accessorKey: "lostReason",
+      header: ({ column }) => (
+        <div className="flex justify-center px-2">
+          <DataTableColumnHeader column={column} title="Lost Reason" />
+        </div>
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="flex space-x-2">
+            <P className="truncate font-medium">
+              {row.original.lostReason ? row.original.lostReason : "-"}
             </P>
           </div>
         );

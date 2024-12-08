@@ -96,6 +96,11 @@ async function handler(req: NextRequest, user: any, context: Context) {
                 },
               },
             },
+            request: {
+              include: {
+                user: true,
+              },
+            },
           },
         },
         transportRequest: {

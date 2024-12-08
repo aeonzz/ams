@@ -107,7 +107,7 @@ export const createJobRequest = authedProcedure
           departmentId: rest.departmentId,
           role: {
             name: {
-              in: ["DEPARTMENT_HEAD", "REQUEST_MANAGER"],
+              in: ["DEPARTMENT_HEAD", "OPERATIONS_MANAGER"],
             },
           },
         },
@@ -418,7 +418,7 @@ export const cancelRequest = authedProcedure
             departmentId: updatedRequest.departmentId,
             role: {
               name: {
-                in: ["DEPARTMENT_HEAD", "REQUEST_MANAGER"],
+                in: ["DEPARTMENT_HEAD", "OPERATIONS_MANAGER"],
               },
             },
           },

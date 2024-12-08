@@ -169,6 +169,7 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                   onHoldReason={data.onHoldReason}
                   requestStatus={data.status}
                   isCurrentUser={currentUser.id === data.userId}
+                  departmentId={data.departmentId}
                 />
               )}
               {data.type === "SUPPLY" && data.supplyRequest && (

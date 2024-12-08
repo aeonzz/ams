@@ -33,11 +33,21 @@ export const createReturnableResourceRequest = authedProcedure
       const requestId = `REQ-${generateId(5)}`;
       const resourceRequestId = `RRQ-${generateId(5)}`;
 
+      const item = await db.inventorySubItem.findUnique({
+        where: {
+          id: rest.itemId,
+        },
+      });
+
+      if (!item) {
+        throw "Item not found";
+      }
+
       let title;
       try {
         const text = await generateTitle({
           type: input.type,
-          inputs: [input.purpose],
+          inputs: [input.purpose, item.subName],
         });
         title = text.title || requestId;
       } catch (error) {
@@ -72,7 +82,7 @@ export const createReturnableResourceRequest = authedProcedure
           departmentId: rest.departmentId,
           role: {
             name: {
-              in: ["DEPARTMENT_HEAD", "REQUEST_MANAGER"],
+              in: ["DEPARTMENT_HEAD", "OPERATIONS_MANAGER"],
             },
           },
         },
@@ -171,7 +181,7 @@ export const createSupplyResourceRequest = authedProcedure
           departmentId: rest.departmentId,
           role: {
             name: {
-              in: ["DEPARTMENT_HEAD", "REQUEST_MANAGER"],
+              in: ["DEPARTMENT_HEAD", "OPERATIONS_MANAGER"],
             },
           },
         },

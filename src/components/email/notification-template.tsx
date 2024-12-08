@@ -54,7 +54,7 @@ export const NotificationTemplate = ({
         )}
         <Hr style={hr} />
         <Text style={footer}>
-          If you're having trouble viewing this notification, please contact our
+          If you&apos;re having trouble viewing this notification, please contact our
           support team.
         </Text>
         {link && (
