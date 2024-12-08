@@ -14,6 +14,7 @@ import {
   Text,
 } from "@react-email/components";
 import { env } from "@/lib/env.mjs";
+import { backgroundSize } from "html2canvas/dist/types/css/property-descriptors/background-size";
 
 interface ResetPasswordTemplateProps {
   email: string;
@@ -26,22 +27,22 @@ export const ResetPasswordTemplate = ({
 }: ResetPasswordTemplateProps) => (
   <Html>
     <Head />
-    <Preview>Reset Your Sync Account Password</Preview>
+    <Preview>Reset Your ReqQuest Account Password</Preview>
     <Body style={main}>
       <Container style={container}>
         <Img
-          src="https://your-company-logo-url.com/logo.png"
-          alt="Sync Logo"
+          src="https://utfs.io/f/kl4weUdrwUH2r4J2xtULCnNBXLfT5yh8jsRlV3HuvGEKSQaM"
+          alt="USTP Logo"
           width="100"
-          height="50"
+          height="100"
           style={logo}
         />
         <Heading style={h1}>Reset Your Password</Heading>
+        <Text style={text}>Hello {email},</Text>
         <Text style={text}>
-          Hello {email},
-        </Text>
-        <Text style={text}>
-          We received a request to reset the password for AMS your account. If you didn&apos;t make this request, you can safely ignore this email.
+          We received a request to reset the password for ReqQuest your account.
+          If you didn&apos;t make this request, you can safely ignore this
+          email.
         </Text>
         <Section style={buttonContainer}>
           <Button
@@ -52,11 +53,13 @@ export const ResetPasswordTemplate = ({
           </Button>
         </Section>
         <Text style={text}>
-          This password reset link will expire in 24 hours. If you need to reset your password after that, please request a new reset link.
+          This password reset link will expire in 24 hours. If you need to reset
+          your password after that, please request a new reset link.
         </Text>
         <Hr style={hr} />
         <Text style={footer}>
-          If you&apos;re having trouble clicking the &quot;Reset Password&quot; button, copy and paste the following URL into your web browser:
+          If you&apos;re having trouble clicking the &quot;Reset Password&quot;
+          button, copy and paste the following URL into your web browser:
         </Text>
         <Link
           href={`${env.NEXT_PUBLIC_APP_URL}/sign-in/reset-password?token=${resetPasswordToken}`}
@@ -65,7 +68,12 @@ export const ResetPasswordTemplate = ({
           {`${env.NEXT_PUBLIC_APP_URL}/sign-in/reset-password?token=${resetPasswordToken}`}
         </Link>
         <Text style={footer}>
-          If you didn&apos;t request a password reset, please ignore this email or <Link href="mailto:support@sync.com" style={link}>contact support</Link> if you have questions.
+          If you didn&apos;t request a password reset, please ignore this email
+          or{" "}
+          <Link href="christiancaneos1@gmail.com" style={link}>
+            contact support
+          </Link>{" "}
+          if you have questions.
         </Text>
       </Container>
     </Body>
@@ -75,7 +83,7 @@ export const ResetPasswordTemplate = ({
 const main = {
   backgroundColor: "#f6f9fc",
   fontFamily:
-    '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Ubuntu,sans-serif',
+    '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Ubuntu, sans-serif',
   padding: "60px 0",
 };
 
@@ -92,6 +100,7 @@ const container = {
 const logo = {
   margin: "0 auto",
   marginBottom: "24px",
+  backgroundSize: "cover",
 };
 
 const h1 = {
@@ -116,9 +125,9 @@ const buttonContainer = {
 };
 
 const button = {
-  backgroundColor: "#007ee6",
+  backgroundColor: "#1b1952",
   borderRadius: "4px",
-  color: "#fff",
+  color: "#fbb318",
   fontSize: "16px",
   fontWeight: "bold",
   textDecoration: "none",
@@ -144,4 +153,3 @@ const link = {
   color: "#007ee6",
   textDecoration: "underline",
 };
-

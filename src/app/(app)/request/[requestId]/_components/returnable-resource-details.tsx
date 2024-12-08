@@ -48,6 +48,9 @@ import axios from "axios";
 import { Textarea } from "@/components/ui/text-area";
 import { Input } from "@/components/ui/input";
 import { AlertCard } from "@/components/ui/alert-card";
+import { PermissionGuard } from "@/components/permission-guard";
+import UserBorrowHistoryDialog from "./user-borrow-history-dialog";
+import { useSession } from "@/lib/hooks/use-session";
 
 interface ReturnableResourceDetailsProps {
   data: ReturnableRequestWithRelations;
@@ -57,6 +60,7 @@ interface ReturnableResourceDetailsProps {
   onHoldReason: string | null;
   requestStatus: RequestStatusTypeType;
   isCurrentUser: boolean;
+  departmentId: string;
 }
 
 export default function ReturnableResourceDetails({
@@ -67,9 +71,11 @@ export default function ReturnableResourceDetails({
   onHoldReason,
   requestStatus,
   isCurrentUser,
+  departmentId,
 }: ReturnableResourceDetailsProps) {
   const { itemId } = data;
   const pathname = usePathname();
+  const currentUser = useSession();
   const [editField, setEditField] = React.useState<string | null>(null);
   const { icon: Icon, variant } = getReturnableItemStatusIcon(data.item.status);
 
@@ -173,7 +179,7 @@ export default function ReturnableResourceDetails({
   const canEdit =
     (requestStatus === "PENDING" || requestStatus === "ON_HOLD") &&
     isCurrentUser;
-
+    
   return (
     <>
       <div className="space-y-4 pb-10">
@@ -246,8 +252,17 @@ export default function ReturnableResourceDetails({
             Borrow Request Details
           </H4>
         </div>
-        <div>
-          <H5 className="mb-2 font-semibold text-muted-foreground">Item:</H5>
+        <div className="space-y-2">
+          <div className="flex justify-between items-center">
+            <H5 className="mb-2 font-semibold text-muted-foreground">Item:</H5>
+            <PermissionGuard
+              allowedRoles={["OPERATIONS_MANAGER"]}
+              allowedDepartment={departmentId}
+              currentUser={currentUser}
+            >
+              <UserBorrowHistoryDialog userId={data.request.userId} />
+            </PermissionGuard>
+          </div>
           <Card>
             <CardHeader className="p-3">
               <div className="flex w-full space-x-3">
@@ -319,7 +334,7 @@ export default function ReturnableResourceDetails({
                 {canEdit && (
                   <Button
                     variant="link"
-                    className="lg:opacity-0 group-hover:opacity-100"
+                    className="group-hover:opacity-100 lg:opacity-0"
                     onClick={(e) => {
                       e.preventDefault();
                       setEditField("location");
@@ -363,7 +378,7 @@ export default function ReturnableResourceDetails({
                 {canEdit && (
                   <Button
                     variant="link"
-                    className="lg:opacity-0 group-hover:opacity-100"
+                    className="group-hover:opacity-100 lg:opacity-0"
                     onClick={(e) => {
                       e.preventDefault();
                       setEditField("dateAndTimeNeeded");
@@ -407,7 +422,7 @@ export default function ReturnableResourceDetails({
                 {canEdit && (
                   <Button
                     variant="link"
-                    className="lg:opacity-0 group-hover:opacity-100"
+                    className="group-hover:opacity-100 lg:opacity-0"
                     onClick={(e) => {
                       e.preventDefault();
                       setEditField("returnDateAndTime");
@@ -461,7 +476,7 @@ export default function ReturnableResourceDetails({
                 {canEdit && (
                   <Button
                     variant="link"
-                    className="lg:opacity-0 group-hover:opacity-100"
+                    className="group-hover:opacity-100 lg:opacity-0"
                     onClick={(e) => {
                       e.preventDefault();
                       setEditField("purpose");
@@ -517,7 +532,7 @@ export default function ReturnableResourceDetails({
                 {canEdit && (
                   <Button
                     variant="link"
-                    className="lg:opacity-0 group-hover:opacity-100"
+                    className="group-hover:opacity-100 lg:opacity-0"
                     onClick={(e) => {
                       e.preventDefault();
                       setEditField("notes");

@@ -82,7 +82,8 @@ export const cancelRequestSchema = z.object({
   requestId: z.string(),
   path: z.string(),
   status: RequestStatusTypeSchema,
-  cancellationReason: z.string().optional(),
+  userId: z.string(),
+  cancellationReason: z.string(),
 });
 
 export type CancelRequestSchema = z.infer<typeof cancelRequestSchema>;

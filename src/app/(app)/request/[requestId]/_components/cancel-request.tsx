@@ -25,6 +25,7 @@ import { Textarea } from "@/components/ui/text-area";
 import type { RequestStatusTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestStatusTypeSchema";
 import { useMediaQuery } from "usehooks-ts";
 import { cn } from "@/lib/utils";
+import { useSession } from "@/lib/hooks/use-session";
 
 interface CancelRequestProps {
   requestStatus: RequestStatusTypeType;
@@ -38,6 +39,7 @@ export default function CancelRequest({
   disabled = false,
 }: CancelRequestProps) {
   const pathname = usePathname();
+  const currentUser = useSession();
   const queryClient = useQueryClient();
   const isDesktop = useMediaQuery("(min-width: 769px)");
   const { mutateAsync, isPending } = useServerActionMutation(cancelRequest);
@@ -56,6 +58,7 @@ export default function CancelRequest({
       requestId: requestId,
       path: pathname,
       status: "CANCELLED",
+      userId: currentUser.id,
       cancellationReason: cancellationReason.trim(),
     };
 

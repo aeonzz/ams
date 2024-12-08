@@ -37,6 +37,7 @@ export type DialogType =
   | "adminCommandDialog"
   | "scheduleCalendar"
   | "requestActionSheet"
+  | "userBorrowDialog"
   | null;
 
 export interface DialogState {

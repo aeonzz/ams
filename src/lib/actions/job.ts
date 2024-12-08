@@ -28,6 +28,7 @@ import { formatFullName } from "../utils";
 import { PrismaClient } from "@prisma/client";
 import { togetherai } from "@/components/providers/ai-provider";
 import { generateTitle } from "./ai";
+import { sendEmailNotification } from "./email";
 
 const generateDateId = async (db: PrismaClient) => {
   const currentDate = new Date();
@@ -101,14 +102,39 @@ export const createJobRequest = authedProcedure
         },
       });
 
+      const departmentRoleUsers = await db.userRole.findMany({
+        where: {
+          departmentId: rest.departmentId,
+          role: {
+            name: {
+              in: ["DEPARTMENT_HEAD", "OPERATIONS_MANAGER"],
+            },
+          },
+        },
+        include: {
+          user: true,
+        },
+      });
+
+      const recipientIds = departmentRoleUsers.map(
+        (roleUser) => roleUser.userId
+      );
+
       await createNotification({
         resourceId: `/request/${createdRequest.id}`,
         title: `New Job Request: ${createdRequest.title}`,
         resourceType: "REQUEST",
         notificationType: "INFO",
         message: `A new job request titled "${createdRequest.title}" has been submitted. Please review the details and take the necessary actions.`,
-        recepientIds: [createdRequest.departmentId],
+        recepientIds: [...recipientIds, createdRequest.departmentId],
         userId: user.id,
+      });
+
+      await sendEmailNotification({
+        recipientIds: recipientIds,
+        resourceId: `/request/${createdRequest.id}`,
+        title: `New Job Request: ${createdRequest.title}`,
+        payload: `A new job request titled "${createdRequest.title}" has been submitted. Please review the details.`,
       });
 
       try {
@@ -174,6 +200,13 @@ export const assignPersonnel = authedProcedure
             userId: user.id,
             recepientIds: [rest.personnelId],
           });
+
+          await sendEmailNotification({
+            recipientIds: [rest.personnelId],
+            resourceId: `/request/${updatedRequest.id}`,
+            title: `New Job Assignment: ${updatedRequest.title}`,
+            payload: `You have been assigned to a new job: ${updatedRequest.title}. Please review the details and take the necessary actions.`,
+          });
         }
 
         return updatedRequest;
@@ -231,11 +264,11 @@ export const updateRequestStatus = authedProcedure
             },
           });
 
-          const departmentHeads = updatedRequest.department.userRole
-            ?.filter((role) => role.role.name === "DEPARTMENT_HEAD")
-            .map((role) => role.user.id);
-
           if (rest.status === "REVIEWED") {
+            const departmentHeads = updatedRequest.department.userRole
+              ?.filter((role) => role.role.name === "DEPARTMENT_HEAD")
+              .map((role) => role.user.id);
+
             await createNotification({
               resourceId: `/request/${updatedRequest.id}`,
               title: `Request Reviewed: ${updatedRequest.title}`,
@@ -244,6 +277,13 @@ export const updateRequestStatus = authedProcedure
               message: `The request titled "${updatedRequest.title}" has been reviewed and is awaiting your approval. Please review the details and take the necessary actions.`,
               userId: user.id,
               recepientIds: departmentHeads,
+            });
+
+            await sendEmailNotification({
+              recipientIds: departmentHeads,
+              resourceId: `/request/${updatedRequest.id}`,
+              title: `Request Reviewed: ${updatedRequest.title}`,
+              payload: `The request titled "${updatedRequest.title}" has been reviewed and is awaiting your approval. Please review the details and take the necessary actions.`,
             });
           }
 
@@ -256,6 +296,13 @@ export const updateRequestStatus = authedProcedure
               message: `Your request for "${updatedRequest.title}" has been approved! Visit the request page for details and next steps.`,
               userId: user.id,
               recepientIds: [updatedRequest.userId],
+            });
+
+            await sendEmailNotification({
+              recipientIds: [updatedRequest.userId],
+              resourceId: `/request/${updatedRequest.id}`,
+              title: `Request Approved: ${updatedRequest.title}`,
+              payload: `Your request for "${updatedRequest.title}" has been approved! Visit the request page for details and next steps.`,
             });
 
             await createNotification({
@@ -281,6 +328,13 @@ export const updateRequestStatus = authedProcedure
                 userId: user.id,
                 recepientIds: [updatedRequest.jobRequest?.assignedTo],
               });
+
+              await sendEmailNotification({
+                recipientIds: [updatedRequest.jobRequest?.assignedTo],
+                resourceId: `/request/${updatedRequest.id}`,
+                title: `New Job Assignment: ${updatedRequest.title}`,
+                payload: `You have been assigned to a new job: ${updatedRequest.title}. Please review the details and take the necessary actions.`,
+              });
             }
           }
 
@@ -294,6 +348,13 @@ export const updateRequestStatus = authedProcedure
               userId: user.id,
               recepientIds: [updatedRequest.userId],
             });
+
+            await sendEmailNotification({
+              recipientIds: [updatedRequest.userId],
+              resourceId: `/request/${updatedRequest.id}`,
+              title: `Request Rejected: ${updatedRequest.title}`,
+              payload: `Your request for "${updatedRequest.title}" has been rejected. Please check the request for further details.`,
+            });
           }
 
           if (rest.status === "ON_HOLD") {
@@ -305,6 +366,13 @@ export const updateRequestStatus = authedProcedure
               message: `Your request for "${updatedRequest.title}" is currently on hold. Please review the request for further details and take the necessary actions.`,
               userId: user.id,
               recepientIds: [updatedRequest.userId],
+            });
+
+            await sendEmailNotification({
+              recipientIds: [updatedRequest.userId],
+              resourceId: `/request/${updatedRequest.id}`,
+              title: `Request On Hold: ${updatedRequest.title}`,
+              payload: `Your request for "${updatedRequest.title}" is currently on hold. Please review the request for further details and take the necessary actions.`,
             });
           }
 
@@ -334,7 +402,7 @@ export const cancelRequest = authedProcedure
   .input(cancelRequestSchema)
   .handler(async ({ ctx, input }) => {
     const { user } = ctx;
-    const { path, requestId, ...rest } = input;
+    const { path, requestId, userId, ...rest } = input;
 
     try {
       const result = await db.$transaction(async (prisma) => {
@@ -345,28 +413,70 @@ export const cancelRequest = authedProcedure
           },
         });
 
-        if (rest.cancellationReason) {
+        const departmentRoleUsers = await prisma.userRole.findMany({
+          where: {
+            departmentId: updatedRequest.departmentId,
+            role: {
+              name: {
+                in: ["DEPARTMENT_HEAD", "OPERATIONS_MANAGER"],
+              },
+            },
+          },
+          include: {
+            user: true,
+          },
+        });
+
+        const recipientIds = departmentRoleUsers.map(
+          (roleUser) => roleUser.userId
+        );
+
+        if (user.id === updatedRequest.userId) {
+          await createNotification({
+            resourceId: `/request/${updatedRequest.id}`,
+            title: `Request Cancelled by Requester: ${updatedRequest.title}`,
+            resourceType: "REQUEST",
+            notificationType: "ALERT",
+            message: `The request "${updatedRequest.title}" has been cancelled by the requester. Reason: ${rest.cancellationReason}`,
+            userId: user.id,
+            recepientIds: recipientIds,
+          });
+
+          await sendEmailNotification({
+            recipientIds: recipientIds,
+            resourceId: `/request/${updatedRequest.id}`,
+            title: `Request Cancelled by Requester: ${updatedRequest.title}`,
+            payload: `The request "${updatedRequest.title}" has been cancelled by the requester. Reason: ${rest.cancellationReason}`,
+          });
+        } else {
           await createNotification({
             resourceId: `/request/${updatedRequest.id}`,
             title: `Request Cancelled: ${updatedRequest.title}`,
             resourceType: "REQUEST",
             notificationType: "ALERT",
-            message: `Your request for "${updatedRequest.title}" has been cancelled. Please contact support or the relevant authority if you need further assistance.`,
+            message: `Your request "${updatedRequest.title}" has been cancelled. Reason: ${rest.cancellationReason}. Please contact support or the relevant authority if you need further assistance.`,
             userId: user.id,
             recepientIds: [updatedRequest.userId],
           });
-        }
 
-        try {
-          await pusher.trigger("request", "request_update", {
-            message: "",
+          await sendEmailNotification({
+            recipientIds: [updatedRequest.userId],
+            resourceId: `/request/${updatedRequest.id}`,
+            title: `Request Cancelled: ${updatedRequest.title}`,
+            payload: `Your request "${updatedRequest.title}" has been cancelled. Reason: ${rest.cancellationReason}. Please contact support or the relevant authority if you need further assistance.`,
           });
-        } catch (pusherError) {
-          console.error("Failed to send Pusher notifications:", pusherError);
         }
 
         return updatedRequest;
       });
+
+      try {
+        await pusher.trigger("request", "request_update", {
+          message: "",
+        });
+      } catch (pusherError) {
+        console.error("Failed to send Pusher notifications:", pusherError);
+      }
 
       return revalidatePath(path);
     } catch (error) {
@@ -415,6 +525,13 @@ export const updateJobRequest = authedProcedure
             userId: user.id,
           });
 
+          await sendEmailNotification({
+            recipientIds: [updatedRequest.reviewedBy],
+            resourceId: `/request/${updatedRequest.id}`,
+            title: `Job In Progress: ${updatedRequest.title}`,
+            payload: `The job for "${updatedRequest.title}" is currently in progress. Please check the request for further details.`,
+          });
+
           await createNotification({
             resourceId: `/request/${updatedRequest.id}`,
             title: `Job In Progress: ${updatedRequest.title}`,
@@ -423,6 +540,13 @@ export const updateJobRequest = authedProcedure
             message: `Your job request for "${updatedRequest.title}" is currently in progress. Please check the request for further details.`,
             recepientIds: [updatedRequest.userId],
             userId: user.id,
+          });
+
+          await sendEmailNotification({
+            recipientIds: [updatedRequest.userId],
+            resourceId: `/request/${updatedRequest.id}`,
+            title: `Job In Progress: ${updatedRequest.title}`,
+            payload: `Your job request for "${updatedRequest.title}" is currently in progress. Please check the request for further details.`,
           });
         }
 
@@ -439,19 +563,26 @@ export const updateJobRequest = authedProcedure
             ],
             userId: user.id,
           });
-        }
 
-        try {
-          await Promise.all([
-            pusher.trigger("request", "request_update", { message: "" }),
-            pusher.trigger("request", "notifications", { message: "" }),
-          ]);
-        } catch (pusherError) {
-          console.error("Failed to send Pusher notifications:", pusherError);
+          await sendEmailNotification({
+            recipientIds: [updatedRequest.reviewedBy],
+            resourceId: `/request/${updatedRequest.id}`,
+            title: `Job Completed: ${updatedRequest.title}`,
+            payload: `The job for "${updatedRequest.title}" has been successfully completed. Please review the request for further details.`,
+          });
         }
 
         return updatedRequest;
       });
+
+      try {
+        await Promise.all([
+          pusher.trigger("request", "request_update", { message: "" }),
+          pusher.trigger("request", "notifications", { message: "" }),
+        ]);
+      } catch (pusherError) {
+        console.error("Failed to send Pusher notifications:", pusherError);
+      }
 
       return revalidatePath(path);
     } catch (error) {
@@ -642,14 +773,28 @@ export const completeJobRequest = authedProcedure
               userId: user.id,
             });
 
+            await sendEmailNotification({
+              recipientIds: [updatedRequest.assignedTo],
+              resourceId: `/request/${updatedRequest.id}`,
+              title: `Job Verified: ${updatedRequest.request.title}`,
+              payload: `Your work on the job request "${updatedRequest.request.title}" has been successfully verified and completed.`,
+            });
+
             await createNotification({
               resourceId: `/request/${updatedRequest.id}`,
               title: `Job Request Completed: ${updatedRequest.request.title}`,
               resourceType: "REQUEST",
               notificationType: "SUCCESS",
-              message: `Your job request for "${updatedRequest.request.title}" has been successfully completed. Thank you for your patience! Please review the request for any further details.`,
+              message: `Your job request for "${updatedRequest.request.title}" has been successfully completed. Please review the request for any further details.`,
               userId: user.id,
               recepientIds: [updatedRequest.request.userId],
+            });
+
+            await sendEmailNotification({
+              recipientIds: [updatedRequest.request.userId],
+              resourceId: `/request/${updatedRequest.id}`,
+              title: `Job Request Completed: ${updatedRequest.request.title}`,
+              payload: `Your job request for "${updatedRequest.request.title}" has been successfully completed. Please review the request for any further details.`,
             });
           }
         }
@@ -658,9 +803,10 @@ export const completeJobRequest = authedProcedure
       });
 
       try {
-        await pusher.trigger("request", "request_update", {
-          message: "",
-        });
+        await Promise.all([
+          pusher.trigger("request", "request_update", { message: "" }),
+          pusher.trigger("request", "notifications", { message: "" }),
+        ]);
       } catch (pusherError) {
         console.error("Failed to send Pusher notifications:", pusherError);
       }

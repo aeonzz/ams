@@ -165,7 +165,9 @@ export default function SupplyResourceDetails({
     form.reset();
   }, [editField]);
 
-  const canEdit = requestStatus === "PENDING" && isCurrentUser;
+  const canEdit =
+    (requestStatus === "PENDING" || requestStatus === "ON_HOLD") &&
+    isCurrentUser;
 
   React.useEffect(() => {
     if (!canEdit) {
@@ -275,7 +277,7 @@ export default function SupplyResourceDetails({
                 {canEdit && (
                   <Button
                     variant="link"
-                    className="lg:opacity-0 group-hover:opacity-100"
+                    className="group-hover:opacity-100 lg:opacity-0"
                     onClick={(e) => {
                       e.preventDefault();
                       setEditField("dateAndTimeNeeded");
@@ -329,7 +331,7 @@ export default function SupplyResourceDetails({
                 {canEdit && (
                   <Button
                     variant="link"
-                    className="lg:opacity-0 group-hover:opacity-100"
+                    className="group-hover:opacity-100 lg:opacity-0"
                     onClick={(e) => {
                       e.preventDefault();
                       setEditField("purpose");

@@ -19,6 +19,7 @@ import {
 } from "../schema/resource/request-supply";
 import { pusher } from "../pusher";
 import { generateTitle } from "./ai";
+import { sendEmailNotification } from "./email";
 
 export const createReturnableResourceRequest = authedProcedure
   .createServerAction()
@@ -32,11 +33,21 @@ export const createReturnableResourceRequest = authedProcedure
       const requestId = `REQ-${generateId(5)}`;
       const resourceRequestId = `RRQ-${generateId(5)}`;
 
+      const item = await db.inventorySubItem.findUnique({
+        where: {
+          id: rest.itemId,
+        },
+      });
+
+      if (!item) {
+        throw "Item not found";
+      }
+
       let title;
       try {
         const text = await generateTitle({
           type: input.type,
-          inputs: [input.purpose],
+          inputs: [input.purpose, item.subName],
         });
         title = text.title || requestId;
       } catch (error) {
@@ -66,20 +77,49 @@ export const createReturnableResourceRequest = authedProcedure
         },
       });
 
+      const departmentRoleUsers = await db.userRole.findMany({
+        where: {
+          departmentId: rest.departmentId,
+          role: {
+            name: {
+              in: ["DEPARTMENT_HEAD", "OPERATIONS_MANAGER"],
+            },
+          },
+        },
+        include: {
+          user: true,
+        },
+      });
+
+      const recipientIds = departmentRoleUsers.map(
+        (roleUser) => roleUser.userId
+      );
+
       await createNotification({
         resourceId: `/request/${createdRequest.id}`,
         title: `New Borrow Request: ${createdRequest.title}`,
         resourceType: "REQUEST",
         notificationType: "INFO",
         message: `A new borrow request titled "${createdRequest.title}" has been submitted. Please review the request and take the necessary actions.`,
-        recepientIds: [createdRequest.departmentId],
+        recepientIds: [...recipientIds, createdRequest.departmentId],
         userId: user.id,
       });
 
-      await Promise.all([
-        pusher.trigger("request", "request_update", { message: "" }),
-        pusher.trigger("request", "notifications", { message: "" }),
-      ]);
+      await sendEmailNotification({
+        recipientIds: recipientIds,
+        resourceId: `/request/${createdRequest.id}`,
+        title: `New Borrow Request: ${createdRequest.title}`,
+        payload: `A new borrow request titled "${createdRequest.title}" has been submitted. Please review the request and take the necessary actions.`,
+      });
+
+      try {
+        await Promise.all([
+          pusher.trigger("request", "request_update", { message: "" }),
+          pusher.trigger("request", "notifications", { message: "" }),
+        ]);
+      } catch (pusherError) {
+        console.error("Failed to send Pusher notifications:", pusherError);
+      }
 
       return revalidatePath(path);
     } catch (error) {
@@ -136,20 +176,49 @@ export const createSupplyResourceRequest = authedProcedure
         },
       });
 
+      const departmentRoleUsers = await db.userRole.findMany({
+        where: {
+          departmentId: rest.departmentId,
+          role: {
+            name: {
+              in: ["DEPARTMENT_HEAD", "OPERATIONS_MANAGER"],
+            },
+          },
+        },
+        include: {
+          user: true,
+        },
+      });
+
+      const recipientIds = departmentRoleUsers.map(
+        (roleUser) => roleUser.userId
+      );
+
       await createNotification({
         resourceId: `/request/${createdRequest.id}`,
-        title: `New Job Request: ${createdRequest.title}`,
+        title: `New Supply Request: ${createdRequest.title}`,
         resourceType: "REQUEST",
         notificationType: "INFO",
         message: `A new supply request titled "${createdRequest.title}" has been submitted. Please review the details and take the necessary actions.`,
-        recepientIds: [createdRequest.departmentId],
+        recepientIds: [...recipientIds, createdRequest.departmentId],
         userId: user.id,
       });
 
-      await Promise.all([
-        pusher.trigger("request", "request_update", { message: "" }),
-        pusher.trigger("request", "notifications", { message: "" }),
-      ]);
+      await sendEmailNotification({
+        recipientIds: recipientIds,
+        resourceId: `/request/${createdRequest.id}`,
+        title: `New Supply Request: ${createdRequest.title}`,
+        payload: `A new supply request titled "${createdRequest.title}" has been submitted. Please review the details and take the necessary actions.`,
+      });
+
+      try {
+        await Promise.all([
+          pusher.trigger("request", "request_update", { message: "" }),
+          pusher.trigger("request", "notifications", { message: "" }),
+        ]);
+      } catch (pusherError) {
+        console.error("Failed to send Pusher notifications:", pusherError);
+      }
 
       return revalidatePath(path);
     } catch (error) {

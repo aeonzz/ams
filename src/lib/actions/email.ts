@@ -18,48 +18,67 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-export const sendNotification = authedProcedure
+export const sendEmailNotification = authedProcedure
   .createServerAction()
   .input(
     z.object({
-      recepientId: z.string({
-        required_error: "Recepient ID is required",
+      recipientIds: z.array(z.string()).min(1, {
+        message: "At least one recipient ID is required",
       }),
       resourceId: z.string().optional(),
       payload: z.string().min(1),
+      title: z.string(),
     })
   )
   .handler(async ({ input }) => {
-    const { recepientId, resourceId, payload } = input;
+    const { recipientIds, resourceId, payload, title } = input;
     try {
-      const user = await db.user.findUnique({
+      const users = await db.user.findMany({
         where: {
-          id: recepientId,
+          id: {
+            in: recipientIds,
+          },
         },
       });
 
-      if (!user) {
-        throw "User not found";
+      if (users.length === 0) {
+        throw "No users found";
       }
 
-      const emailHtml = render(
-        NotificationTemplate({
-          name: formatFullName(user.firstName, user.middleName, user.lastName),
-          link: resourceId,
-          payload: payload,
-        })
-      );
+      const emailPromises = users.map(async (user) => {
+        const emailHtml = render(
+          NotificationTemplate({
+            name: formatFullName(
+              user.firstName,
+              user.middleName,
+              user.lastName
+            ),
+            link: `${env.NEXT_PUBLIC_APP_URL}/${resourceId}`,
+            payload: payload,
+            preview: title,
+          })
+        );
 
-      const data = await transporter.sendMail({
-        from: process.env.SMTP_FROM,
-        to: user.email,
-        subject: "Welcome to Our Platform!",
-        html: emailHtml,
+        return transporter.sendMail({
+          from: env.SMTP_FROM,
+          to: user.email,
+          subject: "You have new notification",
+          html: emailHtml,
+        });
       });
 
-      return data;
+      const results = await Promise.all(emailPromises);
+
+      return {
+        success: true,
+        results: results,
+        sentTo: users.length,
+      };
     } catch (error) {
       console.log(error);
-      getErrorMessage(error);
+      return {
+        success: false,
+        error: getErrorMessage(error),
+      };
     }
   });
