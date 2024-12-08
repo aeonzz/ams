@@ -58,7 +58,7 @@ export async function POST(request: Request) {
     const data = await transporter.sendMail({
       from: process.env.SMTP_FROM,
       to: email,
-      subject: "Welcome to Our Platform!",
+      subject: "Reset Your Password",
       html: emailHtml,
     });
 

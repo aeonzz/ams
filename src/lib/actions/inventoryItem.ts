@@ -345,13 +345,17 @@ export const returnableResourceActions = authedProcedure
           },
         });
 
+        return updatedRequest;
+      });
+
+      try {
         await Promise.all([
           pusher.trigger("request", "request_update", { message: "" }),
           pusher.trigger("request", "notifications", { message: "" }),
         ]);
-
-        return updatedRequest;
-      });
+      } catch (pusherError) {
+        console.error("Failed to send Pusher notifications:", pusherError);
+      }
 
       return revalidatePath(path);
     } catch (error) {

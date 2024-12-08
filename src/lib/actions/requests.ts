@@ -30,6 +30,7 @@ import { transportRequestActions } from "../schema/request/transport";
 import { formatFullName } from "../utils";
 import { RequestStatusTypeType } from "prisma/generated/zod/inputTypeSchemas/RequestStatusTypeSchema";
 import { generateTitle } from "./ai";
+import { sendEmailNotification } from "./email";
 
 const cohere = createCohere({
   apiKey: process.env.COHERE_API_KEY,
@@ -228,13 +229,31 @@ export const createVenueRequest = authedProcedure
         },
       });
 
+      const departmentRoleUsers = await db.userRole.findMany({
+        where: {
+          departmentId: rest.departmentId,
+          role: {
+            name: {
+              in: ["DEPARTMENT_HEAD", "REQUEST_MANAGER"],
+            },
+          },
+        },
+        include: {
+          user: true,
+        },
+      });
+
+      const recipientIds = departmentRoleUsers.map(
+        (roleUser) => roleUser.userId
+      );
+
       await createNotification({
         resourceId: `/request/${createdRequest.id}`,
         title: `New Venue Request: ${createdRequest.title}`,
         resourceType: "REQUEST",
         notificationType: "INFO",
         message: `A new venue request titled "${createdRequest.title}" has been submitted. Please check the details and proceed with the necessary actions.`,
-        recepientIds: [createdRequest.departmentId],
+        recepientIds: [...recipientIds, createdRequest.departmentId],
         userId: user.id,
       });
 
@@ -249,6 +268,14 @@ export const createVenueRequest = authedProcedure
           userId: user.id,
         });
       }
+
+      await sendEmailNotification({
+        recipientIds: recipientIds,
+        resourceId: `/request/${createdRequest.id}`,
+        title: `New Venue Request: ${createdRequest.title}`,
+        payload: `A new venue request titled "${createdRequest.title}" has been submitted. Please check the details and proceed with the necessary actions.`,
+      });
+
       try {
         await Promise.all([
           pusher.trigger("request", "request_update", { message: "" }),
@@ -325,20 +352,49 @@ export const createTransportRequest = authedProcedure
         },
       });
 
+      const departmentRoleUsers = await db.userRole.findMany({
+        where: {
+          departmentId: rest.departmentId,
+          role: {
+            name: {
+              in: ["DEPARTMENT_HEAD", "REQUEST_MANAGER"],
+            },
+          },
+        },
+        include: {
+          user: true,
+        },
+      });
+
+      const recipientIds = departmentRoleUsers.map(
+        (roleUser) => roleUser.userId
+      );
+
       await createNotification({
         resourceId: `/request/${createdRequest.id}`,
-        title: `New Job Request: ${createdRequest.title}`,
+        title: `New Transport Request: ${createdRequest.title}`,
         resourceType: "REQUEST",
         notificationType: "INFO",
         message: `A new transport request titled "${createdRequest.title}" has been submitted. Please review the details and take the necessary actions.`,
-        recepientIds: [createdRequest.departmentId],
+        recepientIds: [...recipientIds, createdRequest.departmentId],
         userId: user.id,
       });
 
-      await Promise.all([
-        pusher.trigger("request", "request_update", { message: "" }),
-        pusher.trigger("request", "notifications", { message: "" }),
-      ]);
+      await sendEmailNotification({
+        recipientIds: recipientIds,
+        resourceId: `/request/${createdRequest.id}`,
+        title: `New Transport Request: ${createdRequest.title}`,
+        payload: `A new transport request titled "${createdRequest.title}" has been submitted. Please review the details and take the necessary actions.`,
+      });
+
+      try {
+        await Promise.all([
+          pusher.trigger("request", "request_update", { message: "" }),
+          pusher.trigger("request", "notifications", { message: "" }),
+        ]);
+      } catch (pusherError) {
+        console.error("Failed to send Pusher notifications:", pusherError);
+      }
 
       return revalidatePath(path);
     } catch (error) {
@@ -650,11 +706,23 @@ export const updateTransportRequest = authedProcedure
           userId: user.id,
           recepientIds: [result.request.userId],
         });
+
+        await sendEmailNotification({
+          recipientIds: [result.request.userId],
+          resourceId: `/request/${result.requestId}`,
+          title: `Transport Request Started: ${result.requestId}`,
+          payload: `Your request for "${result.request.title}" has started. Please ensure that everything is prepared and proceed as scheduled.`,
+        });
       }
 
-      await pusher.trigger("request", "request_update", {
-        message: "",
-      });
+      try {
+        await Promise.all([
+          pusher.trigger("request", "request_update", { message: "" }),
+          pusher.trigger("request", "notifications", { message: "" }),
+        ]);
+      } catch (pusherError) {
+        console.error("Failed to send Pusher notifications:", pusherError);
+      }
 
       return revalidatePath(path);
     } catch (error) {
@@ -706,6 +774,24 @@ export const udpateVenueRequest = authedProcedure
           },
         });
 
+        const departmentRoleUsers = await prisma.userRole.findMany({
+          where: {
+            departmentId: updatedVenueRequest.request.departmentId,
+            role: {
+              name: {
+                in: ["REQUEST_MANAGER"],
+              },
+            },
+          },
+          include: {
+            user: true,
+          },
+        });
+
+        const recipientIds = departmentRoleUsers.map(
+          (roleUser) => roleUser.userId
+        );
+
         if (
           rest.approvedByHead !== undefined &&
           rest.approvedByHead === false
@@ -719,6 +805,13 @@ export const udpateVenueRequest = authedProcedure
             userId: user.id,
             recepientIds: [updatedVenueRequest.request.userId],
           });
+
+          await sendEmailNotification({
+            recipientIds: [updatedVenueRequest.request.userId],
+            resourceId: `/request/${updatedVenueRequest.requestId}`,
+            title: `Venue Booking Declined: ${updatedVenueRequest.request.title}`,
+            payload: `Your venue booking for "${updatedVenueRequest.request.title}" has been declined by the department head. Please contact your department for further clarification.`,
+          });
         }
 
         if (rest.approvedByHead !== undefined && rest.approvedByHead === true) {
@@ -727,9 +820,16 @@ export const udpateVenueRequest = authedProcedure
             title: `Venue Booking Approved: ${updatedVenueRequest.request.title}`,
             resourceType: "REQUEST",
             notificationType: "SUCCESS",
-            message: `Your venue booking for "${updatedVenueRequest.request.title}" has been approved by the department head. You may proceed with the necessary preparations.`,
+            message: `Your venue booking for "${updatedVenueRequest.request.title}" has been approved by the department head..`,
             userId: user.id,
             recepientIds: [updatedVenueRequest.request.userId],
+          });
+
+          await sendEmailNotification({
+            recipientIds: [updatedVenueRequest.request.userId],
+            resourceId: `/request/${updatedVenueRequest.requestId}`,
+            title: `Venue Booking Approved: ${updatedVenueRequest.request.title}`,
+            payload: `Your venue booking for "${updatedVenueRequest.request.title}" has been approved by the department head..`,
           });
 
           await createNotification({
@@ -737,9 +837,19 @@ export const udpateVenueRequest = authedProcedure
             title: `Venue Booking Approved: ${updatedVenueRequest.request.title}`,
             resourceType: "REQUEST",
             notificationType: "SUCCESS",
-            message: `The venue booking request for "${updatedVenueRequest.request.title}" has been approved by the department head. The booking is now ready for your review and further action if necessary.`,
+            message: `The venue booking request for "${updatedVenueRequest.request.title}" has been approved by the requester's department head. The booking is now ready for your review and further action if necessary.`,
             userId: user.id,
-            recepientIds: [updatedVenueRequest.request.departmentId],
+            recepientIds: [
+              ...recipientIds,
+              updatedVenueRequest.request.departmentId,
+            ],
+          });
+
+          await sendEmailNotification({
+            recipientIds: [...recipientIds],
+            resourceId: `/request/${updatedVenueRequest.requestId}`,
+            title: `Venue Booking Approved: ${updatedVenueRequest.request.title}`,
+            payload: `The venue booking request for "${updatedVenueRequest.request.title}" has been approved by the requester's department head. The booking is now ready for your review and further action if necessary.`,
           });
         }
 
@@ -753,13 +863,25 @@ export const udpateVenueRequest = authedProcedure
             userId: user.id,
             recepientIds: [updatedVenueRequest.request.userId],
           });
+
+          await sendEmailNotification({
+            recipientIds: [updatedVenueRequest.request.userId],
+            resourceId: `/request/${updatedVenueRequest.requestId}`,
+            title: `Venue Booking In Progress: ${updatedVenueRequest.requestId}`,
+            payload: `Your venue booking for "${updatedVenueRequest.request.title}" is now in progress. Please ensure you arrive on time and follow the booking guidelines.`,
+          });
         }
         return updatedVenueRequest;
       });
 
-      await pusher.trigger("request", "request_update", {
-        message: "",
-      });
+      try {
+        await Promise.all([
+          pusher.trigger("request", "request_update", { message: "" }),
+          pusher.trigger("request", "notifications", { message: "" }),
+        ]);
+      } catch (pusherError) {
+        console.error("Failed to send Pusher notifications:", pusherError);
+      }
 
       return revalidatePath(path);
     } catch (error) {
@@ -865,13 +987,24 @@ export const completeVenueRequest = authedProcedure
           userId: user.id,
         });
 
+        await sendEmailNotification({
+          recipientIds: [updatedVenueRequest.request.userId],
+          resourceId: `/request/${updatedVenueRequest.requestId}`,
+          title: `Request Completed: ${updatedVenueRequest.request.title}`,
+          payload: `Your request titled "${updatedVenueRequest.request.title}" has been successfully completed.`,
+        });
+
+        return updatedVenueRequest;
+      });
+
+      try {
         await Promise.all([
           pusher.trigger("request", "request_update", { message: "" }),
           pusher.trigger("request", "notifications", { message: "" }),
         ]);
-
-        return updatedVenueRequest;
-      });
+      } catch (pusherError) {
+        console.error("Failed to send Pusher notifications:", pusherError);
+      }
 
       return revalidatePath(path);
     } catch (error) {
@@ -948,6 +1081,13 @@ export const completeTransportRequest = authedProcedure
             recepientIds: [transportRequest.request.userId],
           });
 
+          await sendEmailNotification({
+            recipientIds: [transportRequest.request.userId],
+            resourceId: `/request/${requestId}`,
+            title: "Transport Request Completed",
+            payload: `Your transport request has been successfully completed. Please check the request details for more information.`,
+          });
+
           return {
             updatedTransportRequest,
             vehicleId: transportRequest.vehicleId,
@@ -1000,8 +1140,10 @@ export const completeTransportRequest = authedProcedure
             },
           });
 
-          const departmentHeadUserId = vehicle.department.userRole[0]?.userId;
-          if (departmentHeadUserId) {
+          const departmentHeadUserIds =
+            vehicle?.department.userRole.map((role) => role.userId) || [];
+
+          if (departmentHeadUserIds.length > 0) {
             await createNotification({
               resourceId: `/department/${vehicle.departmentId}/resources/transport/${vehicleId}`,
               title: `Vehicle Maintenance Required`,
@@ -1009,7 +1151,14 @@ export const completeTransportRequest = authedProcedure
               notificationType: "ALERT",
               message: `The vehicle "${vehicle.name}" requires maintenance. Please address this issue immediately.`,
               userId: user.id,
-              recepientIds: [vehicle.departmentId, departmentHeadUserId],
+              recepientIds: [...departmentHeadUserIds, vehicle.departmentId],
+            });
+
+            await sendEmailNotification({
+              recipientIds: [...departmentHeadUserIds],
+              resourceId: `/department/${vehicle.departmentId}/resources/transport/${vehicleId}`,
+              title: `Vehicle Maintenance Required`,
+              payload: `The vehicle "${vehicle.name}" requires maintenance. Please address this issue immediately.`,
             });
           }
 
@@ -1043,17 +1192,27 @@ export const completeTransportRequest = authedProcedure
               notificationType: "WARNING",
               message: `The vehicle for your transport request on ${request.dateAndTimeNeeded.toLocaleDateString()} is currently under maintenance and its availability is uncertain. We recommend that you review your request and cancel it if possible, as we cannot guarantee when the vehicle will be available.`,
               userId: user.id,
-              recepientIds: [request.request.userId], // Send to the requester
+              recepientIds: [request.request.userId],
+            });
+
+            await sendEmailNotification({
+              recipientIds: [request.request.userId],
+              resourceId: `/request/my-requests?page=1&per_page=10&sort=createdAt.desc`,
+              title: "Vehicle Unavailable for Your Transport Request",
+              payload: `The vehicle for your transport request on ${request.dateAndTimeNeeded.toLocaleDateString()} is currently under maintenance and its availability is uncertain. We recommend that you review your request and cancel it if possible, as we cannot guarantee when the vehicle will be available.`,
             });
           }
         }
       }
 
-      // Trigger pusher events outside transaction
-      await Promise.all([
-        pusher.trigger("request", "request_update", { message: "" }),
-        pusher.trigger("request", "notifications", { message: "" }),
-      ]);
+      try {
+        await Promise.all([
+          pusher.trigger("request", "request_update", { message: "" }),
+          pusher.trigger("request", "notifications", { message: "" }),
+        ]);
+      } catch (pusherError) {
+        console.error("Failed to send Pusher notifications:", pusherError);
+      }
 
       return revalidatePath(path);
     } catch (error) {

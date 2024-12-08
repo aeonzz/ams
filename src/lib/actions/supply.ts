@@ -16,6 +16,7 @@ import {
 import { revalidatePath } from "next/cache";
 import { createNotification } from "./notification";
 import { pusher } from "../pusher";
+import { sendEmailNotification } from "./email";
 
 export async function getSupply(input: GetSupplyItemSchema) {
   await checkAuth();
@@ -354,6 +355,9 @@ export const supplyRequestActions = authedProcedure
               },
             },
           },
+          include: {
+            request: true,
+          },
         });
 
         const supplyRequestItems = await prisma.supplyRequestItem.findMany({
@@ -396,6 +400,24 @@ export const supplyRequestActions = authedProcedure
             },
           });
 
+          const departmentRoleUsers = await db.userRole.findMany({
+            where: {
+              departmentId: updatedRequest.request.departmentId,
+              role: {
+                name: {
+                  in: ["DEPARTMENT_HEAD"],
+                },
+              },
+            },
+            include: {
+              user: true,
+            },
+          });
+
+          const recipientIds = departmentRoleUsers.map(
+            (roleUser) => roleUser.userId
+          );
+
           if (
             finalUpdatedItem.status === "LOW_STOCK" ||
             finalUpdatedItem.status === "OUT_OF_STOCK"
@@ -406,19 +428,30 @@ export const supplyRequestActions = authedProcedure
               resourceType: "SUPPLY",
               notificationType: "WARNING",
               message: `The supply item "${finalUpdatedItem.name}" is low on stock. Only ${finalUpdatedItem.quantity} ${finalUpdatedItem.unit}(s) remain. Please consider restocking to avoid shortages.`,
-              recepientIds: [finalUpdatedItem.departmentId],
+              recepientIds: [...recipientIds, finalUpdatedItem.departmentId],
               userId: user.id,
+            });
+
+            await sendEmailNotification({
+              recipientIds: [...recipientIds],
+              resourceId: `/department/${finalUpdatedItem.departmentId}/resources/supply-items?page=1&per_page=10&sort=createdAt.desc`,
+              title: `Low Stock Alert: ${finalUpdatedItem.name}`,
+              payload: `The supply item "${finalUpdatedItem.name}" is low on stock. Only ${finalUpdatedItem.quantity} ${finalUpdatedItem.unit}(s) remain. Please consider restocking to avoid shortages.`,
             });
           }
         }
 
+        return updatedRequest;
+      });
+
+      try {
         await Promise.all([
           pusher.trigger("request", "request_update", { message: "" }),
           pusher.trigger("request", "notifications", { message: "" }),
         ]);
-
-        return updatedRequest;
-      });
+      } catch (pusherError) {
+        console.error("Failed to send Pusher notifications:", pusherError);
+      }
 
       return revalidatePath(path);
     } catch (error) {
