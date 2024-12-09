@@ -265,6 +265,51 @@ export default function CreateDepartmentForm({
               <>
                 <FormField
                   control={form.control}
+                  name="acceptsJobs"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-sm">Accept Jobs</FormLabel>
+                        <FormDescription className="text-xs">
+                          Indicates whether this department can handle job
+                          requests.
+                        </FormDescription>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                {form.watch("acceptsJobs") && (
+                  <Card className="space-y-3 bg-secondary p-3">
+                    <FormField
+                      control={form.control}
+                      name="responsibilities"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Responsibilities</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              rows={1}
+                              maxRows={10}
+                              placeholder="responsibilities..."
+                              className="min-h-[100px] flex-grow resize-none text-sm"
+                              disabled={isPending}
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </Card>
+                )}
+                <FormField
+                  control={form.control}
                   name="managesTransport"
                   render={({ field }) => (
                     <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
