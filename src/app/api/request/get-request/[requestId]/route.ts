@@ -70,18 +70,6 @@ async function handler(req: NextRequest, user: any, context: Context) {
               },
             },
             jobRequestEvaluation: true,
-            reworkAttempts: {
-              include: {
-                jobRequest: {
-                  select: {
-                    assignedUser: true,
-                  },
-                },
-              },
-              orderBy: {
-                createdAt: "desc",
-              },
-            },
             department: true,
           },
         },

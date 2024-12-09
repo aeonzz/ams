@@ -197,7 +197,7 @@ export function getUsersColumns(): ColumnDef<UserType>[] {
 
         return (
           <>
-            <div className="flex max-w-[15vw] flex-wrap gap-2">
+            <div className="flex max-w-[30vw] flex-wrap gap-2">
               {row.original.userDepartments.length > 0 ? (
                 <>
                   {row.original.userDepartments.map((userDepartment) => (

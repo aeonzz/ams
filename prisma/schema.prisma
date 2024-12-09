@@ -2,7 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
@@ -193,7 +193,6 @@ model JobRequest {
   images               String[]
   verifiedByReviewer   Boolean               @default(false)
   verifiedByRequester  Boolean               @default(false)
-  reworkAttempts       Rework[]
   rejectionCount       Int                   @default(0)
   priority             PriorityType          @default(NO_PRIORITY)
   requestId            String                @unique
@@ -205,18 +204,6 @@ model JobRequest {
   createdAt            DateTime              @default(now())
   updatedAt            DateTime              @updatedAt
   jobRequestEvaluation JobRequestEvaluation?
-}
-
-model Rework {
-  id              String     @id
-  jobRequestId    String
-  jobRequest      JobRequest @relation(fields: [jobRequestId], references: [id], onDelete: Cascade)
-  reworkStartDate DateTime?
-  reworkEndDate   DateTime?
-  status          Boolean    @default(false)
-  rejectionReason String
-  createdAt       DateTime   @default(now())
-  updatedAt       DateTime   @updatedAt
 }
 
 model JobRequestEvaluation {
@@ -488,7 +475,6 @@ enum ResourceType {
   REQUEST
   FILE
   TASK
-  REWORK
   SUPPLY
 }
 

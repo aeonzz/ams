@@ -591,134 +591,134 @@ export const updateJobRequest = authedProcedure
     }
   });
 
-export const reworkJobRequest = authedProcedure
-  .createServerAction()
-  .input(reworkJobRequestSchema)
-  .handler(async ({ ctx, input }) => {
-    const { user } = ctx;
-    const { id, status, rejectionReason } = input;
-    try {
-      const result = await db.$transaction(async (prisma) => {
-        const updateJobRequestStatus = await db.jobRequest.update({
-          where: {
-            requestId: id,
-          },
-          data: {
-            status: status,
-            rejectionCount: {
-              increment: 1,
-            },
-          },
-          include: {
-            request: true,
-          },
-        });
+// export const reworkJobRequest = authedProcedure
+//   .createServerAction()
+//   .input(reworkJobRequestSchema)
+//   .handler(async ({ ctx, input }) => {
+//     const { user } = ctx;
+//     const { id, status, rejectionReason } = input;
+//     try {
+//       const result = await db.$transaction(async (prisma) => {
+//         const updateJobRequestStatus = await db.jobRequest.update({
+//           where: {
+//             requestId: id,
+//           },
+//           data: {
+//             status: status,
+//             rejectionCount: {
+//               increment: 1,
+//             },
+//           },
+//           include: {
+//             request: true,
+//           },
+//         });
 
-        await prisma.rework.create({
-          data: {
-            id: generateId(3),
-            jobRequestId: updateJobRequestStatus.id,
-            rejectionReason: rejectionReason,
-          },
-        });
+//         await prisma.rework.create({
+//           data: {
+//             id: generateId(3),
+//             jobRequestId: updateJobRequestStatus.id,
+//             rejectionReason: rejectionReason,
+//           },
+//         });
 
-        if (updateJobRequestStatus.assignedTo) {
-          await createNotification({
-            resourceId: `/request/${updateJobRequestStatus.requestId}`,
-            title: `Job Rejected: ${updateJobRequestStatus.request.title}`,
-            resourceType: "TASK",
-            notificationType: "ALERT",
-            message: `The job for "${updateJobRequestStatus.request.title}" has been rejected after review. Specific issues were identified, and a rework is required to meet the necessary standards. Please check the request for detailed feedback and instructions on the next steps.`,
-            recepientIds: [updateJobRequestStatus.assignedTo],
-            userId: user.id,
-          });
+//         if (updateJobRequestStatus.assignedTo) {
+//           await createNotification({
+//             resourceId: `/request/${updateJobRequestStatus.requestId}`,
+//             title: `Job Rejected: ${updateJobRequestStatus.request.title}`,
+//             resourceType: "TASK",
+//             notificationType: "ALERT",
+//             message: `The job for "${updateJobRequestStatus.request.title}" has been rejected after review. Specific issues were identified, and a rework is required to meet the necessary standards. Please check the request for detailed feedback and instructions on the next steps.`,
+//             recepientIds: [updateJobRequestStatus.assignedTo],
+//             userId: user.id,
+//           });
 
-          await createNotification({
-            resourceId: `/request/${updateJobRequestStatus.requestId}`,
-            title: `Job Rejected: ${updateJobRequestStatus.request.title}`,
-            resourceType: "REQUEST",
-            notificationType: "INFO",
-            message: `Your job request for "${updateJobRequestStatus.request.title}" has been rejected and requires a rework. Please check the request for further details on the changes needed.`,
-            recepientIds: [updateJobRequestStatus.request.userId],
-            userId: user.id,
-          });
-        }
+//           await createNotification({
+//             resourceId: `/request/${updateJobRequestStatus.requestId}`,
+//             title: `Job Rejected: ${updateJobRequestStatus.request.title}`,
+//             resourceType: "REQUEST",
+//             notificationType: "INFO",
+//             message: `Your job request for "${updateJobRequestStatus.request.title}" has been rejected and requires a rework. Please check the request for further details on the changes needed.`,
+//             recepientIds: [updateJobRequestStatus.request.userId],
+//             userId: user.id,
+//           });
+//         }
 
-        await Promise.all([
-          pusher.trigger("request", "request_update", { message: "" }),
-          pusher.trigger("request", "notifications", { message: "" }),
-        ]);
+//         await Promise.all([
+//           pusher.trigger("request", "request_update", { message: "" }),
+//           pusher.trigger("request", "notifications", { message: "" }),
+//         ]);
 
-        return updateJobRequestStatus;
-      });
+//         return updateJobRequestStatus;
+//       });
 
-      return result;
-    } catch (error) {
-      console.log(error);
-      getErrorMessage(error);
-    }
-  });
+//       return result;
+//     } catch (error) {
+//       console.log(error);
+//       getErrorMessage(error);
+//     }
+//   });
 
-export const updateReworkJobRequest = authedProcedure
-  .createServerAction()
-  .input(updateReworkJobRequestSchema)
-  .handler(async ({ ctx, input }) => {
-    const { user } = ctx;
-    const { reworkId, status, ...rest } = input;
-    try {
-      const result = await db.$transaction(async (prisma) => {
-        const updateJobRequestStatus = await db.rework.update({
-          where: {
-            id: reworkId,
-          },
-          data: {
-            jobRequest: {
-              update: {
-                status: status,
-              },
-            },
-            ...rest,
-          },
-          select: {
-            jobRequest: {
-              select: {
-                request: true,
-              },
-            },
-          },
-        });
+// export const updateReworkJobRequest = authedProcedure
+//   .createServerAction()
+//   .input(updateReworkJobRequestSchema)
+//   .handler(async ({ ctx, input }) => {
+//     const { user } = ctx;
+//     const { reworkId, status, ...rest } = input;
+//     try {
+//       const result = await db.$transaction(async (prisma) => {
+//         const updateJobRequestStatus = await db.rework.update({
+//           where: {
+//             id: reworkId,
+//           },
+//           data: {
+//             jobRequest: {
+//               update: {
+//                 status: status,
+//               },
+//             },
+//             ...rest,
+//           },
+//           select: {
+//             jobRequest: {
+//               select: {
+//                 request: true,
+//               },
+//             },
+//           },
+//         });
 
-        if (
-          status === "COMPLETED" &&
-          updateJobRequestStatus.jobRequest.request.reviewedBy
-        ) {
-          await createNotification({
-            resourceId: `/request/${updateJobRequestStatus.jobRequest.request.id}`,
-            title: `Rework Completed: ${updateJobRequestStatus.jobRequest.request.title}`,
-            resourceType: "TASK",
-            notificationType: "SUCCESS",
-            message: `The rework for the request "${updateJobRequestStatus.jobRequest.request.title}" has been successfully completed. Please review the request for further details.`,
-            recepientIds: [
-              updateJobRequestStatus.jobRequest.request.reviewedBy,
-            ],
-            userId: user.id,
-          });
-        }
+//         if (
+//           status === "COMPLETED" &&
+//           updateJobRequestStatus.jobRequest.request.reviewedBy
+//         ) {
+//           await createNotification({
+//             resourceId: `/request/${updateJobRequestStatus.jobRequest.request.id}`,
+//             title: `Rework Completed: ${updateJobRequestStatus.jobRequest.request.title}`,
+//             resourceType: "TASK",
+//             notificationType: "SUCCESS",
+//             message: `The rework for the request "${updateJobRequestStatus.jobRequest.request.title}" has been successfully completed. Please review the request for further details.`,
+//             recepientIds: [
+//               updateJobRequestStatus.jobRequest.request.reviewedBy,
+//             ],
+//             userId: user.id,
+//           });
+//         }
 
-        await Promise.all([
-          pusher.trigger("request", "request_update", { message: "" }),
-          pusher.trigger("request", "notifications", { message: "" }),
-        ]);
+//         await Promise.all([
+//           pusher.trigger("request", "request_update", { message: "" }),
+//           pusher.trigger("request", "notifications", { message: "" }),
+//         ]);
 
-        return updateJobRequestStatus;
-      });
+//         return updateJobRequestStatus;
+//       });
 
-      return result;
-    } catch (error) {
-      console.log(error);
-      getErrorMessage(error);
-    }
-  });
+//       return result;
+//     } catch (error) {
+//       console.log(error);
+//       getErrorMessage(error);
+//     }
+//   });
 
 export const completeJobRequest = authedProcedure
   .createServerAction()
