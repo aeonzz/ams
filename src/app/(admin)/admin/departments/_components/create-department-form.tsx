@@ -65,6 +65,7 @@ export default function CreateDepartmentForm({
 }: CreateDepartmentFormProps) {
   const pathname = usePathname();
   const [open, setOpen] = React.useState(false);
+  const departmentType = form.watch("departmentType");
 
   async function onSubmit(values: CreateDepartmentSchema) {
     const data = {
@@ -189,97 +190,148 @@ export default function CreateDepartmentForm({
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="acceptsJobs"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                  <div className="space-y-0.5">
-                    <FormLabel className="text-sm">Accept Jobs</FormLabel>
-                    <FormDescription className="text-xs">
-                      Indicates whether this department can handle job requests.
-                    </FormDescription>
-                  </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            {form.watch("acceptsJobs") && (
-              <Card className="space-y-3 bg-secondary p-3">
+            {departmentType === "ACADEMIC" ? (
+              <>
                 <FormField
                   control={form.control}
-                  name="responsibilities"
+                  name="acceptsJobs"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Responsibilities</FormLabel>
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-sm">Accept Jobs</FormLabel>
+                        <FormDescription className="text-xs">
+                          Indicates whether this department can handle job
+                          requests.
+                        </FormDescription>
+                      </div>
                       <FormControl>
-                        <Textarea
-                          rows={1}
-                          maxRows={10}
-                          placeholder="responsibilities..."
-                          className="min-h-[100px] flex-grow resize-none text-sm"
-                          disabled={isPending}
-                          {...field}
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
                         />
                       </FormControl>
-                      <FormMessage />
                     </FormItem>
                   )}
                 />
-              </Card>
-            )}
-            <FormField
-              control={form.control}
-              name="managesTransport"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                  <div className="space-y-0.5">
-                    <FormLabel className="text-sm">
-                      Transport Services
-                    </FormLabel>
-                    <FormDescription className="text-xs">
-                      Indicates whether this department offers or manages
-                      transport services.
-                    </FormDescription>
-                  </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
+                {form.watch("acceptsJobs") && (
+                  <Card className="space-y-3 bg-secondary p-3">
+                    <FormField
+                      control={form.control}
+                      name="responsibilities"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Responsibilities</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              rows={1}
+                              maxRows={10}
+                              placeholder="responsibilities..."
+                              className="min-h-[100px] flex-grow resize-none text-sm"
+                              disabled={isPending}
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="managesBorrowRequest"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                  <div className="space-y-0.5">
-                    <FormLabel className="text-sm">
-                      Borrow Request Management
-                    </FormLabel>
-                    <FormDescription className="text-xs">
-                      Indicates whether this department manages or handles
-                      borrow requests.
-                    </FormDescription>
-                  </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
+                  </Card>
+                )}
+                <FormField
+                  control={form.control}
+                  name="managesBorrowRequest"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-sm">
+                          Borrow Request Management
+                        </FormLabel>
+                        <FormDescription className="text-xs">
+                          Indicates whether this department manages or handles
+                          borrow requests.
+                        </FormDescription>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              </>
+            ) : (
+              <>
+                <FormField
+                  control={form.control}
+                  name="acceptsJobs"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-sm">Accept Jobs</FormLabel>
+                        <FormDescription className="text-xs">
+                          Indicates whether this department can handle job
+                          requests.
+                        </FormDescription>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                {form.watch("acceptsJobs") && (
+                  <Card className="space-y-3 bg-secondary p-3">
+                    <FormField
+                      control={form.control}
+                      name="responsibilities"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Responsibilities</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              rows={1}
+                              maxRows={10}
+                              placeholder="responsibilities..."
+                              className="min-h-[100px] flex-grow resize-none text-sm"
+                              disabled={isPending}
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            {/* {form.watch("managesBorrowRequest") && (
+                  </Card>
+                )}
+                <FormField
+                  control={form.control}
+                  name="managesTransport"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-sm">
+                          Transport Services
+                        </FormLabel>
+                        <FormDescription className="text-xs">
+                          Indicates whether this department offers or manages
+                          transport services.
+                        </FormDescription>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                {/* {form.watch("managesBorrowRequest") && (
               <Card className="space-y-3 bg-secondary p-3">
                 <FormField
                   control={form.control}
@@ -418,52 +470,54 @@ export default function CreateDepartmentForm({
                 />
               </Card>
             )} */}
-            <FormField
-              control={form.control}
-              name="managesSupplyRequest"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                  <div className="space-y-0.5">
-                    <FormLabel className="text-sm">
-                      Supply Request Management
-                    </FormLabel>
-                    <FormDescription className="text-xs">
-                      Indicates whether this department manages or handles
-                      supply requests.
-                    </FormDescription>
-                  </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="managesFacility"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                  <div className="space-y-0.5">
-                    <FormLabel className="text-sm">
-                      Facility Management
-                    </FormLabel>
-                    <FormDescription className="text-xs">
-                      Indicates whether this department manages or handles
-                      facilities.
-                    </FormDescription>
-                  </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
+                <FormField
+                  control={form.control}
+                  name="managesSupplyRequest"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-sm">
+                          Supply Request Management
+                        </FormLabel>
+                        <FormDescription className="text-xs">
+                          Indicates whether this department manages or handles
+                          supply requests.
+                        </FormDescription>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="managesFacility"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-sm">
+                          Facility Management
+                        </FormLabel>
+                        <FormDescription className="text-xs">
+                          Indicates whether this department manages or handles
+                          facilities.
+                        </FormDescription>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              </>
+            )}
           </div>
         </div>
         <Separator className="my-4" />

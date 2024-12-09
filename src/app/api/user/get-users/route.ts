@@ -7,6 +7,10 @@ async function handler(request: NextRequest) {
     const result = await db.user.findMany({
       include: {
         userRole: true,
+        userDepartments: true,
+      },
+      where: {
+        isArchived: false,
       },
     });
 

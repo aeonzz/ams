@@ -9,7 +9,6 @@ export * from './SettingSchema';
 export * from './NotificationSchema';
 export * from './RequestSchema';
 export * from './JobRequestSchema';
-export * from './ReworkSchema';
 export * from './JobRequestEvaluationSchema';
 export * from './VenueRequestSchema';
 export * from './VenueSchema';

@@ -21,7 +21,6 @@ interface UsersTableProps {
 
 export function UsersTable({ usersPromise }: UsersTableProps) {
   const { data, pageCount } = React.use(usersPromise);
-  console.log(data);
 
   // Memoize the columns so they don't re-render on every render
   const columns = React.useMemo(() => getUsersColumns(), []);

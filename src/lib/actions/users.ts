@@ -391,7 +391,10 @@ export const removeUserDepartment = authedProcedure
     try {
       const userDepartment = await db.userDepartment.findUnique({
         where: { id },
-        select: { userId: true },
+        select: {
+          userId: true,
+          departmentId: true,
+        },
       });
 
       if (!userDepartment) {
@@ -403,12 +406,24 @@ export const removeUserDepartment = authedProcedure
       });
 
       if (departmentCount <= 1) {
-        throw "Cannot remove the last department from a user"
+        throw "Cannot remove the last department from a user";
       }
 
-      await db.userDepartment.delete({
-        where: { id },
-      });
+      // Use a transaction to ensure both operations succeed or fail together
+      await db.$transaction([
+        // Delete the associated user roles first
+        db.userRole.deleteMany({
+          where: {
+            userId: userDepartment.userId,
+            departmentId: userDepartment.departmentId,
+          },
+        }),
+        // Then delete the user department
+        db.userDepartment.delete({
+          where: { id },
+        }),
+      ]);
+
       return revalidatePath(path);
     } catch (error) {
       getErrorMessage(error);

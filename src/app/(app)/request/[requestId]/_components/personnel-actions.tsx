@@ -1,7 +1,6 @@
 import React from "react";
 import type { JobRequestWithRelations } from "prisma/generated/zod";
 import RegularJobActions from "./regular-job-actions";
-import ReworkJobActions from "./rework-job-actions";
 
 interface PersonnelActionsProps {
   allowedDepartment?: string;

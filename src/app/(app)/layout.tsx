@@ -18,9 +18,9 @@ export default async function AppLayout({
     return redirect("/sign-in");
   }
 
-  // if (data.isAdmin) {
-  //   return redirect("/admin");
-  // }
+  if (data.isAdmin) {
+    return redirect("/admin/dashboard");
+  }
 
   return (
     //@ts-ignore

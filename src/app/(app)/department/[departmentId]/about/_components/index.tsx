@@ -28,7 +28,6 @@ import {
 import { H1, P } from "@/components/typography/text";
 import FetchDataError from "@/components/card/fetch-data-error";
 import { Button } from "@/components/ui/button";
-import { UpdateDepartmentSheet } from "@/app/(admin)/admin/departments/_components/update-department-sheet";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useDepartmentData } from "@/lib/hooks/use-department-data";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -119,20 +118,21 @@ export default function AboutDepartmentScreen({
         <div className="space-y-1">
           <div className="flex items-center justify-between">
             <H1 className="font-semibold tracking-tight">{data.name}</H1>
-            <UpdateDepartmentSheet
+            {/* <UpdateDepartmentSheet
               open={showUpdateDepartment}
               onOpenChange={setShowUpdateDepartment}
               queryKey={[departmentId]}
               //@ts-ignore
               department={data}
-            />
-            <Button
+              removeField
+            /> */}
+            {/* <Button
               variant="ghost2"
-              size="icon"
+              size="icon" 
               onClick={() => setShowUpdateDepartment(true)}
             >
               <Pencil className="size-4" />
-            </Button>
+            </Button> */}
           </div>
           <Badge variant="outline">{textTransform(data.departmentType)}</Badge>
           <P className="break-all text-muted-foreground">{data.description}</P>
