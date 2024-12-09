@@ -91,6 +91,7 @@ export function UpdateDepartmentSheet({
       departmentId: department.id,
     },
   });
+  const departmentType = form.watch("departmentType");
 
   const { dirtyFields } = useFormState({ control: form.control });
 
@@ -274,7 +275,7 @@ export function UpdateDepartmentSheet({
                   </FormItem>
                 )}
               />
-              {!removeField && (
+              {departmentType === "ACADEMIC" ? (
                 <>
                   <FormField
                     control={form.control}
@@ -297,29 +298,30 @@ export function UpdateDepartmentSheet({
                       </FormItem>
                     )}
                   />
-                  <FormField
-                    control={form.control}
-                    name="managesTransport"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                        <div className="space-y-0.5">
-                          <FormLabel className="text-sm">
-                            Transport Services
-                          </FormLabel>
-                          <FormDescription className="text-xs">
-                            Indicates whether this department offers or manages
-                            transport services.
-                          </FormDescription>
-                        </div>
-                        <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
+                  {form.watch("acceptsJobs") && (
+                    <Card className="space-y-3 bg-secondary p-3">
+                      <FormField
+                        control={form.control}
+                        name="responsibilities"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Responsibilities</FormLabel>
+                            <FormControl>
+                              <Textarea
+                                rows={1}
+                                maxRows={10}
+                                placeholder="responsibilities..."
+                                className="min-h-[100px] flex-grow resize-none text-sm"
+                                disabled={isPending}
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </Card>
+                  )}
                   <FormField
                     control={form.control}
                     name="managesBorrowRequest"
@@ -332,6 +334,32 @@ export function UpdateDepartmentSheet({
                           <FormDescription className="text-xs">
                             Indicates whether this department manages or handles
                             borrow requests.
+                          </FormDescription>
+                        </div>
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </>
+              ) : (
+                <>
+                  <FormField
+                    control={form.control}
+                    name="managesTransport"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-sm">
+                            Transport Services
+                          </FormLabel>
+                          <FormDescription className="text-xs">
+                            Indicates whether this department offers or manages
+                            transport services.
                           </FormDescription>
                         </div>
                         <FormControl>
