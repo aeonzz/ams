@@ -126,13 +126,13 @@ export default function AboutDepartmentScreen({
               department={data}
               removeField
             /> */}
-            <Button
+            {/* <Button
               variant="ghost2"
-              size="icon"
+              size="icon" 
               onClick={() => setShowUpdateDepartment(true)}
             >
               <Pencil className="size-4" />
-            </Button>
+            </Button> */}
           </div>
           <Badge variant="outline">{textTransform(data.departmentType)}</Badge>
           <P className="break-all text-muted-foreground">{data.description}</P>
