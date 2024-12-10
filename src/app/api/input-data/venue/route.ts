@@ -5,6 +5,12 @@ import { authMiddleware } from "@/app/lucia-middleware";
 async function handler(req: Request) {
   try {
     const venues = await db.venue.findMany({
+      where: {
+        isArchived: false,
+        department: {
+          isArchived: false,
+        },
+      },
       include: {
         venueSetupRequirement: true,
       },

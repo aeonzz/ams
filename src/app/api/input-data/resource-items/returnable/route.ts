@@ -7,6 +7,9 @@ async function handler(req: Request) {
     const inventoryItems = await db.inventoryItem.findMany({
       where: {
         isArchived: false,
+        department: {
+          isArchived: false,
+        },
       },
       include: {
         inventorySubItems: true,
@@ -25,4 +28,3 @@ async function handler(req: Request) {
 }
 
 export const GET = (request: NextRequest) => authMiddleware(request, handler);
-

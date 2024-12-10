@@ -4,7 +4,11 @@ import { authMiddleware } from "@/app/lucia-middleware";
 
 async function handler(req: Request) {
   try {
-    const departments = await db.department.findMany({});
+    const departments = await db.department.findMany({
+      where: {
+        isArchived: false,
+      },
+    });
 
     return NextResponse.json({ data: departments }, { status: 200 });
   } catch (error) {

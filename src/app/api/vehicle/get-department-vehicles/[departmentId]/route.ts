@@ -27,6 +27,9 @@ async function handler(req: NextRequest, user: any, context: Context) {
       where: {
         isArchived: false,
         departmentId: departmentExist.id,
+        department: {
+          isArchived: false,
+        },
       },
       orderBy: {
         createdAt: "desc",

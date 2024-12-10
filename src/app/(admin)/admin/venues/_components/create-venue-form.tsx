@@ -186,57 +186,128 @@ export default function CreateVenueForm({
               </FormItem>
             )}
           />
-          <div className="flex gap-3">
+          <FormField
+            control={form.control}
+            name="venueType"
+            render={({ field }) => (
+              <FormItem className="flex-1">
+                <FormLabel>Venue type</FormLabel>
+                <Popover open={venueType} onOpenChange={setVenueType} modal>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant="outline"
+                        disabled={isUploading || isPending}
+                        role="combobox"
+                        className="w-full flex-1 justify-between text-muted-foreground"
+                      >
+                        <span className="truncate">
+                          {field.value
+                            ? textTransform(field.value)
+                            : "Select venue type"}
+                        </span>
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="p-0">
+                    <Command className="max-h-72">
+                      <CommandInput placeholder="Search type..." />
+                      <CommandList>
+                        <CommandEmpty>No type found.</CommandEmpty>
+                        <CommandGroup>
+                          {VenueTypeSchema.options.map((venue, index) => (
+                            <CommandItem
+                              value={venue}
+                              key={index}
+                              onSelect={() => {
+                                form.setValue("venueType", venue);
+                                setVenueType(false);
+                              }}
+                            >
+                              {textTransform(venue)}
+                              <Check
+                                className={cn(
+                                  "ml-auto h-4 w-4",
+                                  venue === field.value
+                                    ? "opacity-100"
+                                    : "opacity-0"
+                                )}
+                              />
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          {!queryKey && (
             <FormField
               control={form.control}
-              name="venueType"
+              name="departmentId"
               render={({ field }) => (
                 <FormItem className="flex-1">
-                  <FormLabel>Venue type</FormLabel>
-                  <Popover open={venueType} onOpenChange={setVenueType} modal>
+                  <FormLabel>Assign Managing Department</FormLabel>
+                  <Popover open={open} onOpenChange={setOpen} modal>
                     <PopoverTrigger asChild>
                       <FormControl>
                         <Button
                           variant="outline"
-                          disabled={isUploading || isPending}
                           role="combobox"
+                          disabled={isLoading || isPending || isUploading}
                           className="w-full flex-1 justify-between text-muted-foreground"
                         >
-                          <span className="truncate">
-                            {field.value
-                              ? textTransform(field.value)
-                              : "Select venue type"}
-                          </span>
+                          {field.value ? (
+                            data?.find(
+                              (department) => department.id === field.value
+                            )?.name
+                          ) : (
+                            <P className="max-w-40 truncate">
+                              Select a department to manage
+                            </P>
+                          )}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
                       </FormControl>
                     </PopoverTrigger>
                     <PopoverContent className="p-0">
-                      <Command className="max-h-72">
-                        <CommandInput placeholder="Search type..." />
+                      <Command>
+                        <CommandInput placeholder="Search department..." />
                         <CommandList>
-                          <CommandEmpty>No type found.</CommandEmpty>
+                          <CommandEmpty>
+                            {isLoading ? "Loading..." : "No department found."}
+                          </CommandEmpty>
                           <CommandGroup>
-                            {VenueTypeSchema.options.map((venue, index) => (
-                              <CommandItem
-                                value={venue}
-                                key={index}
-                                onSelect={() => {
-                                  form.setValue("venueType", venue);
-                                  setVenueType(false);
-                                }}
-                              >
-                                {textTransform(venue)}
-                                <Check
-                                  className={cn(
-                                    "ml-auto h-4 w-4",
-                                    venue === field.value
-                                      ? "opacity-100"
-                                      : "opacity-0"
-                                  )}
-                                />
-                              </CommandItem>
-                            ))}
+                            <div className="scroll-bar max-h-40 overflow-y-auto">
+                              {data?.map((department) => (
+                                <CommandItem
+                                  value={department.name}
+                                  key={department.id}
+                                  onSelect={() => {
+                                    field.onChange(
+                                      department.id === field.value
+                                        ? ""
+                                        : department.id
+                                    );
+                                    setOpen(false);
+                                  }}
+                                >
+                                  <Check
+                                    className={cn(
+                                      "mr-2 h-4 w-4",
+                                      field.value === department.id
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                  {department.name}
+                                </CommandItem>
+                              ))}
+                            </div>
                           </CommandGroup>
                         </CommandList>
                       </Command>
@@ -246,82 +317,7 @@ export default function CreateVenueForm({
                 </FormItem>
               )}
             />
-            {!queryKey && (
-              <FormField
-                control={form.control}
-                name="departmentId"
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormLabel>Assign Managing Department</FormLabel>
-                    <Popover open={open} onOpenChange={setOpen} modal>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant="outline"
-                            role="combobox"
-                            disabled={isLoading || isPending || isUploading}
-                            className="w-full flex-1 justify-between text-muted-foreground"
-                          >
-                            {field.value ? (
-                              data?.find(
-                                (department) => department.id === field.value
-                              )?.name
-                            ) : (
-                              <P className="max-w-40 truncate">
-                                Select a department to manage
-                              </P>
-                            )}
-                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="p-0">
-                        <Command>
-                          <CommandInput placeholder="Search department..." />
-                          <CommandList>
-                            <CommandEmpty>
-                              {isLoading
-                                ? "Loading..."
-                                : "No department found."}
-                            </CommandEmpty>
-                            <CommandGroup>
-                              <div className="scroll-bar max-h-40 overflow-y-auto">
-                                {data?.map((department) => (
-                                  <CommandItem
-                                    value={department.name}
-                                    key={department.id}
-                                    onSelect={() => {
-                                      field.onChange(
-                                        department.id === field.value
-                                          ? ""
-                                          : department.id
-                                      );
-                                      setOpen(false);
-                                    }}
-                                  >
-                                    <Check
-                                      className={cn(
-                                        "mr-2 h-4 w-4",
-                                        field.value === department.id
-                                          ? "opacity-100"
-                                          : "opacity-0"
-                                      )}
-                                    />
-                                    {department.name}
-                                  </CommandItem>
-                                ))}
-                              </div>
-                            </CommandGroup>
-                          </CommandList>
-                        </Command>
-                      </PopoverContent>
-                    </Popover>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
-          </div>
+          )}
           <FormField
             control={form.control}
             name="capacity"

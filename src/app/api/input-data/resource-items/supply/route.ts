@@ -8,6 +8,9 @@ async function handler(req: Request) {
       const items = await prisma.supplyItem.findMany({
         where: {
           isArchived: false,
+          department: {
+            isArchived: false,
+          },
         },
         include: {
           category: true,

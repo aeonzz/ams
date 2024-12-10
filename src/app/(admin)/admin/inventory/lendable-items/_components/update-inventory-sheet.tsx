@@ -74,6 +74,7 @@ export function UpdateInventorySheet({
     defaultValues: {
       name: inventory.name,
       description: inventory.description,
+      departmentId: inventory.departmentId,
       imageUrl: undefined,
     },
   });
@@ -92,6 +93,7 @@ export function UpdateInventorySheet({
     form.reset({
       name: inventory.name,
       description: inventory.description,
+      departmentId: inventory.departmentId,
       imageUrl: undefined,
     });
   }, [inventory, form, props.open]);
@@ -110,6 +112,7 @@ export function UpdateInventorySheet({
           path: pathname,
           name: values.name,
           description: values.description,
+          departmentId: inventory.departmentId,
           imageUrl: currentFiles.map((result) => result.url),
         };
 

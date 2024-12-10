@@ -7,6 +7,7 @@ async function handler(req: Request) {
     const departments = await db.department.findMany({
       where: {
         acceptsJobs: true,
+        isArchived: false,
       },
     });
 

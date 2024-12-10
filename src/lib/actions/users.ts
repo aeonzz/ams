@@ -289,6 +289,7 @@ export async function getUsers(input: GetUsersSchema) {
 
     const where: any = {
       isArchived: false,
+      isAdmin: false,
     };
 
     if (email) {

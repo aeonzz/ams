@@ -12,6 +12,9 @@ async function handler(req: Request) {
         },
       }),
       db.user.findMany({
+        where: {
+          isAdmin: false,
+        },
         select: {
           id: true,
           firstName: true,

@@ -67,7 +67,7 @@ export function InventoryTableToolbarActions({
           <DropdownMenuItem
             onClick={() =>
               exportTableToCSV(table, {
-                filename: "Users",
+                filename: "Lendable-Items",
                 excludeColumns: ["select", "actions", "inventorySubItems"],
               })
             }
@@ -77,7 +77,7 @@ export function InventoryTableToolbarActions({
           <DropdownMenuItem
             onClick={() =>
               exportTableToXLSX(table, {
-                filename: "Requests",
+                filename: "Lendable-Items",
                 excludeColumns: ["select", "actions", "inventorySubItems"],
               })
             }
