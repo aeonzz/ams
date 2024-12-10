@@ -345,6 +345,29 @@ export function UpdateDepartmentSheet({
                       </FormItem>
                     )}
                   />
+                  <FormField
+                    control={form.control}
+                    name="managesFacility"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-sm">
+                            Facility Management
+                          </FormLabel>
+                          <FormDescription className="text-xs">
+                            Indicates whether this department manages or handles
+                            facilities.
+                          </FormDescription>
+                        </div>
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
                 </>
               ) : (
                 <>
