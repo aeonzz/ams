@@ -68,7 +68,7 @@ export function VenuesTableToolbarActions({
           <DropdownMenuItem
             onClick={() =>
               exportTableToCSV(table, {
-                filename: "Requests",
+                filename: "Facilities",
                 excludeColumns: ["select", "actions"],
               })
             }
@@ -78,7 +78,7 @@ export function VenuesTableToolbarActions({
           <DropdownMenuItem
             onClick={() =>
               exportTableToXLSX(table, {
-                filename: "Requests",
+                filename: "Facilities",
                 excludeColumns: ["select", "actions"],
               })
             }

@@ -107,6 +107,45 @@ export const createMultipleUserRoleUser = authedProcedure
   .handler(async ({ input }) => {
     const { path, userId, departmentId, roleIds } = input;
     try {
+      
+      const departmentHeadRole = await db.role.findUnique({
+        where: { name: 'DEPARTMENT_HEAD' },
+      });
+
+      
+
+      if (departmentHeadRole && roleIds.includes(departmentHeadRole.id)) {
+        // Check if there's already a department head for this department
+        const existingDepartmentHead = await db.userRole.findFirst({
+          where: {
+            departmentId: departmentId,
+            roleId: departmentHeadRole.id,
+          },
+          include: {
+            user: {
+              select: {
+                firstName: true,
+                middleName: true,
+                lastName: true,
+              },
+            },
+            department: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        });
+
+        if (existingDepartmentHead) {
+          throw `Department ${existingDepartmentHead.department.name} already has a Department Head: ${formatFullName(
+            existingDepartmentHead.user.firstName,
+            existingDepartmentHead.user.middleName,
+            existingDepartmentHead.user.lastName
+          )}`;
+        }
+      }
+
       for (const roleId of roleIds) {
         const existingUserRole = await db.userRole.findUnique({
           where: {
@@ -143,7 +182,7 @@ export const createMultipleUserRoleUser = authedProcedure
 
         await db.userRole.create({
           data: {
-            id: generateId(3),
+            id: generateId(5),
             userId: userId,
             roleId: roleId,
             departmentId: departmentId,

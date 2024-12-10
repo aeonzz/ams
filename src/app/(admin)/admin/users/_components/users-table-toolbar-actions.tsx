@@ -68,7 +68,7 @@ export function UsersTableToolbarActions({
           <DropdownMenuItem
             onClick={() =>
               exportTableToXLSX(table, {
-                filename: "Requests",
+                filename: "Users",
                 excludeColumns: ["select", "actions", "userRole"],
               })
             }

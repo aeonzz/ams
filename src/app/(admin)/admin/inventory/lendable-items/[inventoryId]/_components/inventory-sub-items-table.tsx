@@ -56,7 +56,10 @@ export function InventorySubItemsTable({
       }
     >
       <DataTableToolbar table={table} filterFields={filterFields}>
-        <InventorySubItemsTableToolbarActions table={table} />
+        <InventorySubItemsTableToolbarActions
+          table={table}
+          fileName={`${item?.name}-Sub-Items`}
+        />
       </DataTableToolbar>
     </DataTable>
   );

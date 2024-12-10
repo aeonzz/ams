@@ -21,10 +21,12 @@ import {
 
 interface InventorySubItemsTableToolbarActionsProps {
   table: Table<InventorySubItemType>;
+  fileName: string;
 }
 
 export function InventorySubItemsTableToolbarActions({
   table,
+  fileName,
 }: InventorySubItemsTableToolbarActionsProps) {
   const dialogManager = useDialogManager();
   return (
@@ -67,7 +69,7 @@ export function InventorySubItemsTableToolbarActions({
           <DropdownMenuItem
             onClick={() =>
               exportTableToCSV(table, {
-                filename: "Users",
+                filename: fileName,
                 excludeColumns: ["select", "actions"],
               })
             }
@@ -77,7 +79,7 @@ export function InventorySubItemsTableToolbarActions({
           <DropdownMenuItem
             onClick={() =>
               exportTableToXLSX(table, {
-                filename: "Requests",
+                filename: fileName,
                 excludeColumns: ["select", "actions"],
               })
             }

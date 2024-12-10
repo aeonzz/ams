@@ -132,6 +132,7 @@ export const updateInventoryItemSchemaServer = z.object({
   name: z.string().optional(),
   description: z.string().optional(),
   imageUrl: z.array(z.string()).optional(),
+  departmentId: z.string().optional(),
 });
 
 export const extendedUpdateInventoryItemServerSchema =

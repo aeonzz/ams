@@ -14,6 +14,7 @@ async function handler(req: NextRequest, user: any, context: Context) {
     const result = await db.department.findUnique({
       where: {
         id: departmentId,
+        isArchived: false,
       },
       include: {
         files: true,

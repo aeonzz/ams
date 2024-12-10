@@ -88,7 +88,7 @@ export default function RequestsTable({
           return (
             <div className="flex space-x-2">
               <Link
-                href={`/request/${row.original.id}`}
+                href={`/admin/requests/${row.original.id}`}
                 className={cn(
                   buttonVariants({ variant: "link" }),
                   "h-auto truncate p-0 text-foreground"

@@ -68,7 +68,7 @@ export function VehiclesTableToolbarActions({
           <DropdownMenuItem
             onClick={() =>
               exportTableToCSV(table, {
-                filename: "Users",
+                filename: "Vehicles",
                 excludeColumns: ["select", "actions"],
               })
             }
@@ -78,7 +78,7 @@ export function VehiclesTableToolbarActions({
           <DropdownMenuItem
             onClick={() =>
               exportTableToXLSX(table, {
-                filename: "Requests",
+                filename: "Vehicles",
                 excludeColumns: ["select", "actions"],
               })
             }
