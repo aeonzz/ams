@@ -67,7 +67,7 @@ export function SupplyItemsTableToolbarActions({
           <DropdownMenuItem
             onClick={() =>
               exportTableToCSV(table, {
-                filename: "Users",
+                filename: "Supply-Items",
                 excludeColumns: ["select", "actions"],
               })
             }
@@ -77,7 +77,7 @@ export function SupplyItemsTableToolbarActions({
           <DropdownMenuItem
             onClick={() =>
               exportTableToXLSX(table, {
-                filename: "Requests",
+                filename: "Supply-Items",
                 excludeColumns: ["select", "actions"],
               })
             }
