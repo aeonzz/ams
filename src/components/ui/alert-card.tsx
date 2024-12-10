@@ -15,7 +15,7 @@ const alertCardVariants = cva(
         success:
           "border-green-500/20 bg-green-100 text-green-500 dark:bg-green-900/20 [&>svg]:text-green-500",
         warning:
-          "border-yellow-500/20 bg-yellow-100 text-yellow-500 dark:bg-yellow-900/20 [&>svg]:text-yellow-500",
+          "border-amber-500/20 bg-amber-100 text-amber-500 dark:bg-amber-900/20 [&>svg]:text-amber-500",
         info: "border-blue-500/20 bg-blue-100 text-blue-500 dark:bg-blue-900/20 [&>svg]:text-blue-500",
       },
     },

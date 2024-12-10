@@ -71,8 +71,6 @@ export default function DepartmentVehicleScreen({
         <div className="flex h-screen w-full items-center justify-center">
           <FetchDataError refetch={refetch} />
         </div>
-      ) : data?.length === 0 ? (
-        <NoDataMessage message="No vehicles available." />
       ) : (
         <div className="w-[1280px]">
           <div className="mb-3 flex w-full justify-between">
@@ -90,13 +88,15 @@ export default function DepartmentVehicleScreen({
               variant="default"
               onClick={() =>
                 dialogManager.setActiveDialog("adminCreateVehicleDialog")
-              } 
+              }
             >
               <PlusIcon className="mr-1 size-4" aria-hidden="true" />
               <P className="font-semibold">Add</P>
             </Button>
           </div>
-          {filteredVehicles.length === 0 ? (
+          {data?.length === 0 ? (
+            <NoDataMessage message="No vehicles available." />
+          ) : filteredVehicles.length === 0 ? (
             <NoDataMessage message="No vehicles found. Try adjusting your search" />
           ) : (
             <div className="grid grid-cols-1 gap-3 pb-3 md:grid-cols-2 lg:grid-cols-3">

@@ -87,8 +87,6 @@ export default function DepartmentFacilitiesScreen({
         <div className="flex h-screen w-full items-center justify-center">
           <FetchDataError refetch={refetch} />
         </div>
-      ) : data?.length === 0 ? (
-        <NoDataMessage message="No facilities available." />
       ) : (
         <div className="w-[1280px]">
           <div className="mb-3 flex w-full justify-between">
@@ -112,7 +110,9 @@ export default function DepartmentFacilitiesScreen({
               <P className="font-semibold">Add</P>
             </Button>
           </div>
-          {filteredVenues.length === 0 ? (
+          {data?.length === 0 ? (
+            <NoDataMessage message="No facilities available." />
+          ) : filteredVenues.length === 0 ? (
             <NoDataMessage message="No facilities found. Try adjusting your search" />
           ) : (
             <div className="grid grid-cols-1 gap-3 pb-3 md:grid-cols-2 lg:grid-cols-3">
