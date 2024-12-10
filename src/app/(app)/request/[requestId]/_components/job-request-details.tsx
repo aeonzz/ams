@@ -385,12 +385,13 @@ export default function JobRequestDetails({
                 description={onHoldReason}
                 className="mb-6"
               />
+              {/*               
               <AlertCard
                 variant="info"
                 title="Next Steps"
                 description="You can update your request to address the issue, cancel it if no longer needed, or contact support for assistance."
                 className="mb-6"
-              />
+              /> */}
             </div>
           )}
           <div className="flex h-7 items-center justify-between">
@@ -612,7 +613,7 @@ export default function JobRequestDetails({
                 {canEdit && (
                   <Button
                     variant="link"
-                    className="lg:opacity-0 group-hover:opacity-100"
+                    className="group-hover:opacity-100 lg:opacity-0"
                     onClick={(e) => {
                       e.preventDefault();
                       setEditField("jobType");
@@ -663,7 +664,7 @@ export default function JobRequestDetails({
                 {canEdit && (
                   <Button
                     variant="link"
-                    className="lg:opacity-0 group-hover:opacity-100"
+                    className="group-hover:opacity-100 lg:opacity-0"
                     onClick={(e) => {
                       e.preventDefault();
                       setEditField("location");
@@ -888,7 +889,7 @@ export default function JobRequestDetails({
                 {canEdit && (
                   <Button
                     variant="link"
-                    className="lg:opacity-0 group-hover:opacity-100"
+                    className="group-hover:opacity-100 lg:opacity-0"
                     onClick={(e) => {
                       e.preventDefault();
                       setEditField("description");
