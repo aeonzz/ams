@@ -376,7 +376,7 @@ export default function TransportRequestInput({
                       )}
                     />
                   </div>
-                  {isDesktop && vehicleId && <div>{scheduleSection}</div>}
+                  {isDesktop && vehicleId && <div className="flex-1">{scheduleSection}</div>}
                 </div>
                 <Separator className="my-4" />
                 <DialogFooter>

@@ -559,13 +559,14 @@ export const updateJobRequest = authedProcedure
             message: `The job for "${updatedRequest.title}" has been successfully completed. Please review the request for further details.`,
             recepientIds: [
               updatedRequest.reviewedBy,
+              updatedRequest.userId,
               updatedRequest.departmentId,
             ],
             userId: user.id,
           });
 
           await sendEmailNotification({
-            recipientIds: [updatedRequest.reviewedBy],
+            recipientIds: [updatedRequest.reviewedBy, updatedRequest.userId],
             resourceId: `/request/${updatedRequest.id}`,
             title: `Job Completed: ${updatedRequest.title}`,
             payload: `The job for "${updatedRequest.title}" has been successfully completed. Please review the request for further details.`,

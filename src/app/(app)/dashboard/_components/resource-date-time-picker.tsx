@@ -348,7 +348,7 @@ export default function ResourceDateTimePicker<T extends FieldValues>({
                   />
 
                   {form.getValues(name) && (
-                    <div className="flex flex-col lg:flex-row">
+                    <div className="flex flex-col">
                       <div className="w-full space-y-3 p-3 lg:w-auto">
                         <Select
                           value={selectedMonth.toString()}
