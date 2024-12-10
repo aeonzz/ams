@@ -235,7 +235,7 @@ export default function DateTimePicker<T extends FieldValues>({
                     disabled={isDateDisabled}
                   />
                   {form.getValues(name) && (
-                    <div className="flex min-h-[300px] w-full flex-col gap-3 overflow-y-auto p-3 lg:flex-row">
+                    <div className="flex min-h-[300px] w-full flex-col gap-3 overflow-y-auto p-3">
                       <Select
                         value={selectedMonth.toString()}
                         onValueChange={(value) => {

@@ -85,7 +85,7 @@ export async function fillTransportRequestFormPDF(
   const fieldPositions: FieldPositions = {
     createdAt: { x: 100, y: height - 125, size: 9, maxWidth: 200 },
     requestedBy: { x: 155, y: height - 138, size: 9, maxWidth: 200 },
-    office: { x: 375, y: height - 138, size: 9, maxWidth: 100 },
+    office: { x: 375, y: height - 138, size: 9, maxWidth: 200 },
     destination: { x: 130, y: height - 150, size: 9, maxWidth: 150 },
     numberOfPassengers: { x: 410, y: height - 150, size: 9, maxWidth: 50 },
     passengersName: { x: 160, y: height - 165, size: 8, maxWidth: 420 },
