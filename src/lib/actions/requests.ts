@@ -1220,3 +1220,32 @@ export const completeTransportRequest = authedProcedure
       getErrorMessage(error);
     }
   });
+
+export const assignJobTime = authedProcedure
+  .createServerAction()
+  .input(
+    z.object({
+      requestId: z.string(),
+      path: z.string(),
+      date: z.date(),
+    })
+  )
+  .handler(async ({ ctx, input }) => {
+    const { user } = ctx;
+    const { path, requestId, date } = input;
+
+    try {
+      const a = await db.jobRequest.update({
+        where: {
+          requestId: requestId,
+        },
+        data: {
+          scheduledDateTime: date,
+        },
+      });
+      console.log(a)
+      return revalidatePath(path);
+    } catch (error) {
+      getErrorMessage(error);
+    }
+  });

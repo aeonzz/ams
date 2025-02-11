@@ -23,6 +23,7 @@ export const JobRequestSchema = z.object({
   location: z.string(),
   startDate: z.coerce.date().nullable(),
   endDate: z.coerce.date().nullable(),
+  scheduledDateTime: z.coerce.date().nullable(),
   jobType: z.string(),
   proofImages: z.string().array(),
   images: z.string().array(),

@@ -63,7 +63,6 @@ interface RequestDetailsProps {
 export default function RequestDetails({ params }: RequestDetailsProps) {
   const currentUser = useSession();
   const isDesktop = useMediaQuery("(min-width: 769px)");
-  const dialogManager = useDialogManager();
   const [sheetOpen, setSheetOpen] = React.useState(false);
   const { data, isLoading, isError, refetch } = useRequest(params);
 
@@ -326,6 +325,14 @@ export default function RequestDetails({ params }: RequestDetailsProps) {
                     }
                     allowedDepartment={data.departmentId}
                   />
+                )}
+                {data.jobRequest?.scheduledDateTime && (
+                  <div>
+                    <P className="mb-1 text-sm">Date and Time schedule</P>
+                    <div className="flex items-center space-x-2 p-1">
+                      <P>{format(data.jobRequest?.scheduledDateTime, "P p")}</P>
+                    </div>
+                  </div>
                 )}
               </div>
             </div>

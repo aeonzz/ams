@@ -71,6 +71,7 @@ import { ClientRoleGuard } from "@/components/client-role-guard";
 import { AlertCard } from "@/components/ui/alert-card";
 import CancelRequest from "./cancel-request";
 import { useMediaQuery } from "usehooks-ts";
+import AssignJobTime from "./assign-job-time";
 
 interface JobRequestReviewerActionsProps {
   request: RequestWithRelations;
@@ -437,6 +438,11 @@ export default function JobRequestReviewerActions({
                 )}
                 {request.jobRequest?.assignedUser && (
                   <div>
+                    <AssignJobTime
+                      requestId={request.id}
+                      setIsOpen={setIsOpen}
+                      date={request.jobRequest.scheduledDateTime}
+                    />
                     <div className="flex items-center justify-between">
                       <P className="text-xs text-muted-foreground">
                         Assigned Personnel:

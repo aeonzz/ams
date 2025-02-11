@@ -23,7 +23,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Button } from "./button";
+import { Button, buttonVariants } from "./button";
 import { Calendar } from "./calendar";
 import { TimePicker } from "./time-picker";
 import {
@@ -39,11 +39,17 @@ import {
 import LoadingSpinner from "../loaders/loading-spinner";
 import { CalendarIcon } from "lucide-react";
 import { cn, isDateInPast } from "@/lib/utils";
+import type { VariantProps } from "class-variance-authority";
+
+
+type ButtonSizeType = VariantProps<typeof buttonVariants>["size"];
 
 interface DateTimePickerProps<T extends FieldValues> {
   form: UseFormReturn<T>;
   name: Path<T>;
   isLoading?: boolean;
+  size?: ButtonSizeType;
+  className?: string;
   disabled: boolean;
   disabledDates?: Date[];
   disabledTimeRanges?: { start: Date; end: Date }[];
@@ -118,6 +124,8 @@ export default function DateTimePicker<T extends FieldValues>({
   disabledDates = [],
   disabledTimeRanges = [],
   children,
+  className,
+  size,
 }: DateTimePickerProps<T>) {
   const [selectedMonth, setSelectedMonth] = React.useState(
     new Date().getMonth()
@@ -175,7 +183,7 @@ export default function DateTimePicker<T extends FieldValues>({
         control={form.control}
         name={name}
         render={({ field }) => (
-          <FormItem className="flex flex-col">
+          <FormItem className={cn("flex flex-col", className)}>
             {label && (
               <FormLabel className="text-left">
                 {label} {children}
@@ -186,6 +194,7 @@ export default function DateTimePicker<T extends FieldValues>({
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
+                    size={size}
                     disabled={disabled || isLoading}
                     className={cn(
                       "justify-start text-left font-normal",

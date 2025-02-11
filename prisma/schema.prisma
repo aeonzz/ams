@@ -188,6 +188,7 @@ model JobRequest {
   location             String
   startDate            DateTime?
   endDate              DateTime?
+  scheduledDateTime    DateTime?
   jobType              String
   proofImages          String[]
   images               String[]
